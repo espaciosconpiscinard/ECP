@@ -31,7 +31,7 @@ const Layout = ({ children, currentView, setCurrentView }) => {
             >
               {sidebarOpen ? <X size={24} /> : <Menu size={24} />}
             </button>
-            <h1 className="text-xl font-bold text-gray-800">Gestión de Villas</h1>
+            <h1 className="text-xl font-bold text-blue-600">Espacios Con Piscina</h1>
           </div>
           <div className="flex items-center space-x-4">
             <div className="text-sm text-right" data-testid="user-info">
