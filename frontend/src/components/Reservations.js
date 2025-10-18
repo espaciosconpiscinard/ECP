@@ -653,16 +653,30 @@ const Reservations = () => {
                   </select>
                 </div>
 
-                {/* Precio Base (auto desde villa) */}
-                <div className="col-span-2">
-                  <Label>Precio Base</Label>
+                {/* Precio al Cliente (editable) */}
+                <div>
+                  <Label>Precio al Cliente *</Label>
                   <Input
                     type="number"
                     step="0.01"
                     value={formData.base_price}
-                    onChange={(e) => setFormData({ ...formData, base_price: parseFloat(e.target.value) })}
+                    onChange={(e) => setFormData({ ...formData, base_price: parseFloat(e.target.value) || 0 })}
+                    required
                     data-testid="base-price-input"
                   />
+                </div>
+
+                {/* Precio al Propietario (editable) */}
+                <div>
+                  <Label>Pago al Propietario</Label>
+                  <Input
+                    type="number"
+                    step="0.01"
+                    value={formData.owner_price}
+                    onChange={(e) => setFormData({ ...formData, owner_price: parseFloat(e.target.value) || 0 })}
+                    data-testid="owner-price-input"
+                  />
+                  <p className="text-xs text-gray-500 mt-1">Se registrará la deuda automáticamente</p>
                 </div>
                 
                 {/* Horas Extras */}
