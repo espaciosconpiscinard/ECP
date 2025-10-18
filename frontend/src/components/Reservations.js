@@ -1,12 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import { getReservations, getCustomers, createReservation, updateReservation, deleteReservation } from '../api/api';
+import { getReservations, getCustomers, getVillas, getExtraServices, createReservation, updateReservation, deleteReservation } from '../api/api';
 import { Button } from './ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from './ui/card';
 import { Input } from './ui/input';
 import { Label } from './ui/label';
 import { Alert, AlertDescription } from './ui/alert';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from './ui/dialog';
-import { Plus, Edit, Trash2, Printer, Search } from 'lucide-react';
+import { Plus, Edit, Trash2, Printer, Search, X } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import CustomerDialog from './CustomerDialog';
 
@@ -14,26 +14,41 @@ const Reservations = () => {
   const { user } = useAuth();
   const [reservations, setReservations] = useState([]);
   const [customers, setCustomers] = useState([]);
+  const [villas, setVillas] = useState([]);
+  const [extraServices, setExtraServices] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [searchTerm, setSearchTerm] = useState('');
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [editingReservation, setEditingReservation] = useState(null);
+  const [selectedExtraServices, setSelectedExtraServices] = useState([]);
+  const [showExtraServices, setShowExtraServices] = useState(false);
+  
   const [formData, setFormData] = useState({
     customer_id: '',
     customer_name: '',
-    villa_name: '',
-    check_in: '',
-    check_out: '',
-    total_amount: 0,
-    deposit: 0,
-    amount_paid: 0,
-    currency: 'DOP',
+    villa_id: '',
+    villa_code: '',
+    villa_description: '',
+    rental_type: 'pasadia',
+    event_type: '',
+    reservation_date: new Date().toISOString().split('T')[0],
+    check_in_time: '9:00 AM',
+    check_out_time: '8:00 PM',
     guests: 1,
+    base_price: 0,
     extra_hours: 0,
     extra_hours_cost: 0,
-    additional_guests: 0,
-    additional_guests_cost: 0,
+    extra_services: [],
+    extra_services_total: 0,
+    subtotal: 0,
+    discount: 0,
+    total_amount: 0,
+    deposit: 0,
+    payment_method: 'efectivo',
+    payment_details: '',
+    amount_paid: 0,
+    currency: 'DOP',
     notes: '',
     status: 'confirmed'
   });
