@@ -10,7 +10,7 @@ const Layout = ({ children, currentView, setCurrentView }) => {
   const menuItems = [
     { id: 'dashboard', label: 'Dashboard', icon: Home },
     { id: 'reservations', label: 'Reservaciones', icon: FileText },
-    { id: 'owners', label: 'Propietarios', icon: Building },
+    { id: 'owners', label: 'Villas', icon: Building },
     { id: 'expenses', label: 'Gastos', icon: DollarSign },
   ];
 
