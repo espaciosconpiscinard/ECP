@@ -263,31 +263,62 @@ const Reservations = () => {
     printWindow.document.write(`
       <html>
         <head>
-          <title>Factura - ${reservation.invoice_number}</title>
+          <title>Factura ${reservation.invoice_number}</title>
           <style>
-            body { font-family: Arial, sans-serif; padding: 40px; }
-            h1 { color: #333; border-bottom: 2px solid #333; padding-bottom: 10px; }
-            .info { margin: 20px 0; }
-            .info-row { display: flex; justify-content: space-between; margin: 10px 0; }
-            .label { font-weight: bold; }
-            .total { font-size: 18px; font-weight: bold; background: #f0f0f0; padding: 10px; margin-top: 20px; }
-            @media print { button { display: none; } }
+            * { margin: 0; padding: 0; box-sizing: border-box; }
+            body { font-family: Arial, sans-serif; padding: 30px; color: #333; }
+            .header { text-align: center; border-bottom: 3px solid #2563eb; padding-bottom: 20px; margin-bottom: 20px; }
+            .company-name { font-size: 28px; font-weight: bold; color: #2563eb; margin-bottom: 8px; }
+            .company-slogan { font-size: 14px; color: #666; margin-bottom: 10px; }
+            .company-info { font-size: 11px; line-height: 1.6; color: #555; }
+            .invoice-title { background: #2563eb; color: white; padding: 12px; text-align: center; font-size: 22px; font-weight: bold; margin: 20px 0; }
+            .invoice-number { text-align: right; font-size: 18px; font-weight: bold; color: #2563eb; margin-bottom: 20px; }
+            .info-section { margin: 20px 0; }
+            .info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px; }
+            .info-row { display: flex; padding: 8px; border-bottom: 1px solid #e5e7eb; }
+            .info-row:nth-child(even) { background: #f9fafb; }
+            .label { font-weight: bold; min-width: 150px; color: #374151; }
+            .value { flex: 1; color: #1f2937; }
+            .services-section { margin: 25px 0; }
+            .services-table { width: 100%; border-collapse: collapse; margin: 15px 0; }
+            .services-table th { background: #2563eb; color: white; padding: 10px; text-align: left; font-size: 13px; }
+            .services-table td { border: 1px solid #e5e7eb; padding: 10px; font-size: 13px; }
+            .services-table tr:nth-child(even) { background: #f9fafb; }
+            .totals-section { margin-top: 30px; padding: 20px; background: #f3f4f6; border: 2px solid #2563eb; border-radius: 8px; }
+            .total-row { display: flex; justify-content: space-between; margin: 8px 0; font-size: 15px; padding: 5px 0; }
+            .total-row.subtotal { border-top: 1px solid #cbd5e1; padding-top: 10px; }
+            .total-row.final { font-size: 20px; font-weight: bold; color: #2563eb; border-top: 2px solid #2563eb; padding-top: 12px; margin-top: 12px; }
+            .payment-info { background: #eff6ff; padding: 15px; border-left: 4px solid #2563eb; margin: 20px 0; }
+            .notes-section { margin: 20px 0; padding: 15px; background: #fef3c7; border-left: 4px solid #f59e0b; }
+            .footer { margin-top: 40px; padding-top: 20px; border-top: 2px solid #e5e7eb; font-size: 10px; line-height: 1.6; color: #6b7280; }
+            .footer-title { font-weight: bold; color: #374151; margin-bottom: 8px; }
+            .print-button { margin: 20px auto; display: block; padding: 12px 30px; background: #2563eb; color: white; border: none; border-radius: 6px; font-size: 16px; cursor: pointer; }
+            .print-button:hover { background: #1d4ed8; }
+            @media print { .print-button { display: none; } }
           </style>
         </head>
         <body>
-          <h1>FACTURA DE RESERVACIÓN</h1>
-          <div class="info">
-            <div class="info-row">
-              <span class="label">Número de Factura:</span>
-              <span>${reservation.invoice_number}</span>
+          <div class="header">
+            <div class="company-name">ESPACIOS CON PISCINA</div>
+            <div class="company-slogan">ECP, SRL</div>
+            <div class="company-info">
+              RNC: 1-33-24652-1<br/>
+              Calle Mencia #5, Ensanche Los Tainos<br/>
+              San Isidro, Santo Domingo Este, República Dominicana<br/>
+              Oficina: 829-953-8401 | WhatsApp Ventas: 829-904-4245
             </div>
+          </div>
+          
+          <div class="invoice-number">FACTURA N° ${reservation.invoice_number}</div>
+          
+          <div class="info-section">
             <div class="info-row">
               <span class="label">Cliente:</span>
-              <span>${reservation.customer_name}</span>
+              <span class="value">${reservation.customer_name}</span>
             </div>
             <div class="info-row">
               <span class="label">Villa:</span>
-              <span>${reservation.villa_name}</span>
+              <span class="value">${reservation.villa_code || reservation.villa_name}</span>
             </div>
             <div class="info-row">
               <span class="label">Check-in:</span>
