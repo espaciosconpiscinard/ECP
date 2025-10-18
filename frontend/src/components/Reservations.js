@@ -257,8 +257,8 @@ const Reservations = () => {
   };
 
   const handlePrint = (reservation) => {
-    const printWindow = window.open('', '', 'width=800,height=600');
-    const balanceDue = reservation.total_amount - reservation.amount_paid;
+    const printWindow = window.open('', '', 'width=900,height=700');
+    const balanceDue = reservation.balance_due || 0;
     
     printWindow.document.write(`
       <html>
