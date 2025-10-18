@@ -88,15 +88,24 @@ const Reservations = () => {
     
     const subtotal = basePrice + extraHoursCost + extraServicesTotal;
     const discount = parseFloat(formData.discount) || 0;
-    const total = subtotal - discount;
+    const subtotalAfterDiscount = subtotal - discount;
+    
+    // Calcular ITBIS (18% sobre subtotal sin depósito)
+    let itbisAmount = 0;
+    if (formData.include_itbis) {
+      itbisAmount = subtotalAfterDiscount * 0.18;
+    }
+    
+    const total = subtotalAfterDiscount + itbisAmount;
     
     setFormData(prev => ({
       ...prev,
       extra_services_total: extraServicesTotal,
       subtotal: subtotal,
+      itbis_amount: itbisAmount,
       total_amount: total
     }));
-  }, [formData.base_price, formData.extra_hours_cost, formData.discount, selectedExtraServices]);
+  }, [formData.base_price, formData.extra_hours_cost, formData.discount, formData.include_itbis, selectedExtraServices]);
   
   const handleVillaChange = (villaId) => {
     const villa = villas.find(v => v.id === villaId);
