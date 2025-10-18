@@ -565,27 +565,153 @@ const Reservations = () => {
                     data-testid="extra-hours-cost-input"
                   />
                 </div>
-                <div>
-                  <Label>Personas Adicionales</Label>
-                  <Input
-                    type="number"
-                    min="0"
-                    value={formData.additional_guests}
-                    onChange={(e) => setFormData({ ...formData, additional_guests: parseInt(e.target.value) })}
-                    data-testid="additional-guests-input"
-                  />
+                
+                {/* Checkbox para servicios adicionales */}
+                <div className="col-span-2">
+                  <label className="flex items-center space-x-2 cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={showExtraServices}
+                      onChange={(e) => setShowExtraServices(e.target.checked)}
+                      className="w-4 h-4"
+                    />
+                    <span className="font-medium">¿Lleva servicios adicionales?</span>
+                  </label>
                 </div>
-                <div>
-                  <Label>Costo Personas Adicionales</Label>
+
+                {/* Servicios Extras */}
+                {showExtraServices && (
+                  <div className="col-span-2 border-2 border-blue-200 p-4 rounded-md bg-blue-50">
+                    <div className="flex justify-between items-center mb-3">
+                      <Label className="text-lg font-bold">Servicios Adicionales</Label>
+                      <Button type="button" size="sm" onClick={addExtraService}>
+                        <Plus size={16} className="mr-1" /> Agregar
+                      </Button>
+                    </div>
+                    {selectedExtraServices.map((service, index) => (
+                      <div key={index} className="grid grid-cols-4 gap-2 mb-2 items-end">
+                        <div className="col-span-2">
+                          <Label className="text-xs">Servicio</Label>
+                          <select
+                            value={service.service_id}
+                            onChange={(e) => updateExtraService(index, 'service_id', e.target.value)}
+                            className="w-full p-2 border rounded-md text-sm"
+                          >
+                            <option value="">Seleccionar</option>
+                            {extraServices.map(s => (
+                              <option key={s.id} value={s.id}>{s.name}</option>
+                            ))}
+                          </select>
+                        </div>
+                        <div>
+                          <Label className="text-xs">Cant.</Label>
+                          <Input
+                            type="number"
+                            min="1"
+                            value={service.quantity}
+                            onChange={(e) => updateExtraService(index, 'quantity', parseInt(e.target.value))}
+                            className="text-sm"
+                          />
+                        </div>
+                        <div className="flex items-center space-x-2">
+                          <div className="flex-1">
+                            <Label className="text-xs">Precio</Label>
+                            <Input
+                              type="number"
+                              step="0.01"
+                              value={service.unit_price}
+                              onChange={(e) => updateExtraService(index, 'unit_price', parseFloat(e.target.value))}
+                              className="text-sm"
+                            />
+                          </div>
+                          <Button
+                            type="button"
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => removeExtraService(index)}
+                            className="text-red-600 mt-5"
+                          >
+                            <X size={16} />
+                          </Button>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+
+                {/* Descuento */}
+                <div className="col-span-2">
+                  <Label>Descuento</Label>
                   <Input
                     type="number"
                     step="0.01"
                     min="0"
-                    value={formData.additional_guests_cost}
-                    onChange={(e) => setFormData({ ...formData, additional_guests_cost: parseFloat(e.target.value) })}
-                    data-testid="additional-guests-cost-input"
+                    value={formData.discount}
+                    onChange={(e) => setFormData({ ...formData, discount: parseFloat(e.target.value) || 0 })}
                   />
                 </div>
+
+                {/* Resumen de Totales */}
+                <div className="col-span-2 bg-gray-100 p-4 rounded-md">
+                  <div className="space-y-2">
+                    <div className="flex justify-between">
+                      <span>Subtotal:</span>
+                      <span className="font-bold">{formatCurrency(formData.subtotal, formData.currency)}</span>
+                    </div>
+                    {formData.discount > 0 && (
+                      <div className="flex justify-between text-red-600">
+                        <span>Descuento:</span>
+                        <span>- {formatCurrency(formData.discount, formData.currency)}</span>
+                      </div>
+                    )}
+                    <div className="flex justify-between text-lg font-bold border-t pt-2">
+                      <span>TOTAL:</span>
+                      <span>{formatCurrency(formData.total_amount, formData.currency)}</span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Método de Pago */}
+                <div className="col-span-2">
+                  <Label>Método de Pago *</Label>
+                  <select
+                    value={formData.payment_method}
+                    onChange={(e) => setFormData({ ...formData, payment_method: e.target.value })}
+                    className="w-full p-2 border rounded-md"
+                    required
+                  >
+                    <option value="efectivo">Efectivo</option>
+                    <option value="deposito">Depósito</option>
+                    <option value="transferencia">Transferencia</option>
+                    <option value="mixto">Mixto</option>
+                  </select>
+                </div>
+
+                {/* Depósito */}
+                <div>
+                  <Label>Depósito de Seguridad</Label>
+                  <Input
+                    type="number"
+                    step="0.01"
+                    min="0"
+                    value={formData.deposit}
+                    onChange={(e) => setFormData({ ...formData, deposit: parseFloat(e.target.value) || 0 })}
+                  />
+                </div>
+
+                {/* Monto Pagado */}
+                <div>
+                  <Label>Monto Pagado *</Label>
+                  <Input
+                    type="number"
+                    step="0.01"
+                    min="0"
+                    value={formData.amount_paid}
+                    onChange={(e) => setFormData({ ...formData, amount_paid: parseFloat(e.target.value) || 0 })}
+                    required
+                  />
+                </div>
+
                 <div className="col-span-2">
                   <Label>Estado</Label>
                   <select
