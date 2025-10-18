@@ -344,6 +344,12 @@ const Reservations = () => {
               <span class="label">Villa:</span>
               <span class="value">${reservation.villa_code || reservation.villa_name}</span>
             </div>
+            ${reservation.villa_description ? `
+              <div class="info-row">
+                <span class="label">Descripción:</span>
+                <span class="value">${reservation.villa_description}</span>
+              </div>
+            ` : ''}
             <div class="info-row">
               <span class="label">Tipo de Renta:</span>
               <span class="value">${reservation.rental_type === 'pasadia' ? 'Pasadía' : reservation.rental_type === 'amanecida' ? 'Amanecida' : 'Evento'}</span>
