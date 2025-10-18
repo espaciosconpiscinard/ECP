@@ -5,7 +5,7 @@ import Login from './components/Login';
 import Layout from './components/Layout';
 import Dashboard from './components/Dashboard';
 import Reservations from './components/Reservations';
-import Owners from './components/Owners';
+import VillasManagement from './components/VillasManagement';
 import Expenses from './components/Expenses';
 import './App.css';
 
