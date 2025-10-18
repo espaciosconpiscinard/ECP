@@ -110,13 +110,18 @@ const Reservations = () => {
   const handleVillaChange = (villaId) => {
     const villa = villas.find(v => v.id === villaId);
     if (villa) {
-      let price = 0;
+      let clientPrice = 0;
+      let ownerPrice = 0;
+      
       if (formData.rental_type === 'pasadia') {
-        price = villa.default_price_pasadia;
+        clientPrice = villa.default_price_pasadia;
+        ownerPrice = villa.owner_price_pasadia || 0;
       } else if (formData.rental_type === 'amanecida') {
-        price = villa.default_price_amanecida;
+        clientPrice = villa.default_price_amanecida;
+        ownerPrice = villa.owner_price_amanecida || 0;
       } else if (formData.rental_type === 'evento') {
-        price = villa.default_price_evento;
+        clientPrice = villa.default_price_evento;
+        ownerPrice = villa.owner_price_evento || 0;
       }
       
       setFormData(prev => ({
@@ -124,7 +129,8 @@ const Reservations = () => {
         villa_id: villaId,
         villa_code: villa.code,
         villa_description: villa.description || '',
-        base_price: price
+        base_price: clientPrice,
+        owner_price: ownerPrice
       }));
     }
   };
