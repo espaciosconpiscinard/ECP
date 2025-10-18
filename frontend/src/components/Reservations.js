@@ -321,32 +321,106 @@ const Reservations = () => {
               <span class="value">${reservation.villa_code || reservation.villa_name}</span>
             </div>
             <div class="info-row">
-              <span class="label">Check-in:</span>
-              <span>${new Date(reservation.check_in).toLocaleDateString('es-DO')}</span>
+              <span class="label">Tipo de Renta:</span>
+              <span class="value">${reservation.rental_type === 'pasadia' ? 'Pasadía' : reservation.rental_type === 'amanecida' ? 'Amanecida' : 'Evento'}</span>
             </div>
             <div class="info-row">
-              <span class="label">Check-out:</span>
-              <span>${new Date(reservation.check_out).toLocaleDateString('es-DO')}</span>
+              <span class="label">Fecha:</span>
+              <span class="value">${new Date(reservation.reservation_date).toLocaleDateString('es-DO')}</span>
             </div>
             <div class="info-row">
-              <span class="label">Huéspedes:</span>
-              <span>${reservation.guests}</span>
+              <span class="label">Horario:</span>
+              <span class="value">${reservation.check_in_time} - ${reservation.check_out_time}</span>
             </div>
-            ${reservation.extra_hours > 0 ? `
-              <div class="info-row">
-                <span class="label">Horas Extras:</span>
-                <span>${reservation.extra_hours} (${reservation.currency === 'DOP' ? 'RD$' : '$'} ${reservation.extra_hours_cost})</span>
-              </div>
-            ` : ''}
-            ${reservation.additional_guests > 0 ? `
-              <div class="info-row">
-                <span class="label">Personas Adicionales:</span>
-                <span>${reservation.additional_guests} (${reservation.currency === 'DOP' ? 'RD$' : '$'} ${reservation.additional_guests_cost})</span>
-              </div>
-            ` : ''}
+            <div class="info-row">
+              <span class="label">Personas:</span>
+              <span class="value">${reservation.guests}</span>
+            </div>
           </div>
-          <hr />
-          <div class="info">
+          
+          ${reservation.extra_services && reservation.extra_services.length > 0 ? `
+            <div class="services-section">
+              <h3 style="margin-bottom: 10px; color: #374151;">Desglose de Servicios</h3>
+              <table class="services-table">
+                <thead>
+                  <tr>
+                    <th>Descripción</th>
+                    <th style="text-align: center;">Cantidad</th>
+                    <th style="text-align: right;">Precio Unit.</th>
+                    <th style="text-align: right;">Total</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>Alquiler de Espacio (${reservation.villa_code || reservation.villa_name})</td>
+                    <td style="text-align: center;">1</td>
+                    <td style="text-align: right;">${reservation.currency === 'DOP' ? 'RD$' : '$'} ${(reservation.base_price || 0).toLocaleString('es-DO')}</td>
+                    <td style="text-align: right;">${reservation.currency === 'DOP' ? 'RD$' : '$'} ${(reservation.base_price || 0).toLocaleString('es-DO')}</td>
+                  </tr>
+                  ${reservation.extra_hours && reservation.extra_hours > 0 ? `
+                    <tr>
+                      <td>Horas Extras</td>
+                      <td style="text-align: center;">${reservation.extra_hours}</td>
+                      <td style="text-align: right;">${reservation.currency === 'DOP' ? 'RD$' : '$'} ${((reservation.extra_hours_cost || 0) / reservation.extra_hours).toLocaleString('es-DO')}</td>
+                      <td style="text-align: right;">${reservation.currency === 'DOP' ? 'RD$' : '$'} ${(reservation.extra_hours_cost || 0).toLocaleString('es-DO')}</td>
+                    </tr>
+                  ` : ''}
+                  ${reservation.extra_services.map(service => `
+                    <tr>
+                      <td>${service.service_name}</td>
+                      <td style="text-align: center;">${service.quantity}</td>
+                      <td style="text-align: right;">${reservation.currency === 'DOP' ? 'RD$' : '$'} ${service.unit_price.toLocaleString('es-DO')}</td>
+                      <td style="text-align: right;">${reservation.currency === 'DOP' ? 'RD$' : '$'} ${service.total.toLocaleString('es-DO')}</td>
+                    </tr>
+                  `).join('')}
+                </tbody>
+              </table>
+            </div>
+          ` : ''}
+          
+          <div class="totals-section">
+            <div class="total-row">
+              <span>Subtotal:</span>
+              <span>${reservation.currency === 'DOP' ? 'RD$' : '$'} ${(reservation.subtotal || reservation.total_amount).toLocaleString('es-DO')}</span>
+            </div>
+            ${reservation.discount && reservation.discount > 0 ? `
+              <div class="total-row" style="color: #dc2626;">
+                <span>Descuento:</span>
+                <span>- ${reservation.currency === 'DOP' ? 'RD$' : '$'} ${reservation.discount.toLocaleString('es-DO')}</span>
+              </div>
+            ` : ''}
+            <div class="total-row subtotal">
+              <span>TOTAL:</span>
+              <span>${reservation.currency === 'DOP' ? 'RD$' : '$'} ${reservation.total_amount.toLocaleString('es-DO')}</span>
+            </div>
+            <div class="total-row">
+              <span>Depósito de Seguridad:</span>
+              <span>${reservation.currency === 'DOP' ? 'RD$' : '$'} ${(reservation.deposit || 0).toLocaleString('es-DO')}</span>
+            </div>
+            <div class="total-row">
+              <span>Monto Pagado:</span>
+              <span>${reservation.currency === 'DOP' ? 'RD$' : '$'} ${reservation.amount_paid.toLocaleString('es-DO')}</span>
+            </div>
+            <div class="total-row final">
+              <span>RESTANTE A PAGAR:</span>
+              <span>${reservation.currency === 'DOP' ? 'RD$' : '$'} ${balanceDue.toLocaleString('es-DO')}</span>
+            </div>
+          </div>
+          
+          <div class="payment-info">
+            <strong>Método de Pago:</strong> ${reservation.payment_method ? reservation.payment_method.charAt(0).toUpperCase() + reservation.payment_method.slice(1) : 'No especificado'}
+            ${reservation.payment_details ? `<br/><strong>Detalles:</strong> ${reservation.payment_details}` : ''}
+          </div>
+          
+          ${reservation.notes ? `
+            <div class="notes-section">
+              <strong>Notas Adicionales:</strong><br/>
+              ${reservation.notes}
+            </div>
+          ` : ''}
+          
+          <div class="footer">
+            <div class="footer-title">POLÍTICAS Y CONDICIONES:</div>
             <div class="info-row">
               <span class="label">Total:</span>
               <span>${reservation.currency === 'DOP' ? 'RD$' : '$'} ${reservation.total_amount.toLocaleString('es-DO')}</span>
