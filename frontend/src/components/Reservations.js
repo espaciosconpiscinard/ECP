@@ -667,39 +667,6 @@ const Reservations = () => {
                   </select>
                 </div>
 
-                {/* Precio Base (viene de la villa, editable si necesitas) */}
-                <div className="col-span-2 bg-gray-50 p-3 rounded-md border">
-                  <div className="flex justify-between items-center mb-2">
-                    <Label className="text-sm font-bold">Precio de la Villa</Label>
-                    <span className="text-xs text-gray-500">(Editable si hay cambios)</span>
-                  </div>
-                  <div className="grid grid-cols-2 gap-3">
-                    <div>
-                      <Label className="text-xs">Precio al Cliente *</Label>
-                      <Input
-                        type="number"
-                        step="0.01"
-                        value={formData.base_price}
-                        onChange={(e) => setFormData({ ...formData, base_price: parseFloat(e.target.value) || 0 })}
-                        required
-                        data-testid="base-price-input"
-                      />
-                    </div>
-                    <div>
-                      <Label className="text-xs">Pago al Propietario *</Label>
-                      <Input
-                        type="number"
-                        step="0.01"
-                        value={formData.owner_price}
-                        onChange={(e) => setFormData({ ...formData, owner_price: parseFloat(e.target.value) || 0 })}
-                        required
-                        data-testid="owner-price-input"
-                      />
-                    </div>
-                  </div>
-                  <p className="text-xs text-gray-500 mt-2">✓ Los precios se cargan automáticamente de la villa seleccionada</p>
-                </div>
-                
                 {/* Horas Extras */}
                 <div>
                   <Label>Horas Extras</Label>
