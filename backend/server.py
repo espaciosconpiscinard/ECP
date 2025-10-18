@@ -348,5 +348,225 @@ async def delete_reservation(reservation_id: str, current_user: dict = Depends(r
         raise HTTPException(status_code=404, detail="Reservation not found")
     return {"message": "Reservation deleted successfully"}
 
-# Continue with remaining endpoints (owners, expenses, dashboard)...
-# (Parte 2 del servidor - necesito continuar en el siguiente mensaje debido al límite de caracteres)
+# ============ VILLA OWNER ENDPOINTS ============
+
+@api_router.post("/owners", response_model=VillaOwner)
+async def create_owner(owner_data: VillaOwnerCreate, current_user: dict = Depends(get_current_user)):
+    """Create a new villa owner"""
+    owner = VillaOwner(**owner_data.model_dump(), created_by=current_user["id"])
+    doc = prepare_doc_for_insert(owner.model_dump())
+    await db.villa_owners.insert_one(doc)
+    return owner
+
+@api_router.get("/owners", response_model=List[VillaOwner])
+async def get_owners(current_user: dict = Depends(get_current_user)):
+    """Get all villa owners"""
+    owners = await db.villa_owners.find({}, {"_id": 0}).to_list(1000)
+    return [restore_datetimes(o, ["created_at"]) for o in owners]
+
+@api_router.get("/owners/{owner_id}", response_model=VillaOwner)
+async def get_owner(owner_id: str, current_user: dict = Depends(get_current_user)):
+    """Get an owner by ID"""
+    owner = await db.villa_owners.find_one({"id": owner_id}, {"_id": 0})
+    if not owner:
+        raise HTTPException(status_code=404, detail="Owner not found")
+    return restore_datetimes(owner, ["created_at"])
+
+@api_router.put("/owners/{owner_id}", response_model=VillaOwner)
+async def update_owner(owner_id: str, update_data: VillaOwnerUpdate, current_user: dict = Depends(get_current_user)):
+    """Update an owner"""
+    existing = await db.villa_owners.find_one({"id": owner_id}, {"_id": 0})
+    if not existing:
+        raise HTTPException(status_code=404, detail="Owner not found")
+    
+    update_dict = {k: v for k, v in update_data.model_dump(exclude_unset=True).items() if v is not None}
+    
+    if update_dict:
+        await db.villa_owners.update_one({"id": owner_id}, {"$set": update_dict})
+    
+    updated = await db.villa_owners.find_one({"id": owner_id}, {"_id": 0})
+    return restore_datetimes(updated, ["created_at"])
+
+@api_router.delete("/owners/{owner_id}")
+async def delete_owner(owner_id: str, current_user: dict = Depends(require_admin)):
+    """Delete an owner (admin only)"""
+    result = await db.villa_owners.delete_one({"id": owner_id})
+    if result.deleted_count == 0:
+        raise HTTPException(status_code=404, detail="Owner not found")
+    return {"message": "Owner deleted successfully"}
+
+@api_router.post("/owners/{owner_id}/payments", response_model=Payment)
+async def create_owner_payment(owner_id: str, payment_data: PaymentCreate, current_user: dict = Depends(get_current_user)):
+    """Record a payment to an owner"""
+    owner = await db.villa_owners.find_one({"id": owner_id}, {"_id": 0})
+    if not owner:
+        raise HTTPException(status_code=404, detail="Owner not found")
+    
+    payment = Payment(**payment_data.model_dump(), created_by=current_user["id"])
+    doc = prepare_doc_for_insert(payment.model_dump())
+    await db.owner_payments.insert_one(doc)
+    
+    new_amount_paid = owner.get("amount_paid", 0) + payment_data.amount
+    new_balance_due = calculate_balance(owner.get("total_owed", 0), new_amount_paid)
+    
+    await db.villa_owners.update_one(
+        {"id": owner_id},
+        {"$set": {"amount_paid": new_amount_paid, "balance_due": new_balance_due}}
+    )
+    
+    return payment
+
+@api_router.get("/owners/{owner_id}/payments", response_model=List[Payment])
+async def get_owner_payments(owner_id: str, current_user: dict = Depends(get_current_user)):
+    """Get all payments for an owner"""
+    payments = await db.owner_payments.find({"owner_id": owner_id}, {"_id": 0}).sort("payment_date", -1).to_list(1000)
+    return [restore_datetimes(p, ["payment_date"]) for p in payments]
+
+@api_router.put("/owners/{owner_id}/amounts")
+async def update_owner_amounts(owner_id: str, total_owed: float, current_user: dict = Depends(get_current_user)):
+    """Update owner's total owed and recalculate balance"""
+    owner = await db.villa_owners.find_one({"id": owner_id}, {"_id": 0})
+    if not owner:
+        raise HTTPException(status_code=404, detail="Owner not found")
+    
+    amount_paid = owner.get("amount_paid", 0)
+    balance_due = calculate_balance(total_owed, amount_paid)
+    
+    await db.villa_owners.update_one(
+        {"id": owner_id},
+        {"$set": {"total_owed": total_owed, "balance_due": balance_due}}
+    )
+    
+    return {"message": "Amounts updated successfully", "balance_due": balance_due}
+
+# ============ EXPENSE ENDPOINTS ============
+
+@api_router.post("/expenses", response_model=Expense)
+async def create_expense(expense_data: ExpenseCreate, current_user: dict = Depends(get_current_user)):
+    """Create a new expense"""
+    expense = Expense(**expense_data.model_dump(), created_by=current_user["id"])
+    doc = prepare_doc_for_insert(expense.model_dump())
+    await db.expenses.insert_one(doc)
+    return expense
+
+@api_router.get("/expenses", response_model=List[Expense])
+async def get_expenses(category: Optional[str] = None, current_user: dict = Depends(get_current_user)):
+    """Get all expenses"""
+    query = {}
+    if category:
+        query["category"] = category
+    
+    expenses = await db.expenses.find(query, {"_id": 0}).sort("expense_date", -1).to_list(1000)
+    return [restore_datetimes(e, ["expense_date", "created_at"]) for e in expenses]
+
+@api_router.get("/expenses/{expense_id}", response_model=Expense)
+async def get_expense(expense_id: str, current_user: dict = Depends(get_current_user)):
+    """Get an expense by ID"""
+    expense = await db.expenses.find_one({"id": expense_id}, {"_id": 0})
+    if not expense:
+        raise HTTPException(status_code=404, detail="Expense not found")
+    return restore_datetimes(expense, ["expense_date", "created_at"])
+
+@api_router.put("/expenses/{expense_id}", response_model=Expense)
+async def update_expense(expense_id: str, update_data: ExpenseUpdate, current_user: dict = Depends(get_current_user)):
+    """Update an expense"""
+    existing = await db.expenses.find_one({"id": expense_id}, {"_id": 0})
+    if not existing:
+        raise HTTPException(status_code=404, detail="Expense not found")
+    
+    update_dict = {k: v for k, v in update_data.model_dump(exclude_unset=True).items() if v is not None}
+    
+    if update_dict:
+        prepared_update = {}
+        for key, value in update_dict.items():
+            if isinstance(value, datetime):
+                prepared_update[key] = value.isoformat()
+            else:
+                prepared_update[key] = value
+        
+        await db.expenses.update_one({"id": expense_id}, {"$set": prepared_update})
+    
+    updated = await db.expenses.find_one({"id": expense_id}, {"_id": 0})
+    return restore_datetimes(updated, ["expense_date", "created_at"])
+
+@api_router.delete("/expenses/{expense_id}")
+async def delete_expense(expense_id: str, current_user: dict = Depends(require_admin)):
+    """Delete an expense (admin only)"""
+    result = await db.expenses.delete_one({"id": expense_id})
+    if result.deleted_count == 0:
+        raise HTTPException(status_code=404, detail="Expense not found")
+    return {"message": "Expense deleted successfully"}
+
+# ============ DASHBOARD & STATS ENDPOINTS ============
+
+@api_router.get("/dashboard/stats", response_model=DashboardStats)
+async def get_dashboard_stats(current_user: dict = Depends(get_current_user)):
+    """Get dashboard statistics"""
+    all_reservations = await db.reservations.find({}, {"_id": 0}).to_list(10000)
+    
+    total_reservations = len(all_reservations)
+    pending_reservations = len([r for r in all_reservations if r.get("balance_due", 0) > 0])
+    
+    total_revenue_dop = sum(r.get("amount_paid", 0) for r in all_reservations if r.get("currency") == "DOP")
+    total_revenue_usd = sum(r.get("amount_paid", 0) for r in all_reservations if r.get("currency") == "USD")
+    
+    pending_payments_dop = sum(r.get("balance_due", 0) for r in all_reservations if r.get("currency") == "DOP")
+    pending_payments_usd = sum(r.get("balance_due", 0) for r in all_reservations if r.get("currency") == "USD")
+    
+    all_expenses = await db.expenses.find({}, {"_id": 0}).to_list(10000)
+    total_expenses_dop = sum(e.get("amount", 0) for e in all_expenses if e.get("currency") == "DOP")
+    total_expenses_usd = sum(e.get("amount", 0) for e in all_expenses if e.get("currency") == "USD")
+    
+    all_owners = await db.villa_owners.find({}, {"_id": 0}).to_list(1000)
+    total_owners = len(all_owners)
+    owners_balance_due_dop = sum(o.get("balance_due", 0) for o in all_owners)
+    owners_balance_due_usd = 0
+    
+    recent_reservations_raw = await db.reservations.find({}, {"_id": 0}).sort("created_at", -1).limit(5).to_list(5)
+    recent_reservations = [restore_datetimes(r, ["reservation_date", "created_at", "updated_at"]) for r in recent_reservations_raw]
+    
+    pending_payment_reservations_raw = await db.reservations.find(
+        {"balance_due": {"$gt": 0}},
+        {"_id": 0}
+    ).sort("created_at", -1).limit(10).to_list(10)
+    pending_payment_reservations = [restore_datetimes(r, ["reservation_date", "created_at", "updated_at"]) for r in pending_payment_reservations_raw]
+    
+    return DashboardStats(
+        total_reservations=total_reservations,
+        pending_reservations=pending_reservations,
+        total_revenue_dop=total_revenue_dop,
+        total_revenue_usd=total_revenue_usd,
+        pending_payments_dop=pending_payments_dop,
+        pending_payments_usd=pending_payments_usd,
+        total_expenses_dop=total_expenses_dop,
+        total_expenses_usd=total_expenses_usd,
+        total_owners=total_owners,
+        owners_balance_due_dop=owners_balance_due_dop,
+        owners_balance_due_usd=owners_balance_due_usd,
+        recent_reservations=recent_reservations,
+        pending_payment_reservations=pending_payment_reservations
+    )
+
+# ============ HEALTH CHECK ============
+
+@api_router.get("/health")
+async def health_check():
+    """Health check endpoint"""
+    return {"status": "healthy", "service": "espacios-con-piscina-api"}
+
+# Include router in app
+app.include_router(api_router)
+
+# CORS middleware
+app.add_middleware(
+    CORSMiddleware,
+    allow_credentials=True,
+    allow_origins=os.environ.get('CORS_ORIGINS', '*').split(','),
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+# Shutdown event
+@app.on_event("shutdown")
+async def shutdown_event():
+    Database.close_db()
