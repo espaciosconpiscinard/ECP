@@ -452,9 +452,10 @@ const Reservations = () => {
   };
 
   const filteredReservations = reservations.filter(r => 
-    r.customer_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    r.villa_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    r.invoice_number.toLowerCase().includes(searchTerm.toLowerCase())
+    r.customer_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    r.villa_code?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    r.villa_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    r.invoice_number?.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   if (loading) {
