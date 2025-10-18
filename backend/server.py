@@ -281,6 +281,42 @@ async def create_reservation(reservation_data: ReservationCreate, current_user: 
     doc = prepare_doc_for_insert(reservation.model_dump())
     await db.reservations.insert_one(doc)
     
+    # Si hay owner_price, crear/actualizar deuda al propietario de la villa
+    if reservation_data.owner_price > 0 and reservation_data.villa_id:
+        villa = await db.villas.find_one({"id": reservation_data.villa_id}, {"_id": 0})
+        if villa:
+            # Buscar si ya existe un registro del propietario
+            owner_name = f"Propietario {villa['code']}"
+            owner = await db.villa_owners.find_one({"name": owner_name}, {"_id": 0})
+            
+            if not owner:
+                # Crear nuevo propietario
+                from models import VillaOwner
+                import uuid
+                owner = {
+                    "id": str(uuid.uuid4()),
+                    "name": owner_name,
+                    "phone": villa.get("phone", ""),
+                    "email": "",
+                    "villas": [villa["code"]],
+                    "commission_percentage": 0,
+                    "total_owed": reservation_data.owner_price,
+                    "amount_paid": 0,
+                    "balance_due": reservation_data.owner_price,
+                    "notes": f"Auto-generado para {villa['code']}",
+                    "created_at": datetime.now(timezone.utc).isoformat(),
+                    "created_by": current_user["id"]
+                }
+                await db.villa_owners.insert_one(owner)
+            else:
+                # Actualizar deuda existente
+                new_total = owner.get("total_owed", 0) + reservation_data.owner_price
+                new_balance = new_total - owner.get("amount_paid", 0)
+                await db.villa_owners.update_one(
+                    {"id": owner["id"]},
+                    {"$set": {"total_owed": new_total, "balance_due": new_balance}}
+                )
+    
     return reservation
 
 @api_router.get("/reservations", response_model=List[Reservation])
