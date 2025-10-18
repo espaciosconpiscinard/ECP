@@ -54,6 +54,10 @@ class VillaBase(BaseModel):
     description: Optional[str] = None  # Descripción de lo que contiene
     phone: Optional[str] = None  # Teléfono del propietario (opcional)
     
+    # Horarios por defecto
+    default_check_in_time: str = "9:00 AM"
+    default_check_out_time: str = "8:00 PM"
+    
     # Precios al cliente
     default_price_pasadia: float = 0.0
     default_price_amanecida: float = 0.0
