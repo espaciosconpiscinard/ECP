@@ -52,9 +52,18 @@ class VillaBase(BaseModel):
     code: str  # ECPVSH, ECPVWLSL, etc.
     name: str  # Villa Sabrina (interno)
     description: Optional[str] = None  # Descripción de lo que contiene
+    phone: Optional[str] = None  # Teléfono del propietario (opcional)
+    
+    # Precios al cliente
     default_price_pasadia: float = 0.0
     default_price_amanecida: float = 0.0
     default_price_evento: float = 0.0
+    
+    # Precios al propietario (lo que debemos pagar)
+    owner_price_pasadia: float = 0.0
+    owner_price_amanecida: float = 0.0
+    owner_price_evento: float = 0.0
+    
     max_guests: int = 0
     amenities: List[str] = []  # Piscina, Jacuzzi, BBQ, etc.
     is_active: bool = True
