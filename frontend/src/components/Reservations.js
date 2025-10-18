@@ -402,33 +402,105 @@ const Reservations = () => {
                     ))}
                   </select>
                 </div>
+                
+                {/* Tipo de Renta */}
                 <div className="col-span-2">
-                  <Label>Nombre de Villa *</Label>
-                  <Input
-                    value={formData.villa_name}
-                    onChange={(e) => setFormData({ ...formData, villa_name: e.target.value })}
+                  <Label>Tipo de Renta *</Label>
+                  <div className="grid grid-cols-3 gap-2 mt-2">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setFormData({...formData, rental_type: 'pasadia'});
+                        if(formData.villa_id) handleVillaChange(formData.villa_id);
+                      }}
+                      className={`p-3 border-2 rounded-md font-medium ${formData.rental_type === 'pasadia' ? 'border-blue-600 bg-blue-50 text-blue-600' : 'border-gray-300'}`}
+                    >
+                      Pasadía
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setFormData({...formData, rental_type: 'amanecida'});
+                        if(formData.villa_id) handleVillaChange(formData.villa_id);
+                      }}
+                      className={`p-3 border-2 rounded-md font-medium ${formData.rental_type === 'amanecida' ? 'border-blue-600 bg-blue-50 text-blue-600' : 'border-gray-300'}`}
+                    >
+                      Amanecida
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setFormData({...formData, rental_type: 'evento'});
+                        if(formData.villa_id) handleVillaChange(formData.villa_id);
+                      }}
+                      className={`p-3 border-2 rounded-md font-medium ${formData.rental_type === 'evento' ? 'border-blue-600 bg-blue-50 text-blue-600' : 'border-gray-300'}`}
+                    >
+                      Evento
+                    </button>
+                  </div>
+                </div>
+
+                {/* Villa */}
+                <div className="col-span-2">
+                  <Label>Villa *</Label>
+                  <select
+                    value={formData.villa_id}
+                    onChange={(e) => handleVillaChange(e.target.value)}
+                    className="w-full p-2 border rounded-md"
                     required
-                    data-testid="villa-name-input"
+                    data-testid="villa-select"
+                  >
+                    <option value="">Seleccionar villa</option>
+                    {villas.map(v => (
+                      <option key={v.id} value={v.id}>{v.code} - {v.name}</option>
+                    ))}
+                  </select>
+                </div>
+
+                {/* Fecha según tipo de renta */}
+                {formData.rental_type === 'pasadia' ? (
+                  <div className="col-span-2">
+                    <Label>Fecha de Pasadía *</Label>
+                    <Input
+                      type="date"
+                      value={formData.reservation_date}
+                      onChange={(e) => setFormData({ ...formData, reservation_date: e.target.value })}
+                      required
+                      data-testid="reservation-date-input"
+                    />
+                  </div>
+                ) : (
+                  <div className="col-span-2">
+                    <Label>Fecha de Reservación *</Label>
+                    <Input
+                      type="date"
+                      value={formData.reservation_date}
+                      onChange={(e) => setFormData({ ...formData, reservation_date: e.target.value })}
+                      required
+                      data-testid="reservation-date-input"
+                    />
+                  </div>
+                )}
+                
+                {/* Horarios */}
+                <div>
+                  <Label>Hora de Entrada *</Label>
+                  <Input
+                    type="text"
+                    value={formData.check_in_time}
+                    onChange={(e) => setFormData({ ...formData, check_in_time: e.target.value })}
+                    placeholder="9:00 AM"
+                    required
                   />
                 </div>
                 <div>
-                  <Label>Check-in *</Label>
+                  <Label>Hora de Salida *</Label>
                   <Input
-                    type="date"
-                    value={formData.check_in}
-                    onChange={(e) => setFormData({ ...formData, check_in: e.target.value })}
+                    type="text"
+                    value={formData.check_out_time}
+                    onChange={(e) => setFormData({ ...formData, check_out_time: e.target.value })}
+                    placeholder="8:00 PM"
                     required
-                    data-testid="checkin-input"
-                  />
-                </div>
-                <div>
-                  <Label>Check-out *</Label>
-                  <Input
-                    type="date"
-                    value={formData.check_out}
-                    onChange={(e) => setFormData({ ...formData, check_out: e.target.value })}
-                    required
-                    data-testid="checkout-input"
                   />
                 </div>
                 <div>
