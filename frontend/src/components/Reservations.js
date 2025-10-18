@@ -421,23 +421,20 @@ const Reservations = () => {
           
           <div class="footer">
             <div class="footer-title">POLÍTICAS Y CONDICIONES:</div>
-            <div class="info-row">
-              <span class="label">Total:</span>
-              <span>${reservation.currency === 'DOP' ? 'RD$' : '$'} ${reservation.total_amount.toLocaleString('es-DO')}</span>
+            <p>• El depósito de seguridad es <strong>reembolsable</strong> si no hay daños a la propiedad al momento de la salida.</p>
+            <p>• Las fechas y horarios de reservación se garantizan únicamente con el <strong>pago del depósito del 50%</strong> del total.</p>
+            <p>• <strong>No hay reembolsos</strong> por cancelaciones, llegadas tardías o salidas anticipadas.</p>
+            <p>• El número máximo de huéspedes permitidos <strong>no debe ser excedido</strong> bajo ninguna circunstancia.</p>
+            <p>• Cualquier daño causado a la propiedad, muebles, electrodomésticos o amenidades será <strong>cobrado al cliente</strong>.</p>
+            <p>• El cliente debe mantener el espacio limpio y ordenado durante su estadía.</p>
+            <p>• Está prohibido fumar dentro de las instalaciones cerradas.</p>
+            <p>• La música debe mantenerse a un volumen moderado para no molestar a los vecinos.</p>
+            <br/>
+            <div style="text-align: center; margin-top: 15px; padding-top: 15px; border-top: 1px solid #cbd5e1;">
+              <strong>Gracias por preferirnos</strong><br/>
+              <span style="color: #2563eb; font-weight: bold;">ESPACIOS CON PISCINA</span><br/>
+              Para consultas: 829-904-4245 (WhatsApp)
             </div>
-            <div class="info-row">
-              <span class="label">Depósito:</span>
-              <span>${reservation.currency === 'DOP' ? 'RD$' : '$'} ${reservation.deposit.toLocaleString('es-DO')}</span>
-            </div>
-            <div class="info-row">
-              <span class="label">Pagado:</span>
-              <span>${reservation.currency === 'DOP' ? 'RD$' : '$'} ${reservation.amount_paid.toLocaleString('es-DO')}</span>
-            </div>
-            <div class="total">
-              <div class="info-row">
-                <span class="label">RESTANTE A PAGAR:</span>
-                <span>${reservation.currency === 'DOP' ? 'RD$' : '$'} ${balanceDue.toLocaleString('es-DO')}</span>
-              </div>
             </div>
           </div>
           ${reservation.notes ? `
