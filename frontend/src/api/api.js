@@ -15,6 +15,19 @@ export const getCustomer = (id) => axios.get(`${API}/customers/${id}`);
 export const createCustomer = (data) => axios.post(`${API}/customers`, data);
 export const deleteCustomer = (id) => axios.delete(`${API}/customers/${id}`);
 
+// ============ VILLAS ============
+export const getVillas = () => axios.get(`${API}/villas`);
+export const getVilla = (id) => axios.get(`${API}/villas/${id}`);
+export const createVilla = (data) => axios.post(`${API}/villas`, data);
+export const updateVilla = (id, data) => axios.put(`${API}/villas/${id}`, data);
+export const deleteVilla = (id) => axios.delete(`${API}/villas/${id}`);
+
+// ============ EXTRA SERVICES ============
+export const getExtraServices = () => axios.get(`${API}/extra-services`);
+export const createExtraService = (data) => axios.post(`${API}/extra-services`, data);
+export const updateExtraService = (id, data) => axios.put(`${API}/extra-services/${id}`, data);
+export const deleteExtraService = (id) => axios.delete(`${API}/extra-services/${id}`);
+
 // ============ RESERVATIONS ============
 export const getReservations = (status = null) => {
   const url = status ? `${API}/reservations?status=${status}` : `${API}/reservations`;
