@@ -22,6 +22,8 @@ const VillasManagement = () => {
     name: '',
     description: '',
     phone: '',
+    default_check_in_time: '9:00 AM',
+    default_check_out_time: '8:00 PM',
     default_price_pasadia: 0,
     default_price_amanecida: 0,
     default_price_evento: 0,
