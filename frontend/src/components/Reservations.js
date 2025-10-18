@@ -788,6 +788,20 @@ const Reservations = () => {
                   />
                 </div>
 
+                {/* ITBIS Checkbox */}
+                <div className="col-span-2">
+                  <label className="flex items-center space-x-2 cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={formData.include_itbis}
+                      onChange={(e) => setFormData({ ...formData, include_itbis: e.target.checked })}
+                      className="w-4 h-4"
+                    />
+                    <span className="font-medium">Incluir ITBIS (18%)</span>
+                  </label>
+                  <p className="text-xs text-gray-500 ml-6">Se calcula sobre el total sin incluir el depósito de seguridad</p>
+                </div>
+
                 {/* Resumen de Totales */}
                 <div className="col-span-2 bg-gray-100 p-4 rounded-md">
                   <div className="space-y-2">
@@ -799,6 +813,12 @@ const Reservations = () => {
                       <div className="flex justify-between text-red-600">
                         <span>Descuento:</span>
                         <span>- {formatCurrency(formData.discount, formData.currency)}</span>
+                      </div>
+                    )}
+                    {formData.include_itbis && (
+                      <div className="flex justify-between text-blue-600">
+                        <span>ITBIS (18%):</span>
+                        <span>+ {formatCurrency(formData.itbis_amount, formData.currency)}</span>
                       </div>
                     )}
                     <div className="flex justify-between text-lg font-bold border-t pt-2">
