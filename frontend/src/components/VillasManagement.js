@@ -199,6 +199,34 @@ const VillasManagement = () => {
                   />
                 </div>
 
+                {/* HORARIOS POR DEFECTO */}
+                <div className="col-span-2 bg-purple-50 p-4 rounded-md border-2 border-purple-200">
+                  <h3 className="font-bold text-lg mb-3 text-purple-800">🕐 Horario Por Defecto</h3>
+                  <div className="grid grid-cols-2 gap-3">
+                    <div>
+                      <Label className="text-sm">Hora de Entrada *</Label>
+                      <Input
+                        value={formData.default_check_in_time}
+                        onChange={(e) => setFormData({ ...formData, default_check_in_time: e.target.value })}
+                        placeholder="9:00 AM"
+                        required
+                        data-testid="default-checkin-input"
+                      />
+                    </div>
+                    <div>
+                      <Label className="text-sm">Hora de Salida *</Label>
+                      <Input
+                        value={formData.default_check_out_time}
+                        onChange={(e) => setFormData({ ...formData, default_check_out_time: e.target.value })}
+                        placeholder="8:00 PM"
+                        required
+                        data-testid="default-checkout-input"
+                      />
+                    </div>
+                  </div>
+                  <p className="text-xs text-gray-600 mt-2">Este horario se usará por defecto en las reservaciones (editable)</p>
+                </div>
+
                 {/* PRECIOS AL CLIENTE */}
                 <div className="col-span-2 bg-blue-50 p-4 rounded-md border-2 border-blue-200">
                   <h3 className="font-bold text-lg mb-3 text-blue-800">💰 Precios al Cliente</h3>
