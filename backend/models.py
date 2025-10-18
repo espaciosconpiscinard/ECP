@@ -162,12 +162,15 @@ class ReservationUpdate(BaseModel):
     check_out_time: Optional[str] = None
     guests: Optional[int] = None
     base_price: Optional[float] = None
+    owner_price: Optional[float] = None
     extra_hours: Optional[float] = None
     extra_hours_cost: Optional[float] = None
     extra_services: Optional[List[ReservationExtraService]] = None
     extra_services_total: Optional[float] = None
     subtotal: Optional[float] = None
     discount: Optional[float] = None
+    include_itbis: Optional[bool] = None
+    itbis_amount: Optional[float] = None
     total_amount: Optional[float] = None
     deposit: Optional[float] = None
     payment_method: Optional[Literal["efectivo", "deposito", "transferencia", "mixto"]] = None
