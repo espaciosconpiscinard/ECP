@@ -516,41 +516,33 @@ const Reservations = () => {
                     data-testid="guests-input"
                   />
                 </div>
+                
+                {/* Moneda */}
                 <div>
-                  <Label>Total *</Label>
+                  <Label>Moneda *</Label>
+                  <select
+                    value={formData.currency}
+                    onChange={(e) => setFormData({ ...formData, currency: e.target.value })}
+                    className="w-full p-2 border rounded-md"
+                  >
+                    <option value="DOP">Pesos Dominicanos (DOP)</option>
+                    <option value="USD">Dólares (USD)</option>
+                  </select>
+                </div>
+
+                {/* Precio Base (auto desde villa) */}
+                <div className="col-span-2">
+                  <Label>Precio Base</Label>
                   <Input
                     type="number"
                     step="0.01"
-                    min="0"
-                    value={formData.total_amount}
-                    onChange={(e) => setFormData({ ...formData, total_amount: parseFloat(e.target.value) })}
-                    required
-                    data-testid="total-amount-input"
+                    value={formData.base_price}
+                    onChange={(e) => setFormData({ ...formData, base_price: parseFloat(e.target.value) })}
+                    data-testid="base-price-input"
                   />
                 </div>
-                <div>
-                  <Label>Depósito</Label>
-                  <Input
-                    type="number"
-                    step="0.01"
-                    min="0"
-                    value={formData.deposit}
-                    onChange={(e) => setFormData({ ...formData, deposit: parseFloat(e.target.value) })}
-                    data-testid="deposit-input"
-                  />
-                </div>
-                <div>
-                  <Label>Monto Pagado *</Label>
-                  <Input
-                    type="number"
-                    step="0.01"
-                    min="0"
-                    value={formData.amount_paid}
-                    onChange={(e) => setFormData({ ...formData, amount_paid: parseFloat(e.target.value) })}
-                    required
-                    data-testid="amount-paid-input"
-                  />
-                </div>
+                
+                {/* Horas Extras */}
                 <div>
                   <Label>Horas Extras</Label>
                   <Input
