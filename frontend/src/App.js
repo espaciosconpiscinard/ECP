@@ -32,7 +32,7 @@ const AppContent = () => {
       case 'reservations':
         return <Reservations />;
       case 'owners':
-        return <Owners />;
+        return <VillasManagement />;
       case 'expenses':
         return <Expenses />;
       default:
