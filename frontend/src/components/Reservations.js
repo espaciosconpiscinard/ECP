@@ -503,18 +503,8 @@ const Reservations = () => {
                     required
                   />
                 </div>
-                <div>
-                  <Label>Moneda *</Label>
-                  <select
-                    value={formData.currency}
-                    onChange={(e) => setFormData({ ...formData, currency: e.target.value })}
-                    className="w-full p-2 border rounded-md"
-                    data-testid="currency-select"
-                  >
-                    <option value="DOP">Pesos Dominicanos (DOP)</option>
-                    <option value="USD">Dólares (USD)</option>
-                  </select>
-                </div>
+                
+                {/* Huéspedes y Moneda */}
                 <div>
                   <Label>Huéspedes *</Label>
                   <Input
