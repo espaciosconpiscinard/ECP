@@ -419,6 +419,12 @@ const Reservations = () => {
                 <span>- ${reservation.currency === 'DOP' ? 'RD$' : '$'} ${reservation.discount.toLocaleString('es-DO')}</span>
               </div>
             ` : ''}
+            ${reservation.include_itbis && reservation.itbis_amount > 0 ? `
+              <div class="total-row" style="color: #2563eb;">
+                <span>ITBIS (18%):</span>
+                <span>+ ${reservation.currency === 'DOP' ? 'RD$' : '$'} ${reservation.itbis_amount.toLocaleString('es-DO')}</span>
+              </div>
+            ` : ''}
             <div class="total-row subtotal">
               <span>TOTAL:</span>
               <span>${reservation.currency === 'DOP' ? 'RD$' : '$'} ${reservation.total_amount.toLocaleString('es-DO')}</span>
