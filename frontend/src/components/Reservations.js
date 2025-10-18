@@ -59,18 +59,93 @@ const Reservations = () => {
 
   const fetchData = async () => {
     try {
-      const [resResponse, custResponse] = await Promise.all([
+      const [resResponse, custResponse, villasResponse, servicesResponse] = await Promise.all([
         getReservations(),
-        getCustomers()
+        getCustomers(),
+        getVillas(),
+        getExtraServices()
       ]);
       setReservations(resResponse.data);
       setCustomers(custResponse.data);
+      setVillas(villasResponse.data);
+      setExtraServices(servicesResponse.data);
     } catch (err) {
       setError('Error al cargar datos');
       console.error(err);
     } finally {
       setLoading(false);
     }
+  };
+  
+  // Calcular totales automáticamente
+  useEffect(() => {
+    const basePrice = parseFloat(formData.base_price) || 0;
+    const extraHoursCost = parseFloat(formData.extra_hours_cost) || 0;
+    const extraServicesTotal = selectedExtraServices.reduce((sum, s) => sum + (s.total || 0), 0);
+    
+    const subtotal = basePrice + extraHoursCost + extraServicesTotal;
+    const discount = parseFloat(formData.discount) || 0;
+    const total = subtotal - discount;
+    
+    setFormData(prev => ({
+      ...prev,
+      extra_services_total: extraServicesTotal,
+      subtotal: subtotal,
+      total_amount: total
+    }));
+  }, [formData.base_price, formData.extra_hours_cost, formData.discount, selectedExtraServices]);
+  
+  const handleVillaChange = (villaId) => {
+    const villa = villas.find(v => v.id === villaId);
+    if (villa) {
+      let price = 0;
+      if (formData.rental_type === 'pasadia') {
+        price = villa.default_price_pasadia;
+      } else if (formData.rental_type === 'amanecida') {
+        price = villa.default_price_amanecida;
+      } else if (formData.rental_type === 'evento') {
+        price = villa.default_price_evento;
+      }
+      
+      setFormData(prev => ({
+        ...prev,
+        villa_id: villaId,
+        villa_code: villa.code,
+        villa_description: villa.description || '',
+        base_price: price
+      }));
+    }
+  };
+  
+  const addExtraService = () => {
+    setSelectedExtraServices([
+      ...selectedExtraServices,
+      { service_id: '', service_name: '', quantity: 1, unit_price: 0, total: 0 }
+    ]);
+  };
+  
+  const removeExtraService = (index) => {
+    setSelectedExtraServices(selectedExtraServices.filter((_, i) => i !== index));
+  };
+  
+  const updateExtraService = (index, field, value) => {
+    const updated = [...selectedExtraServices];
+    updated[index][field] = value;
+    
+    if (field === 'service_id') {
+      const service = extraServices.find(s => s.id === value);
+      if (service) {
+        updated[index].service_name = service.name;
+        updated[index].unit_price = service.default_price;
+        updated[index].total = service.default_price * updated[index].quantity;
+      }
+    }
+    
+    if (field === 'quantity' || field === 'unit_price') {
+      updated[index].total = updated[index].quantity * updated[index].unit_price;
+    }
+    
+    setSelectedExtraServices(updated);
   };
 
   const handleSubmit = async (e) => {
