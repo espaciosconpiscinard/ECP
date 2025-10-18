@@ -8,6 +8,7 @@ import { Alert, AlertDescription } from './ui/alert';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from './ui/dialog';
 import { Plus, Edit, Trash2, Printer, Search } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
+import CustomerDialog from './CustomerDialog';
 
 const Reservations = () => {
   const { user } = useAuth();
