@@ -129,6 +129,8 @@ const Reservations = () => {
         villa_id: villaId,
         villa_code: villa.code,
         villa_description: villa.description || '',
+        check_in_time: villa.default_check_in_time || '9:00 AM',
+        check_out_time: villa.default_check_out_time || '8:00 PM',
         base_price: clientPrice,
         owner_price: ownerPrice
       }));
