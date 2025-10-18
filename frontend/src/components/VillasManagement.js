@@ -77,6 +77,8 @@ const VillasManagement = () => {
       name: villa.name,
       description: villa.description || '',
       phone: villa.phone || '',
+      default_check_in_time: villa.default_check_in_time || '9:00 AM',
+      default_check_out_time: villa.default_check_out_time || '8:00 PM',
       default_price_pasadia: villa.default_price_pasadia || 0,
       default_price_amanecida: villa.default_price_amanecida || 0,
       default_price_evento: villa.default_price_evento || 0,
