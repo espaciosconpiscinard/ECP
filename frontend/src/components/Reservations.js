@@ -224,6 +224,8 @@ const Reservations = () => {
 
   const resetForm = () => {
     setEditingReservation(null);
+    setSelectedExtraServices([]);
+    setShowExtraServices(false);
     setFormData({
       customer_id: '',
       customer_name: '',
