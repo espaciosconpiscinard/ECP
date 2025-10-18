@@ -153,24 +153,27 @@ const Reservations = () => {
     setError('');
     
     try {
+      const customer = customers.find(c => c.id === formData.customer_id);
+      
+      const dataToSend = {
+        ...formData,
+        customer_name: customer?.name || '',
+        reservation_date: new Date(formData.reservation_date).toISOString(),
+        extra_services: selectedExtraServices.filter(s => s.service_id)
+      };
+      
       if (editingReservation) {
-        await updateReservation(editingReservation.id, formData);
+        await updateReservation(editingReservation.id, dataToSend);
       } else {
-        // Find customer name
-        const customer = customers.find(c => c.id === formData.customer_id);
-        const dataToSend = {
-          ...formData,
-          customer_name: customer?.name || '',
-          check_in: new Date(formData.check_in).toISOString(),
-          check_out: new Date(formData.check_out).toISOString()
-        };
         await createReservation(dataToSend);
       }
+      
       await fetchData();
       setIsFormOpen(false);
       resetForm();
     } catch (err) {
       setError(err.response?.data?.detail || 'Error al guardar reservación');
+      console.error('Error completo:', err.response?.data);
     }
   };
 
