@@ -437,13 +437,9 @@ const Reservations = () => {
             </div>
             </div>
           </div>
-          ${reservation.notes ? `
-            <div class="info">
-              <p class="label">Notas:</p>
-              <p>${reservation.notes}</p>
-            </div>
-          ` : ''}
-          <button onclick="window.print()" style="margin-top: 20px; padding: 10px 20px; background: #333; color: white; border: none; cursor: pointer;">Imprimir</button>
+          </div>
+          
+          <button onclick="window.print()" class="print-button">🖨️ IMPRIMIR FACTURA</button>
         </body>
       </html>
     `);
