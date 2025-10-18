@@ -121,7 +121,8 @@ class ReservationBase(BaseModel):
     guests: int = 1
     
     # Precios
-    base_price: float  # Precio base de la villa
+    base_price: float  # Precio base de la villa al cliente
+    owner_price: float = 0.0  # Precio a pagar al propietario
     extra_hours: float = 0.0
     extra_hours_cost: float = 0.0
     
@@ -132,6 +133,8 @@ class ReservationBase(BaseModel):
     # Totales
     subtotal: float
     discount: float = 0.0
+    include_itbis: bool = False  # Si se incluye ITBIS
+    itbis_amount: float = 0.0  # Monto del ITBIS (18%)
     total_amount: float
     
     # Pagos
