@@ -269,7 +269,10 @@ const Reservations = () => {
             <form onSubmit={handleSubmit} className="space-y-4">
               <div className="grid grid-cols-2 gap-4">
                 <div className="col-span-2">
-                  <Label>Cliente *</Label>
+                  <div className="flex justify-between items-center mb-2">
+                    <Label>Cliente *</Label>
+                    <CustomerDialog onCustomerCreated={fetchData} />
+                  </div>
                   <select
                     value={formData.customer_id}
                     onChange={(e) => setFormData({ ...formData, customer_id: e.target.value })}
