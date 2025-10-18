@@ -194,11 +194,20 @@ const Reservations = () => {
       base_price: reservation.base_price,
       extra_hours: reservation.extra_hours || 0,
       extra_hours_cost: reservation.extra_hours_cost || 0,
-      additional_guests: reservation.additional_guests || 0,
-      additional_guests_cost: reservation.additional_guests_cost || 0,
+      extra_services_total: reservation.extra_services_total || 0,
+      subtotal: reservation.subtotal,
+      discount: reservation.discount || 0,
+      total_amount: reservation.total_amount,
+      deposit: reservation.deposit || 0,
+      payment_method: reservation.payment_method,
+      payment_details: reservation.payment_details || '',
+      amount_paid: reservation.amount_paid,
+      currency: reservation.currency,
       notes: reservation.notes || '',
       status: reservation.status
     });
+    setSelectedExtraServices(reservation.extra_services || []);
+    setShowExtraServices((reservation.extra_services || []).length > 0);
     setIsFormOpen(true);
   };
 
