@@ -1,6 +1,6 @@
 from pydantic import BaseModel, Field, ConfigDict, EmailStr
-from typing import Optional, List, Literal
-from datetime import datetime, timezone
+from typing import Optional, List, Literal, Dict
+from datetime import datetime, timezone, time
 import uuid
 
 # ============ USER MODELS ============
@@ -47,22 +47,92 @@ class Customer(CustomerBase):
     created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
     created_by: str  # user_id
 
+# ============ VILLA MODELS ============
+class VillaBase(BaseModel):
+    code: str  # ECPVSH, ECPVWLSL, etc.
+    name: str  # Villa Sabrina (interno)
+    description: Optional[str] = None  # Descripción de lo que contiene
+    default_price_pasadia: float = 0.0
+    default_price_amanecida: float = 0.0
+    default_price_evento: float = 0.0
+    max_guests: int = 0
+    amenities: List[str] = []  # Piscina, Jacuzzi, BBQ, etc.
+    is_active: bool = True
+
+class VillaCreate(VillaBase):
+    pass
+
+class Villa(VillaBase):
+    model_config = ConfigDict(extra="ignore")
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+    created_by: str
+
+# ============ EXTRA SERVICE MODELS ============
+class ExtraServiceBase(BaseModel):
+    name: str  # Buffet, Decoración, DJ, etc.
+    description: Optional[str] = None
+    default_price: float = 0.0
+    is_active: bool = True
+
+class ExtraServiceCreate(ExtraServiceBase):
+    pass
+
+class ExtraService(ExtraServiceBase):
+    model_config = ConfigDict(extra="ignore")
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+    created_by: str
+
 # ============ RESERVATION MODELS ============
+class ReservationExtraService(BaseModel):
+    service_id: str
+    service_name: str
+    quantity: int = 1
+    unit_price: float
+    total: float
+
 class ReservationBase(BaseModel):
     customer_id: str
-    customer_name: str  # Denormalized for easy display
-    villa_name: str
-    check_in: datetime
-    check_out: datetime
-    total_amount: float
-    deposit: float = 0.0
-    amount_paid: float = 0.0
-    currency: Literal["DOP", "USD"] = "DOP"
+    customer_name: str
+    villa_id: str
+    villa_code: str  # ECPVSH
+    villa_description: Optional[str] = None
+    
+    # Tipo de renta
+    rental_type: Literal["pasadia", "amanecida", "evento"] = "pasadia"
+    event_type: Optional[str] = None  # Si es evento, qué tipo
+    
+    # Fechas y horarios
+    reservation_date: datetime
+    check_in_time: str  # "9:00 AM"
+    check_out_time: str  # "8:00 PM"
+    
+    # Personas
     guests: int = 1
+    
+    # Precios
+    base_price: float  # Precio base de la villa
     extra_hours: float = 0.0
     extra_hours_cost: float = 0.0
-    additional_guests: int = 0
-    additional_guests_cost: float = 0.0
+    
+    # Servicios extras
+    extra_services: List[ReservationExtraService] = []
+    extra_services_total: float = 0.0
+    
+    # Totales
+    subtotal: float
+    discount: float = 0.0
+    total_amount: float
+    
+    # Pagos
+    deposit: float = 0.0
+    payment_method: Literal["efectivo", "deposito", "transferencia", "mixto"] = "efectivo"
+    payment_details: Optional[str] = None  # Detalles del pago
+    amount_paid: float = 0.0
+    
+    # Estado
+    currency: Literal["DOP", "USD"] = "DOP"
     notes: Optional[str] = None
     status: Literal["pending", "confirmed", "completed", "cancelled"] = "confirmed"
 
@@ -70,25 +140,35 @@ class ReservationCreate(ReservationBase):
     pass
 
 class ReservationUpdate(BaseModel):
-    villa_name: Optional[str] = None
-    check_in: Optional[datetime] = None
-    check_out: Optional[datetime] = None
-    total_amount: Optional[float] = None
-    deposit: Optional[float] = None
-    amount_paid: Optional[float] = None
-    currency: Optional[Literal["DOP", "USD"]] = None
+    villa_id: Optional[str] = None
+    villa_code: Optional[str] = None
+    villa_description: Optional[str] = None
+    rental_type: Optional[Literal["pasadia", "amanecida", "evento"]] = None
+    event_type: Optional[str] = None
+    reservation_date: Optional[datetime] = None
+    check_in_time: Optional[str] = None
+    check_out_time: Optional[str] = None
     guests: Optional[int] = None
+    base_price: Optional[float] = None
     extra_hours: Optional[float] = None
     extra_hours_cost: Optional[float] = None
-    additional_guests: Optional[int] = None
-    additional_guests_cost: Optional[float] = None
+    extra_services: Optional[List[ReservationExtraService]] = None
+    extra_services_total: Optional[float] = None
+    subtotal: Optional[float] = None
+    discount: Optional[float] = None
+    total_amount: Optional[float] = None
+    deposit: Optional[float] = None
+    payment_method: Optional[Literal["efectivo", "deposito", "transferencia", "mixto"]] = None
+    payment_details: Optional[str] = None
+    amount_paid: Optional[float] = None
+    currency: Optional[Literal["DOP", "USD"]] = None
     notes: Optional[str] = None
     status: Optional[Literal["pending", "confirmed", "completed", "cancelled"]] = None
 
 class Reservation(ReservationBase):
     model_config = ConfigDict(extra="ignore")
     id: str = Field(default_factory=lambda: str(uuid.uuid4()))
-    invoice_number: str
+    invoice_number: str  # Comenzará desde 1600
     balance_due: float  # Calculated: total_amount - amount_paid
     created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
     updated_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
@@ -119,11 +199,11 @@ class VillaOwner(VillaOwnerBase):
     id: str = Field(default_factory=lambda: str(uuid.uuid4()))
     total_owed: float = 0.0
     amount_paid: float = 0.0
-    balance_due: float = 0.0  # Calculated: total_owed - amount_paid
+    balance_due: float = 0.0
     created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
-    created_by: str  # user_id
+    created_by: str
 
-# ============ PAYMENT MODELS (for owner payments) ============
+# ============ PAYMENT MODELS ============
 class PaymentBase(BaseModel):
     owner_id: str
     amount: float
@@ -138,7 +218,7 @@ class Payment(PaymentBase):
     model_config = ConfigDict(extra="ignore")
     id: str = Field(default_factory=lambda: str(uuid.uuid4()))
     payment_date: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
-    created_by: str  # user_id
+    created_by: str
 
 # ============ EXPENSE MODELS ============
 class ExpenseBase(BaseModel):
@@ -166,7 +246,13 @@ class Expense(ExpenseBase):
     model_config = ConfigDict(extra="ignore")
     id: str = Field(default_factory=lambda: str(uuid.uuid4()))
     created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
-    created_by: str  # user_id
+    created_by: str
+
+# ============ INVOICE COUNTER MODEL ============
+class InvoiceCounter(BaseModel):
+    model_config = ConfigDict(extra="ignore")
+    counter_id: str = "main_counter"
+    current_number: int = 1600  # Comenzar desde 1600
 
 # ============ STATS MODELS ============
 class DashboardStats(BaseModel):
