@@ -6,6 +6,7 @@ import Layout from './components/Layout';
 import Dashboard from './components/Dashboard';
 import Reservations from './components/Reservations';
 import VillasManagement from './components/VillasManagement';
+import Categories from './components/Categories';
 import Expenses from './components/Expenses';
 import './App.css';
 
@@ -31,8 +32,10 @@ const AppContent = () => {
         return <Dashboard />;
       case 'reservations':
         return <Reservations />;
-      case 'owners':
+      case 'villas':
         return <VillasManagement />;
+      case 'categories':
+        return <Categories />;
       case 'expenses':
         return <Expenses />;
       default:
