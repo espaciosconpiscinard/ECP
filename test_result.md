@@ -124,11 +124,14 @@ backend:
     file: "/app/backend/models.py, /app/backend/server.py"
     stuck_count: 0
     priority: "high"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
       - working: true
         agent: "main"
         comment: "Creado modelo Category con campos name, description, is_active. Implementados endpoints POST/GET/PUT/DELETE. Al eliminar categoría, villas quedan sin asignar."
+      - working: true
+        agent: "testing"
+        comment: "✅ TESTED: Category CRUD completamente funcional. Creación (POST), lectura (GET), actualización (PUT) y eliminación (DELETE) funcionan correctamente. Ordenamiento alfabético automático verificado. Al eliminar categoría, villas quedan correctamente sin asignar (category_id = null)."
   
   - task: "Villa model - Agregar category_id"
     implemented: true
@@ -136,11 +139,14 @@ backend:
     file: "/app/backend/models.py"
     stuck_count: 0
     priority: "high"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
       - working: true
         agent: "main"
         comment: "Agregado campo category_id opcional al modelo Villa"
+      - working: true
+        agent: "testing"
+        comment: "✅ TESTED: Campo category_id funcional. Villas pueden crearse con y sin categoría. Filtrado por category_id funciona correctamente. Al eliminar categoría, villas quedan sin category_id como esperado."
   
   - task: "Endpoint de villas - Búsqueda y filtrado"
     implemented: true
@@ -148,11 +154,14 @@ backend:
     file: "/app/backend/server.py"
     stuck_count: 0
     priority: "high"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
       - working: true
         agent: "main"
         comment: "Actualizado GET /api/villas para aceptar parámetros search (nombre/código) y category_id"
+      - working: true
+        agent: "testing"
+        comment: "✅ TESTED: Búsqueda y filtrado completamente funcional. Parámetro 'search' busca correctamente por nombre y código (case-insensitive). Parámetro 'category_id' filtra villas por categoría correctamente. Ambos parámetros pueden usarse independientemente."
 
 frontend:
   - task: "Componente Categories - CRUD"
