@@ -766,7 +766,7 @@ const VillasManagementNew = () => {
                 <div className="flex items-center justify-between">
                   <div className="flex items-center space-x-2">
                     <Package className="h-5 w-5 text-blue-600" />
-                    <CardTitle className="text-lg">{service.service_name}</CardTitle>
+                    <CardTitle className="text-lg">{service.name}</CardTitle>
                   </div>
                   {!service.is_active && (
                     <span className="text-xs px-2 py-1 bg-gray-200 text-gray-600 rounded">
@@ -781,20 +781,9 @@ const VillasManagementNew = () => {
                 )}
                 <div className="space-y-2 mb-4">
                   <div className="flex justify-between text-sm">
-                    <span className="text-gray-600">Precio:</span>
+                    <span className="text-gray-600">Precio por Defecto:</span>
                     <span className="font-bold text-lg text-blue-600">
-                      {service.currency === 'DOP' ? 'RD$' : '$'}
-                      {(service.unit_price || 0).toLocaleString('es-DO', {minimumFractionDigits: 2})}
-                    </span>
-                  </div>
-                  <div className="flex justify-between text-sm">
-                    <span className="text-gray-600">Categoría:</span>
-                    <span className="text-gray-800 capitalize">
-                      {service.category === 'decoracion' ? 'Decoración' :
-                       service.category === 'entretenimiento' ? 'Entretenimiento' :
-                       service.category === 'comida_bebida' ? 'Comida y Bebida' :
-                       service.category === 'fotografia' ? 'Fotografía/Video' :
-                       service.category === 'transporte' ? 'Transporte' : 'Otros'}
+                      RD$ {(service.default_price || 0).toLocaleString('es-DO', {minimumFractionDigits: 2})}
                     </span>
                   </div>
                 </div>
