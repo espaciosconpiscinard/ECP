@@ -12,6 +12,7 @@ from datetime import datetime, timezone, timedelta
 from models import (
     UserCreate, UserLogin, User, UserResponse,
     CustomerCreate, Customer,
+    CategoryCreate, CategoryUpdate, Category,
     VillaCreate, Villa,
     ExtraServiceCreate, ExtraService,
     ReservationCreate, ReservationUpdate, Reservation,
