@@ -272,9 +272,24 @@ const Expenses = () => {
                 {editingExpense ? 'Editar Gasto' : 'Nuevo Gasto'}
               </DialogTitle>
             </DialogHeader>
-            <form onSubmit={handleSubmit} className="space-y-4">
+            <form onSubmit={handleSubmit} className="space-y-4 max-h-[70vh] overflow-y-auto">
               <div>
-                <Label>Categoría *</Label>
+                <Label>Categoría Personalizada</Label>
+                <select
+                  value={formData.expense_category_id}
+                  onChange={(e) => setFormData({ ...formData, expense_category_id: e.target.value })}
+                  className="w-full p-2 border rounded-md"
+                >
+                  <option value="">Sin categoría</option>
+                  {expenseCategories.map(cat => (
+                    <option key={cat.id} value={cat.id}>{cat.name}</option>
+                  ))}
+                </select>
+                <p className="text-xs text-gray-500 mt-1">Puedes crear categorías en "Categorías Gastos"</p>
+              </div>
+
+              <div>
+                <Label>Categoría Base *</Label>
                 <select
                   value={formData.category}
                   onChange={(e) => setFormData({ ...formData, category: e.target.value })}
@@ -285,9 +300,11 @@ const Expenses = () => {
                   <option value="local">Pago de Local</option>
                   <option value="nomina">Nómina</option>
                   <option value="variable">Gasto Variable</option>
+                  <option value="pago_propietario">Pago Propietario</option>
                   <option value="otros">Otros</option>
                 </select>
               </div>
+              
               <div>
                 <Label>Descripción *</Label>
                 <Input
@@ -298,6 +315,7 @@ const Expenses = () => {
                   data-testid="description-input"
                 />
               </div>
+              
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <Label>Monto *</Label>
@@ -324,6 +342,7 @@ const Expenses = () => {
                   </select>
                 </div>
               </div>
+              
               <div>
                 <Label>Fecha del Gasto *</Label>
                 <Input
@@ -334,10 +353,93 @@ const Expenses = () => {
                   data-testid="expense-date-input"
                 />
               </div>
+              
               <div>
                 <Label>Estado de Pago *</Label>
                 <select
                   value={formData.payment_status}
+                  onChange={(e) => setFormData({ ...formData, payment_status: e.target.value })}
+                  className="w-full p-2 border rounded-md"
+                  data-testid="payment-status-select"
+                >
+                  <option value="paid">Pagado</option>
+                  <option value="pending">Pendiente</option>
+                </select>
+              </div>
+
+              {/* Recordatorio de Pago */}
+              <div className="border-t pt-4">
+                <div className="flex items-center space-x-2 mb-3">
+                  <input
+                    type="checkbox"
+                    checked={formData.has_payment_reminder}
+                    onChange={(e) => setFormData({ ...formData, has_payment_reminder: e.target.checked })}
+                    id="has_reminder"
+                  />
+                  <Label htmlFor="has_reminder" className="flex items-center">
+                    <Bell className="h-4 w-4 mr-1" />
+                    Configurar Recordatorio de Pago
+                  </Label>
+                </div>
+
+                {formData.has_payment_reminder && (
+                  <div className="space-y-3 pl-6">
+                    <div>
+                      <Label>Día del Mes para Recordatorio *</Label>
+                      <Input
+                        type="number"
+                        min="1"
+                        max="31"
+                        value={formData.payment_reminder_day}
+                        onChange={(e) => setFormData({ ...formData, payment_reminder_day: parseInt(e.target.value) })}
+                        placeholder="Ej: 15"
+                      />
+                      <p className="text-xs text-gray-500 mt-1">
+                        Día del mes en que se debe pagar (1-31)
+                      </p>
+                    </div>
+
+                    <div className="flex items-center space-x-2">
+                      <input
+                        type="checkbox"
+                        checked={formData.is_recurring}
+                        onChange={(e) => setFormData({ ...formData, is_recurring: e.target.checked })}
+                        id="is_recurring"
+                      />
+                      <Label htmlFor="is_recurring">
+                        Gasto Recurrente (se repite cada mes)
+                      </Label>
+                    </div>
+                  </div>
+                )}
+              </div>
+              
+              <div>
+                <Label>Notas</Label>
+                <textarea
+                  value={formData.notes}
+                  onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
+                  className="w-full p-2 border rounded-md"
+                  rows="3"
+                  data-testid="notes-input"
+                />
+              </div>
+
+              {error && (
+                <Alert variant="destructive">
+                  <AlertDescription>{error}</AlertDescription>
+                </Alert>
+              )}
+
+              <div className="flex justify-end space-x-2">
+                <Button type="button" variant="outline" onClick={() => setIsFormOpen(false)}>
+                  Cancelar
+                </Button>
+                <Button type="submit" data-testid="save-expense-button">
+                  {editingExpense ? 'Actualizar' : 'Guardar'}
+                </Button>
+              </div>
+            </form>
                   onChange={(e) => setFormData({ ...formData, payment_status: e.target.value })}
                   className="w-full p-2 border rounded-md"
                   data-testid="payment-status-select"
