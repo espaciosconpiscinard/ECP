@@ -21,7 +21,8 @@ const Layout = ({ children, currentView, setCurrentView }) => {
       { id: 'categories', label: 'Categorías Villas', icon: Tag, roles: ['admin'] },
       { id: 'expense-categories', label: 'Categorías Gastos', icon: Tag, roles: ['admin'] },
       { id: 'expenses', label: 'Gastos', icon: DollarSign, roles: ['admin'] },
-      { id: 'users', label: 'Usuarios', icon: UserCog, roles: ['admin'] }
+      { id: 'users', label: 'Usuarios', icon: UserCog, roles: ['admin'] },
+      { id: 'configuration', label: 'Configuración', icon: Settings, roles: ['admin'] }
     );
   }
 
