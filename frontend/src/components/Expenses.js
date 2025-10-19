@@ -402,6 +402,8 @@ const Expenses = () => {
                   <th className="text-left p-2 text-sm font-medium">Categoría</th>
                   <th className="text-left p-2 text-sm font-medium">Descripción</th>
                   <th className="text-right p-2 text-sm font-medium">Monto</th>
+                  <th className="text-right p-2 text-sm font-medium">Pagado</th>
+                  <th className="text-right p-2 text-sm font-medium">Restante</th>
                   <th className="text-center p-2 text-sm font-medium">Estado</th>
                   <th className="text-center p-2 text-sm font-medium">Acciones</th>
                 </tr>
