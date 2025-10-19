@@ -496,9 +496,9 @@ const VillasManagementNew = () => {
                     <div className="col-span-2">
                       <Label>Nombre del Servicio *</Label>
                       <Input
-                        value={serviceFormData.service_name}
-                        onChange={(e) => setServiceFormData({ ...serviceFormData, service_name: e.target.value })}
-                        placeholder="Ej: Decoración, DJ, Fotografía"
+                        value={serviceFormData.name}
+                        onChange={(e) => setServiceFormData({ ...serviceFormData, name: e.target.value })}
+                        placeholder="Ej: Decoración, DJ, Fotografía, Sillas Plásticas"
                         required
                       />
                     </div>
@@ -514,43 +514,18 @@ const VillasManagementNew = () => {
                       />
                     </div>
 
-                    <div>
-                      <Label>Precio Unitario *</Label>
+                    <div className="col-span-2">
+                      <Label>Precio por Defecto *</Label>
                       <Input
                         type="number"
                         step="0.01"
-                        value={serviceFormData.unit_price}
-                        onChange={(e) => setServiceFormData({ ...serviceFormData, unit_price: parseFloat(e.target.value) })}
+                        value={serviceFormData.default_price}
+                        onChange={(e) => setServiceFormData({ ...serviceFormData, default_price: parseFloat(e.target.value) })}
                         required
                       />
-                    </div>
-
-                    <div>
-                      <Label>Moneda *</Label>
-                      <select
-                        value={serviceFormData.currency}
-                        onChange={(e) => setServiceFormData({ ...serviceFormData, currency: e.target.value })}
-                        className="w-full p-2 border rounded-md"
-                      >
-                        <option value="DOP">Pesos (DOP)</option>
-                        <option value="USD">Dólares (USD)</option>
-                      </select>
-                    </div>
-
-                    <div className="col-span-2">
-                      <Label>Categoría *</Label>
-                      <select
-                        value={serviceFormData.category}
-                        onChange={(e) => setServiceFormData({ ...serviceFormData, category: e.target.value })}
-                        className="w-full p-2 border rounded-md"
-                      >
-                        <option value="decoracion">Decoración</option>
-                        <option value="entretenimiento">Entretenimiento</option>
-                        <option value="comida_bebida">Comida y Bebida</option>
-                        <option value="fotografia">Fotografía/Video</option>
-                        <option value="transporte">Transporte</option>
-                        <option value="otros">Otros</option>
-                      </select>
+                      <p className="text-xs text-gray-500 mt-1">
+                        Este precio se usará como base al agregar el servicio a una reservación
+                      </p>
                     </div>
 
                     <div className="col-span-2 flex items-center space-x-2">
