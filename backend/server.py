@@ -558,9 +558,13 @@ async def add_abono_to_reservation(reservation_id: str, abono_data: AbonoCreate,
     abono_doc["reservation_id"] = reservation_id
     await db.reservation_abonos.insert_one(abono_doc)
     
-    # Update reservation amount_paid and balance_due
+    # Update reservation amount_paid and balance_due: Total + Depósito - Pagado
     new_amount_paid = reservation.get("amount_paid", 0) + abono_data.amount
-    new_balance_due = calculate_balance(reservation.get("total_amount", 0), new_amount_paid)
+    new_balance_due = calculate_balance(
+        reservation.get("total_amount", 0), 
+        new_amount_paid,
+        reservation.get("deposit", 0)
+    )
     
     await db.reservations.update_one(
         {"id": reservation_id},
