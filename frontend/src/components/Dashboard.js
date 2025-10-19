@@ -234,7 +234,7 @@ const Dashboard = () => {
                     <tr key={res.id} className="border-b hover:bg-gray-50">
                       <td className="p-2 text-sm">{res.invoice_number}</td>
                       <td className="p-2 text-sm">{res.customer_name}</td>
-                      <td className="p-2 text-sm">{res.villa_name}</td>
+                      <td className="p-2 text-sm">{res.villa_code}</td>
                       <td className="p-2 text-sm text-right">
                         {formatCurrency(res.total_amount, res.currency)}
                       </td>
