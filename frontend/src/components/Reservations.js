@@ -543,6 +543,23 @@ const Reservations = () => {
     r.invoice_number?.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
+  // Filtrar y ordenar villas alfabéticamente
+  const filteredVillas = villas
+    .filter(v => 
+      v.code?.toLowerCase().includes(villaSearchTerm.toLowerCase()) ||
+      v.name?.toLowerCase().includes(villaSearchTerm.toLowerCase())
+    )
+    .sort((a, b) => a.code.localeCompare(b.code));
+
+  const handleSelectVilla = (villaId) => {
+    const villa = villas.find(v => v.id === villaId);
+    if (villa) {
+      setVillaSearchTerm(`${villa.code} - ${villa.name}`);
+      setShowVillaDropdown(false);
+      handleVillaChange(villaId);
+    }
+  };
+
   if (loading) {
     return <div className="text-center py-8" data-testid="reservations-loading">Cargando...</div>;
   }
