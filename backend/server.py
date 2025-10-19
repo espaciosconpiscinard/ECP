@@ -354,6 +354,31 @@ async def create_reservation(reservation_data: ReservationCreate, current_user: 
     doc = prepare_doc_for_insert(reservation.model_dump())
     await db.reservations.insert_one(doc)
     
+    # AUTO-CREAR GASTO PARA PAGO AL PROPIETARIO
+    if reservation_data.owner_price > 0 and reservation_data.villa_id:
+        villa = await db.villas.find_one({"id": reservation_data.villa_id}, {"_id": 0})
+        if villa:
+            # Crear gasto automático para el pago al propietario
+            from models import Expense
+            import uuid
+            
+            expense = {
+                "id": str(uuid.uuid4()),
+                "category": "pago_propietario",
+                "category_id": None,
+                "description": f"Pago propietario villa {villa['code']} - Factura #{invoice_number}",
+                "amount": reservation_data.owner_price,
+                "currency": reservation_data.currency,
+                "expense_date": reservation_data.reservation_date.isoformat() if isinstance(reservation_data.reservation_date, datetime) else reservation_data.reservation_date,
+                "payment_status": "pending",
+                "notes": f"Auto-generado por reservación. Cliente: {reservation_data.customer_name}",
+                "related_reservation_id": reservation.id,
+                "created_at": datetime.now(timezone.utc).isoformat(),
+                "created_by": current_user["id"]
+            }
+            
+            await db.expenses.insert_one(expense)
+    
     # Si hay owner_price, crear/actualizar deuda al propietario de la villa
     if reservation_data.owner_price > 0 and reservation_data.villa_id:
         villa = await db.villas.find_one({"id": reservation_data.villa_id}, {"_id": 0})
