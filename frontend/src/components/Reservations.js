@@ -633,10 +633,7 @@ const Reservations = () => {
               <div className="grid grid-cols-2 gap-4">
                 {/* Cliente con Buscador */}
                 <div className="col-span-2">
-                  <div className="flex justify-between items-center mb-2">
-                    <Label>Cliente *</Label>
-                    <CustomerDialog onCustomerCreated={fetchCustomersOnly} />
-                  </div>
+                  <Label>Cliente *</Label>
                   <div className="relative">
                     <Input
                       type="text"
