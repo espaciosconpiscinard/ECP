@@ -307,6 +307,8 @@ class Expense(ExpenseBase):
     id: str = Field(default_factory=lambda: str(uuid.uuid4()))
     created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
     created_by: str
+    total_paid: float = 0  # Total de abonos pagados
+    balance_due: float = 0  # Saldo restante (puede ser negativo si se paga de más)
 
 # ============ INVOICE COUNTER MODEL ============
 class InvoiceCounter(BaseModel):
