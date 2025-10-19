@@ -118,6 +118,30 @@ user_problem_statement: |
      - Empleado: solo ve info cliente (sin gastos, sin pago propietario, sin categorías)
 
 backend:
+  - task: "Campo DNI opcional en modelo Customer"
+    implemented: true
+    working: "NA"
+    file: "/app/backend/models.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Agregado campo 'dni' opcional al modelo CustomerBase. Campo disponible para capturar DNI de clientes."
+  
+  - task: "Permitir eliminación de gastos auto-generados"
+    implemented: true
+    working: "NA"
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Modificado endpoint DELETE /api/expenses/{expense_id} para permitir eliminar cualquier gasto, incluyendo los auto-generados por reservaciones. Eliminada la validación que bloqueaba la eliminación de gastos con related_reservation_id."
+
   - task: "Modelo Category - CRUD completo"
     implemented: true
     working: true
