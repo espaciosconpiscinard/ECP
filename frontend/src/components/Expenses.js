@@ -1060,6 +1060,28 @@ const Expenses = () => {
               />
             </div>
 
+            <div>
+              <Label>Notas</Label>
+              <textarea
+                value={abonoFormData.notes}
+                onChange={(e) => setAbonoFormData({ ...abonoFormData, notes: e.target.value })}
+                className="w-full p-2 border rounded-md"
+                rows="2"
+              />
+            </div>
+
+            <div className="flex justify-end space-x-2">
+              <Button type="button" variant="outline" onClick={() => setIsAbonoDialogOpen(false)}>
+                Cancelar
+              </Button>
+              <Button type="submit">
+                Registrar Abono
+              </Button>
+            </div>
+          </form>
+        </DialogContent>
+      </Dialog>
+
       {/* Modal de Gestión de Categorías */}
       <Dialog open={isCategoryFormOpen} onOpenChange={setIsCategoryFormOpen}>
         <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
