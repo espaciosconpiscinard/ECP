@@ -785,7 +785,8 @@ const VillasManagementNew = () => {
             <p className="text-gray-500 text-lg">No hay villas que coincidan con la búsqueda</p>
           </div>
         )}
-      </div>
+        </div>
+      )}
 
       {/* Vista de Servicios */}
       {itemType === 'service' && (
