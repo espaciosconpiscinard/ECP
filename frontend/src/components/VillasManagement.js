@@ -481,16 +481,133 @@ const VillasManagementNew = () => {
                   </Button>
                 </div>
               </form>
+              ) : (
+                /* Formulario de Servicio */
+                <form onSubmit={handleServiceSubmit} className="space-y-4">
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="col-span-2">
+                      <Label>Nombre del Servicio *</Label>
+                      <Input
+                        value={serviceFormData.service_name}
+                        onChange={(e) => setServiceFormData({ ...serviceFormData, service_name: e.target.value })}
+                        placeholder="Ej: Decoración, DJ, Fotografía"
+                        required
+                      />
+                    </div>
+
+                    <div className="col-span-2">
+                      <Label>Descripción</Label>
+                      <textarea
+                        value={serviceFormData.description}
+                        onChange={(e) => setServiceFormData({ ...serviceFormData, description: e.target.value })}
+                        className="w-full p-2 border rounded-md"
+                        rows="3"
+                        placeholder="Describe el servicio..."
+                      />
+                    </div>
+
+                    <div>
+                      <Label>Precio Unitario *</Label>
+                      <Input
+                        type="number"
+                        step="0.01"
+                        value={serviceFormData.unit_price}
+                        onChange={(e) => setServiceFormData({ ...serviceFormData, unit_price: parseFloat(e.target.value) })}
+                        required
+                      />
+                    </div>
+
+                    <div>
+                      <Label>Moneda *</Label>
+                      <select
+                        value={serviceFormData.currency}
+                        onChange={(e) => setServiceFormData({ ...serviceFormData, currency: e.target.value })}
+                        className="w-full p-2 border rounded-md"
+                      >
+                        <option value="DOP">Pesos (DOP)</option>
+                        <option value="USD">Dólares (USD)</option>
+                      </select>
+                    </div>
+
+                    <div className="col-span-2">
+                      <Label>Categoría *</Label>
+                      <select
+                        value={serviceFormData.category}
+                        onChange={(e) => setServiceFormData({ ...serviceFormData, category: e.target.value })}
+                        className="w-full p-2 border rounded-md"
+                      >
+                        <option value="decoracion">Decoración</option>
+                        <option value="entretenimiento">Entretenimiento</option>
+                        <option value="comida_bebida">Comida y Bebida</option>
+                        <option value="fotografia">Fotografía/Video</option>
+                        <option value="transporte">Transporte</option>
+                        <option value="otros">Otros</option>
+                      </select>
+                    </div>
+
+                    <div className="col-span-2 flex items-center space-x-2">
+                      <input
+                        type="checkbox"
+                        checked={serviceFormData.is_active}
+                        onChange={(e) => setServiceFormData({ ...serviceFormData, is_active: e.target.checked })}
+                        id="service_active"
+                      />
+                      <Label htmlFor="service_active">Servicio activo</Label>
+                    </div>
+                  </div>
+
+                  {error && (
+                    <Alert variant="destructive">
+                      <AlertDescription>{error}</AlertDescription>
+                    </Alert>
+                  )}
+
+                  <div className="flex justify-end space-x-2 pt-4 border-t">
+                    <Button type="button" variant="outline" onClick={() => setIsFormOpen(false)}>
+                      Cancelar
+                    </Button>
+                    <Button type="submit">
+                      {editingService ? 'Actualizar Servicio' : 'Guardar Servicio'}
+                    </Button>
+                  </div>
+                </form>
+              )}
             </DialogContent>
           </Dialog>
         )}
+      </div>
+
+      {/* Selector de Tipo (Tabs) */}
+      <div className="flex space-x-2 border-b">
+        <button
+          onClick={() => setItemType('villa')}
+          className={`px-4 py-2 font-semibold transition-colors flex items-center gap-2 ${
+            itemType === 'villa' 
+              ? 'text-blue-600 border-b-2 border-blue-600' 
+              : 'text-gray-500 hover:text-gray-700'
+          }`}
+        >
+          <Building size={18} />
+          Villas ({villas.length})
+        </button>
+        <button
+          onClick={() => setItemType('service')}
+          className={`px-4 py-2 font-semibold transition-colors flex items-center gap-2 ${
+            itemType === 'service' 
+              ? 'text-blue-600 border-b-2 border-blue-600' 
+              : 'text-gray-500 hover:text-gray-700'
+          }`}
+        >
+          <Package size={18} />
+          Servicios ({services.length})
+        </button>
       </div>
 
       {/* Buscador */}
       <div className="flex items-center space-x-2">
         <Search className="text-gray-400" size={20} />
         <Input
-          placeholder="Buscar por código, nombre o categoría..."
+          placeholder={itemType === 'villa' ? "Buscar por código, nombre o categoría..." : "Buscar servicios..."}
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
           className="max-w-md"
