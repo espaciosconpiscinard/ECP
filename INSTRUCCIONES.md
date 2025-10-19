@@ -6,7 +6,7 @@ Sistema completo para gestionar el negocio de alquiler de villas, incluyendo res
 
 ### Acceso al Sistema
 
-La aplicación está disponible en: `https://espacios-piscina.preview.emergentagent.com`
+La aplicación está disponible en: `https://espacios-piscina-1.preview.emergentagent.com`
 
 ### Usuarios Predefinidos
 
