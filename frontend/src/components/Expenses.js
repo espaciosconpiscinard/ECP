@@ -56,7 +56,17 @@ const Expenses = () => {
 
   useEffect(() => {
     fetchExpenses();
+    fetchExpenseCategories();
   }, [filterCategory]);
+
+  const fetchExpenseCategories = async () => {
+    try {
+      const response = await getExpenseCategories();
+      setExpenseCategories(response.data);
+    } catch (err) {
+      console.error('Error al cargar categorías:', err);
+    }
+  };
 
   const fetchExpenses = async () => {
     try {
