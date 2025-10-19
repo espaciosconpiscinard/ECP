@@ -571,12 +571,29 @@ const Reservations = () => {
     )
     .sort((a, b) => a.code.localeCompare(b.code));
 
+  // Filtrar y ordenar clientes alfabéticamente
+  const filteredCustomers = customers
+    .filter(c =>
+      c.name?.toLowerCase().includes(customerSearchTerm.toLowerCase()) ||
+      c.phone?.toLowerCase().includes(customerSearchTerm.toLowerCase())
+    )
+    .sort((a, b) => a.name.localeCompare(b.name));
+
   const handleSelectVilla = (villaId) => {
     const villa = villas.find(v => v.id === villaId);
     if (villa) {
       setVillaSearchTerm(`${villa.code} - ${villa.name}`);
       setShowVillaDropdown(false);
       handleVillaChange(villaId);
+    }
+  };
+
+  const handleSelectCustomer = (customerId) => {
+    const customer = customers.find(c => c.id === customerId);
+    if (customer) {
+      setCustomerSearchTerm(customer.name);
+      setShowCustomerDropdown(false);
+      setFormData({ ...formData, customer_id: customerId, customer_name: customer.name });
     }
   };
 
