@@ -37,6 +37,8 @@ const AppContent = () => {
         return <VillasManagement />;
       case 'categories':
         return <Categories />;
+      case 'customers':
+        return <Customers />;
       case 'expenses':
         return <Expenses />;
       default:
