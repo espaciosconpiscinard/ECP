@@ -606,7 +606,7 @@ const Reservations = () => {
                 <div className="col-span-2">
                   <div className="flex justify-between items-center mb-2">
                     <Label>Cliente *</Label>
-                    <CustomerDialog onCustomerCreated={fetchData} />
+                    <CustomerDialog onCustomerCreated={fetchCustomersOnly} />
                   </div>
                   <select
                     value={formData.customer_id}
