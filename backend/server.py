@@ -521,6 +521,35 @@ async def get_reservation_abonos(reservation_id: str, current_user: dict = Depen
     abonos = await db.reservation_abonos.find({"reservation_id": reservation_id}, {"_id": 0}).sort("payment_date", -1).to_list(100)
     return [restore_datetimes(a, ["payment_date", "created_at"]) for a in abonos]
 
+@api_router.delete("/reservations/{reservation_id}/abonos/{abono_id}")
+async def delete_reservation_abono(reservation_id: str, abono_id: str, current_user: dict = Depends(require_admin)):
+    """Delete an abono from a reservation (admin only) - to correct errors"""
+    # Delete the abono
+    result = await db.reservation_abonos.delete_one({"reservation_id": reservation_id, "id": abono_id})
+    if result.deleted_count == 0:
+        raise HTTPException(status_code=404, detail="Abono not found")
+    
+    # Recalculate reservation balance
+    reservation = await db.reservations.find_one({"id": reservation_id}, {"_id": 0})
+    if reservation:
+        all_abonos = await db.reservation_abonos.find({"reservation_id": reservation_id}, {"_id": 0}).to_list(1000)
+        total_paid = sum(a.get("amount", 0) for a in all_abonos)
+        # Add the original amount_paid from reservation creation
+        original_payment = reservation.get("amount_paid", 0) - sum(a.get("amount", 0) for a in all_abonos if a.get("id") != abono_id)
+        
+        new_amount_paid = reservation.get("amount_paid", 0) - result.deleted_count * next((a.get("amount", 0) for a in all_abonos if a.get("id") == abono_id), 0)
+        new_balance_due = calculate_balance(reservation.get("total_amount", 0), new_amount_paid)
+        
+        await db.reservations.update_one(
+            {"id": reservation_id},
+            {"$set": {
+                "amount_paid": new_amount_paid,
+                "balance_due": new_balance_due
+            }}
+        )
+    
+    return {"message": "Abono deleted successfully"}
+
 # ============ VILLA OWNER ENDPOINTS ============
 
 @api_router.post("/owners", response_model=VillaOwner)
