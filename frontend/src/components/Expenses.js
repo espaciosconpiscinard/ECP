@@ -590,120 +590,194 @@ const Expenses = () => {
           <CardTitle>Lista de Gastos ({expenses.length})</CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="overflow-x-auto">
-            <table className="w-full" data-testid="expenses-table">
-              <thead>
-                <tr className="border-b">
-                  <th className="text-left p-2 text-sm font-medium">Fecha</th>
-                  <th className="text-left p-2 text-sm font-medium">Categoría</th>
-                  <th className="text-left p-2 text-sm font-medium">Descripción</th>
-                  <th className="text-right p-2 text-sm font-medium">Monto</th>
-                  <th className="text-right p-2 text-sm font-medium">Pagado</th>
-                  <th className="text-right p-2 text-sm font-medium">Restante</th>
-                  <th className="text-center p-2 text-sm font-medium">Estado</th>
-                  <th className="text-center p-2 text-sm font-medium">Acciones</th>
-                </tr>
-              </thead>
-              <tbody>
-                {expenses.length > 0 ? (
-                  expenses.map((expense) => (
-                    <tr key={expense.id} className="border-b hover:bg-gray-50">
-                      <td className="p-2 text-sm">
-                        {new Date(expense.expense_date).toLocaleDateString('es-DO')}
-                      </td>
-                      <td className="p-2 text-sm">
-                        <div className="space-y-1">
-                          <span className={`px-2 py-1 rounded text-xs ${getCategoryColor(expense.category)}`}>
-                            {getCategoryLabel(expense.category)}
+          {!groupByCategory ? (
+            <div className="overflow-x-auto">
+              <table className="w-full" data-testid="expenses-table">
+                <thead>
+                  <tr className="border-b">
+                    <th className="text-left p-2 text-sm font-medium">Fecha</th>
+                    <th className="text-left p-2 text-sm font-medium">Categoría</th>
+                    <th className="text-left p-2 text-sm font-medium">Descripción</th>
+                    <th className="text-right p-2 text-sm font-medium">Monto</th>
+                    <th className="text-right p-2 text-sm font-medium">Pagado</th>
+                    <th className="text-right p-2 text-sm font-medium">Restante</th>
+                    <th className="text-center p-2 text-sm font-medium">Estado</th>
+                    <th className="text-center p-2 text-sm font-medium">Acciones</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {expenses.length > 0 ? (
+                    expenses.map((expense) => (
+                      <tr key={expense.id} className="border-b hover:bg-gray-50">
+                        <td className="p-2 text-sm">
+                          {new Date(expense.expense_date).toLocaleDateString('es-DO')}
+                        </td>
+                        <td className="p-2 text-sm">
+                          <div className="space-y-1">
+                            <span className={`px-2 py-1 rounded text-xs ${getCategoryColor(expense.category)}`}>
+                              {getCategoryLabel(expense.category)}
+                            </span>
+                            {getExpenseCategoryName(expense.expense_category_id) && (
+                              <div className="text-xs text-gray-600 font-semibold">
+                                📁 {getExpenseCategoryName(expense.expense_category_id)}
+                              </div>
+                            )}
+                          </div>
+                        </td>
+                        <td className="p-2 text-sm">
+                          <div className="flex items-center space-x-2">
+                            <span>{expense.description}</span>
+                            {expense.has_payment_reminder && (
+                              <Bell size={14} className="text-orange-500" title={`Recordatorio día ${expense.payment_reminder_day}`} />
+                            )}
+                            {expense.is_recurring && (
+                              <span className="text-xs px-1 py-0.5 bg-blue-100 text-blue-700 rounded">Recurrente</span>
+                            )}
+                          </div>
+                        </td>
+                        <td className="p-2 text-sm text-right font-medium">
+                          {formatCurrency(expense.amount, expense.currency)}
+                        </td>
+                        <td className="p-2 text-sm text-right">
+                          {formatCurrency(expense.total_paid || 0, expense.currency)}
+                        </td>
+                        <td className="p-2 text-sm text-right font-medium">
+                          <span className={expense.balance_due > 0 ? 'text-orange-600' : 'text-green-600'}>
+                            {formatCurrency(expense.balance_due || 0, expense.currency)}
                           </span>
-                          {getExpenseCategoryName(expense.expense_category_id) && (
-                            <div className="text-xs text-gray-600 font-semibold">
-                              📁 {getExpenseCategoryName(expense.expense_category_id)}
-                            </div>
-                          )}
-                        </div>
-                      </td>
-                      <td className="p-2 text-sm">
-                        <div className="flex items-center space-x-2">
-                          <span>{expense.description}</span>
-                          {expense.has_payment_reminder && (
-                            <Bell size={14} className="text-orange-500" title={`Recordatorio día ${expense.payment_reminder_day}`} />
-                          )}
-                          {expense.is_recurring && (
-                            <span className="text-xs px-1 py-0.5 bg-blue-100 text-blue-700 rounded">Recurrente</span>
-                          )}
-                        </div>
-                      </td>
-                      <td className="p-2 text-sm text-right font-medium">
-                        {formatCurrency(expense.amount, expense.currency)}
-                      </td>
-                      <td className="p-2 text-sm text-right">
-                        {formatCurrency(expense.total_paid || 0, expense.currency)}
-                      </td>
-                      <td className="p-2 text-sm text-right font-medium">
-                        <span className={expense.balance_due > 0 ? 'text-orange-600' : 'text-green-600'}>
-                          {formatCurrency(expense.balance_due || 0, expense.currency)}
-                        </span>
-                      </td>
-                      <td className="p-2 text-sm text-center">
-                        <span className={`px-2 py-1 rounded text-xs ${
-                          expense.payment_status === 'paid' 
-                            ? 'bg-green-100 text-green-800' 
-                            : 'bg-orange-100 text-orange-800'
-                        }`}>
-                          {expense.payment_status === 'paid' ? 'Pagado' : 'Pendiente'}
-                        </span>
-                      </td>
-                      <td className="p-2 text-sm">
-                        <div className="flex justify-center space-x-1">
-                          <Button
-                            size="sm"
-                            variant="ghost"
-                            onClick={() => handleOpenAbonoDialog(expense)}
-                            className="text-green-600 hover:text-green-700 hover:bg-green-50"
-                            title="Agregar Abono"
-                          >
-                            <DollarSign size={16} />
-                          </Button>
-                          <Button
-                            size="sm"
-                            variant="ghost"
-                            onClick={() => handleEdit(expense)}
-                            className="hover:bg-gray-100"
-                            data-testid="edit-expense-button"
-                          >
-                            <Edit size={16} />
-                          </Button>
-                          {user?.role === 'admin' && (
+                        </td>
+                        <td className="p-2 text-sm text-center">
+                          <span className={`px-2 py-1 rounded text-xs ${
+                            expense.payment_status === 'paid' 
+                              ? 'bg-green-100 text-green-800' 
+                              : 'bg-orange-100 text-orange-800'
+                          }`}>
+                            {expense.payment_status === 'paid' ? 'Pagado' : 'Pendiente'}
+                          </span>
+                        </td>
+                        <td className="p-2 text-sm">
+                          <div className="flex justify-center space-x-1">
                             <Button
                               size="sm"
                               variant="ghost"
-                              onClick={() => handleDelete(expense.id)}
-                              className="text-red-600 hover:text-red-700 hover:bg-red-50"
-                              data-testid="delete-expense-button"
+                              onClick={() => handleOpenAbonoDialog(expense)}
+                              className="text-green-600 hover:text-green-700 hover:bg-green-50"
+                              title="Agregar Abono"
                             >
-                              <Trash2 size={16} />
+                              <DollarSign size={16} />
                             </Button>
-                          )}
-                          {expense.related_reservation_id && (
-                            <span className="text-xs text-gray-500 italic ml-2">
-                              (Auto-generado)
-                            </span>
-                          )}
-                        </div>
+                            <Button
+                              size="sm"
+                              variant="ghost"
+                              onClick={() => handleEdit(expense)}
+                              className="hover:bg-gray-100"
+                              data-testid="edit-expense-button"
+                            >
+                              <Edit size={16} />
+                            </Button>
+                            {user?.role === 'admin' && (
+                              <Button
+                                size="sm"
+                                variant="ghost"
+                                onClick={() => handleDelete(expense.id)}
+                                className="text-red-600 hover:text-red-700 hover:bg-red-50"
+                                data-testid="delete-expense-button"
+                              >
+                                <Trash2 size={16} />
+                              </Button>
+                            )}
+                            {expense.related_reservation_id && (
+                              <span className="text-xs text-gray-500 italic ml-2">
+                                (Auto-generado)
+                              </span>
+                            )}
+                          </div>
+                        </td>
+                      </tr>
+                    ))
+                  ) : (
+                    <tr>
+                      <td colSpan="8" className="text-center py-8 text-gray-500">
+                        No hay gastos registrados
                       </td>
                     </tr>
-                  ))
-                ) : (
-                  <tr>
-                    <td colSpan="8" className="text-center py-8 text-gray-500">
-                      No hay gastos registrados
-                    </td>
-                  </tr>
-                )}
-              </tbody>
-            </table>
-          </div>
+                  )}
+                </tbody>
+              </table>
+            </div>
+          ) : (
+            <div className="space-y-6">
+              {Object.entries(groupExpensesByCategory()).map(([categoryName, categoryExpenses]) => {
+                const categoryTotal = categoryExpenses.reduce((sum, e) => sum + e.amount, 0);
+                return (
+                  <div key={categoryName} className="border rounded-lg p-4">
+                    <div className="flex justify-between items-center mb-4 border-b pb-2">
+                      <h3 className="text-lg font-semibold flex items-center">
+                        📁 {categoryName}
+                        <span className="ml-2 text-sm text-gray-500">({categoryExpenses.length} gastos)</span>
+                      </h3>
+                      <p className="text-lg font-bold text-red-600">
+                        {formatCurrency(categoryTotal, categoryExpenses[0].currency)}
+                      </p>
+                    </div>
+                    <div className="space-y-2">
+                      {categoryExpenses.map((expense) => (
+                        <div key={expense.id} className="flex items-center justify-between p-3 bg-gray-50 rounded-md hover:bg-gray-100">
+                          <div className="flex-1">
+                            <div className="flex items-center space-x-2">
+                              <p className="font-semibold">{expense.description}</p>
+                              {expense.has_payment_reminder && (
+                                <Bell size={14} className="text-orange-500" />
+                              )}
+                              {expense.is_recurring && (
+                                <span className="text-xs px-1 py-0.5 bg-blue-100 text-blue-700 rounded">Recurrente</span>
+                              )}
+                            </div>
+                            <p className="text-sm text-gray-600">
+                              {new Date(expense.expense_date).toLocaleDateString('es-DO')} • 
+                              <span className={`ml-2 ${expense.balance_due > 0 ? 'text-orange-600' : 'text-green-600'}`}>
+                                Restante: {formatCurrency(expense.balance_due || 0, expense.currency)}
+                              </span>
+                            </p>
+                          </div>
+                          <div className="flex items-center space-x-2">
+                            <p className="font-bold text-lg mr-4">
+                              {formatCurrency(expense.amount, expense.currency)}
+                            </p>
+                            <Button
+                              size="sm"
+                              variant="ghost"
+                              onClick={() => handleOpenAbonoDialog(expense)}
+                              className="text-green-600"
+                            >
+                              <DollarSign size={16} />
+                            </Button>
+                            <Button
+                              size="sm"
+                              variant="ghost"
+                              onClick={() => handleEdit(expense)}
+                            >
+                              <Edit size={16} />
+                            </Button>
+                            {user?.role === 'admin' && (
+                              <Button
+                                size="sm"
+                                variant="ghost"
+                                onClick={() => handleDelete(expense.id)}
+                                className="text-red-600"
+                              >
+                                <Trash2 size={16} />
+                              </Button>
+                            )}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          )}
         </CardContent>
       </Card>
 
