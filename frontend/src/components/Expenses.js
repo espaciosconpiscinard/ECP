@@ -440,40 +440,6 @@ const Expenses = () => {
                 </Button>
               </div>
             </form>
-                  onChange={(e) => setFormData({ ...formData, payment_status: e.target.value })}
-                  className="w-full p-2 border rounded-md"
-                  data-testid="payment-status-select"
-                >
-                  <option value="paid">Pagado</option>
-                  <option value="pending">Pendiente</option>
-                </select>
-              </div>
-              <div>
-                <Label>Notas</Label>
-                <textarea
-                  value={formData.notes}
-                  onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
-                  className="w-full p-2 border rounded-md"
-                  rows="3"
-                  data-testid="notes-input"
-                />
-              </div>
-
-              {error && (
-                <Alert variant="destructive">
-                  <AlertDescription>{error}</AlertDescription>
-                </Alert>
-              )}
-
-              <div className="flex justify-end space-x-2">
-                <Button type="button" variant="outline" onClick={() => setIsFormOpen(false)}>
-                  Cancelar
-                </Button>
-                <Button type="submit" data-testid="save-expense-button">
-                  {editingExpense ? 'Actualizar' : 'Guardar'}
-                </Button>
-              </div>
-            </form>
           </DialogContent>
         </Dialog>
       </div>
