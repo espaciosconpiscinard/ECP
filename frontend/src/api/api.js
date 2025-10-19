@@ -83,16 +83,6 @@ export const deleteExpense = (id) => axios.delete(`${API}/expenses/${id}`);
 export const addAbonoToExpense = (expenseId, data) => axios.post(`${API}/expenses/${expenseId}/abonos`, data);
 export const getExpenseAbonos = (expenseId) => axios.get(`${API}/expenses/${expenseId}/abonos`);
 
-// ============ RESERVATIONS ============
-export const getReservations = (status = null) => {
-  const url = status ? `${API}/reservations?status=${status}` : `${API}/reservations`;
-  return axios.get(url);
-};
-export const getReservation = (id) => axios.get(`${API}/reservations/${id}`);
-export const createReservation = (data) => axios.post(`${API}/reservations`, data);
-export const updateReservation = (id, data) => axios.put(`${API}/reservations/${id}`, data);
-export const deleteReservation = (id) => axios.delete(`${API}/reservations/${id}`);
-
 // Abonos to reservations
 export const addAbonoToReservation = (reservationId, data) => axios.post(`${API}/reservations/${reservationId}/abonos`, data);
 export const getReservationAbonos = (reservationId) => axios.get(`${API}/reservations/${reservationId}/abonos`);
