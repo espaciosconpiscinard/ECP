@@ -643,22 +643,70 @@ const Reservations = () => {
                   </div>
                 </div>
 
-                {/* Villa */}
+                {/* Villa con Buscador */}
                 <div className="col-span-2">
                   <Label>Villa *</Label>
-                  <select
-                    value={formData.villa_id}
-                    onChange={(e) => handleVillaChange(e.target.value)}
-                    className="w-full p-2 border rounded-md"
-                    required
-                    data-testid="villa-select"
-                  >
-                    <option value="">Seleccionar villa</option>
-                    {villas.map(v => (
-                      <option key={v.id} value={v.id}>{v.code} - {v.name}</option>
-                    ))}
-                  </select>
+                  <div className="relative">
+                    <Input
+                      type="text"
+                      value={villaSearchTerm}
+                      onChange={(e) => {
+                        setVillaSearchTerm(e.target.value);
+                        setShowVillaDropdown(true);
+                      }}
+                      onFocus={() => setShowVillaDropdown(true)}
+                      placeholder="Buscar por código o nombre de villa..."
+                      className="w-full"
+                      data-testid="villa-search-input"
+                    />
+                    <Search className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={18} />
+                    
+                    {/* Dropdown de villas filtradas */}
+                    {showVillaDropdown && filteredVillas.length > 0 && (
+                      <div className="absolute z-50 w-full mt-1 bg-white border border-gray-300 rounded-md shadow-lg max-h-60 overflow-y-auto">
+                        {filteredVillas.map(villa => (
+                          <div
+                            key={villa.id}
+                            onClick={() => handleSelectVilla(villa.id)}
+                            className="p-3 hover:bg-blue-50 cursor-pointer border-b last:border-b-0"
+                          >
+                            <div className="flex justify-between items-center">
+                              <div>
+                                <p className="font-semibold text-blue-600">{villa.code}</p>
+                                <p className="text-sm text-gray-600">{villa.name}</p>
+                              </div>
+                              <div className="text-right text-sm">
+                                <p className="text-gray-700">
+                                  {formData.rental_type === 'pasadia' && `RD$ ${villa.default_price_pasadia?.toLocaleString()}`}
+                                  {formData.rental_type === 'amanecida' && `RD$ ${villa.default_price_amanecida?.toLocaleString()}`}
+                                  {formData.rental_type === 'evento' && `RD$ ${villa.default_price_evento?.toLocaleString()}`}
+                                </p>
+                              </div>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                    
+                    {/* Mensaje si no hay resultados */}
+                    {showVillaDropdown && villaSearchTerm && filteredVillas.length === 0 && (
+                      <div className="absolute z-50 w-full mt-1 bg-white border border-gray-300 rounded-md shadow-lg p-3 text-center text-gray-500">
+                        No se encontraron villas
+                      </div>
+                    )}
+                  </div>
+                  {!formData.villa_id && (
+                    <p className="text-xs text-red-500 mt-1">* Debes seleccionar una villa</p>
+                  )}
                 </div>
+
+                {/* Click fuera para cerrar dropdown */}
+                {showVillaDropdown && (
+                  <div 
+                    className="fixed inset-0 z-40" 
+                    onClick={() => setShowVillaDropdown(false)}
+                  />
+                )}
 
                 {/* Fecha según tipo de renta */}
                 {formData.rental_type === 'pasadia' ? (
