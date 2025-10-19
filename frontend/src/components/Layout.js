@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { Button } from './ui/button';
-import { Home, Users, FileText, DollarSign, Building, Menu, X, LogOut, Tag } from 'lucide-react';
+import { Home, Users, FileText, DollarSign, Building, Menu, X, LogOut, Tag, UserCog } from 'lucide-react';
 
 const Layout = ({ children, currentView, setCurrentView }) => {
   const { user, logout } = useAuth();
@@ -21,7 +21,7 @@ const Layout = ({ children, currentView, setCurrentView }) => {
       { id: 'categories', label: 'Categorías Villas', icon: Tag, roles: ['admin'] },
       { id: 'expense-categories', label: 'Categorías Gastos', icon: Tag, roles: ['admin'] },
       { id: 'expenses', label: 'Gastos', icon: DollarSign, roles: ['admin'] },
-      { id: 'users', label: 'Usuarios', icon: Users, roles: ['admin'] }
+      { id: 'users', label: 'Usuarios', icon: UserCog, roles: ['admin'] }
     );
   }
 
