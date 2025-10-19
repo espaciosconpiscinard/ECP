@@ -340,6 +340,38 @@ test_plan:
 agent_communication:
   - agent: "main"
     message: |
+      🔧 NUEVAS IMPLEMENTACIONES COMPLETADAS:
+      
+      BACKEND:
+      1. ✅ Campo DNI opcional agregado al modelo Customer
+         - Campo: dni (Optional[str])
+         - Disponible en CustomerBase para creación y actualización
+      
+      2. ✅ Endpoint DELETE /expenses/{expense_id} modificado
+         - Ahora permite eliminar CUALQUIER gasto, incluyendo auto-generados
+         - Eliminada la restricción anterior que bloqueaba gastos con related_reservation_id
+         - Elimina también los abonos asociados al gasto
+      
+      FRONTEND:
+      1. ✅ Componente Customers actualizado con campo DNI
+         - Campo agregado en formData state
+         - Incluido en formulario de creación (opcional)
+         - Agregado a tabla de visualización
+         - Placeholder: "001-1234567-8"
+      
+      2. ✅ Componente Expenses actualizado para eliminar cualquier gasto
+         - Botón de eliminar ahora visible para TODOS los gastos (admin only)
+         - Corregido bug en handleDelete (ahora llama fetchExpenses correctamente)
+         - Agregado indicador visual "(Auto-generado)" para gastos con related_reservation_id
+         - Mejor estilo visual para botón de eliminar
+      
+      SIGUIENTE PASO:
+      - Testing backend: Campo DNI y eliminación de gastos auto-generados
+      - Testing frontend: Formulario de clientes con DNI y eliminación de gastos
+      - Verificar flujo completo end-to-end
+  
+  - agent: "main"
+    message: |
       Implementación completa de nuevas funcionalidades:
       
       BACKEND:
