@@ -3,96 +3,78 @@ The AI engineer successfully initiated and developed a full-stack villa manageme
 </analysis>
 
 <product_requirements>
-The user required a comprehensive villa management application for their business, Espacios Con Piscina. Key features included:
-- **User Management:** Admin and employee roles with simplified data entry for employees.
-- **Reservations/Clients:** Register client data, record payments (paid, total, security deposit), automatic remaining balance calculation, editable invoices (add persons, extra hours), save/print invoices, support for DOP and USD currencies.
-- **Villa Management:** Register villas (initially thought as owners), record payments, total, and remaining balance (automatic calculation). Later refined to include , , , , and  (optional, 18%, not applied to security deposit).
-- **Expenses:** Section to register business expenses (rent, payroll, variable costs).
-- **Dashboard/Reports:** Total monthly income, pending reservations, general statistics, payment notifications.
-- **Branding:** Application name changed from Sistema de Gestión de Villa to Espacios Con Piscina.
-- **Invoice Customization:** Personalized invoice environment with company details (ECP, SRL, RNC, phone, address), flexible pricing (fixed/variable), option to add custom extra services, payment method selection (cash, deposit, transfer), and starting invoice number (e.g., 1600).
-- **Data Import:** Ability to load previous PDF/Excel invoices for data analysis.
-- **UI Enhancements:** Desktop-like app experience, buttons for rental type (Pasadía/Amanecida/Evento), services (buffet, decoration), and removal of price fields from reservation form (moved to villa management).
+The user's core need is a comprehensive villa management application, Espacios Con Piscina. Initial requirements included user management (admin/employee roles), reservation/client management with payment tracking (total, paid, deposit, remaining), editable invoices, and multi-currency support. Villa management needed , , , , and optional ITBIS. An expense tracking section, a dashboard for statistics, and application branding were also requested.
+
+Over time, requirements expanded:
+*   **Invoice Customization:** Professional design, company details, flexible pricing, custom extra services, payment method selection, and starting invoice numbers.
+*   **Villas & Services**: Renaming Villas section to Villas y Servicios to include other services catalog. Villas to be displayed in a list view, clickable for details, with sales users restricted to client-side pricing. Category management for villas with search functionality.
+*   **Abonos (Payments):** Implement partial payment system for reservations and expenses, including tracking  and allowing negative  for returns.
+*   **Expense Management Enhancements:** Auto-register owner payments as expenses upon reservation creation. Introduce a separate system for expense categories (user-creatable, e.g., Luz, Nómina). Implement payment reminders (day of month, recurring) with visual indicators and grouping. Improved search for expenses by invoice, villa, client, or owner.
+*   **Deletion Logic:** Cascade deletion of associated expenses and abonos when a reservation is deleted. Allow deletion of manual expenses, but protect auto-generated ones.
+*   **Customer Management**: A dedicated section for managing customers (CRUD operations) separately from reservations, including optional DNI/passport fields, and a search feature in the reservation form to select existing customers.
 </product_requirements>
 
 <key_technical_concepts>
 - **Full-stack Development:** React (Frontend), FastAPI (Backend), MongoDB (Database).
-- **Authentication:** JWT (JSON Web Tokens) for user roles (Admin, Employee).
-- **Styling:** Tailwind CSS for UI components.
-- **Database Modeling:** Pydantic models for data validation and serialization in FastAPI.
-- **API Design:** RESTful API with  prefix for all backend routes.
-- **Environment Variables:** Strict usage for  and .
+- **Authentication:** JWT for user roles, role-based access control.
+- **Styling:** Tailwind CSS.
+- **Data Validation/Modeling:** Pydantic models.
+- **API Design:** RESTful API with  prefix, environment variables.
+- **State Management:** React Context.
+- **Database Operations**: CRUD, UUIDs for IDs.
 </key_technical_concepts>
 
 <code_architecture>
-The application follows a standard full-stack architecture with separate backend and frontend directories.
+The application employs a standard full-stack architecture with distinct  and  directories.
 
 
 
 -   ****:
-    -   **Importance:** Defines the data structures (Pydantic models) for MongoDB collections and API request/response validation.
-    -   **Changes:** Initially created for User, Customer, Reservation. Later updated to include  model with , , ,  (entry/exit times), and  model to include , , and related fields for invoice customization.
+    -   **Importance:** Defines Pydantic models for data schema and validation.
+    -   **Changes:** Extended to include , ,  (for reservations and expenses).  model updated with , , .  model updated with , , .  model updated with , , , , , , .  model is pending an update for optional .
 -   ****:
-    -   **Importance:** Handles user authentication, password hashing, and JWT token generation/validation.
-    -   **Changes:** Created to implement login, token handling, and role-based access.
+    -   **Importance:** Main FastAPI application defining API routes.
+    -   **Changes:** Added CRUD endpoints for  and . Updated  for search/filter. Modified  to auto-create associated  for owner. Added endpoints for  creation/deletion for both reservations and expenses. Enhanced  for detailed search. Implemented cascade deletion for . Modified  to prevent deletion of auto-generated expenses.
 -   ****:
-    -   **Importance:** Manages the MongoDB connection and provides functions for database operations.
-    -   **Changes:** Created to establish the connection and interact with collections.
+    -   **Importance:** Main React component for routing.
+    -   **Changes:** Updated routing to include  for ,  for , and  for .
 -   ****:
-    -   **Importance:** Main FastAPI application entry point, defines all API routes (prefixed with ), and integrates database and authentication logic.
-    -   **Changes:** Rewritten to incorporate , , and . Expanded significantly to include endpoints for user registration, login, customer management, reservations, villa management (originally owners), extra services, and dashboard statistics. Modified to retrieve  when selecting a villa for a reservation.
+    -   **Importance:** Centralized API client for frontend.
+    -   **Changes:** Added functions for  and  CRUD. Added API calls for  management (create, get, delete) for both reservations and expenses.
 -   ****:
-    -   **Importance:** The main React component that handles routing and overall application layout.
-    -   **Changes:** Updated to include  for global authentication state. Modified to integrate new components like , , , and . Most recently,  was replaced with  in the routing.
+    -   **Importance:** Defines overall UI layout and navigation.
+    -   **Changes:** Updated navigation links to reflect Villas y Servicios. Implemented role-based access for navigation items. Added Clientes link.
 -   ****:
-    -   **Importance:** Provides authentication context to the entire React application.
-    -   **Changes:** Created to manage user login status and JWT tokens.
+    -   **Importance:** Manages client reservations.
+    -   **Changes:** Heavily refactored for expandable list view. Added editable Precio Base de la Villa field. Integrated  functionality. Replaced static villa dropdown with an autocomplete search. Removed  and its functionality, replacing static customer dropdown with a searchable selector, using .
 -   ****:
-    -   **Importance:** Handles user login.
-    -   **Changes:** Branding text updated from Sistema de Gestión de Villa to Espacios Con Piscina.
+    -   **Importance:** Manages villa details.
+    -   **Changes:** Newly created to replace  and . Designed for list view, expandable details, and permission control.
 -   ****:
-    -   **Importance:** Defines the main application layout and navigation.
-    -   **Changes:** Branding text updated in the navigation/header.
+    -   **Importance:** Manages  data.
+    -   **Changes:** Newly created for CRUD operations on villa categories.
 -   ****:
-    -   **Importance:** Manages client reservations, including data entry, editing, and invoice generation.
-    -   **Changes:** This file underwent extensive modifications. It was first updated to include a . Later, it was heavily refactored to incorporate new fields like  (Pasadía/Amanecida/Evento), , , , and to handle automatic calculations. The  function was completely rewritten for a professional, detailed invoice design incorporating company info, villa description, and ITBIS calculation logic. Most recently, price-related input fields (, ) were removed from this form, as they should be managed via the  component.
+    -   **Importance:** Manages business expenses.
+    -   **Changes:** This file underwent multiple complex modifications and subsequent restorations due to persistent frontend errors. Currently, it has a fixed  function (calling ) and the delete button visibility is conditional on admin role and the expense not being . It lacks the advanced category management and reminder UI that was attempted and reverted.
 -   ****:
-    -   **Importance:** Initially intended for managing villa owners.
-    -   **Changes:** Was created but effectively replaced by  to align with user's renaming request.
--   ****:
-    -   **Importance:** Manages the details of individual villas.
-    -   **Changes:** Newly created to replace . Designed to allow adding/editing villas with fields like , , ,  (optional), , , and  (entry/exit times).
--   ****:
-    -   **Importance:** The root HTML file for the React application.
-    -   **Changes:** Document title updated to reflect Espacios Con Piscina.
+    -   **Importance:** Manages customer details.
+    -   **Changes:** Newly created to provide a dedicated section for client management, separating it from the reservation process.
 </code_architecture>
 
 <pending_tasks>
-- **Data Import:** Implement functionality to load and parse existing PDF and Excel invoices for data.
-- **Admin Panel for Villas/Services:** Create a UI for administrators to add/edit villas and extra services directly from the frontend.
+- **Invoice Redesign:** Implement a modern, professional design for printed invoices.
+- **Frontend Expense Management:** Re-implement the advanced expense management features (categories, payment reminders, grouped views) in , ensuring stability.
+- **Services Catalog:** Integrate other services into the Villas y Servicios section.
 </pending_tasks>
 
 <current_work>
-Immediately prior to this summary, the AI engineer was addressing the user's feedback that the Precio al cliente and Pago a propietario fields should be in the Villas management section, not the Reservations form.
+Immediately prior to this summary request, the AI engineer was addressing two persistent issues reported by the user:
+1.  **Deletion of Manual Expenses:** The user reported that the delete button for manual expenses was still not visible or functional in the  section. This indicates that despite previous attempts, the  component, which was restored to an older version due to persistent JSX errors, still does not correctly allow deletion of manual expenses or display the button correctly.
+2.  **Optional DNI/Passport for Customers:** The user requested to add an optional  or  field when adding a new client. This is a new data field for customer records.
 
-The engineer's actions involved:
-1.  **Creating **: A new React component () was created to handle the management of villas, including their , , ,  (now optional), , , and .
-2.  **Updating **: The main  routing was modified to use  instead of the previous  component for the corresponding route.
-3.  **Removing Price Fields from **: The explicit input fields for  and  were removed from the  form, as these values should now be automatically pulled from the selected villa.
-4.  **Backend Update for Villa Schedule**: The  model in  was updated to include  and  fields.
-5.  **Frontend Update for Villa Schedule**: The  component was updated to include input fields for  (default entry/exit times). The  in  was also updated to load these  fields.
-6.  **Restarting Services**: Both the backend and frontend services were restarted after these code changes.
-7.  **Recreating Villas**: Existing villa data was deleted, and new sample villas were created via API calls, including the , , and  information.
-
-The very last user feedback was about the HORARIOS POR DEFECTO section in the  form, indicating it was showing, but also an image implied some confusion. The engineer clarified that the fields were implemented and asked the user to hard refresh their browser cache. The user then responded with ESTO NO DEBE IR AHI, referring to the Precio de la Villa section *still being visible* in the **reservation form**, despite previous attempts to remove it or move its context.
-
-The most recent action was:  after using  to remove the price section from  (Message 356). The immediate next step (Message 357) was to restart the frontend.
+The AI engineer's most recent stated action (Chat Message 538) was: ## 1. Primero agregar cédula/pasaporte al modelo Customer en backend. This indicates the immediate focus is on updating the  data model in the backend to accommodate the new optional identification fields before proceeding with frontend adjustments or addressing the expense deletion bug.
 </current_work>
 
 <optional_next_step>
-Restart the frontend and confirm the Precio de la Villa section is removed from the reservation form.
+Add the  field to the  model in .
 </optional_next_step>
-<direct_quotes_for_next_step>
-¡Entiendo! Esa sección de Precio de la Villa NO debe estar visible en el formulario de reservaciones. Los precios deben cargarse automáticamente de la villa seleccionada pero sin mostrar esa caja. Voy a quitarla:
-Perfecto! Ahora voy a reiniciar el frontend:
-</direct_quotes_for_next_step>
