@@ -70,9 +70,9 @@ async def get_next_invoice_number() -> str:
     
     return str(invoice_num)
 
-def calculate_balance(total: float, paid: float) -> float:
-    """Calculate balance due"""
-    return max(0, total - paid)
+def calculate_balance(total: float, paid: float, deposit: float = 0) -> float:
+    """Calculate balance due - includes deposit in calculation"""
+    return max(0, total + deposit - paid)
 
 # ============ AUTH ENDPOINTS ============
 
