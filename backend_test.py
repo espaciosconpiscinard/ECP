@@ -793,7 +793,7 @@ class BackendTester:
         # Step 6: Test deletion of a regular (non-auto-generated) expense for comparison
         # Create a manual expense
         manual_expense_data = {
-            "category": "mantenimiento",
+            "category": "otros",  # Use valid category
             "description": "Test manual expense for deletion",
             "amount": 2500.0,
             "currency": "DOP",
