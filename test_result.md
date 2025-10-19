@@ -327,11 +327,15 @@ metadata:
   run_ui: false
 
 test_plan:
-  current_focus: []
+  current_focus:
+    - "Campo DNI opcional en modelo Customer"
+    - "Permitir eliminación de gastos auto-generados"
+    - "Componente Customers - Agregar campo DNI"
+    - "Componente Expenses - Mostrar botón eliminar para todos los gastos"
   stuck_tasks: []
   test_all: false
-  test_priority: "completed"
-  latest_test: "Auto-creación de gastos en reservaciones - COMPLETADO ✅"
+  test_priority: "high_first"
+  latest_test: "Pendiente testing de nuevas funcionalidades"
 
 agent_communication:
   - agent: "main"
