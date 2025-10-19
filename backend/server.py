@@ -473,14 +473,28 @@ async def get_reservations(
     status: Optional[str] = None,
     current_user: dict = Depends(get_current_user)
 ):
-    """Get all reservations"""
+    """Get all reservations with customer identification"""
     query = {}
     if status:
         query["status"] = status
     
     reservations = await db.reservations.find(query, {"_id": 0}).sort("created_at", -1).to_list(1000)
     datetime_fields = ["reservation_date", "created_at", "updated_at"]
-    return [restore_datetimes(r, datetime_fields) for r in reservations]
+    
+    # Enrich with customer identification document
+    enriched_reservations = []
+    for r in reservations:
+        restored = restore_datetimes(r, datetime_fields)
+        
+        # Get customer identification if customer_id exists
+        if r.get("customer_id"):
+            customer = await db.customers.find_one({"id": r["customer_id"]}, {"_id": 0})
+            if customer:
+                restored["customer_identification_document"] = customer.get("identification_document") or customer.get("dni")
+        
+        enriched_reservations.append(restored)
+    
+    return enriched_reservations
 
 @api_router.get("/reservations/{reservation_id}", response_model=Reservation)
 async def get_reservation(reservation_id: str, current_user: dict = Depends(get_current_user)):
