@@ -38,6 +38,8 @@ const AppContent = () => {
         return <VillasManagement />;
       case 'categories':
         return <Categories />;
+      case 'expense-categories':
+        return <ExpenseCategories />;
       case 'customers':
         return <Customers />;
       case 'expenses':
