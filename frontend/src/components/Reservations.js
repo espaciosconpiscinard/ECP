@@ -211,6 +211,13 @@ const Reservations = () => {
 
   const handleEdit = (reservation) => {
     setEditingReservation(reservation);
+    
+    // Encontrar la villa para establecer el texto de búsqueda
+    const villa = villas.find(v => v.id === reservation.villa_id);
+    if (villa) {
+      setVillaSearchTerm(`${villa.code} - ${villa.name}`);
+    }
+    
     setFormData({
       customer_id: reservation.customer_id,
       customer_name: reservation.customer_name,
