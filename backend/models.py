@@ -319,13 +319,16 @@ class ExpenseCreate(ExpenseBase):
 
 class ExpenseUpdate(BaseModel):
     category: Optional[Literal["local", "nomina", "variable", "pago_propietario", "otros"]] = None
-    category_id: Optional[str] = None
+    expense_category_id: Optional[str] = None
     description: Optional[str] = None
     amount: Optional[float] = None
     currency: Optional[Literal["DOP", "USD"]] = None
     expense_date: Optional[datetime] = None
     payment_status: Optional[Literal["pending", "paid"]] = None
     notes: Optional[str] = None
+    has_payment_reminder: Optional[bool] = None
+    payment_reminder_day: Optional[int] = None
+    is_recurring: Optional[bool] = None
 
 class Expense(ExpenseBase):
     model_config = ConfigDict(extra="ignore")
