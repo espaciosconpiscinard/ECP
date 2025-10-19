@@ -121,6 +121,80 @@ const Expenses = () => {
     });
   };
 
+  // Abono functions
+  const handleOpenAbonoDialog = async (expense) => {
+    setSelectedExpense(expense);
+    setAbonoFormData({
+      amount: 0,
+      currency: expense.currency,
+      payment_method: 'efectivo',
+      payment_date: new Date().toISOString().split('T')[0],
+      notes: ''
+    });
+    
+    // Fetch abonos for this expense
+    try {
+      const response = await getExpenseAbonos(expense.id);
+      setAbonos(response.data);
+    } catch (err) {
+      console.error('Error al cargar abonos:', err);
+      setAbonos([]);
+    }
+    
+    setIsAbonoDialogOpen(true);
+  };
+
+  const handleAbonoSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      const dataToSend = {
+        ...abonoFormData,
+        payment_date: new Date(abonoFormData.payment_date).toISOString()
+      };
+      
+      await addAbonoToExpense(selectedExpense.id, dataToSend);
+      
+      // Refresh abonos list
+      const response = await getExpenseAbonos(selectedExpense.id);
+      setAbonos(response.data);
+      
+      // Refresh expenses list
+      await fetchExpenses();
+      
+      // Reset form
+      setAbonoFormData({
+        amount: 0,
+        currency: selectedExpense.currency,
+        payment_method: 'efectivo',
+        payment_date: new Date().toISOString().split('T')[0],
+        notes: ''
+      });
+      
+      alert('✅ Abono agregado exitosamente');
+    } catch (err) {
+      alert('Error al agregar abono: ' + (err.response?.data?.detail || err.message));
+    }
+  };
+
+  const handleDeleteAbono = async (abonoId) => {
+    if (window.confirm('¿Estás seguro de eliminar este abono?')) {
+      try {
+        await deleteExpenseAbono(selectedExpense.id, abonoId);
+        
+        // Refresh abonos list
+        const response = await getExpenseAbonos(selectedExpense.id);
+        setAbonos(response.data);
+        
+        // Refresh expenses list
+        await fetchExpenses();
+        
+        alert('✅ Abono eliminado exitosamente');
+      } catch (err) {
+        alert('Error al eliminar abono: ' + (err.response?.data?.detail || err.message));
+      }
+    }
+  };
+
   const formatCurrency = (amount, currency) => {
     const formatted = new Intl.NumberFormat('es-DO').format(amount);
     return currency === 'DOP' ? `RD$ ${formatted}` : `$ ${formatted}`;
