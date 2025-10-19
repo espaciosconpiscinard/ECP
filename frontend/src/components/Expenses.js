@@ -485,11 +485,27 @@ const ExpensesNew = () => {
                               </div>
                               <div>
                                 <p className="text-xs text-gray-500 font-medium">ESTADO:</p>
-                                <p className="text-gray-900">{expense.payment_status === 'paid' ? 'Pagado' : 'Pendiente'}</p>
+                                <p className="text-gray-900">{expense.balance_due <= 0 ? 'Pagado' : 'Pendiente'}</p>
                               </div>
                               <div>
-                                <p className="text-xs text-gray-500 font-medium">MONTO:</p>
+                                <p className="text-xs text-gray-500 font-medium">MONTO ORIGINAL:</p>
                                 <p className="text-gray-900 font-semibold">{formatCurrency(expense.amount, expense.currency)}</p>
+                              </div>
+                              <div>
+                                <p className="text-xs text-gray-500 font-medium">TOTAL PAGADO:</p>
+                                <p className="text-green-600 font-semibold">{formatCurrency(expense.total_paid || 0, expense.currency)}</p>
+                              </div>
+                              <div className="col-span-2">
+                                <p className="text-xs text-gray-500 font-medium">SALDO RESTANTE:</p>
+                                <p className={`text-lg font-bold ${
+                                  expense.balance_due < 0 ? 'text-blue-600' : 
+                                  expense.balance_due === 0 ? 'text-green-600' : 
+                                  'text-red-600'
+                                }`}>
+                                  {expense.balance_due < 0 ? '-' : ''}{formatCurrency(Math.abs(expense.balance_due || expense.amount), expense.currency)}
+                                  {expense.balance_due < 0 && ' (Excedente de pago)'}
+                                  {expense.balance_due === 0 && ' (Totalmente pagado)'}
+                                </p>
                               </div>
                               <div>
                                 <p className="text-xs text-gray-500 font-medium">MONEDA:</p>
