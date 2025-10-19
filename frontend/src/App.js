@@ -11,6 +11,7 @@ import ExpenseCategories from './components/ExpenseCategories';
 import Customers from './components/Customers';
 import Expenses from './components/Expenses';
 import Users from './components/Users';
+import Configuration from './components/Configuration';
 import './App.css';
 
 const AppContent = () => {
@@ -47,6 +48,8 @@ const AppContent = () => {
         return <Expenses />;
       case 'users':
         return <Users />;
+      case 'configuration':
+        return <Configuration />;
       default:
         return <Dashboard />;
     }
