@@ -84,3 +84,7 @@ frontend/dist/win-unpacked/resources/app.asar
 frontend/dist/win-unpacked/Espacios
 Con
 Piscina.exe
+-e 
+# Environment files
+*.env
+*.env.*
