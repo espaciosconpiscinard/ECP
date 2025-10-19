@@ -283,6 +283,13 @@ const Reservations = () => {
     });
   };
 
+  const toggleExpand = (reservationId) => {
+    setExpandedReservations(prev => ({
+      ...prev,
+      [reservationId]: !prev[reservationId]
+    }));
+  };
+
   const handlePrint = (reservation) => {
     const printWindow = window.open('', '', 'width=900,height=700');
     const balanceDue = reservation.balance_due || 0;
