@@ -141,12 +141,37 @@ const ExpensesNew = () => {
     e.preventDefault();
     if (!selectedExpense) return;
     
+    // Validar si el abono excede el saldo pendiente
+    const balanceDue = selectedExpense.balance_due || selectedExpense.amount;
+    const willBeOverpaid = abonoFormData.amount > balanceDue;
+    const overpayAmount = abonoFormData.amount - balanceDue;
+    
+    if (willBeOverpaid) {
+      const confirmOverpay = window.confirm(
+        `⚠️ ADVERTENCIA: Estás pagando de más.\n\n` +
+        `Saldo pendiente: ${formatCurrency(balanceDue, selectedExpense.currency)}\n` +
+        `Abono a registrar: ${formatCurrency(abonoFormData.amount, abonoFormData.currency)}\n` +
+        `Excedente: ${formatCurrency(overpayAmount, selectedExpense.currency)}\n\n` +
+        `El saldo final será negativo: -${formatCurrency(overpayAmount, selectedExpense.currency)}\n\n` +
+        `¿Deseas continuar de todos modos?`
+      );
+      
+      if (!confirmOverpay) {
+        return; // Cancelar si el usuario no confirma
+      }
+    }
+    
     try {
       await addAbonoToExpense(selectedExpense.id, abonoFormData);
       setIsAbonoDialogOpen(false);
       setSelectedExpense(null);
       await fetchData();
-      alert('Abono registrado exitosamente');
+      
+      if (willBeOverpaid) {
+        alert(`✅ Abono registrado exitosamente.\n\n⚠️ Nota: El gasto tiene un excedente de pago de ${formatCurrency(overpayAmount, selectedExpense.currency)}`);
+      } else {
+        alert('✅ Abono registrado exitosamente');
+      }
     } catch (err) {
       setError('Error al registrar abono');
       console.error(err);
