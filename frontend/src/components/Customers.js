@@ -185,6 +185,7 @@ const Customers = () => {
                 <tr className="border-b">
                   <th className="text-left p-2 text-sm font-medium">Nombre</th>
                   <th className="text-left p-2 text-sm font-medium">Teléfono</th>
+                  <th className="text-left p-2 text-sm font-medium">DNI</th>
                   <th className="text-left p-2 text-sm font-medium">Email</th>
                   <th className="text-center p-2 text-sm font-medium">Acciones</th>
                 </tr>
