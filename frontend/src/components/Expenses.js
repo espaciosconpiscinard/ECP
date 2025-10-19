@@ -84,7 +84,7 @@ const Expenses = () => {
     if (window.confirm('¿Estás seguro de eliminar este gasto?')) {
       try {
         await deleteExpense(id);
-        await fetchData();
+        await fetchExpenses();
       } catch (err) {
         setError('Error al eliminar gasto');
         alert('Error al eliminar gasto: ' + (err.response?.data?.detail || err.message));
