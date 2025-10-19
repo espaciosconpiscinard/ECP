@@ -590,6 +590,233 @@ class BackendTester:
         
         print(f"   🎯 TEST SUMMARY: Auto-expense creation flow {'✅ PASSED' if all_checks_passed else '❌ FAILED'}")
         return auto_expense if 'auto_expense' in locals() else None
+
+    def test_customer_dni_field(self):
+        """Test DNI field functionality in Customer model"""
+        print("\n📋 Testing Customer DNI Field")
+        
+        # Test 1: Create customer WITH DNI
+        customer_with_dni = {
+            "name": "Juan Pérez",
+            "phone": "809-555-1234",
+            "dni": "001-1234567-8",
+            "email": "juan@test.com"
+        }
+        
+        result = self.make_request("POST", "/customers", customer_with_dni, self.admin_token)
+        
+        if result.get("success"):
+            created_customer = result["data"]
+            if created_customer.get("dni") == "001-1234567-8":
+                self.log_test("Create Customer WITH DNI", True, f"Customer created with DNI: {created_customer['dni']}")
+                customer_with_dni_id = created_customer["id"]
+            else:
+                self.log_test("Create Customer WITH DNI", False, f"DNI field missing or incorrect: {created_customer.get('dni')}")
+                return
+        else:
+            self.log_test("Create Customer WITH DNI", False, "Failed to create customer with DNI", result)
+            return
+        
+        # Test 2: Create customer WITHOUT DNI (optional field)
+        customer_without_dni = {
+            "name": "María González",
+            "phone": "809-555-5678",
+            "email": "maria@test.com"
+        }
+        
+        result = self.make_request("POST", "/customers", customer_without_dni, self.admin_token)
+        
+        if result.get("success"):
+            created_customer = result["data"]
+            # DNI should be None or not present
+            dni_value = created_customer.get("dni")
+            if dni_value is None or dni_value == "":
+                self.log_test("Create Customer WITHOUT DNI", True, "Customer created successfully without DNI field")
+                customer_without_dni_id = created_customer["id"]
+            else:
+                self.log_test("Create Customer WITHOUT DNI", False, f"Unexpected DNI value: {dni_value}")
+                return
+        else:
+            self.log_test("Create Customer WITHOUT DNI", False, "Failed to create customer without DNI", result)
+            return
+        
+        # Test 3: Get customers list and verify DNI field is present
+        result = self.make_request("GET", "/customers", token=self.admin_token)
+        
+        if result.get("success"):
+            customers = result["data"]
+            
+            # Find our test customers
+            customer_with_dni_found = None
+            customer_without_dni_found = None
+            
+            for customer in customers:
+                if customer.get("id") == customer_with_dni_id:
+                    customer_with_dni_found = customer
+                elif customer.get("id") == customer_without_dni_id:
+                    customer_without_dni_found = customer
+            
+            # Verify customer with DNI
+            if customer_with_dni_found:
+                if customer_with_dni_found.get("dni") == "001-1234567-8":
+                    self.log_test("Verify Customer WITH DNI in List", True, f"DNI field present and correct: {customer_with_dni_found['dni']}")
+                else:
+                    self.log_test("Verify Customer WITH DNI in List", False, f"DNI field incorrect: {customer_with_dni_found.get('dni')}")
+            else:
+                self.log_test("Verify Customer WITH DNI in List", False, "Customer with DNI not found in list")
+            
+            # Verify customer without DNI
+            if customer_without_dni_found:
+                dni_value = customer_without_dni_found.get("dni")
+                if dni_value is None or dni_value == "":
+                    self.log_test("Verify Customer WITHOUT DNI in List", True, "Customer without DNI correctly shows no DNI value")
+                else:
+                    self.log_test("Verify Customer WITHOUT DNI in List", False, f"Unexpected DNI value: {dni_value}")
+            else:
+                self.log_test("Verify Customer WITHOUT DNI in List", False, "Customer without DNI not found in list")
+            
+            # Test 4: Verify DNI field structure in API response
+            dni_field_present = any("dni" in customer for customer in customers)
+            if dni_field_present:
+                self.log_test("DNI Field Structure", True, "DNI field is present in customer API responses")
+            else:
+                self.log_test("DNI Field Structure", False, "DNI field missing from customer API responses")
+                
+        else:
+            self.log_test("Get Customers List", False, "Failed to get customers list", result)
+
+    def test_auto_generated_expense_deletion(self):
+        """Test deletion of auto-generated expenses"""
+        print("\n🗑️ Testing Auto-Generated Expense Deletion")
+        
+        # Step 1: Create a reservation with owner_price > 0 to generate an auto-expense
+        # Get a villa first
+        villas_result = self.make_request("GET", "/villas", token=self.admin_token)
+        if not villas_result.get("success") or not villas_result["data"]:
+            self.log_test("Get Villa for Expense Deletion Test", False, "No villas available")
+            return
+        
+        test_villa = villas_result["data"][0]
+        
+        # Get a customer
+        customers_result = self.make_request("GET", "/customers", token=self.admin_token)
+        if not customers_result.get("success") or not customers_result["data"]:
+            self.log_test("Get Customer for Expense Deletion Test", False, "No customers available")
+            return
+        
+        test_customer = customers_result["data"][0]
+        
+        # Create reservation with owner_price > 0
+        reservation_data = {
+            "customer_id": test_customer["id"],
+            "customer_name": test_customer["name"],
+            "villa_id": test_villa["id"],
+            "villa_code": test_villa["code"],
+            "rental_type": "pasadia",
+            "reservation_date": "2024-01-16T00:00:00Z",
+            "check_in_time": "10:00 AM",
+            "check_out_time": "6:00 PM",
+            "guests": 4,
+            "base_price": 12000.0,
+            "owner_price": 5000.0,  # This will trigger auto-expense creation
+            "subtotal": 12000.0,
+            "total_amount": 12000.0,
+            "amount_paid": 6000.0,
+            "currency": "DOP",
+            "status": "confirmed",
+            "notes": "Test reservation for expense deletion"
+        }
+        
+        reservation_result = self.make_request("POST", "/reservations", reservation_data, self.admin_token)
+        
+        if not reservation_result.get("success"):
+            self.log_test("Create Reservation for Expense Deletion", False, "Failed to create reservation", reservation_result)
+            return
+        
+        created_reservation = reservation_result["data"]
+        self.log_test("Create Reservation for Expense Deletion", True, f"Created reservation #{created_reservation['invoice_number']}")
+        
+        # Step 2: Get expenses and find the auto-generated one
+        expenses_result = self.make_request("GET", "/expenses", token=self.admin_token)
+        
+        if not expenses_result.get("success"):
+            self.log_test("Get Expenses for Deletion Test", False, "Failed to get expenses", expenses_result)
+            return
+        
+        expenses = expenses_result["data"]
+        
+        # Find the auto-generated expense
+        auto_expense = None
+        for expense in expenses:
+            if (expense.get("category") == "pago_propietario" and 
+                expense.get("related_reservation_id") == created_reservation["id"]):
+                auto_expense = expense
+                break
+        
+        if not auto_expense:
+            self.log_test("Find Auto-Generated Expense", False, "Auto-generated expense not found")
+            return
+        
+        self.log_test("Find Auto-Generated Expense", True, f"Found auto-generated expense with ID: {auto_expense['id']}")
+        
+        # Step 3: Verify the expense has related_reservation_id (marking it as auto-generated)
+        if auto_expense.get("related_reservation_id"):
+            self.log_test("Verify Auto-Generated Expense Marker", True, f"Expense has related_reservation_id: {auto_expense['related_reservation_id']}")
+        else:
+            self.log_test("Verify Auto-Generated Expense Marker", False, "Expense missing related_reservation_id")
+        
+        # Step 4: Attempt to delete the auto-generated expense (this MUST work now)
+        delete_result = self.make_request("DELETE", f"/expenses/{auto_expense['id']}", token=self.admin_token)
+        
+        if delete_result.get("success"):
+            self.log_test("Delete Auto-Generated Expense", True, "Auto-generated expense deleted successfully")
+        else:
+            self.log_test("Delete Auto-Generated Expense", False, f"Failed to delete auto-generated expense. Status: {delete_result.get('status_code')}", delete_result)
+            return
+        
+        # Step 5: Verify the expense was actually deleted
+        verify_result = self.make_request("GET", "/expenses", token=self.admin_token)
+        
+        if verify_result.get("success"):
+            remaining_expenses = verify_result["data"]
+            
+            # Check if the deleted expense is still in the list
+            deleted_expense_found = any(exp.get("id") == auto_expense["id"] for exp in remaining_expenses)
+            
+            if not deleted_expense_found:
+                self.log_test("Verify Expense Deletion", True, "Auto-generated expense successfully removed from expenses list")
+            else:
+                self.log_test("Verify Expense Deletion", False, "Auto-generated expense still appears in expenses list")
+        else:
+            self.log_test("Verify Expense Deletion", False, "Failed to verify expense deletion", verify_result)
+        
+        # Step 6: Test deletion of a regular (non-auto-generated) expense for comparison
+        # Create a manual expense
+        manual_expense_data = {
+            "category": "mantenimiento",
+            "description": "Test manual expense for deletion",
+            "amount": 2500.0,
+            "currency": "DOP",
+            "expense_date": "2024-01-16T00:00:00Z",
+            "payment_status": "pending",
+            "notes": "Manual expense for testing deletion"
+        }
+        
+        manual_expense_result = self.make_request("POST", "/expenses", manual_expense_data, self.admin_token)
+        
+        if manual_expense_result.get("success"):
+            manual_expense = manual_expense_result["data"]
+            self.log_test("Create Manual Expense", True, f"Created manual expense with ID: {manual_expense['id']}")
+            
+            # Try to delete the manual expense
+            delete_manual_result = self.make_request("DELETE", f"/expenses/{manual_expense['id']}", token=self.admin_token)
+            
+            if delete_manual_result.get("success"):
+                self.log_test("Delete Manual Expense", True, "Manual expense deleted successfully")
+            else:
+                self.log_test("Delete Manual Expense", False, "Failed to delete manual expense", delete_manual_result)
+        else:
+            self.log_test("Create Manual Expense", False, "Failed to create manual expense for comparison", manual_expense_result)
     
     def run_all_tests(self):
         """Run all backend tests"""
