@@ -23,6 +23,7 @@ const Reservations = () => {
   const [editingReservation, setEditingReservation] = useState(null);
   const [selectedExtraServices, setSelectedExtraServices] = useState([]);
   const [showExtraServices, setShowExtraServices] = useState(false);
+  const [expandedReservations, setExpandedReservations] = useState({});
   
   const [formData, setFormData] = useState({
     customer_id: '',
