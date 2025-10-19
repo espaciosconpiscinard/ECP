@@ -396,6 +396,196 @@ class BackendTester:
             self.log_test("Employee View Villas", True, f"Employee can view {len(villas)} villas")
         else:
             self.log_test("Employee View Villas", False, "Employee cannot view villas", result)
+
+    def test_auto_expense_creation_flow(self):
+        """Test auto-creation of expenses when reservation has owner_price > 0"""
+        print("\n💰 Testing Auto-Expense Creation Flow")
+        
+        # Step 1: Get villas with owner_price configured
+        villas_result = self.make_request("GET", "/villas", token=self.admin_token)
+        if not villas_result.get("success"):
+            self.log_test("Get Villas for Expense Test", False, "Failed to get villas", villas_result)
+            return
+        
+        villas = villas_result["data"]
+        if not villas:
+            self.log_test("Get Villas for Expense Test", False, "No villas available for testing")
+            return
+        
+        # Use the first villa
+        test_villa = villas[0]
+        self.log_test("Get Villas for Expense Test", True, f"Using villa: {test_villa['code']}")
+        
+        # Step 2: Get customers
+        customers_result = self.make_request("GET", "/customers", token=self.admin_token)
+        if not customers_result.get("success"):
+            # Create a test customer if none exist
+            customer_data = {
+                "name": "María González",
+                "phone": "809-555-1234",
+                "email": "maria.gonzalez@email.com",
+                "address": "Santo Domingo, República Dominicana"
+            }
+            create_result = self.make_request("POST", "/customers", customer_data, self.admin_token)
+            if create_result.get("success"):
+                test_customer = create_result["data"]
+                self.log_test("Create Test Customer", True, f"Created customer: {test_customer['name']}")
+            else:
+                self.log_test("Create Test Customer", False, "Failed to create test customer", create_result)
+                return
+        else:
+            customers = customers_result["data"]
+            if customers:
+                test_customer = customers[0]
+                self.log_test("Get Customers for Expense Test", True, f"Using customer: {test_customer['name']}")
+            else:
+                # Create a test customer
+                customer_data = {
+                    "name": "María González",
+                    "phone": "809-555-1234", 
+                    "email": "maria.gonzalez@email.com",
+                    "address": "Santo Domingo, República Dominicana"
+                }
+                create_result = self.make_request("POST", "/customers", customer_data, self.admin_token)
+                if create_result.get("success"):
+                    test_customer = create_result["data"]
+                    self.log_test("Create Test Customer", True, f"Created customer: {test_customer['name']}")
+                else:
+                    self.log_test("Create Test Customer", False, "Failed to create test customer", create_result)
+                    return
+        
+        # Step 3: Create reservation with owner_price > 0
+        reservation_data = {
+            "customer_id": test_customer["id"],
+            "customer_name": test_customer["name"],
+            "villa_id": test_villa["id"],
+            "villa_code": test_villa["code"],
+            "rental_type": "pasadia",
+            "reservation_date": "2024-01-15",
+            "base_price": 15000.0,
+            "owner_price": 8000.0,  # IMPORTANT: > 0 to trigger auto-expense
+            "total_amount": 15000.0,
+            "amount_paid": 7500.0,
+            "currency": "DOP",
+            "status": "confirmed",
+            "notes": "Test reservation for auto-expense creation"
+        }
+        
+        # Get expenses count before creating reservation
+        expenses_before_result = self.make_request("GET", "/expenses", token=self.admin_token)
+        expenses_before_count = len(expenses_before_result["data"]) if expenses_before_result.get("success") else 0
+        
+        reservation_result = self.make_request("POST", "/reservations", reservation_data, self.admin_token)
+        
+        if not reservation_result.get("success"):
+            self.log_test("Create Reservation with Owner Price", False, "Failed to create reservation", reservation_result)
+            return
+        
+        created_reservation = reservation_result["data"]
+        self.log_test("Create Reservation with Owner Price", True, f"Created reservation #{created_reservation['invoice_number']} with owner_price: {reservation_data['owner_price']}")
+        
+        # Step 4: Verify auto-created expense
+        expenses_after_result = self.make_request("GET", "/expenses", token=self.admin_token)
+        
+        if not expenses_after_result.get("success"):
+            self.log_test("Get Expenses After Reservation", False, "Failed to get expenses", expenses_after_result)
+            return
+        
+        expenses_after = expenses_after_result["data"]
+        expenses_after_count = len(expenses_after)
+        
+        # Check if a new expense was created
+        if expenses_after_count > expenses_before_count:
+            self.log_test("Expense Count Increased", True, f"Expenses increased from {expenses_before_count} to {expenses_after_count}")
+            
+            # Find the auto-created expense
+            auto_expense = None
+            for expense in expenses_after:
+                if (expense.get("category") == "pago_propietario" and 
+                    expense.get("related_reservation_id") == created_reservation["id"]):
+                    auto_expense = expense
+                    break
+            
+            if auto_expense:
+                # Verify expense details
+                checks = []
+                
+                # Check category
+                if auto_expense.get("category") == "pago_propietario":
+                    checks.append("✓ Category: pago_propietario")
+                else:
+                    checks.append(f"✗ Category: {auto_expense.get('category')} (expected: pago_propietario)")
+                
+                # Check amount
+                if auto_expense.get("amount") == 8000.0:
+                    checks.append("✓ Amount: 8000.0")
+                else:
+                    checks.append(f"✗ Amount: {auto_expense.get('amount')} (expected: 8000.0)")
+                
+                # Check description contains villa code
+                description = auto_expense.get("description", "")
+                if test_villa["code"] in description:
+                    checks.append(f"✓ Description contains villa code: {test_villa['code']}")
+                else:
+                    checks.append(f"✗ Description missing villa code: {description}")
+                
+                # Check related_reservation_id
+                if auto_expense.get("related_reservation_id") == created_reservation["id"]:
+                    checks.append("✓ Related reservation ID matches")
+                else:
+                    checks.append(f"✗ Related reservation ID: {auto_expense.get('related_reservation_id')}")
+                
+                # Check payment_status
+                if auto_expense.get("payment_status") == "pending":
+                    checks.append("✓ Payment status: pending")
+                else:
+                    checks.append(f"✗ Payment status: {auto_expense.get('payment_status')} (expected: pending)")
+                
+                # Check currency
+                if auto_expense.get("currency") == "DOP":
+                    checks.append("✓ Currency: DOP")
+                else:
+                    checks.append(f"✗ Currency: {auto_expense.get('currency')} (expected: DOP)")
+                
+                all_checks_passed = all("✓" in check for check in checks)
+                
+                if all_checks_passed:
+                    self.log_test("Auto-Created Expense Verification", True, f"All expense fields correct:\n   " + "\n   ".join(checks))
+                else:
+                    self.log_test("Auto-Created Expense Verification", False, f"Some expense fields incorrect:\n   " + "\n   ".join(checks))
+                
+                # Log the full expense for debugging
+                print(f"   📋 Auto-created expense details:")
+                print(f"      ID: {auto_expense.get('id')}")
+                print(f"      Category: {auto_expense.get('category')}")
+                print(f"      Amount: {auto_expense.get('amount')} {auto_expense.get('currency')}")
+                print(f"      Description: {auto_expense.get('description')}")
+                print(f"      Payment Status: {auto_expense.get('payment_status')}")
+                print(f"      Related Reservation: {auto_expense.get('related_reservation_id')}")
+                
+            else:
+                self.log_test("Find Auto-Created Expense", False, "No expense found with category 'pago_propietario' and matching reservation ID")
+                
+                # Debug: show all expenses
+                print("   🔍 All expenses found:")
+                for i, expense in enumerate(expenses_after):
+                    print(f"      {i+1}. Category: {expense.get('category')}, Amount: {expense.get('amount')}, Related: {expense.get('related_reservation_id')}")
+        else:
+            self.log_test("Expense Count Increased", False, f"No new expenses created. Count remained at {expenses_before_count}")
+        
+        # Step 5: Verify expense structure and auto-generated flag
+        if 'auto_expense' in locals() and auto_expense:
+            # Check if expense has proper structure
+            required_fields = ["id", "category", "description", "amount", "currency", "expense_date", "payment_status", "related_reservation_id", "created_at", "created_by"]
+            missing_fields = [field for field in required_fields if field not in auto_expense]
+            
+            if not missing_fields:
+                self.log_test("Expense Structure Complete", True, "All required fields present in auto-created expense")
+            else:
+                self.log_test("Expense Structure Complete", False, f"Missing fields: {missing_fields}")
+        
+        print(f"   🎯 TEST SUMMARY: Auto-expense creation flow {'✅ PASSED' if all_checks_passed else '❌ FAILED'}")
+        return auto_expense if 'auto_expense' in locals() else None
     
     def run_all_tests(self):
         """Run all backend tests"""
