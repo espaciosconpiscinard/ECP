@@ -47,12 +47,33 @@ class Customer(CustomerBase):
     created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
     created_by: str  # user_id
 
+# ============ CATEGORY MODELS ============
+class CategoryBase(BaseModel):
+    name: str  # Nombre de la categoría (ej: "Premium", "Zona Norte", etc.)
+    description: Optional[str] = None
+    is_active: bool = True
+
+class CategoryCreate(CategoryBase):
+    pass
+
+class CategoryUpdate(BaseModel):
+    name: Optional[str] = None
+    description: Optional[str] = None
+    is_active: Optional[bool] = None
+
+class Category(CategoryBase):
+    model_config = ConfigDict(extra="ignore")
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+    created_by: str
+
 # ============ VILLA MODELS ============
 class VillaBase(BaseModel):
     code: str  # ECPVSH, ECPVWLSL, etc.
     name: str  # Villa Sabrina (interno)
     description: Optional[str] = None  # Descripción de lo que contiene
     phone: Optional[str] = None  # Teléfono del propietario (opcional)
+    category_id: Optional[str] = None  # ID de la categoría asignada
     
     # Horarios por defecto
     default_check_in_time: str = "9:00 AM"
