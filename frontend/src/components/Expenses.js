@@ -20,6 +20,19 @@ const Expenses = () => {
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [editingExpense, setEditingExpense] = useState(null);
   const [filterCategory, setFilterCategory] = useState('');
+  
+  // Abono states
+  const [isAbonoDialogOpen, setIsAbonoDialogOpen] = useState(false);
+  const [selectedExpense, setSelectedExpense] = useState(null);
+  const [abonos, setAbonos] = useState([]);
+  const [abonoFormData, setAbonoFormData] = useState({
+    amount: 0,
+    currency: 'DOP',
+    payment_method: 'efectivo',
+    payment_date: new Date().toISOString().split('T')[0],
+    notes: ''
+  });
+  
   const [formData, setFormData] = useState({
     category: 'otros',
     description: '',
