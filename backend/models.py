@@ -276,7 +276,8 @@ class ExpenseCreate(ExpenseBase):
     pass
 
 class ExpenseUpdate(BaseModel):
-    category: Optional[Literal["local", "nomina", "variable", "otros"]] = None
+    category: Optional[Literal["local", "nomina", "variable", "pago_propietario", "otros"]] = None
+    category_id: Optional[str] = None
     description: Optional[str] = None
     amount: Optional[float] = None
     currency: Optional[Literal["DOP", "USD"]] = None
