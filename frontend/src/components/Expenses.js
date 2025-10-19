@@ -12,16 +12,18 @@ import { useAuth } from '../context/AuthContext';
 const ExpensesNew = () => {
   const { user } = useAuth();
   const [expenses, setExpenses] = useState([]);
-  const [categories, setCategories] = useState([]);
+  const [expenseCategories, setExpenseCategories] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [isFormOpen, setIsFormOpen] = useState(false);
+  const [isCategoryFormOpen, setIsCategoryFormOpen] = useState(false);
   const [editingExpense, setEditingExpense] = useState(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [expandedExpenses, setExpandedExpenses] = useState({});
   const [isAbonoDialogOpen, setIsAbonoDialogOpen] = useState(false);
   const [selectedExpense, setSelectedExpense] = useState(null);
   const [expenseAbonos, setExpenseAbonos] = useState({});
+  const [viewMode, setViewMode] = useState('all'); // 'all' o 'reminders'
   const [abonoFormData, setAbonoFormData] = useState({
     amount: 0,
     currency: 'DOP',
@@ -30,15 +32,23 @@ const ExpensesNew = () => {
     notes: ''
   });
   
+  const [categoryFormData, setCategoryFormData] = useState({
+    name: '',
+    description: ''
+  });
+  
   const [formData, setFormData] = useState({
     category: 'otros',
-    category_id: '',
+    expense_category_id: '',
     description: '',
     amount: 0,
     currency: 'DOP',
     expense_date: new Date().toISOString().split('T')[0],
     payment_status: 'pending',
-    notes: ''
+    notes: '',
+    has_payment_reminder: false,
+    payment_reminder_day: null,
+    is_recurring: false
   });
 
   useEffect(() => {
