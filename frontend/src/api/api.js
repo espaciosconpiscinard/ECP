@@ -15,8 +15,22 @@ export const getCustomer = (id) => axios.get(`${API}/customers/${id}`);
 export const createCustomer = (data) => axios.post(`${API}/customers`, data);
 export const deleteCustomer = (id) => axios.delete(`${API}/customers/${id}`);
 
+// ============ CATEGORIES ============
+export const getCategories = () => axios.get(`${API}/categories`);
+export const getCategory = (id) => axios.get(`${API}/categories/${id}`);
+export const createCategory = (data) => axios.post(`${API}/categories`, data);
+export const updateCategory = (id, data) => axios.put(`${API}/categories/${id}`, data);
+export const deleteCategory = (id) => axios.delete(`${API}/categories/${id}`);
+
 // ============ VILLAS ============
-export const getVillas = () => axios.get(`${API}/villas`);
+export const getVillas = (search = null, categoryId = null) => {
+  let url = `${API}/villas`;
+  const params = [];
+  if (search) params.push(`search=${encodeURIComponent(search)}`);
+  if (categoryId) params.push(`category_id=${categoryId}`);
+  if (params.length > 0) url += `?${params.join('&')}`;
+  return axios.get(url);
+};
 export const getVilla = (id) => axios.get(`${API}/villas/${id}`);
 export const createVilla = (data) => axios.post(`${API}/villas`, data);
 export const updateVilla = (id, data) => axios.put(`${API}/villas/${id}`, data);
