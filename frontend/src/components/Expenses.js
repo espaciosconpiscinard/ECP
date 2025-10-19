@@ -1279,4 +1279,4 @@ const ExpensesNew = () => {
   );
 };
 
-export default ExpensesNew;
+export default Expenses;
