@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { getExpenses, getCategories, createExpense, updateExpense, deleteExpense, addAbonoToExpense } from '../api/api';
+import { getExpenses, getCategories, createExpense, updateExpense, deleteExpense, addAbonoToExpense, getExpenseAbonos, deleteExpenseAbono } from '../api/api';
 import { Button } from './ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from './ui/card';
 import { Input } from './ui/input';
