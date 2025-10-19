@@ -245,9 +245,26 @@ async def create_villa(villa_data: VillaCreate, current_user: dict = Depends(get
     return villa
 
 @api_router.get("/villas", response_model=List[Villa])
-async def get_villas(current_user: dict = Depends(get_current_user)):
-    """Get all villas"""
-    villas = await db.villas.find({}, {"_id": 0}).to_list(1000)
+async def get_villas(
+    search: Optional[str] = None,
+    category_id: Optional[str] = None,
+    current_user: dict = Depends(get_current_user)
+):
+    """Get all villas with optional search and category filter"""
+    query = {}
+    
+    # Filtro por categoría
+    if category_id:
+        query["category_id"] = category_id
+    
+    # Búsqueda por nombre o código
+    if search:
+        query["$or"] = [
+            {"code": {"$regex": search, "$options": "i"}},
+            {"name": {"$regex": search, "$options": "i"}}
+        ]
+    
+    villas = await db.villas.find(query, {"_id": 0}).to_list(1000)
     return [restore_datetimes(v, ["created_at"]) for v in villas]
 
 @api_router.get("/villas/{villa_id}", response_model=Villa)
