@@ -341,13 +341,17 @@ const Expenses = () => {
           <Button variant="outline" onClick={() => setIsCategoryFormOpen(true)}>
             📂 Categorías
           </Button>
-          <Dialog open={isFormOpen} onOpenChange={setIsFormOpen}>
-            <DialogTrigger asChild>
-              <Button onClick={() => resetForm()}>
-                <Plus className="mr-2 h-4 w-4" /> Nuevo Gasto
-              </Button>
-            </DialogTrigger>
-          <DialogContent className="max-w-md">
+          <DialogTrigger asChild>
+            <Button onClick={() => resetForm()}>
+              <Plus className="mr-2 h-4 w-4" /> Nuevo Gasto
+            </Button>
+          </DialogTrigger>
+        </div>
+      </div>
+
+      {/* Dialog de Nuevo Gasto */}
+      <Dialog open={isFormOpen} onOpenChange={setIsFormOpen}>
+        <DialogContent className="max-w-md">
             <DialogHeader>
               <DialogTitle>
                 {editingExpense ? 'Editar Gasto' : 'Nuevo Gasto'}
