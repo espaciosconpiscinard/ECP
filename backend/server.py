@@ -18,6 +18,7 @@ from models import (
     ReservationCreate, ReservationUpdate, Reservation,
     VillaOwnerCreate, VillaOwnerUpdate, VillaOwner,
     PaymentCreate, Payment,
+    AbonoCreate, Abono,
     ExpenseCreate, ExpenseUpdate, Expense,
     DashboardStats, InvoiceCounter
 )
