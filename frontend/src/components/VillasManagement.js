@@ -177,11 +177,9 @@ const VillasManagementNew = () => {
   const handleEditService = (service) => {
     setEditingService(service);
     setServiceFormData({
-      service_name: service.service_name,
+      name: service.name,
       description: service.description || '',
-      unit_price: service.unit_price,
-      currency: service.currency,
-      category: service.category || 'otros',
+      default_price: service.default_price || 0,
       is_active: service.is_active !== undefined ? service.is_active : true
     });
     setIsFormOpen(true);
