@@ -300,6 +300,7 @@ const Reservations = () => {
       rental_type: 'pasadia',
       event_type: '',
       reservation_date: new Date().toISOString().split('T')[0],
+      check_out_date: '',
       check_in_time: '9:00 AM',
       check_out_time: '8:00 PM',
       guests: 1,
