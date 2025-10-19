@@ -303,11 +303,28 @@ const ExpensesNew = () => {
   // Ordenar categorías alfabéticamente
   const sortedCategoryKeys = Object.keys(groupedExpenses).sort();
 
+  // Agrupar gastos con recordatorio por día del mes
+  const expensesWithReminders = expenses.filter(e => e.has_payment_reminder);
+  const groupedByReminderDay = {};
+  
+  expensesWithReminders.forEach(expense => {
+    const day = expense.payment_reminder_day;
+    if (day) {
+      if (!groupedByReminderDay[day]) {
+        groupedByReminderDay[day] = [];
+      }
+      groupedByReminderDay[day].push(expense);
+    }
+  });
+
+  // Ordenar días de menor a mayor
+  const sortedReminderDays = Object.keys(groupedByReminderDay).sort((a, b) => parseInt(a) - parseInt(b));
+
   // Calcular totales
   const totalExpensesDOP = expenses.filter(e => e.currency === 'DOP').reduce((sum, e) => sum + e.amount, 0);
   const totalExpensesUSD = expenses.filter(e => e.currency === 'USD').reduce((sum, e) => sum + e.amount, 0);
-  const pendingExpensesDOP = expenses.filter(e => e.currency === 'DOP' && e.payment_status === 'pending').reduce((sum, e) => sum + e.amount, 0);
-  const pendingExpensesUSD = expenses.filter(e => e.currency === 'USD' && e.payment_status === 'pending').reduce((sum, e) => sum + e.amount, 0);
+  const pendingExpensesDOP = expenses.filter(e => e.currency === 'DOP' && e.balance_due > 0).reduce((sum, e) => sum + e.balance_due, 0);
+  const pendingExpensesUSD = expenses.filter(e => e.currency === 'USD' && e.balance_due > 0).reduce((sum, e) => sum + e.balance_due, 0);
 
   if (loading) {
     return <div className="text-center py-8">Cargando...</div>;
