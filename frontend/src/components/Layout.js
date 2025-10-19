@@ -1,22 +1,31 @@
 import React, { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { Button } from './ui/button';
-import { Home, Users, FileText, DollarSign, Building, Menu, X, LogOut } from 'lucide-react';
+import { Home, Users, FileText, DollarSign, Building, Menu, X, LogOut, Tag } from 'lucide-react';
 
 const Layout = ({ children, currentView, setCurrentView }) => {
   const { user, logout } = useAuth();
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
+  // Menú base para todos los usuarios
   const menuItems = [
-    { id: 'dashboard', label: 'Dashboard', icon: Home },
-    { id: 'reservations', label: 'Reservaciones', icon: FileText },
-    { id: 'owners', label: 'Villas', icon: Building },
-    { id: 'expenses', label: 'Gastos', icon: DollarSign },
+    { id: 'dashboard', label: 'Dashboard', icon: Home, roles: ['admin', 'employee'] },
+    { id: 'reservations', label: 'Reservaciones', icon: FileText, roles: ['admin', 'employee'] },
+    { id: 'villas', label: 'Villas', icon: Building, roles: ['admin', 'employee'] },
   ];
 
+  // Menú solo para admin
   if (user?.role === 'admin') {
-    menuItems.push({ id: 'users', label: 'Usuarios', icon: Users });
+    menuItems.push(
+      { id: 'categories', label: 'Categorías', icon: Tag, roles: ['admin'] },
+      { id: 'expenses', label: 'Gastos', icon: DollarSign, roles: ['admin'] }
+    );
   }
+
+  // Filtrar menú según el rol del usuario
+  const visibleMenuItems = menuItems.filter(item => 
+    item.roles.includes(user?.role)
+  );
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -36,7 +45,7 @@ const Layout = ({ children, currentView, setCurrentView }) => {
           <div className="flex items-center space-x-4">
             <div className="text-sm text-right" data-testid="user-info">
               <p className="font-medium">{user?.full_name}</p>
-              <p className="text-gray-500 text-xs capitalize">{user?.role}</p>
+              <p className="text-gray-500 text-xs capitalize">{user?.role === 'admin' ? 'Administrador' : 'Empleado'}</p>
             </div>
             <Button 
               variant="outline" 
@@ -62,7 +71,7 @@ const Layout = ({ children, currentView, setCurrentView }) => {
         >
           <div className="h-full overflow-y-auto py-6">
             <nav className="space-y-1 px-3">
-              {menuItems.map((item) => {
+              {visibleMenuItems.map((item) => {
                 const Icon = item.icon;
                 const isActive = currentView === item.id;
                 return (
