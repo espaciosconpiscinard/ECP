@@ -135,15 +135,18 @@ backend:
   
   - task: "Permitir eliminación de gastos auto-generados"
     implemented: true
-    working: "NA"
+    working: true
     file: "/app/backend/server.py"
     stuck_count: 0
     priority: "high"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
       - working: "NA"
         agent: "main"
         comment: "Modificado endpoint DELETE /api/expenses/{expense_id} para permitir eliminar cualquier gasto, incluyendo los auto-generados por reservaciones. Eliminada la validación que bloqueaba la eliminación de gastos con related_reservation_id."
+      - working: true
+        agent: "testing"
+        comment: "✅ TESTED: Eliminación de gastos auto-generados completamente funcional. Reservación creada con owner_price: 5000.0 generó gasto automático con related_reservation_id. Gasto auto-generado eliminado exitosamente (código 200). Verificado que gasto eliminado no aparece en GET /api/expenses. Funcionalidad working as expected."
 
   - task: "Modelo Category - CRUD completo"
     implemented: true
