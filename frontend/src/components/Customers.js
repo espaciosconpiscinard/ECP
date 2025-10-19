@@ -120,10 +120,10 @@ const Customers = () => {
               </div>
 
               <div>
-                <Label>DNI (Opcional)</Label>
+                <Label>Cedula/Pasaporte/RNC (Opcional)</Label>
                 <Input
-                  value={formData.dni}
-                  onChange={(e) => setFormData({ ...formData, dni: e.target.value })}
+                  value={formData.identification_document}
+                  onChange={(e) => setFormData({ ...formData, identification_document: e.target.value })}
                   placeholder="001-1234567-8"
                 />
               </div>
