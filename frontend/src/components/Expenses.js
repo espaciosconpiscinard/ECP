@@ -454,9 +454,20 @@ const ExpensesNew = () => {
                             </div>
                             <div className="flex items-center justify-between">
                               <div>
-                                <p className="text-sm font-semibold text-red-600">{formatCurrency(expense.amount, expense.currency)}</p>
-                                <span className={`text-xs px-2 py-1 rounded ${expense.payment_status === 'paid' ? 'bg-green-100 text-green-800' : 'bg-orange-100 text-orange-800'}`}>
-                                  {expense.payment_status === 'paid' ? 'Pagado' : 'Pendiente'}
+                                {/* Mostrar balance_due (saldo restante) */}
+                                <p className={`text-sm font-semibold ${
+                                  expense.balance_due < 0 ? 'text-blue-600' : 
+                                  expense.balance_due === 0 ? 'text-green-600' : 
+                                  'text-red-600'
+                                }`}>
+                                  {formatCurrency(Math.abs(expense.balance_due || expense.amount), expense.currency)}
+                                  {expense.balance_due < 0 && ' (Excedente)'}
+                                  {expense.balance_due === 0 && ' (Pagado)'}
+                                </p>
+                                <span className={`text-xs px-2 py-1 rounded ${
+                                  expense.balance_due <= 0 ? 'bg-green-100 text-green-800' : 'bg-orange-100 text-orange-800'
+                                }`}>
+                                  {expense.balance_due <= 0 ? 'Pagado' : 'Pendiente'}
                                 </span>
                               </div>
                               {isExpanded ? <ChevronUp size={20} /> : <ChevronDown size={20} />}
