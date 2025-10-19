@@ -293,12 +293,16 @@ const ExpensesNew = () => {
           <h2 className="text-3xl font-bold text-gray-900">Gastos</h2>
           <p className="text-gray-500 mt-1">Gestiona los gastos del negocio</p>
         </div>
-        <Dialog open={isFormOpen} onOpenChange={setIsFormOpen}>
-          <DialogTrigger asChild>
-            <Button onClick={() => resetForm()}>
-              <Plus className="mr-2 h-4 w-4" /> Nuevo Gasto
-            </Button>
-          </DialogTrigger>
+        <div className="flex gap-2">
+          <Button variant="outline" onClick={() => setIsCategoryFormOpen(true)}>
+            📂 Categorías
+          </Button>
+          <Dialog open={isFormOpen} onOpenChange={setIsFormOpen}>
+            <DialogTrigger asChild>
+              <Button onClick={() => resetForm()}>
+                <Plus className="mr-2 h-4 w-4" /> Nuevo Gasto
+              </Button>
+            </DialogTrigger>
           <DialogContent className="max-w-md">
             <DialogHeader>
               <DialogTitle>
