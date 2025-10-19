@@ -501,21 +501,87 @@ const Expenses = () => {
         </Card>
       </div>
 
-      {/* Filter */}
-      <div className="flex items-center space-x-2">
-        <Filter className="text-gray-400" size={20} />
-        <select
-          value={filterCategory}
-          onChange={(e) => setFilterCategory(e.target.value)}
-          className="p-2 border rounded-md"
-          data-testid="filter-category-select"
-        >
-          <option value="">Todas las categorías</option>
-          <option value="local">Pago de Local</option>
-          <option value="nomina">Nómina</option>
-          <option value="variable">Gasto Variable</option>
-          <option value="otros">Otros</option>
-        </select>
+      {/* Próximos Pagos */}
+      {upcomingPayments.length > 0 && (
+        <Card className="border-orange-200 bg-orange-50">
+          <CardHeader>
+            <CardTitle className="flex items-center text-orange-800">
+              <Bell className="mr-2 h-5 w-5" />
+              Recordatorios de Pago ({upcomingPayments.length})
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-2">
+              {upcomingPayments.map((expense) => {
+                const today = new Date().getDate();
+                const daysUntil = expense.payment_reminder_day - today;
+                const isOverdue = daysUntil < 0;
+                const isToday = daysUntil === 0;
+                
+                return (
+                  <div key={expense.id} className="flex items-center justify-between p-3 bg-white rounded-md border">
+                    <div className="flex-1">
+                      <p className="font-semibold">{expense.description}</p>
+                      {getExpenseCategoryName(expense.expense_category_id) && (
+                        <p className="text-sm text-gray-600">
+                          {getExpenseCategoryName(expense.expense_category_id)}
+                        </p>
+                      )}
+                      <p className="text-sm text-gray-500">
+                        Día de pago: {expense.payment_reminder_day} de cada mes
+                        {expense.is_recurring && ' (Recurrente)'}
+                      </p>
+                    </div>
+                    <div className="text-right">
+                      <p className="font-bold text-lg">
+                        {formatCurrency(expense.amount, expense.currency)}
+                      </p>
+                      <p className={`text-sm font-semibold ${
+                        isOverdue ? 'text-red-600' : 
+                        isToday ? 'text-orange-600' : 
+                        'text-green-600'
+                      }`}>
+                        {isOverdue ? '¡Vencido!' : 
+                         isToday ? 'Hoy' : 
+                         `En ${daysUntil} días`}
+                      </p>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
+      {/* Filter and Group */}
+      <div className="flex items-center justify-between">
+        <div className="flex items-center space-x-2">
+          <Filter className="text-gray-400" size={20} />
+          <select
+            value={filterCategory}
+            onChange={(e) => setFilterCategory(e.target.value)}
+            className="p-2 border rounded-md"
+            data-testid="filter-category-select"
+          >
+            <option value="">Todas las categorías</option>
+            <option value="local">Pago de Local</option>
+            <option value="nomina">Nómina</option>
+            <option value="variable">Gasto Variable</option>
+            <option value="pago_propietario">Pago Propietario</option>
+            <option value="otros">Otros</option>
+          </select>
+        </div>
+        
+        <div className="flex items-center space-x-2">
+          <input
+            type="checkbox"
+            checked={groupByCategory}
+            onChange={(e) => setGroupByCategory(e.target.checked)}
+            id="group_by_category"
+          />
+          <Label htmlFor="group_by_category">Agrupar por Categoría</Label>
+        </div>
       </div>
 
       {/* Expenses Table */}
