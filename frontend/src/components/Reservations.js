@@ -1076,6 +1076,20 @@ const Reservations = () => {
 
                         {/* Acciones */}
                         <div className="flex gap-2 mt-4 pt-3 border-t">
+                          {/* Botón Agregar Abono - Si tiene saldo pendiente */}
+                          {res.balance_due > 0 && (
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handleAddAbono(res);
+                              }}
+                              className="flex-1 bg-green-50 text-green-700 hover:bg-green-100"
+                            >
+                              💵 Agregar Abono
+                            </Button>
+                          )}
                           <Button
                             size="sm"
                             variant="outline"
