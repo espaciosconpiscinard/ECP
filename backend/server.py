@@ -586,21 +586,28 @@ async def get_reservation_abonos(reservation_id: str, current_user: dict = Depen
 @api_router.delete("/reservations/{reservation_id}/abonos/{abono_id}")
 async def delete_reservation_abono(reservation_id: str, abono_id: str, current_user: dict = Depends(require_admin)):
     """Delete an abono from a reservation (admin only) - to correct errors"""
-    # Delete the abono
-    result = await db.reservation_abonos.delete_one({"reservation_id": reservation_id, "id": abono_id})
-    if result.deleted_count == 0:
+    # Get the abono to delete
+    abono_to_delete = await db.reservation_abonos.find_one({"reservation_id": reservation_id, "id": abono_id}, {"_id": 0})
+    if not abono_to_delete:
         raise HTTPException(status_code=404, detail="Abono not found")
     
-    # Recalculate reservation balance
+    # Delete the abono
+    await db.reservation_abonos.delete_one({"reservation_id": reservation_id, "id": abono_id})
+    
+    # Recalculate reservation balance: Total + Depósito - Pagado
     reservation = await db.reservations.find_one({"id": reservation_id}, {"_id": 0})
     if reservation:
+        # Recalculate total paid from remaining abonos
         all_abonos = await db.reservation_abonos.find({"reservation_id": reservation_id}, {"_id": 0}).to_list(1000)
-        total_paid = sum(a.get("amount", 0) for a in all_abonos)
-        # Add the original amount_paid from reservation creation
-        original_payment = reservation.get("amount_paid", 0) - sum(a.get("amount", 0) for a in all_abonos if a.get("id") != abono_id)
+        total_from_abonos = sum(a.get("amount", 0) for a in all_abonos)
         
-        new_amount_paid = reservation.get("amount_paid", 0) - result.deleted_count * next((a.get("amount", 0) for a in all_abonos if a.get("id") == abono_id), 0)
-        new_balance_due = calculate_balance(reservation.get("total_amount", 0), new_amount_paid)
+        # Original payment is stored in the reservation
+        new_amount_paid = reservation.get("amount_paid", 0) - abono_to_delete.get("amount", 0)
+        new_balance_due = calculate_balance(
+            reservation.get("total_amount", 0), 
+            new_amount_paid,
+            reservation.get("deposit", 0)
+        )
         
         await db.reservations.update_one(
             {"id": reservation_id},
