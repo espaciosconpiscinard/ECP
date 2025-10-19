@@ -202,6 +202,9 @@ const Customers = () => {
                         </div>
                       </td>
                       <td className="p-2 text-sm">
+                        {customer.dni || '-'}
+                      </td>
+                      <td className="p-2 text-sm">
                         {customer.email && (
                           <div className="flex items-center">
                             <Mail size={14} className="mr-1 text-gray-500" />
@@ -227,7 +230,7 @@ const Customers = () => {
                   ))
                 ) : (
                   <tr>
-                    <td colSpan="4" className="text-center py-8 text-gray-500">
+                    <td colSpan="5" className="text-center py-8 text-gray-500">
                       No hay clientes registrados
                     </td>
                   </tr>
