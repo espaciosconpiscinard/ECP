@@ -120,6 +120,15 @@ const Customers = () => {
               </div>
 
               <div>
+                <Label>DNI (Opcional)</Label>
+                <Input
+                  value={formData.dni}
+                  onChange={(e) => setFormData({ ...formData, dni: e.target.value })}
+                  placeholder="001-1234567-8"
+                />
+              </div>
+
+              <div>
                 <Label>Email (Opcional)</Label>
                 <Input
                   type="email"
