@@ -587,11 +587,13 @@ const ExpensesNew = () => {
         </Alert>
       )}
 
-      {/* Gastos agrupados por categoría */}
-      <div className="space-y-6">
-        {sortedCategoryKeys.map((categoryKey) => {
-          const categoryExpenses = groupedExpenses[categoryKey];
-          const categoryTotal = categoryExpenses.reduce((sum, e) => sum + (e.currency === 'DOP' ? e.amount : 0), 0);
+      {/* Gastos agrupados por categoría O por recordatorios */}
+      {viewMode === 'all' ? (
+        // Vista normal: Todos los gastos agrupados por categoría
+        <div className="space-y-6">
+          {sortedCategoryKeys.map((categoryKey) => {
+            const categoryExpenses = groupedExpenses[categoryKey];
+            const categoryTotal = categoryExpenses.reduce((sum, e) => sum + (e.currency === 'DOP' ? e.amount : 0), 0);
           
           return (
             <Card key={categoryKey}>
