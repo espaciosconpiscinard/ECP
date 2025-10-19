@@ -360,3 +360,75 @@ class DashboardStats(BaseModel):
     owners_balance_due_usd: float
     recent_reservations: List[Reservation]
     pending_payment_reservations: List[Reservation]
+
+# ============ INVOICE TEMPLATE MODEL ============
+class InvoiceTemplateBase(BaseModel):
+    # Campos visibles
+    show_customer_name: bool = True
+    show_customer_phone: bool = True
+    show_customer_identification: bool = True
+    show_villa_code: bool = True
+    show_villa_description: bool = True
+    show_rental_type: bool = True
+    show_reservation_date: bool = True
+    show_check_in_time: bool = True
+    show_check_out_time: bool = True
+    show_guests: bool = True
+    show_extra_services: bool = True
+    show_payment_method: bool = True
+    show_deposit: bool = True
+    
+    # Políticas y términos (cada una puede estar activa o no)
+    policies: List[str] = [
+        "El depósito no es reembolsable",
+        "Check-in: horario establecido | Check-out: horario establecido",
+        "Capacidad máxima de personas debe respetarse",
+        "Prohibido fumar dentro de las instalaciones",
+        "El cliente es responsable de cualquier daño a la propiedad"
+    ]
+    
+    # Campos personalizados adicionales
+    custom_fields: Dict[str, str] = {}  # {"nombre_campo": "valor_por_defecto"}
+    
+    # Notas adicionales
+    footer_note: Optional[str] = "¡Gracias por su preferencia!"
+    
+    # Colores (hex)
+    primary_color: str = "#2563eb"  # Azul
+    secondary_color: str = "#1e40af"  # Azul oscuro
+    
+    # Logo
+    show_logo: bool = True
+    
+class InvoiceTemplateCreate(InvoiceTemplateBase):
+    pass
+
+class InvoiceTemplateUpdate(BaseModel):
+    show_customer_name: Optional[bool] = None
+    show_customer_phone: Optional[bool] = None
+    show_customer_identification: Optional[bool] = None
+    show_villa_code: Optional[bool] = None
+    show_villa_description: Optional[bool] = None
+    show_rental_type: Optional[bool] = None
+    show_reservation_date: Optional[bool] = None
+    show_check_in_time: Optional[bool] = None
+    show_check_out_time: Optional[bool] = None
+    show_guests: Optional[bool] = None
+    show_extra_services: Optional[bool] = None
+    show_payment_method: Optional[bool] = None
+    show_deposit: Optional[bool] = None
+    policies: Optional[List[str]] = None
+    custom_fields: Optional[Dict[str, str]] = None
+    footer_note: Optional[str] = None
+    primary_color: Optional[str] = None
+    secondary_color: Optional[str] = None
+    show_logo: Optional[bool] = None
+
+class InvoiceTemplate(InvoiceTemplateBase):
+    model_config = ConfigDict(extra="ignore")
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    template_id: str = "main_template"  # Solo una plantilla principal
+    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+    updated_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+    created_by: str
+
