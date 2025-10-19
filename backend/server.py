@@ -504,10 +504,11 @@ async def update_reservation(
     update_dict = {k: v for k, v in update_data.model_dump(exclude_unset=True).items() if v is not None}
     
     if update_dict:
-        # Recalculate balance if amounts changed
+        # Recalculate balance if amounts changed: Total + Depósito - Pagado
         total = update_dict.get("total_amount", existing["total_amount"])
         paid = update_dict.get("amount_paid", existing["amount_paid"])
-        update_dict["balance_due"] = calculate_balance(total, paid)
+        deposit = update_dict.get("deposit", existing.get("deposit", 0))
+        update_dict["balance_due"] = calculate_balance(total, paid, deposit)
         update_dict["updated_at"] = datetime.now(timezone.utc).isoformat()
         
         prepared_update = {}
