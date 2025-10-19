@@ -177,6 +177,33 @@ const ExpensesNew = () => {
     }
   };
 
+  const handleCreateCategory = async (e) => {
+    e.preventDefault();
+    try {
+      await createExpenseCategory(categoryFormData);
+      await fetchData();
+      setIsCategoryFormOpen(false);
+      setCategoryFormData({ name: '', description: '' });
+      alert('✅ Categoría creada exitosamente');
+    } catch (err) {
+      setError('Error al crear categoría');
+      console.error(err);
+    }
+  };
+
+  const handleDeleteCategory = async (categoryId) => {
+    if (window.confirm('¿Estás seguro de eliminar esta categoría? Los gastos quedarán sin categoría asignada.')) {
+      try {
+        await deleteExpenseCategory(categoryId);
+        await fetchData();
+        alert('✅ Categoría eliminada exitosamente');
+      } catch (err) {
+        setError('Error al eliminar categoría');
+        console.error(err);
+      }
+    }
+  };
+
   const handleAddAbono = (expense) => {
     setSelectedExpense(expense);
     setAbonoFormData({
