@@ -262,13 +262,15 @@ class Payment(PaymentBase):
 
 # ============ EXPENSE MODELS ============
 class ExpenseBase(BaseModel):
-    category: Literal["local", "nomina", "variable", "otros"] = "otros"
+    category: Literal["local", "nomina", "variable", "pago_propietario", "otros"] = "otros"
+    category_id: Optional[str] = None  # ID de categoría personalizada
     description: str
     amount: float
     currency: Literal["DOP", "USD"] = "DOP"
     expense_date: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
-    payment_status: Literal["pending", "paid"] = "paid"
+    payment_status: Literal["pending", "paid"] = "pending"
     notes: Optional[str] = None
+    related_reservation_id: Optional[str] = None  # Para gastos auto-generados por reservaciones
 
 class ExpenseCreate(ExpenseBase):
     pass
