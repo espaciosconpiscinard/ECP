@@ -281,6 +281,8 @@ const Reservations = () => {
     setShowExtraServices(false);
     setVillaSearchTerm('');
     setShowVillaDropdown(false);
+    setCustomerSearchTerm('');
+    setShowCustomerDropdown(false);
     setFormData({
       customer_id: '',
       customer_name: '',
