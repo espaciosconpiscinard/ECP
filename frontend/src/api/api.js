@@ -15,12 +15,18 @@ export const getCustomer = (id) => axios.get(`${API}/customers/${id}`);
 export const createCustomer = (data) => axios.post(`${API}/customers`, data);
 export const deleteCustomer = (id) => axios.delete(`${API}/customers/${id}`);
 
-// ============ CATEGORIES ============
+// ============ CATEGORIES (FOR VILLAS) ============
 export const getCategories = () => axios.get(`${API}/categories`);
 export const getCategory = (id) => axios.get(`${API}/categories/${id}`);
 export const createCategory = (data) => axios.post(`${API}/categories`, data);
 export const updateCategory = (id, data) => axios.put(`${API}/categories/${id}`, data);
 export const deleteCategory = (id) => axios.delete(`${API}/categories/${id}`);
+
+// ============ EXPENSE CATEGORIES (SEPARATE) ============
+export const getExpenseCategories = () => axios.get(`${API}/expense-categories`);
+export const createExpenseCategory = (data) => axios.post(`${API}/expense-categories`, data);
+export const updateExpenseCategory = (id, data) => axios.put(`${API}/expense-categories/${id}`, data);
+export const deleteExpenseCategory = (id) => axios.delete(`${API}/expense-categories/${id}`);
 
 // ============ VILLAS ============
 export const getVillas = (search = null, categoryId = null) => {
