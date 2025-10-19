@@ -120,15 +120,18 @@ user_problem_statement: |
 backend:
   - task: "Campo DNI opcional en modelo Customer"
     implemented: true
-    working: "NA"
+    working: true
     file: "/app/backend/models.py"
     stuck_count: 0
     priority: "high"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
       - working: "NA"
         agent: "main"
         comment: "Agregado campo 'dni' opcional al modelo CustomerBase. Campo disponible para capturar DNI de clientes."
+      - working: true
+        agent: "testing"
+        comment: "✅ TESTED: Campo DNI completamente funcional. Cliente creado CON DNI (001-1234567-8) exitosamente. Cliente creado SIN DNI exitosamente (campo opcional). Campo DNI presente en respuestas GET /api/customers. Estructura de API correcta con campo DNI disponible."
   
   - task: "Permitir eliminación de gastos auto-generados"
     implemented: true
