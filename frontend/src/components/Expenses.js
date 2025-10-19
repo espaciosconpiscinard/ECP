@@ -507,15 +507,34 @@ const ExpensesNew = () => {
         </Card>
       </div>
 
-      {/* Buscador */}
-      <div className="flex items-center space-x-2">
-        <Search className="text-gray-400" size={20} />
-        <Input
-          placeholder="Buscar por descripción o categoría..."
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
-          className="max-w-md"
-        />
+      {/* Buscador y Toggle de Vista */}
+      <div className="flex items-center justify-between gap-4">
+        <div className="flex items-center space-x-2 flex-1">
+          <Search className="text-gray-400" size={20} />
+          <Input
+            placeholder="Buscar por descripción o categoría..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className="max-w-md"
+          />
+        </div>
+        
+        <div className="flex gap-2">
+          <Button
+            variant={viewMode === 'all' ? 'default' : 'outline'}
+            onClick={() => setViewMode('all')}
+            size="sm"
+          >
+            📋 Todos
+          </Button>
+          <Button
+            variant={viewMode === 'reminders' ? 'default' : 'outline'}
+            onClick={() => setViewMode('reminders')}
+            size="sm"
+          >
+            🔔 Recordatorios
+          </Button>
+        </div>
       </div>
 
       {error && !isFormOpen && (
