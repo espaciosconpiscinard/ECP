@@ -202,7 +202,7 @@ const Customers = () => {
                         </div>
                       </td>
                       <td className="p-2 text-sm">
-                        {customer.dni || '-'}
+                        {customer.identification_document || customer.dni || '-'}
                       </td>
                       <td className="p-2 text-sm">
                         {customer.email && (
