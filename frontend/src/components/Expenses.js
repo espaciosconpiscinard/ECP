@@ -47,7 +47,7 @@ const ExpensesNew = () => {
   const fetchData = async () => {
     try {
       const [expensesResponse, categoriesResponse] = await Promise.all([
-        getExpenses(),
+        getExpenses(null, searchTerm || null),
         getCategories()
       ]);
       setExpenses(expensesResponse.data);
