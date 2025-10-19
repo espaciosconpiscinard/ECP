@@ -125,6 +125,34 @@ const ExpensesNew = () => {
     }));
   };
 
+  const handleAddAbono = (expense) => {
+    setSelectedExpense(expense);
+    setAbonoFormData({
+      amount: 0,
+      currency: expense.currency,
+      payment_method: 'efectivo',
+      payment_date: new Date().toISOString().split('T')[0],
+      notes: ''
+    });
+    setIsAbonoDialogOpen(true);
+  };
+
+  const submitAbono = async (e) => {
+    e.preventDefault();
+    if (!selectedExpense) return;
+    
+    try {
+      await addAbonoToExpense(selectedExpense.id, abonoFormData);
+      setIsAbonoDialogOpen(false);
+      setSelectedExpense(null);
+      await fetchData();
+      alert('Abono registrado exitosamente');
+    } catch (err) {
+      setError('Error al registrar abono');
+      console.error(err);
+    }
+  };
+
   const formatCurrency = (amount, currency) => {
     const formatted = new Intl.NumberFormat('es-DO').format(amount);
     return currency === 'DOP' ? `RD$ ${formatted}` : `$ ${formatted}`;
