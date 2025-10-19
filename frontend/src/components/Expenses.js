@@ -119,11 +119,46 @@ const ExpensesNew = () => {
     });
   };
 
-  const toggleExpand = (expenseId) => {
+  const toggleExpand = async (expenseId) => {
+    const wasExpanded = expandedExpenses[expenseId];
+    
     setExpandedExpenses(prev => ({
       ...prev,
       [expenseId]: !prev[expenseId]
     }));
+    
+    // Si se está expandiendo (no colapsando), cargar los abonos
+    if (!wasExpanded && !expenseAbonos[expenseId]) {
+      try {
+        const response = await getExpenseAbonos(expenseId);
+        setExpenseAbonos(prev => ({
+          ...prev,
+          [expenseId]: response.data
+        }));
+      } catch (err) {
+        console.error('Error loading abonos:', err);
+      }
+    }
+  };
+
+  const handleDeleteAbono = async (expenseId, abonoId) => {
+    if (window.confirm('¿Estás seguro de eliminar este abono? Esta acción corregirá el saldo del gasto.')) {
+      try {
+        await deleteExpenseAbono(expenseId, abonoId);
+        // Recargar datos
+        await fetchData();
+        // Recargar abonos del gasto
+        const response = await getExpenseAbonos(expenseId);
+        setExpenseAbonos(prev => ({
+          ...prev,
+          [expenseId]: response.data
+        }));
+        alert('✅ Abono eliminado exitosamente. Saldo actualizado.');
+      } catch (err) {
+        setError('Error al eliminar abono');
+        console.error(err);
+      }
+    }
   };
 
   const handleAddAbono = (expense) => {
