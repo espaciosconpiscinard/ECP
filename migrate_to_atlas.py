@@ -9,7 +9,7 @@ from motor.motor_asyncio import AsyncIOMotorClient
 LOCAL_MONGO_URL = "mongodb://localhost:27017"
 LOCAL_DB_NAME = "test_database"
 
-ATLAS_MONGO_URL = "mongodb+srv://espaciosconpiscinard_db_user:GLOZOk0eNG9wDAiO@cluster0.hyk9vvo.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0"
+ATLAS_MONGO_URL = "mongodb+srv://espaciosconpiscinard_db_user:GLOZOk0eNG9wDAiO@cluster0.hyk9vvo.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0&tls=true&tlsAllowInvalidCertificates=true"
 ATLAS_DB_NAME = "espacios_con_piscina"
 
 # Colecciones a migrar
