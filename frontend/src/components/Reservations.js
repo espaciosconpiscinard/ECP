@@ -98,6 +98,7 @@ const Reservations = () => {
     try {
       const custResponse = await getCustomers();
       setCustomers(custResponse.data);
+      // NO recargamos reservations, villas ni servicios
     } catch (err) {
       console.error('Error al cargar clientes:', err);
     }
