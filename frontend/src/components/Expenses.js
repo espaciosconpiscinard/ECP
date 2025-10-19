@@ -597,11 +597,29 @@ const ExpensesNew = () => {
             <DialogTitle>Agregar Abono al Gasto</DialogTitle>
           </DialogHeader>
           {selectedExpense && (
-            <div className="mb-4 p-3 bg-gray-50 rounded">
+            <div className="mb-4 p-3 bg-gray-50 rounded border-2 border-blue-200">
               <p className="text-sm font-medium">{selectedExpense.description}</p>
-              <p className="text-xs text-gray-600 mt-1">
-                Total: {formatCurrency(selectedExpense.amount, selectedExpense.currency)}
-              </p>
+              <div className="mt-2 space-y-1 text-xs">
+                <div className="flex justify-between">
+                  <span className="text-gray-600">Monto original:</span>
+                  <span className="font-semibold">{formatCurrency(selectedExpense.amount, selectedExpense.currency)}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-gray-600">Ya pagado:</span>
+                  <span className="text-green-600 font-semibold">{formatCurrency(selectedExpense.total_paid || 0, selectedExpense.currency)}</span>
+                </div>
+                <div className="flex justify-between border-t pt-1">
+                  <span className="text-gray-800 font-medium">Saldo pendiente:</span>
+                  <span className={`font-bold text-base ${
+                    selectedExpense.balance_due < 0 ? 'text-blue-600' : 
+                    selectedExpense.balance_due === 0 ? 'text-green-600' : 
+                    'text-red-600'
+                  }`}>
+                    {selectedExpense.balance_due < 0 ? '-' : ''}
+                    {formatCurrency(Math.abs(selectedExpense.balance_due || selectedExpense.amount), selectedExpense.currency)}
+                  </span>
+                </div>
+              </div>
             </div>
           )}
           <form onSubmit={submitAbono} className="space-y-4">
@@ -616,6 +634,11 @@ const ExpensesNew = () => {
                   onChange={(e) => setAbonoFormData({ ...abonoFormData, amount: parseFloat(e.target.value) || 0 })}
                   required
                 />
+                {selectedExpense && selectedExpense.balance_due > 0 && (
+                  <p className="text-xs text-blue-600 mt-1">
+                    💡 Sugerido: {formatCurrency(selectedExpense.balance_due, selectedExpense.currency)}
+                  </p>
+                )}
               </div>
               <div>
                 <Label>Moneda *</Label>
