@@ -314,6 +314,75 @@ async def reset_invoice_counter(
         "next_invoice": str(start_number)
     }
 
+# ============ INVOICE TEMPLATE ENDPOINTS (ADMIN ONLY) ============
+
+@api_router.get("/config/invoice-template", response_model=InvoiceTemplate)
+async def get_invoice_template(current_user: dict = Depends(require_admin)):
+    """Get invoice template configuration (admin only)"""
+    template = await db.invoice_templates.find_one({"template_id": "main_template"}, {"_id": 0})
+    
+    if not template:
+        # Create default template
+        default_template = InvoiceTemplate(
+            template_id="main_template",
+            created_by=current_user["id"]
+        )
+        doc = prepare_doc_for_insert(default_template.model_dump())
+        await db.invoice_templates.insert_one(doc)
+        return default_template
+    
+    return restore_datetimes(template, ["created_at", "updated_at"])
+
+@api_router.put("/config/invoice-template", response_model=InvoiceTemplate)
+async def update_invoice_template(
+    template_data: InvoiceTemplateUpdate,
+    current_user: dict = Depends(require_admin)
+):
+    """Update invoice template (admin only)"""
+    existing_template = await db.invoice_templates.find_one({"template_id": "main_template"})
+    
+    # Prepare update data
+    update_dict = {k: v for k, v in template_data.model_dump(exclude_unset=True).items() if v is not None}
+    update_dict["updated_at"] = datetime.now(timezone.utc).isoformat()
+    
+    if not existing_template:
+        # Create new template
+        new_template = InvoiceTemplate(
+            **template_data.model_dump(exclude_unset=True),
+            template_id="main_template",
+            created_by=current_user["id"]
+        )
+        doc = prepare_doc_for_insert(new_template.model_dump())
+        await db.invoice_templates.insert_one(doc)
+        return new_template
+    else:
+        # Update existing template
+        await db.invoice_templates.update_one(
+            {"template_id": "main_template"},
+            {"$set": update_dict}
+        )
+        
+        updated_template = await db.invoice_templates.find_one({"template_id": "main_template"}, {"_id": 0})
+        return restore_datetimes(updated_template, ["created_at", "updated_at"])
+
+@api_router.post("/config/invoice-template/reset")
+async def reset_invoice_template(current_user: dict = Depends(require_admin)):
+    """Reset invoice template to default (admin only)"""
+    default_template = InvoiceTemplate(
+        template_id="main_template",
+        created_by=current_user["id"]
+    )
+    
+    doc = prepare_doc_for_insert(default_template.model_dump())
+    
+    await db.invoice_templates.update_one(
+        {"template_id": "main_template"},
+        {"$set": doc},
+        upsert=True
+    )
+    
+    return {"message": "Plantilla reseteada a valores por defecto", "template": default_template}
+
 # ============ CUSTOMER ENDPOINTS ============
 
 @api_router.post("/customers", response_model=Customer)
