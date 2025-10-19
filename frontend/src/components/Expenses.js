@@ -717,20 +717,53 @@ const ExpensesNew = () => {
             </div>
           )}
           <form onSubmit={submitAbono} className="space-y-4">
+            {/* Tipo de Transacción */}
+            <div>
+              <Label>Tipo de Transacción *</Label>
+              <select
+                value={abonoFormData.amount >= 0 ? 'pago' : 'devolucion'}
+                onChange={(e) => {
+                  if (e.target.value === 'devolucion') {
+                    setAbonoFormData({ ...abonoFormData, amount: Math.abs(abonoFormData.amount) * -1 });
+                  } else {
+                    setAbonoFormData({ ...abonoFormData, amount: Math.abs(abonoFormData.amount) });
+                  }
+                }}
+                className="w-full p-2 border rounded-md"
+              >
+                <option value="pago">💵 Pago / Abono</option>
+                <option value="devolucion">↩️ Devolución / Corrección</option>
+              </select>
+              <p className="text-xs text-gray-500 mt-1">
+                {abonoFormData.amount < 0 ? 
+                  '⚠️ Una devolución reducirá el total pagado (útil para corregir excedentes)' :
+                  'Un pago aumentará el total pagado hacia el saldo'}
+              </p>
+            </div>
+
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <Label>Monto del Abono *</Label>
+                <Label>Monto {abonoFormData.amount < 0 ? 'de la Devolución' : 'del Abono'} *</Label>
                 <Input
                   type="number"
                   step="0.01"
                   min="0"
-                  value={abonoFormData.amount}
-                  onChange={(e) => setAbonoFormData({ ...abonoFormData, amount: parseFloat(e.target.value) || 0 })}
+                  value={Math.abs(abonoFormData.amount)}
+                  onChange={(e) => {
+                    const value = parseFloat(e.target.value) || 0;
+                    const isDevolucion = abonoFormData.amount < 0;
+                    setAbonoFormData({ ...abonoFormData, amount: isDevolucion ? -value : value });
+                  }}
                   required
                 />
-                {selectedExpense && selectedExpense.balance_due > 0 && (
+                {selectedExpense && selectedExpense.balance_due > 0 && abonoFormData.amount >= 0 && (
                   <p className="text-xs text-blue-600 mt-1">
                     💡 Sugerido: {formatCurrency(selectedExpense.balance_due, selectedExpense.currency)}
+                  </p>
+                )}
+                {selectedExpense && selectedExpense.balance_due < 0 && abonoFormData.amount < 0 && (
+                  <p className="text-xs text-blue-600 mt-1">
+                    💡 Excedente actual: {formatCurrency(Math.abs(selectedExpense.balance_due), selectedExpense.currency)}
                   </p>
                 )}
               </div>
