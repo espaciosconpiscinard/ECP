@@ -59,10 +59,10 @@ const ExpensesNew = () => {
     try {
       const [expensesResponse, categoriesResponse] = await Promise.all([
         getExpenses(null, searchTerm || null),
-        getCategories()
+        getExpenseCategories()
       ]);
       setExpenses(expensesResponse.data);
-      setCategories(categoriesResponse.data);
+      setExpenseCategories(categoriesResponse.data);
     } catch (err) {
       setError('Error al cargar datos');
       console.error(err);
