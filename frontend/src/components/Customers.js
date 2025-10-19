@@ -20,7 +20,7 @@ const Customers = () => {
     name: '',
     phone: '',
     email: '',
-    dni: '',
+    identification_document: '',
     address: ''
   });
 
