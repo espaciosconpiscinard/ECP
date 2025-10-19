@@ -66,14 +66,36 @@ export const updateOwnerAmounts = (ownerId, totalOwed) =>
   axios.put(`${API}/owners/${ownerId}/amounts?total_owed=${totalOwed}`);
 
 // ============ EXPENSES ============
-export const getExpenses = (category = null) => {
-  const url = category ? `${API}/expenses?category=${category}` : `${API}/expenses`;
+export const getExpenses = (category = null, search = null) => {
+  let url = `${API}/expenses`;
+  const params = [];
+  if (category) params.push(`category=${category}`);
+  if (search) params.push(`search=${encodeURIComponent(search)}`);
+  if (params.length > 0) url += `?${params.join('&')}`;
   return axios.get(url);
 };
 export const getExpense = (id) => axios.get(`${API}/expenses/${id}`);
 export const createExpense = (data) => axios.post(`${API}/expenses`, data);
 export const updateExpense = (id, data) => axios.put(`${API}/expenses/${id}`, data);
 export const deleteExpense = (id) => axios.delete(`${API}/expenses/${id}`);
+
+// Abonos to expenses
+export const addAbonoToExpense = (expenseId, data) => axios.post(`${API}/expenses/${expenseId}/abonos`, data);
+export const getExpenseAbonos = (expenseId) => axios.get(`${API}/expenses/${expenseId}/abonos`);
+
+// ============ RESERVATIONS ============
+export const getReservations = (status = null) => {
+  const url = status ? `${API}/reservations?status=${status}` : `${API}/reservations`;
+  return axios.get(url);
+};
+export const getReservation = (id) => axios.get(`${API}/reservations/${id}`);
+export const createReservation = (data) => axios.post(`${API}/reservations`, data);
+export const updateReservation = (id, data) => axios.put(`${API}/reservations/${id}`, data);
+export const deleteReservation = (id) => axios.delete(`${API}/reservations/${id}`);
+
+// Abonos to reservations
+export const addAbonoToReservation = (reservationId, data) => axios.post(`${API}/reservations/${reservationId}/abonos`, data);
+export const getReservationAbonos = (reservationId) => axios.get(`${API}/reservations/${reservationId}/abonos`);
 
 // ============ DASHBOARD ============
 export const getDashboardStats = () => axios.get(`${API}/dashboard/stats`);
