@@ -22,6 +22,7 @@ const Layout = ({ children, currentView, setCurrentView }) => {
       { id: 'expense-categories', label: 'Categorías Gastos', icon: Tag, roles: ['admin'] },
       { id: 'expenses', label: 'Gastos', icon: DollarSign, roles: ['admin'] },
       { id: 'users', label: 'Usuarios', icon: UserCog, roles: ['admin'] },
+      { id: 'invoice-editor', label: 'Editor de Facturas', icon: Receipt, roles: ['admin'] },
       { id: 'configuration', label: 'Configuración', icon: Settings, roles: ['admin'] }
     );
   }
