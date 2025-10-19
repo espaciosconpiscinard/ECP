@@ -225,6 +225,12 @@ const VillasManagementNew = () => {
     return `RD$ ${new Intl.NumberFormat('es-DO').format(amount)}`;
   };
 
+  // Filtrar servicios por búsqueda
+  const filteredServices = services.filter(s =>
+    s.service_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    s.description?.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
   // Filtrar villas por búsqueda
   const filteredVillas = villas.filter(v => 
     v.code?.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -256,16 +262,18 @@ const VillasManagementNew = () => {
 
   return (
     <div className="space-y-6">
+      {/* Header con selector de tipo */}
       <div className="flex justify-between items-center">
         <div>
-          <h2 className="text-3xl font-bold text-gray-900">Gestión de Villas</h2>
-          <p className="text-gray-500 mt-1">Administra las villas y sus precios</p>
+          <h2 className="text-3xl font-bold text-gray-900">Villas y Servicios</h2>
+          <p className="text-gray-500 mt-1">Administra las villas y servicios disponibles</p>
         </div>
         {isAdmin && (
           <Dialog open={isFormOpen} onOpenChange={setIsFormOpen}>
             <DialogTrigger asChild>
-              <Button onClick={() => resetForm()}>
-                <Plus className="mr-2 h-4 w-4" /> Nueva Villa
+              <Button onClick={handleOpenForm}>
+                <Plus className="mr-2 h-4 w-4" /> 
+                {itemType === 'villa' ? 'Nueva Villa' : 'Nuevo Servicio'}
               </Button>
             </DialogTrigger>
             <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
