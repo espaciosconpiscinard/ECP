@@ -91,6 +91,15 @@ const Reservations = () => {
       setLoading(false);
     }
   };
+
+  const fetchCustomersOnly = async () => {
+    try {
+      const custResponse = await getCustomers();
+      setCustomers(custResponse.data);
+    } catch (err) {
+      console.error('Error al cargar clientes:', err);
+    }
+  };
   
   // Calcular totales automáticamente
   useEffect(() => {
