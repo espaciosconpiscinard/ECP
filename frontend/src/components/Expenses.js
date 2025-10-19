@@ -263,8 +263,8 @@ const ExpensesNew = () => {
   // Agrupar gastos por categoría
   const groupedExpenses = {};
   filteredExpenses.forEach(expense => {
-    const key = expense.category_id ? 
-      categories.find(c => c.id === expense.category_id)?.name || expense.category :
+    const key = expense.expense_category_id ? 
+      expenseCategories.find(c => c.id === expense.expense_category_id)?.name || expense.category :
       getCategoryLabel(expense.category);
     
     if (!groupedExpenses[key]) {
