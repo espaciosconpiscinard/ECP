@@ -203,6 +203,33 @@ backend:
         comment: "✅ TESTED: Auto-creación de gastos completamente funcional. Al crear reservación con owner_price: 8000.0, se genera automáticamente gasto con category: 'pago_propietario', amount: 8000.0, description: 'Pago propietario villa ECPVSH - Factura #1605', payment_status: 'pending', related_reservation_id vinculado correctamente. Todos los campos requeridos presentes."
 
 frontend:
+  - task: "Componente Customers - Agregar campo DNI"
+    implemented: true
+    working: "NA"
+    file: "/app/frontend/src/components/Customers.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Agregado campo 'DNI' opcional en formulario de creación de clientes. Campo agregado en formData, resetForm, formulario HTML y tabla de visualización. Placeholder: '001-1234567-8'."
+  
+  - task: "Componente Expenses - Mostrar botón eliminar para todos los gastos"
+    implemented: true
+    working: "NA"
+    file: "/app/frontend/src/components/Expenses.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Modificado componente Expenses para mostrar botón de eliminar para TODOS los gastos (admin only), incluyendo gastos auto-generados. Corregido handleDelete para llamar fetchExpenses(). Agregado indicador '(Auto-generado)' para gastos con related_reservation_id."
+      - working: false
+        agent: "user"
+        comment: "Usuario reportó que el botón de eliminar gastos manuales no estaba visible o funcional"
+
   - task: "Componente Categories - CRUD"
     implemented: true
     working: true
