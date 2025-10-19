@@ -347,11 +347,12 @@ const Expenses = () => {
                             size="sm"
                             variant="ghost"
                             onClick={() => handleEdit(expense)}
+                            className="hover:bg-gray-100"
                             data-testid="edit-expense-button"
                           >
                             <Edit size={16} />
                           </Button>
-                          {user?.role === 'admin' && (
+                          {user?.role === 'admin' && !expense.related_reservation_id && (
                             <Button
                               size="sm"
                               variant="ghost"
@@ -361,6 +362,11 @@ const Expenses = () => {
                             >
                               <Trash2 size={16} />
                             </Button>
+                          )}
+                          {expense.related_reservation_id && (
+                            <span className="text-xs text-gray-500 italic">
+                              Auto-generado - elimina la reservación
+                            </span>
                           )}
                         </div>
                       </td>
