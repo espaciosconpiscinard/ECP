@@ -235,7 +235,7 @@ const VillasManagementNew = () => {
 
   // Filtrar servicios por búsqueda
   const filteredServices = services.filter(s =>
-    s.service_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    s.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
     s.description?.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
