@@ -922,6 +922,126 @@ const ExpensesNew = () => {
               />
             </div>
 
+      {/* Diálogo de Agregar Abono */}
+      <Dialog open={isAbonoDialogOpen} onOpenChange={setIsAbonoDialogOpen}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle>Agregar Abono al Gasto</DialogTitle>
+          </DialogHeader>
+          {selectedExpense && (
+            <div className="mb-4 p-3 bg-gray-50 rounded border-2 border-blue-200">
+              <p className="text-sm font-medium">{selectedExpense.description}</p>
+              <div className="mt-2 space-y-1 text-xs">
+                <div className="flex justify-between">
+                  <span className="text-gray-600">Monto original:</span>
+                  <span className="font-semibold">{formatCurrency(selectedExpense.amount, selectedExpense.currency)}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-gray-600">Ya pagado:</span>
+                  <span className="text-green-600 font-semibold">{formatCurrency(selectedExpense.total_paid || 0, selectedExpense.currency)}</span>
+                </div>
+                <div className="flex justify-between border-t pt-1">
+                  <span className="text-gray-800 font-medium">Saldo pendiente:</span>
+                  <span className={`font-bold text-base ${
+                    selectedExpense.balance_due < 0 ? 'text-blue-600' : 
+                    selectedExpense.balance_due === 0 ? 'text-green-600' : 
+                    'text-red-600'
+                  }`}>
+                    {selectedExpense.balance_due < 0 ? '-' : ''}
+                    {formatCurrency(Math.abs(selectedExpense.balance_due || selectedExpense.amount), selectedExpense.currency)}
+                  </span>
+                </div>
+              </div>
+            </div>
+          )}
+          <form onSubmit={submitAbono} className="space-y-4">
+            {/* Tipo de Transacción */}
+            <div>
+              <Label>Tipo de Transacción *</Label>
+              <select
+                value={abonoFormData.amount >= 0 ? 'pago' : 'devolucion'}
+                onChange={(e) => {
+                  if (e.target.value === 'devolucion') {
+                    setAbonoFormData({ ...abonoFormData, amount: Math.abs(abonoFormData.amount) * -1 });
+                  } else {
+                    setAbonoFormData({ ...abonoFormData, amount: Math.abs(abonoFormData.amount) });
+                  }
+                }}
+                className="w-full p-2 border rounded-md"
+              >
+                <option value="pago">💵 Pago / Abono</option>
+                <option value="devolucion">↩️ Devolución / Corrección</option>
+              </select>
+              <p className="text-xs text-gray-500 mt-1">
+                {abonoFormData.amount < 0 ? 
+                  '⚠️ Una devolución reducirá el total pagado (útil para corregir excedentes)' :
+                  'Un pago aumentará el total pagado hacia el saldo'}
+              </p>
+            </div>
+
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <Label>Monto {abonoFormData.amount < 0 ? 'de la Devolución' : 'del Abono'} *</Label>
+                <Input
+                  type="number"
+                  step="0.01"
+                  min="0"
+                  value={Math.abs(abonoFormData.amount)}
+                  onChange={(e) => {
+                    const value = parseFloat(e.target.value) || 0;
+                    const isDevolucion = abonoFormData.amount < 0;
+                    setAbonoFormData({ ...abonoFormData, amount: isDevolucion ? -value : value });
+                  }}
+                  required
+                />
+                {selectedExpense && selectedExpense.balance_due > 0 && abonoFormData.amount >= 0 && (
+                  <p className="text-xs text-blue-600 mt-1">
+                    💡 Sugerido: {formatCurrency(selectedExpense.balance_due, selectedExpense.currency)}
+                  </p>
+                )}
+                {selectedExpense && selectedExpense.balance_due < 0 && abonoFormData.amount < 0 && (
+                  <p className="text-xs text-blue-600 mt-1">
+                    💡 Excedente actual: {formatCurrency(Math.abs(selectedExpense.balance_due), selectedExpense.currency)}
+                  </p>
+                )}
+              </div>
+              <div>
+                <Label>Moneda *</Label>
+                <select
+                  value={abonoFormData.currency}
+                  onChange={(e) => setAbonoFormData({ ...abonoFormData, currency: e.target.value })}
+                  className="w-full p-2 border rounded-md"
+                >
+                  <option value="DOP">DOP</option>
+                  <option value="USD">USD</option>
+                </select>
+              </div>
+            </div>
+
+            <div>
+              <Label>Método de Pago *</Label>
+              <select
+                value={abonoFormData.payment_method}
+                onChange={(e) => setAbonoFormData({ ...abonoFormData, payment_method: e.target.value })}
+                className="w-full p-2 border rounded-md"
+              >
+                <option value="efectivo">Efectivo</option>
+                <option value="deposito">Depósito</option>
+                <option value="transferencia">Transferencia</option>
+                <option value="mixto">Mixto</option>
+              </select>
+            </div>
+
+            <div>
+              <Label>Fecha de Pago *</Label>
+              <Input
+                type="date"
+                value={abonoFormData.payment_date}
+                onChange={(e) => setAbonoFormData({ ...abonoFormData, payment_date: e.target.value })}
+                required
+              />
+            </div>
+
             <div>
               <Label>Notas</Label>
               <textarea
@@ -941,6 +1061,80 @@ const ExpensesNew = () => {
               </Button>
             </div>
           </form>
+        </DialogContent>
+      </Dialog>
+
+      {/* Modal de Gestión de Categorías */}
+      <Dialog open={isCategoryFormOpen} onOpenChange={setIsCategoryFormOpen}>
+        <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>Gestión de Categorías de Gastos</DialogTitle>
+          </DialogHeader>
+          
+          {/* Formulario para nueva categoría */}
+          <form onSubmit={handleCreateCategory} className="space-y-4 border-b pb-4">
+            <div className="grid grid-cols-3 gap-3">
+              <div className="col-span-2">
+                <Label>Nueva Categoría</Label>
+                <Input
+                  value={categoryFormData.name}
+                  onChange={(e) => setCategoryFormData({ ...categoryFormData, name: e.target.value })}
+                  placeholder="Ej: Luz, Internet, Local, Nómina..."
+                  required
+                />
+              </div>
+              <div className="flex items-end">
+                <Button type="submit" className="w-full">
+                  <Plus size={16} className="mr-1" /> Agregar
+                </Button>
+              </div>
+            </div>
+            <div>
+              <Label>Descripción (Opcional)</Label>
+              <Input
+                value={categoryFormData.description}
+                onChange={(e) => setCategoryFormData({ ...categoryFormData, description: e.target.value })}
+                placeholder="Descripción de la categoría"
+              />
+            </div>
+          </form>
+
+          {/* Lista de categorías existentes */}
+          <div>
+            <h3 className="font-semibold mb-3">Categorías Existentes ({expenseCategories.length})</h3>
+            {expenseCategories.length > 0 ? (
+              <div className="grid grid-cols-2 gap-3">
+                {expenseCategories.map(cat => (
+                  <div key={cat.id} className="border rounded-lg p-3 flex items-center justify-between hover:bg-gray-50">
+                    <div>
+                      <p className="font-medium">{cat.name}</p>
+                      {cat.description && (
+                        <p className="text-xs text-gray-500">{cat.description}</p>
+                      )}
+                    </div>
+                    <Button
+                      size="sm"
+                      variant="ghost"
+                      onClick={() => handleDeleteCategory(cat.id)}
+                      className="text-red-600 hover:text-red-700"
+                    >
+                      <Trash2 size={14} />
+                    </Button>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <p className="text-gray-500 text-center py-4">
+                No hay categorías creadas. Agrega tu primera categoría arriba.
+              </p>
+            )}
+          </div>
+
+          <div className="flex justify-end pt-4 border-t">
+            <Button variant="outline" onClick={() => setIsCategoryFormOpen(false)}>
+              Cerrar
+            </Button>
+          </div>
         </DialogContent>
       </Dialog>
     </div>
