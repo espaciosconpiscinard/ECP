@@ -21,6 +21,7 @@ const ExpensesNew = () => {
   const [expandedExpenses, setExpandedExpenses] = useState({});
   const [isAbonoDialogOpen, setIsAbonoDialogOpen] = useState(false);
   const [selectedExpense, setSelectedExpense] = useState(null);
+  const [expenseAbonos, setExpenseAbonos] = useState({});
   const [abonoFormData, setAbonoFormData] = useState({
     amount: 0,
     currency: 'DOP',
