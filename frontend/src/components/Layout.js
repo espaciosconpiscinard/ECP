@@ -11,7 +11,7 @@ const Layout = ({ children, currentView, setCurrentView }) => {
   const menuItems = [
     { id: 'dashboard', label: 'Dashboard', icon: Home, roles: ['admin', 'employee'] },
     { id: 'reservations', label: 'Reservaciones', icon: FileText, roles: ['admin', 'employee'] },
-    { id: 'villas', label: 'Villas', icon: Building, roles: ['admin', 'employee'] },
+    { id: 'villas', label: 'Villas y Servicios', icon: Building, roles: ['admin', 'employee'] },
   ];
 
   // Menú solo para admin
