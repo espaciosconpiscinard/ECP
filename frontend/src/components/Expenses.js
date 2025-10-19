@@ -404,6 +404,58 @@ const ExpensesNew = () => {
                 />
               </div>
 
+              {/* Recordatorio de Pago */}
+              <div className="border-t pt-4">
+                <div className="flex items-center mb-3">
+                  <input
+                    type="checkbox"
+                    id="has_reminder"
+                    checked={formData.has_payment_reminder}
+                    onChange={(e) => setFormData({ ...formData, has_payment_reminder: e.target.checked })}
+                    className="mr-2"
+                  />
+                  <Label htmlFor="has_reminder" className="cursor-pointer">
+                    🔔 Activar recordatorio de pago
+                  </Label>
+                </div>
+
+                {formData.has_payment_reminder && (
+                  <div className="space-y-3 bg-yellow-50 p-3 rounded-md">
+                    <div>
+                      <Label>Día del mes para pago (1-31) *</Label>
+                      <select
+                        value={formData.payment_reminder_day || ''}
+                        onChange={(e) => setFormData({ ...formData, payment_reminder_day: parseInt(e.target.value) })}
+                        className="w-full p-2 border rounded-md"
+                        required={formData.has_payment_reminder}
+                      >
+                        <option value="">Seleccionar día</option>
+                        {Array.from({ length: 31 }, (_, i) => i + 1).map(day => (
+                          <option key={day} value={day}>Día {day}</option>
+                        ))}
+                      </select>
+                    </div>
+
+                    <div className="flex items-center">
+                      <input
+                        type="checkbox"
+                        id="is_recurring"
+                        checked={formData.is_recurring}
+                        onChange={(e) => setFormData({ ...formData, is_recurring: e.target.checked })}
+                        className="mr-2"
+                      />
+                      <Label htmlFor="is_recurring" className="cursor-pointer text-sm">
+                        🔄 Gasto recurrente mensual
+                      </Label>
+                    </div>
+
+                    <p className="text-xs text-gray-600">
+                      💡 Los gastos recurrentes aparecerán en la vista de recordatorios cada mes
+                    </p>
+                  </div>
+                )}
+              </div>
+
               {error && (
                 <Alert variant="destructive">
                   <AlertDescription>{error}</AlertDescription>
