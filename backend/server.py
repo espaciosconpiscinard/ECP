@@ -742,6 +742,27 @@ async def get_expense_abonos(expense_id: str, current_user: dict = Depends(get_c
     abonos = await db.expense_abonos.find({"expense_id": expense_id}, {"_id": 0}).sort("payment_date", -1).to_list(100)
     return [restore_datetimes(a, ["payment_date", "created_at"]) for a in abonos]
 
+@api_router.delete("/expenses/{expense_id}/abonos/{abono_id}")
+async def delete_expense_abono(expense_id: str, abono_id: str, current_user: dict = Depends(require_admin)):
+    """Delete an abono from an expense (admin only) - to correct errors"""
+    # Delete the abono
+    result = await db.expense_abonos.delete_one({"expense_id": expense_id, "id": abono_id})
+    if result.deleted_count == 0:
+        raise HTTPException(status_code=404, detail="Abono not found")
+    
+    # Recalculate expense status
+    expense = await db.expenses.find_one({"id": expense_id}, {"_id": 0})
+    if expense:
+        all_abonos = await db.expense_abonos.find({"expense_id": expense_id}, {"_id": 0}).to_list(1000)
+        total_paid = sum(a.get("amount", 0) for a in all_abonos)
+        new_status = "paid" if total_paid >= expense.get("amount", 0) else "pending"
+        await db.expenses.update_one(
+            {"id": expense_id},
+            {"$set": {"payment_status": new_status}}
+        )
+    
+    return {"message": "Abono deleted successfully"}
+
 # ============ DASHBOARD & STATS ENDPOINTS ============
 
 @api_router.get("/dashboard/stats", response_model=DashboardStats)
