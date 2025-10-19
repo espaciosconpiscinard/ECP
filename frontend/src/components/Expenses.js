@@ -523,8 +523,8 @@ const ExpensesNew = () => {
 
                             {/* Acciones */}
                             <div className="flex gap-2 mt-4 pt-3 border-t">
-                              {/* Botón Agregar Abono - Siempre visible si está pendiente */}
-                              {expense.payment_status === 'pending' && (
+                              {/* Botón Agregar Abono - Si tiene saldo pendiente (balance_due > 0) */}
+                              {expense.balance_due > 0 && (
                                 <Button
                                   size="sm"
                                   variant="outline"
