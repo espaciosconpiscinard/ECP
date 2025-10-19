@@ -676,6 +676,43 @@ async def delete_expense(expense_id: str, current_user: dict = Depends(require_a
         raise HTTPException(status_code=404, detail="Expense not found")
     return {"message": "Expense deleted successfully"}
 
+# ============ ABONOS TO EXPENSES ============
+
+@api_router.post("/expenses/{expense_id}/abonos", response_model=Abono)
+async def add_abono_to_expense(expense_id: str, abono_data: AbonoCreate, current_user: dict = Depends(get_current_user)):
+    """Add a payment (abono) to an expense"""
+    expense = await db.expenses.find_one({"id": expense_id}, {"_id": 0})
+    if not expense:
+        raise HTTPException(status_code=404, detail="Expense not found")
+    
+    # Create abono record
+    abono = Abono(**abono_data.model_dump(), created_by=current_user["id"])
+    abono_doc = prepare_doc_for_insert(abono.model_dump())
+    
+    # Store in expense_abonos collection
+    abono_doc["expense_id"] = expense_id
+    await db.expense_abonos.insert_one(abono_doc)
+    
+    # Get total abonos for this expense
+    all_abonos = await db.expense_abonos.find({"expense_id": expense_id}, {"_id": 0}).to_list(1000)
+    total_paid = sum(a.get("amount", 0) for a in all_abonos)
+    
+    # Update expense payment status
+    new_status = "paid" if total_paid >= expense.get("amount", 0) else "pending"
+    
+    await db.expenses.update_one(
+        {"id": expense_id},
+        {"$set": {"payment_status": new_status}}
+    )
+    
+    return abono
+
+@api_router.get("/expenses/{expense_id}/abonos", response_model=List[Abono])
+async def get_expense_abonos(expense_id: str, current_user: dict = Depends(get_current_user)):
+    """Get all abonos for an expense"""
+    abonos = await db.expense_abonos.find({"expense_id": expense_id}, {"_id": 0}).sort("payment_date", -1).to_list(100)
+    return [restore_datetimes(a, ["payment_date", "created_at"]) for a in abonos]
+
 # ============ DASHBOARD & STATS ENDPOINTS ============
 
 @api_router.get("/dashboard/stats", response_model=DashboardStats)
