@@ -49,10 +49,6 @@ const Expenses = () => {
     payment_reminder_day: 1,
     is_recurring: false
   });
-    expense_date: new Date().toISOString().split('T')[0],
-    payment_status: 'paid',
-    notes: ''
-  });
 
   useEffect(() => {
     fetchExpenses();
