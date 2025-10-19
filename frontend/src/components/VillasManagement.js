@@ -634,9 +634,10 @@ const VillasManagementNew = () => {
         </Alert>
       )}
 
-      {/* Villas agrupadas por categoría */}
-      <div className="space-y-6">
-        {sortedCategories.map((category) => (
+      {/* Vista de Villas */}
+      {itemType === 'villa' && (
+        <div className="space-y-6">
+          {sortedCategories.map((category) => (
           <Card key={category.id}>
             <CardHeader className="bg-gradient-to-r from-blue-50 to-blue-100">
               <CardTitle className="flex items-center">
