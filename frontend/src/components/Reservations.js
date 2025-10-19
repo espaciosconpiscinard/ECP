@@ -261,6 +261,8 @@ const Reservations = () => {
     setEditingReservation(null);
     setSelectedExtraServices([]);
     setShowExtraServices(false);
+    setVillaSearchTerm('');
+    setShowVillaDropdown(false);
     setFormData({
       customer_id: '',
       customer_name: '',
