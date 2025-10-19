@@ -194,8 +194,15 @@ const VillasManagementNew = () => {
       try {
         await deleteExtraService(id);
         await fetchData();
+        alert('✅ Servicio eliminado exitosamente');
       } catch (err) {
-        setError('Error al eliminar servicio');
+        console.error('Error al eliminar servicio:', err);
+        const errorMsg = err.response?.data?.detail 
+          ? (typeof err.response.data.detail === 'string' 
+            ? err.response.data.detail 
+            : 'Error al eliminar servicio')
+          : 'Error al eliminar servicio';
+        alert(errorMsg);
       }
     }
   };
