@@ -150,6 +150,70 @@ const VillasManagementNew = () => {
     });
   };
 
+  // ============ SERVICIOS FUNCTIONS ============
+  const handleServiceSubmit = async (e) => {
+    e.preventDefault();
+    setError('');
+    
+    try {
+      if (editingService) {
+        await updateExtraService(editingService.id, serviceFormData);
+      } else {
+        await createExtraService(serviceFormData);
+      }
+      await fetchData();
+      setIsFormOpen(false);
+      resetServiceForm();
+    } catch (err) {
+      setError(err.response?.data?.detail || 'Error al guardar servicio');
+    }
+  };
+
+  const handleEditService = (service) => {
+    setEditingService(service);
+    setServiceFormData({
+      service_name: service.service_name,
+      description: service.description || '',
+      unit_price: service.unit_price,
+      currency: service.currency,
+      category: service.category || 'otros',
+      is_active: service.is_active !== undefined ? service.is_active : true
+    });
+    setIsFormOpen(true);
+  };
+
+  const handleDeleteService = async (id) => {
+    if (window.confirm('¿Estás seguro de eliminar este servicio?')) {
+      try {
+        await deleteExtraService(id);
+        await fetchData();
+      } catch (err) {
+        setError('Error al eliminar servicio');
+      }
+    }
+  };
+
+  const resetServiceForm = () => {
+    setEditingService(null);
+    setServiceFormData({
+      service_name: '',
+      description: '',
+      unit_price: 0,
+      currency: 'DOP',
+      category: 'otros',
+      is_active: true
+    });
+  };
+
+  const handleOpenForm = () => {
+    if (itemType === 'villa') {
+      resetForm();
+    } else {
+      resetServiceForm();
+    }
+    setIsFormOpen(true);
+  };
+
   const toggleExpand = (villaId) => {
     setExpandedVillas(prev => ({
       ...prev,
