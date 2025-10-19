@@ -632,6 +632,11 @@ class BackendTester:
         print("\n💰 Auto-Expense Creation Tests")
         self.test_auto_expense_creation_flow()
         
+        # NEW FUNCTIONALITY TESTS
+        print("\n🆕 New Functionality Tests")
+        self.test_customer_dni_field()
+        self.test_auto_generated_expense_deletion()
+        
         # Summary
         print("\n" + "=" * 60)
         print("📊 TEST SUMMARY")
