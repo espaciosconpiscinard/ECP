@@ -383,6 +383,467 @@ const Reservations = () => {
               box-shadow: 0 0 20px rgba(0,0,0,0.1);
             }
             
+            /* Top Bar - Colores del logo (azul) */
+            .top-bar {
+              height: 15px;
+              background: #0ea5e9;
+            }
+            
+            /* Header Section */
+            .header {
+              display: flex;
+              justify-content: space-between;
+              padding: 40px 50px 30px;
+              border-bottom: 3px solid #0369a1;
+            }
+            .header-left {
+              display: flex;
+              align-items: center;
+              gap: 15px;
+            }
+            .logo { 
+              height: 60px; 
+              width: auto;
+            }
+            .brand-info {
+              display: flex;
+              flex-direction: column;
+            }
+            .brand-name { 
+              font-size: 22px; 
+              font-weight: 700;
+              color: #0369a1;
+              line-height: 1.2;
+            }
+            .brand-tagline { 
+              font-size: 11px; 
+              color: #0ea5e9;
+              font-weight: 600;
+              letter-spacing: 1px;
+            }
+            .header-right {
+              text-align: right;
+            }
+            .invoice-title { 
+              font-size: 42px; 
+              font-weight: 700;
+              color: #0ea5e9;
+              margin-bottom: 10px;
+              line-height: 1;
+            }
+            .invoice-meta {
+              font-size: 12px;
+              color: #0369a1;
+              line-height: 1.8;
+            }
+            .invoice-meta strong {
+              display: inline-block;
+              min-width: 90px;
+            }
+            
+            /* Content Area */
+            .content {
+              padding: 30px 50px;
+            }
+            
+            /* Payment Info & Bill To */
+            .info-row {
+              display: grid;
+              grid-template-columns: 1fr 1fr;
+              gap: 40px;
+              margin-bottom: 35px;
+            }
+            .info-box {
+              background: #f0f9ff;
+              padding: 20px;
+              border-left: 4px solid #0ea5e9;
+            }
+            .info-title {
+              font-size: 13px;
+              font-weight: 700;
+              color: #0369a1;
+              margin-bottom: 12px;
+              text-transform: uppercase;
+            }
+            .info-line {
+              font-size: 12px;
+              margin: 6px 0;
+              color: #555;
+            }
+            .info-line strong {
+              color: #0369a1;
+              min-width: 100px;
+              display: inline-block;
+            }
+            
+            /* Villa Description Box */
+            .villa-description {
+              background: #e0f2fe;
+              padding: 20px;
+              margin: 25px 0;
+              border-left: 4px solid #0ea5e9;
+            }
+            .villa-description-title {
+              font-size: 13px;
+              font-weight: 700;
+              color: #0369a1;
+              margin-bottom: 10px;
+              text-transform: uppercase;
+            }
+            .villa-description-text {
+              font-size: 12px;
+              line-height: 1.7;
+              color: #555;
+            }
+            
+            /* Services Table */
+            .services-table {
+              width: 100%;
+              border-collapse: collapse;
+              margin: 25px 0;
+            }
+            .services-table thead {
+              background: #0ea5e9;
+              color: white;
+            }
+            .services-table th {
+              padding: 14px 12px;
+              text-align: left;
+              font-size: 12px;
+              font-weight: 600;
+              text-transform: uppercase;
+              letter-spacing: 0.5px;
+            }
+            .services-table td {
+              padding: 14px 12px;
+              font-size: 13px;
+              border-bottom: 1px solid #e0e0e0;
+            }
+            .services-table tbody tr:nth-child(even) {
+              background: #f9f9f9;
+            }
+            .services-table tbody tr:hover {
+              background: #f0f9ff;
+            }
+            
+            /* Totals Section */
+            .totals-wrapper {
+              display: flex;
+              justify-content: flex-end;
+              margin-top: 30px;
+            }
+            .totals-box {
+              width: 350px;
+            }
+            .total-line {
+              display: flex;
+              justify-content: space-between;
+              padding: 10px 15px;
+              font-size: 14px;
+              border-bottom: 1px solid #e0e0e0;
+            }
+            .total-line.subtotal {
+              background: #f8f9fa;
+              font-weight: 600;
+            }
+            .total-line.deposit {
+              color: #059669;
+            }
+            .total-line.grand-total {
+              background: #0ea5e9;
+              color: white;
+              font-size: 18px;
+              font-weight: 700;
+              border: none;
+              padding: 15px;
+            }
+            
+            /* Payment & Notes */
+            .extra-info {
+              margin: 30px 0;
+            }
+            .payment-box, .notes-box {
+              background: #f0f9ff;
+              padding: 15px 20px;
+              margin: 15px 0;
+              border-left: 4px solid #0ea5e9;
+              font-size: 12px;
+            }
+            .notes-box {
+              border-left-color: #f59e0b;
+              background: #fef3c7;
+            }
+            
+            /* Terms & Signature */
+            .terms-section {
+              margin: 30px 0;
+              padding: 20px;
+              background: #f8f9fa;
+              page-break-inside: avoid;
+            }
+            .terms-title {
+              font-size: 13px;
+              font-weight: 700;
+              color: #0369a1;
+              margin-bottom: 10px;
+              text-transform: uppercase;
+            }
+            .terms-content {
+              font-size: 10px;
+              line-height: 1.7;
+              color: #666;
+            }
+            .terms-content p {
+              margin: 5px 0;
+            }
+            
+            /* Footer */
+            .footer {
+              background: #0369a1;
+              color: white;
+              padding: 25px 50px;
+              text-align: center;
+              position: relative;
+            }
+            .footer::before {
+              content: '';
+              position: absolute;
+              top: -20px;
+              left: 0;
+              width: 0;
+              height: 0;
+              border-left: 50px solid transparent;
+              border-bottom: 20px solid #0ea5e9;
+            }
+            .thank-you {
+              font-size: 18px;
+              font-weight: 700;
+              letter-spacing: 1px;
+              margin-bottom: 10px;
+            }
+            .footer-contact {
+              font-size: 11px;
+              opacity: 0.9;
+            }
+            
+            /* Print Button */
+            .print-button {
+              margin: 30px auto;
+              display: block;
+              padding: 14px 40px;
+              background: #0ea5e9;
+              color: white;
+              border: none;
+              border-radius: 5px;
+              font-size: 15px;
+              font-weight: 600;
+              cursor: pointer;
+              box-shadow: 0 2px 8px rgba(14,165,233,0.3);
+            }
+            .print-button:hover {
+              background: #0284c7;
+            }
+            
+            @media print {
+              body { padding: 0; background: white; }
+              .invoice-wrapper { box-shadow: none; }
+              .print-button { display: none; }
+              .villa-description { page-break-inside: avoid; }
+              .terms-section { page-break-inside: avoid; }
+            }
+          </style>
+        </head>
+        <body>
+          <div class="invoice-wrapper">
+            <!-- Top Bar -->
+            <div class="top-bar"></div>
+            
+            <!-- Header -->
+            <div class="header">
+              <div class="header-left">
+                <img src="/logo.png" alt="Logo" class="logo" />
+                <div class="brand-info">
+                  <div class="brand-name">ESPACIOS CON PISCINA</div>
+                  <div class="brand-tagline">ECP, SRL</div>
+                </div>
+              </div>
+              <div class="header-right">
+                <div class="invoice-title">FACTURA</div>
+                <div class="invoice-meta">
+                  <div><strong>Factura N°:</strong> ${reservation.invoice_number}</div>
+                  <div><strong>Fecha:</strong> ${new Date(reservation.reservation_date).toLocaleDateString('es-DO', { day: '2-digit', month: '2-digit', year: 'numeric' })}</div>
+                  <div><strong>RNC:</strong> 1-33-24652-1</div>
+                </div>
+              </div>
+            </div>
+            
+            <!-- Content -->
+            <div class="content">
+              <!-- Payment Info & Bill To -->
+              <div class="info-row">
+                <div class="info-box">
+                  <div class="info-title">Información de Pago</div>
+                  <div class="info-line"><strong>Método:</strong> ${reservation.payment_method ? reservation.payment_method.charAt(0).toUpperCase() + reservation.payment_method.slice(1) : 'No especificado'}</div>
+                  ${reservation.payment_details ? `<div class="info-line"><strong>Detalles:</strong> ${reservation.payment_details}</div>` : ''}
+                  <div class="info-line"><strong>Teléfono:</strong> 829-953-8401</div>
+                  <div class="info-line"><strong>WhatsApp:</strong> 829-904-4245</div>
+                </div>
+                
+                <div class="info-box">
+                  <div class="info-title">Facturar A:</div>
+                  <div class="info-line"><strong>${reservation.customer_name}</strong></div>
+                  ${reservation.customer_identification_document ? `
+                    <div class="info-line"><strong>Cédula/RNC:</strong> ${reservation.customer_identification_document}</div>
+                  ` : ''}
+                  <div class="info-line"><strong>Villa:</strong> ${reservation.villa_code || reservation.villa_name}</div>
+                  <div class="info-line"><strong>Tipo:</strong> ${reservation.rental_type === 'pasadia' ? 'Pasadía' : reservation.rental_type === 'amanecida' ? 'Amanecida' : 'Evento'}</div>
+                  <div class="info-line"><strong>Horario:</strong> ${reservation.check_in_time} - ${reservation.check_out_time}</div>
+                  <div class="info-line"><strong>Personas:</strong> ${reservation.guests}</div>
+                </div>
+              </div>
+              
+              <!-- Villa Description -->
+              ${reservation.villa_description ? `
+                <div class="villa-description">
+                  <div class="villa-description-title">Descripción de la Villa</div>
+                  <div class="villa-description-text">${reservation.villa_description}</div>
+                </div>
+              ` : ''}
+              
+              <!-- Services Table -->
+              <table class="services-table">
+                <thead>
+                  <tr>
+                    <th style="width: 50px;">N°</th>
+                    <th>DESCRIPCIÓN DEL SERVICIO</th>
+                    <th style="text-align: right; width: 120px;">PRECIO UNIT.</th>
+                    <th style="text-align: center; width: 80px;">CANT</th>
+                    <th style="text-align: right; width: 120px;">TOTAL</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>01</td>
+                    <td><strong>Alquiler de Espacio</strong> - ${reservation.villa_code || reservation.villa_name}</td>
+                    <td style="text-align: right;">${reservation.currency === 'DOP' ? 'RD$' : '$'}${(reservation.base_price || 0).toLocaleString('es-DO', {minimumFractionDigits: 2})}</td>
+                    <td style="text-align: center;">1</td>
+                    <td style="text-align: right;"><strong>${reservation.currency === 'DOP' ? 'RD$' : '$'}${(reservation.base_price || 0).toLocaleString('es-DO', {minimumFractionDigits: 2})}</strong></td>
+                  </tr>
+                  ${reservation.extra_hours && reservation.extra_hours > 0 ? `
+                    <tr>
+                      <td>02</td>
+                      <td>Horas Extras</td>
+                      <td style="text-align: right;">${reservation.currency === 'DOP' ? 'RD$' : '$'}${((reservation.extra_hours_cost || 0) / reservation.extra_hours).toLocaleString('es-DO', {minimumFractionDigits: 2})}</td>
+                      <td style="text-align: center;">${reservation.extra_hours}</td>
+                      <td style="text-align: right;"><strong>${reservation.currency === 'DOP' ? 'RD$' : '$'}${(reservation.extra_hours_cost || 0).toLocaleString('es-DO', {minimumFractionDigits: 2})}</strong></td>
+                    </tr>
+                  ` : ''}
+                  ${reservation.extra_services && reservation.extra_services.length > 0 ? reservation.extra_services.map((service, idx) => `
+                    <tr>
+                      <td>0${idx + (reservation.extra_hours > 0 ? 3 : 2)}</td>
+                      <td>${service.service_name}</td>
+                      <td style="text-align: right;">${reservation.currency === 'DOP' ? 'RD$' : '$'}${service.unit_price.toLocaleString('es-DO', {minimumFractionDigits: 2})}</td>
+                      <td style="text-align: center;">${service.quantity}</td>
+                      <td style="text-align: right;"><strong>${reservation.currency === 'DOP' ? 'RD$' : '$'}${service.total.toLocaleString('es-DO', {minimumFractionDigits: 2})}</strong></td>
+                    </tr>
+                  `).join('') : ''}
+                </tbody>
+              </table>
+              
+              <!-- Totals -->
+              <div class="totals-wrapper">
+                <div class="totals-box">
+                  <div class="total-line">
+                    <span>Subtotal</span>
+                    <span>${reservation.currency === 'DOP' ? 'RD$' : '$'}${(reservation.subtotal || reservation.total_amount).toLocaleString('es-DO', {minimumFractionDigits: 2})}</span>
+                  </div>
+                  ${reservation.discount && reservation.discount > 0 ? `
+                    <div class="total-line" style="color: #dc2626;">
+                      <span>Descuento</span>
+                      <span>- ${reservation.currency === 'DOP' ? 'RD$' : '$'}${reservation.discount.toLocaleString('es-DO', {minimumFractionDigits: 2})}</span>
+                    </div>
+                  ` : ''}
+                  ${reservation.include_itbis && reservation.itbis_amount > 0 ? `
+                    <div class="total-line">
+                      <span>ITBIS 18%</span>
+                      <span>+ ${reservation.currency === 'DOP' ? 'RD$' : '$'}${reservation.itbis_amount.toLocaleString('es-DO', {minimumFractionDigits: 2})}</span>
+                    </div>
+                  ` : ''}
+                  <div class="total-line subtotal">
+                    <span>TOTAL</span>
+                    <span>${reservation.currency === 'DOP' ? 'RD$' : '$'}${reservation.total_amount.toLocaleString('es-DO', {minimumFractionDigits: 2})}</span>
+                  </div>
+                  <div class="total-line deposit">
+                    <span>+ Depósito de Seguridad</span>
+                    <span>${reservation.currency === 'DOP' ? 'RD$' : '$'}${(reservation.deposit || 0).toLocaleString('es-DO', {minimumFractionDigits: 2})}</span>
+                  </div>
+                  <div class="total-line">
+                    <span>Monto Pagado</span>
+                    <span>${reservation.currency === 'DOP' ? 'RD$' : '$'}${reservation.amount_paid.toLocaleString('es-DO', {minimumFractionDigits: 2})}</span>
+                  </div>
+                  <div class="total-line grand-total">
+                    <span>RESTANTE A PAGAR</span>
+                    <span>${reservation.currency === 'DOP' ? 'RD$' : '$'}${balanceDue.toLocaleString('es-DO', {minimumFractionDigits: 2})}</span>
+                  </div>
+                </div>
+              </div>
+              
+              ${reservation.notes ? `
+                <div class="notes-box">
+                  <strong>Notas Adicionales:</strong><br/>
+                  ${reservation.notes}
+                </div>
+              ` : ''}
+              
+              <!-- Terms & Conditions -->
+              <div class="terms-section">
+                <div class="terms-title">Términos y Condiciones</div>
+                <div class="terms-content">
+                  <p>• El depósito de seguridad es reembolsable si no hay daños a la propiedad.</p>
+                  <p>• Las reservaciones se garantizan con el pago del 50% del total.</p>
+                  <p>• No hay reembolsos por cancelaciones, llegadas tardías o salidas anticipadas.</p>
+                  <p>• El número máximo de huéspedes no debe ser excedido.</p>
+                  <p>• Cualquier daño será cobrado al cliente. Prohibido fumar en áreas cerradas.</p>
+                </div>
+              </div>
+            </div>
+            
+            <!-- Footer -->
+            <div class="footer">
+              <div class="thank-you">GRACIAS POR SU PREFERENCIA</div>
+              <div class="footer-contact">
+                Calle Mencia #5, Ensanche Los Tainos, San Isidro, SDE | 
+                Contacto: 829-904-4245 (WhatsApp)
+              </div>
+            </div>
+          </div>
+          
+          <button onclick="window.print()" class="print-button">🖨️ IMPRIMIR FACTURA</button>
+        </body>
+      </html>
+    `);
+    printWindow.document.close();
+  };
+    
+    printWindow.document.write(`
+      <html>
+        <head>
+          <title>Factura ${reservation.invoice_number}</title>
+          <style>
+            * { margin: 0; padding: 0; box-sizing: border-box; }
+            body { 
+              font-family: 'Arial', sans-serif; 
+              padding: 30px; 
+              color: #333;
+              background: #f5f5f5;
+            }
+            .invoice-wrapper {
+              max-width: 900px;
+              margin: 0 auto;
+              background: white;
+              box-shadow: 0 0 20px rgba(0,0,0,0.1);
+            }
+            
             /* Top Red Bar */
             .top-bar {
               height: 15px;
