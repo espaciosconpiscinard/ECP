@@ -164,8 +164,15 @@ const VillasManagementNew = () => {
       await fetchData();
       setIsFormOpen(false);
       resetServiceForm();
+      alert('✅ Servicio guardado exitosamente');
     } catch (err) {
-      setError(err.response?.data?.detail || 'Error al guardar servicio');
+      console.error('Error al guardar servicio:', err);
+      const errorMsg = err.response?.data?.detail 
+        ? (typeof err.response.data.detail === 'string' 
+          ? err.response.data.detail 
+          : JSON.stringify(err.response.data.detail))
+        : err.message || 'Error al guardar servicio';
+      setError(errorMsg);
     }
   };
 
