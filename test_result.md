@@ -373,3 +373,43 @@ agent_communication:
       - Villas expandidas (admin) mostrando pago propietario
       - Formulario de nueva villa completo
       - Vista de empleado sin permisos restringidos
+
+  - agent: "testing"
+    message: |
+      🎯 AUTO-EXPENSE CREATION TESTING COMPLETADO - FLUJO FUNCIONAL ✅
+      
+      ✅ NUEVA FUNCIONALIDAD VERIFICADA:
+      
+      💰 FLUJO DE AUTO-CREACIÓN DE GASTOS:
+      - Login como admin (admin/admin123) ✅ funcional
+      - Obtención de villas existentes ✅ funcional
+      - Obtención de clientes existentes ✅ funcional
+      - Creación de reservación con owner_price > 0 ✅ exitosa
+      - Auto-creación de gasto en categoría "pago_propietario" ✅ verificada
+      
+      🔍 VALIDACIONES ESPECÍFICAS COMPLETADAS:
+      - Gasto creado con category: "pago_propietario" ✅
+      - Amount correcto: 8000.0 DOP (igual a owner_price) ✅
+      - Description contiene código de villa: "Pago propietario villa ECPVSH - Factura #1605" ✅
+      - related_reservation_id vinculado correctamente ✅
+      - payment_status: "pending" ✅
+      - currency: "DOP" (heredada de reservación) ✅
+      - Estructura completa con todos los campos requeridos ✅
+      
+      📋 DETALLES DEL GASTO AUTO-GENERADO:
+      - ID: 202de3b6-14be-4789-8558-d7ead4309e7b
+      - Categoría: pago_propietario
+      - Monto: 8000.0 DOP
+      - Descripción: "Pago propietario villa ECPVSH - Factura #1605"
+      - Estado de pago: pending
+      - Reservación relacionada: cc3c2271-fcf1-4d54-a799-e2ea6713b2b1
+      - Fecha del gasto: 2024-01-15T00:00:00Z
+      
+      ✅ FLUJO DE AUTO-CREACIÓN DE GASTOS COMPLETAMENTE FUNCIONAL
+      
+      🎉 RESULTADO: Cuando se crea una reservación con owner_price > 0, el sistema automáticamente:
+      1. Crea un gasto en categoría "pago_propietario"
+      2. Asigna el monto correcto (owner_price)
+      3. Genera descripción descriptiva con código de villa y número de factura
+      4. Vincula el gasto a la reservación (related_reservation_id)
+      5. Establece estado "pending" para seguimiento de pagos
