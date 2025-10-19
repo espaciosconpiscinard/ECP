@@ -630,24 +630,65 @@ const Reservations = () => {
             </DialogHeader>
             <form onSubmit={handleSubmit} className="space-y-4">
               <div className="grid grid-cols-2 gap-4">
+                {/* Cliente con Buscador */}
                 <div className="col-span-2">
                   <div className="flex justify-between items-center mb-2">
                     <Label>Cliente *</Label>
                     <CustomerDialog onCustomerCreated={fetchCustomersOnly} />
                   </div>
-                  <select
-                    value={formData.customer_id}
-                    onChange={(e) => setFormData({ ...formData, customer_id: e.target.value })}
-                    className="w-full p-2 border rounded-md"
-                    required
-                    data-testid="customer-select"
-                  >
-                    <option value="">Seleccionar cliente</option>
-                    {customers.map(c => (
-                      <option key={c.id} value={c.id}>{c.name}</option>
-                    ))}
-                  </select>
+                  <div className="relative">
+                    <Input
+                      type="text"
+                      value={customerSearchTerm}
+                      onChange={(e) => {
+                        setCustomerSearchTerm(e.target.value);
+                        setShowCustomerDropdown(true);
+                      }}
+                      onFocus={() => setShowCustomerDropdown(true)}
+                      placeholder="Buscar por nombre o teléfono..."
+                      className="w-full"
+                    />
+                    <Search className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={18} />
+                    
+                    {/* Dropdown de clientes filtrados */}
+                    {showCustomerDropdown && filteredCustomers.length > 0 && (
+                      <div className="absolute z-50 w-full mt-1 bg-white border border-gray-300 rounded-md shadow-lg max-h-60 overflow-y-auto">
+                        {filteredCustomers.map(customer => (
+                          <div
+                            key={customer.id}
+                            onClick={() => handleSelectCustomer(customer.id)}
+                            className="p-3 hover:bg-blue-50 cursor-pointer border-b last:border-b-0"
+                          >
+                            <div className="flex justify-between items-center">
+                              <div>
+                                <p className="font-semibold text-blue-600">{customer.name}</p>
+                                <p className="text-sm text-gray-600">{customer.phone}</p>
+                              </div>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                    
+                    {/* Mensaje si no hay resultados */}
+                    {showCustomerDropdown && customerSearchTerm && filteredCustomers.length === 0 && (
+                      <div className="absolute z-50 w-full mt-1 bg-white border border-gray-300 rounded-md shadow-lg p-3 text-center text-gray-500">
+                        No se encontraron clientes
+                      </div>
+                    )}
+                  </div>
+                  {!formData.customer_id && (
+                    <p className="text-xs text-red-500 mt-1">* Debes seleccionar un cliente</p>
+                  )}
                 </div>
+
+                {/* Click fuera para cerrar dropdown */}
+                {showCustomerDropdown && (
+                  <div 
+                    className="fixed inset-0 z-40" 
+                    onClick={() => setShowCustomerDropdown(false)}
+                  />
+                )}
                 
                 {/* Tipo de Renta */}
                 <div className="col-span-2">
