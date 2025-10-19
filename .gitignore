@@ -80,3 +80,7 @@ agenthub/agents/youtube/db
 android-sdk/ frontend/node_modules/electron/dist/electron
 frontend/node_modules/electron/dist/electron
 frontend/dist/win-unpacked/electron.exe
+frontend/dist/win-unpacked/resources/app.asar
+frontend/dist/win-unpacked/Espacios
+Con
+Piscina.exe
