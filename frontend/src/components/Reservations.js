@@ -802,9 +802,32 @@ const Reservations = () => {
                       data-testid="reservation-date-input"
                     />
                   </div>
+                ) : formData.rental_type === 'amanecida' ? (
+                  <>
+                    <div>
+                      <Label>Fecha Desde (Entrada) *</Label>
+                      <Input
+                        type="date"
+                        value={formData.reservation_date}
+                        onChange={(e) => setFormData({ ...formData, reservation_date: e.target.value })}
+                        required
+                        data-testid="reservation-date-from-input"
+                      />
+                    </div>
+                    <div>
+                      <Label>Fecha Hasta (Salida) *</Label>
+                      <Input
+                        type="date"
+                        value={formData.check_out_date || ''}
+                        onChange={(e) => setFormData({ ...formData, check_out_date: e.target.value })}
+                        required
+                        data-testid="reservation-date-to-input"
+                      />
+                    </div>
+                  </>
                 ) : (
                   <div className="col-span-2">
-                    <Label>Fecha de Reservación *</Label>
+                    <Label>Fecha del Evento *</Label>
                     <Input
                       type="date"
                       value={formData.reservation_date}
