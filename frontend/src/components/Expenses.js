@@ -493,6 +493,144 @@ const Expenses = () => {
           </div>
         </CardContent>
       </Card>
+
+      {/* Abono Dialog */}
+      <Dialog open={isAbonoDialogOpen} onOpenChange={setIsAbonoDialogOpen}>
+        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>Abonos - {selectedExpense?.description}</DialogTitle>
+          </DialogHeader>
+          
+          <div className="space-y-4">
+            {/* Expense Summary */}
+            <div className="bg-gray-50 p-4 rounded-md">
+              <div className="grid grid-cols-3 gap-4 text-sm">
+                <div>
+                  <p className="text-gray-600">Monto Total:</p>
+                  <p className="font-bold text-lg">
+                    {selectedExpense && formatCurrency(selectedExpense.amount, selectedExpense.currency)}
+                  </p>
+                </div>
+                <div>
+                  <p className="text-gray-600">Total Pagado:</p>
+                  <p className="font-bold text-lg text-green-600">
+                    {selectedExpense && formatCurrency(selectedExpense.total_paid || 0, selectedExpense.currency)}
+                  </p>
+                </div>
+                <div>
+                  <p className="text-gray-600">Restante:</p>
+                  <p className="font-bold text-lg text-orange-600">
+                    {selectedExpense && formatCurrency(selectedExpense.balance_due || 0, selectedExpense.currency)}
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            {/* Add Abono Form */}
+            <form onSubmit={handleAbonoSubmit} className="border-t pt-4">
+              <h3 className="font-semibold mb-3">Agregar Nuevo Abono</h3>
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <Label>Monto *</Label>
+                  <Input
+                    type="number"
+                    step="0.01"
+                    value={abonoFormData.amount}
+                    onChange={(e) => setAbonoFormData({ ...abonoFormData, amount: parseFloat(e.target.value) })}
+                    required
+                  />
+                </div>
+                <div>
+                  <Label>Moneda *</Label>
+                  <select
+                    value={abonoFormData.currency}
+                    onChange={(e) => setAbonoFormData({ ...abonoFormData, currency: e.target.value })}
+                    className="w-full p-2 border rounded-md"
+                  >
+                    <option value="DOP">Pesos Dominicanos (DOP)</option>
+                    <option value="USD">Dólares (USD)</option>
+                  </select>
+                </div>
+                <div>
+                  <Label>Método de Pago *</Label>
+                  <select
+                    value={abonoFormData.payment_method}
+                    onChange={(e) => setAbonoFormData({ ...abonoFormData, payment_method: e.target.value })}
+                    className="w-full p-2 border rounded-md"
+                  >
+                    <option value="efectivo">Efectivo</option>
+                    <option value="deposito">Depósito</option>
+                    <option value="transferencia">Transferencia</option>
+                    <option value="mixto">Mixto</option>
+                  </select>
+                </div>
+                <div>
+                  <Label>Fecha de Pago *</Label>
+                  <Input
+                    type="date"
+                    value={abonoFormData.payment_date}
+                    onChange={(e) => setAbonoFormData({ ...abonoFormData, payment_date: e.target.value })}
+                    required
+                  />
+                </div>
+                <div className="col-span-2">
+                  <Label>Notas</Label>
+                  <textarea
+                    value={abonoFormData.notes}
+                    onChange={(e) => setAbonoFormData({ ...abonoFormData, notes: e.target.value })}
+                    className="w-full p-2 border rounded-md"
+                    rows="2"
+                  />
+                </div>
+              </div>
+              <div className="flex justify-end mt-4">
+                <Button type="submit">Agregar Abono</Button>
+              </div>
+            </form>
+
+            {/* Abonos List */}
+            <div className="border-t pt-4">
+              <h3 className="font-semibold mb-3">Historial de Abonos ({abonos.length})</h3>
+              {abonos.length > 0 ? (
+                <div className="space-y-2">
+                  {abonos.map((abono) => (
+                    <div key={abono.id} className="flex justify-between items-center p-3 bg-gray-50 rounded-md">
+                      <div className="flex-1">
+                        <div className="flex items-center space-x-4">
+                          <span className="font-semibold">
+                            {formatCurrency(abono.amount, abono.currency)}
+                          </span>
+                          <span className="text-sm text-gray-600">
+                            {new Date(abono.payment_date).toLocaleDateString('es-DO')}
+                          </span>
+                          <span className="text-xs px-2 py-1 bg-blue-100 text-blue-800 rounded">
+                            {abono.payment_method}
+                          </span>
+                        </div>
+                        {abono.notes && (
+                          <p className="text-sm text-gray-500 mt-1">{abono.notes}</p>
+                        )}
+                      </div>
+                      {user?.role === 'admin' && (
+                        <Button
+                          size="sm"
+                          variant="ghost"
+                          onClick={() => handleDeleteAbono(abono.id)}
+                          className="text-red-600 hover:text-red-700"
+                        >
+                          <X size={16} />
+                        </Button>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <p className="text-gray-500 text-center py-4">No hay abonos registrados</p>
+              )}
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
