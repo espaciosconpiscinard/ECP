@@ -537,6 +537,92 @@ const ExpensesNew = () => {
           </div>
         )}
       </div>
+
+      {/* Diálogo de Agregar Abono */}
+      <Dialog open={isAbonoDialogOpen} onOpenChange={setIsAbonoDialogOpen}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle>Agregar Abono al Gasto</DialogTitle>
+          </DialogHeader>
+          {selectedExpense && (
+            <div className="mb-4 p-3 bg-gray-50 rounded">
+              <p className="text-sm font-medium">{selectedExpense.description}</p>
+              <p className="text-xs text-gray-600 mt-1">
+                Total: {formatCurrency(selectedExpense.amount, selectedExpense.currency)}
+              </p>
+            </div>
+          )}
+          <form onSubmit={submitAbono} className="space-y-4">
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <Label>Monto del Abono *</Label>
+                <Input
+                  type="number"
+                  step="0.01"
+                  min="0"
+                  value={abonoFormData.amount}
+                  onChange={(e) => setAbonoFormData({ ...abonoFormData, amount: parseFloat(e.target.value) || 0 })}
+                  required
+                />
+              </div>
+              <div>
+                <Label>Moneda *</Label>
+                <select
+                  value={abonoFormData.currency}
+                  onChange={(e) => setAbonoFormData({ ...abonoFormData, currency: e.target.value })}
+                  className="w-full p-2 border rounded-md"
+                >
+                  <option value="DOP">DOP</option>
+                  <option value="USD">USD</option>
+                </select>
+              </div>
+            </div>
+
+            <div>
+              <Label>Método de Pago *</Label>
+              <select
+                value={abonoFormData.payment_method}
+                onChange={(e) => setAbonoFormData({ ...abonoFormData, payment_method: e.target.value })}
+                className="w-full p-2 border rounded-md"
+              >
+                <option value="efectivo">Efectivo</option>
+                <option value="deposito">Depósito</option>
+                <option value="transferencia">Transferencia</option>
+                <option value="mixto">Mixto</option>
+              </select>
+            </div>
+
+            <div>
+              <Label>Fecha de Pago *</Label>
+              <Input
+                type="date"
+                value={abonoFormData.payment_date}
+                onChange={(e) => setAbonoFormData({ ...abonoFormData, payment_date: e.target.value })}
+                required
+              />
+            </div>
+
+            <div>
+              <Label>Notas</Label>
+              <textarea
+                value={abonoFormData.notes}
+                onChange={(e) => setAbonoFormData({ ...abonoFormData, notes: e.target.value })}
+                className="w-full p-2 border rounded-md"
+                rows="2"
+              />
+            </div>
+
+            <div className="flex justify-end space-x-2">
+              <Button type="button" variant="outline" onClick={() => setIsAbonoDialogOpen(false)}>
+                Cancelar
+              </Button>
+              <Button type="submit">
+                Registrar Abono
+              </Button>
+            </div>
+          </form>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
