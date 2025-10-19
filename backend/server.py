@@ -144,6 +144,95 @@ async def get_me(current_user: dict = Depends(get_current_user)):
         raise HTTPException(status_code=404, detail="User not found")
     return UserResponse(**user)
 
+# ============ USER MANAGEMENT ENDPOINTS (ADMIN ONLY) ============
+
+@api_router.get("/users", response_model=List[UserResponse])
+async def get_users(current_user: dict = Depends(require_admin)):
+    """Get all users (admin only)"""
+    users = await db.users.find({}, {"_id": 0, "password_hash": 0}).to_list(1000)
+    return [restore_datetimes(u, ["created_at"]) for u in users]
+
+@api_router.get("/users/{user_id}", response_model=UserResponse)
+async def get_user(user_id: str, current_user: dict = Depends(require_admin)):
+    """Get a user by ID (admin only)"""
+    user = await db.users.find_one({"id": user_id}, {"_id": 0, "password_hash": 0})
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+    return restore_datetimes(user, ["created_at"])
+
+@api_router.put("/users/{user_id}", response_model=UserResponse)
+async def update_user(
+    user_id: str,
+    user_data: UserCreate,
+    current_user: dict = Depends(require_admin)
+):
+    """Update a user (admin only)"""
+    existing_user = await db.users.find_one({"id": user_id})
+    if not existing_user:
+        raise HTTPException(status_code=404, detail="User not found")
+    
+    # Check if username is taken by another user
+    username_taken = await db.users.find_one({
+        "username": user_data.username,
+        "id": {"$ne": user_id}
+    })
+    if username_taken:
+        raise HTTPException(status_code=400, detail="Username already taken")
+    
+    # Check if email is taken by another user
+    email_taken = await db.users.find_one({
+        "email": user_data.email,
+        "id": {"$ne": user_id}
+    })
+    if email_taken:
+        raise HTTPException(status_code=400, detail="Email already taken")
+    
+    update_data = {
+        "username": user_data.username,
+        "email": user_data.email,
+        "full_name": user_data.full_name,
+        "role": user_data.role,
+        "password_hash": get_password_hash(user_data.password)
+    }
+    
+    await db.users.update_one(
+        {"id": user_id},
+        {"$set": update_data}
+    )
+    
+    updated_user = await db.users.find_one({"id": user_id}, {"_id": 0, "password_hash": 0})
+    return restore_datetimes(updated_user, ["created_at"])
+
+@api_router.delete("/users/{user_id}")
+async def delete_user(user_id: str, current_user: dict = Depends(require_admin)):
+    """Delete a user (admin only)"""
+    # Prevent deleting yourself
+    if user_id == current_user["id"]:
+        raise HTTPException(status_code=400, detail="Cannot delete your own account")
+    
+    result = await db.users.delete_one({"id": user_id})
+    if result.deleted_count == 0:
+        raise HTTPException(status_code=404, detail="User not found")
+    return {"message": "User deleted successfully"}
+
+@api_router.patch("/users/{user_id}/toggle-status")
+async def toggle_user_status(user_id: str, current_user: dict = Depends(require_admin)):
+    """Toggle user active status (admin only)"""
+    if user_id == current_user["id"]:
+        raise HTTPException(status_code=400, detail="Cannot deactivate your own account")
+    
+    user = await db.users.find_one({"id": user_id})
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+    
+    new_status = not user.get("is_active", True)
+    await db.users.update_one(
+        {"id": user_id},
+        {"$set": {"is_active": new_status}}
+    )
+    
+    return {"message": f"User {'activated' if new_status else 'deactivated'} successfully", "is_active": new_status}
+
 # ============ CUSTOMER ENDPOINTS ============
 
 @api_router.post("/customers", response_model=Customer)
