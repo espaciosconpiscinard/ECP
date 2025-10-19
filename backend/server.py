@@ -523,11 +523,18 @@ async def update_reservation(
 
 @api_router.delete("/reservations/{reservation_id}")
 async def delete_reservation(reservation_id: str, current_user: dict = Depends(require_admin)):
-    """Delete a reservation (admin only)"""
+    """Delete a reservation (admin only) - También elimina gasto asociado si existe"""
+    # Eliminar gasto auto-generado asociado a esta reservación
+    await db.expenses.delete_many({"related_reservation_id": reservation_id})
+    
+    # Eliminar abonos de la reservación
+    await db.reservation_abonos.delete_many({"reservation_id": reservation_id})
+    
+    # Eliminar la reservación
     result = await db.reservations.delete_one({"id": reservation_id})
     if result.deleted_count == 0:
         raise HTTPException(status_code=404, detail="Reservation not found")
-    return {"message": "Reservation deleted successfully"}
+    return {"message": "Reservation and related expenses deleted successfully"}
 
 # ============ ABONOS TO RESERVATIONS ============
 
