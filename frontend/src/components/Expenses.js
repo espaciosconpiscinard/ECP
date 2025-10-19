@@ -230,6 +230,7 @@ const Expenses = () => {
       'local': 'Pago de Local',
       'nomina': 'Nómina',
       'variable': 'Gasto Variable',
+      'pago_propietario': 'Pago Propietario',
       'otros': 'Otros'
     };
     return labels[category] || category;
@@ -240,14 +241,50 @@ const Expenses = () => {
       'local': 'bg-blue-100 text-blue-800',
       'nomina': 'bg-green-100 text-green-800',
       'variable': 'bg-yellow-100 text-yellow-800',
+      'pago_propietario': 'bg-purple-100 text-purple-800',
       'otros': 'bg-gray-100 text-gray-800'
     };
     return colors[category] || colors.otros;
   };
 
+  const getExpenseCategoryName = (categoryId) => {
+    const category = expenseCategories.find(c => c.id === categoryId);
+    return category ? category.name : null;
+  };
+
+  const groupExpensesByCategory = () => {
+    const grouped = {};
+    expenses.forEach(expense => {
+      const categoryId = expense.expense_category_id;
+      const categoryName = categoryId ? getExpenseCategoryName(categoryId) : 'Sin Categoría';
+      
+      if (!grouped[categoryName]) {
+        grouped[categoryName] = [];
+      }
+      grouped[categoryName].push(expense);
+    });
+    return grouped;
+  };
+
+  const getUpcomingPayments = () => {
+    const today = new Date();
+    const currentDay = today.getDate();
+    
+    return expenses.filter(expense => {
+      if (!expense.has_payment_reminder || !expense.payment_reminder_day) return false;
+      
+      const reminderDay = expense.payment_reminder_day;
+      const daysUntilPayment = reminderDay - currentDay;
+      
+      // Show if payment is within next 7 days or overdue
+      return daysUntilPayment <= 7 && daysUntilPayment >= -3;
+    }).sort((a, b) => a.payment_reminder_day - b.payment_reminder_day);
+  };
+
   // Calculate totals
   const totalDOP = expenses.filter(e => e.currency === 'DOP').reduce((sum, e) => sum + e.amount, 0);
   const totalUSD = expenses.filter(e => e.currency === 'USD').reduce((sum, e) => sum + e.amount, 0);
+  const upcomingPayments = getUpcomingPayments();
 
   if (loading) {
     return <div className="text-center py-8" data-testid="expenses-loading">Cargando...</div>;
