@@ -82,10 +82,12 @@ export const deleteExpense = (id) => axios.delete(`${API}/expenses/${id}`);
 // Abonos to expenses
 export const addAbonoToExpense = (expenseId, data) => axios.post(`${API}/expenses/${expenseId}/abonos`, data);
 export const getExpenseAbonos = (expenseId) => axios.get(`${API}/expenses/${expenseId}/abonos`);
+export const deleteExpenseAbono = (expenseId, abonoId) => axios.delete(`${API}/expenses/${expenseId}/abonos/${abonoId}`);
 
 // Abonos to reservations
 export const addAbonoToReservation = (reservationId, data) => axios.post(`${API}/reservations/${reservationId}/abonos`, data);
 export const getReservationAbonos = (reservationId) => axios.get(`${API}/reservations/${reservationId}/abonos`);
+export const deleteReservationAbono = (reservationId, abonoId) => axios.delete(`${API}/reservations/${reservationId}/abonos/${abonoId}`);
 
 // ============ DASHBOARD ============
 export const getDashboardStats = () => axios.get(`${API}/dashboard/stats`);
