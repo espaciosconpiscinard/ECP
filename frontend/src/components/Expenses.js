@@ -16,11 +16,13 @@ import { useAuth } from '../context/AuthContext';
 const Expenses = () => {
   const { user } = useAuth();
   const [expenses, setExpenses] = useState([]);
+  const [expenseCategories, setExpenseCategories] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [editingExpense, setEditingExpense] = useState(null);
   const [filterCategory, setFilterCategory] = useState('');
+  const [groupByCategory, setGroupByCategory] = useState(false);
   
   // Abono states
   const [isAbonoDialogOpen, setIsAbonoDialogOpen] = useState(false);
@@ -36,9 +38,17 @@ const Expenses = () => {
   
   const [formData, setFormData] = useState({
     category: 'otros',
+    expense_category_id: '',
     description: '',
     amount: 0,
     currency: 'DOP',
+    expense_date: new Date().toISOString().split('T')[0],
+    payment_status: 'paid',
+    notes: '',
+    has_payment_reminder: false,
+    payment_reminder_day: 1,
+    is_recurring: false
+  });
     expense_date: new Date().toISOString().split('T')[0],
     payment_status: 'paid',
     notes: ''
