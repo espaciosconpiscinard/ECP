@@ -46,11 +46,9 @@ const VillasManagementNew = () => {
   });
 
   const [serviceFormData, setServiceFormData] = useState({
-    service_name: '',
+    name: '',
     description: '',
-    unit_price: 0,
-    currency: 'DOP',
-    category: 'otros',
+    default_price: 0,
     is_active: true
   });
 
