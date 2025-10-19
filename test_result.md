@@ -163,6 +163,21 @@ backend:
         agent: "testing"
         comment: "✅ TESTED: Búsqueda y filtrado completamente funcional. Parámetro 'search' busca correctamente por nombre y código (case-insensitive). Parámetro 'category_id' filtra villas por categoría correctamente. Ambos parámetros pueden usarse independientemente."
 
+  - task: "Auto-creación de gastos en reservaciones"
+    implemented: true
+    working: true
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: true
+        agent: "main"
+        comment: "Implementado flujo automático: cuando se crea reservación con owner_price > 0, se auto-genera gasto en categoría 'pago_propietario' con monto, descripción y vinculación correcta"
+      - working: true
+        agent: "testing"
+        comment: "✅ TESTED: Auto-creación de gastos completamente funcional. Al crear reservación con owner_price: 8000.0, se genera automáticamente gasto con category: 'pago_propietario', amount: 8000.0, description: 'Pago propietario villa ECPVSH - Factura #1605', payment_status: 'pending', related_reservation_id vinculado correctamente. Todos los campos requeridos presentes."
+
 frontend:
   - task: "Componente Categories - CRUD"
     implemented: true
