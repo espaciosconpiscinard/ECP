@@ -564,6 +564,57 @@ const ExpensesNew = () => {
                               </div>
                             )}
 
+                            {/* Lista de Abonos */}
+                            {expenseAbonos[expense.id] && expenseAbonos[expense.id].length > 0 && (
+                              <div className="mt-3 bg-green-50 p-3 rounded-md border border-green-200">
+                                <p className="text-xs font-bold text-green-800 mb-2 flex items-center justify-between">
+                                  <span>📝 HISTORIAL DE ABONOS:</span>
+                                  <span className="text-xs text-gray-600">({expenseAbonos[expense.id].length} pagos)</span>
+                                </p>
+                                <div className="space-y-2">
+                                  {expenseAbonos[expense.id].map((abono, idx) => (
+                                    <div key={abono.id} className="bg-white p-2 rounded border border-green-300 text-xs">
+                                      <div className="flex justify-between items-start">
+                                        <div className="flex-1">
+                                          <div className="flex items-center gap-2">
+                                            <span className="font-semibold text-green-700">
+                                              {formatCurrency(abono.amount, abono.currency)}
+                                            </span>
+                                            <span className="text-gray-500">
+                                              • {new Date(abono.payment_date).toLocaleDateString('es-DO')}
+                                            </span>
+                                            <span className="text-gray-500 capitalize">
+                                              • {abono.payment_method}
+                                            </span>
+                                          </div>
+                                          {abono.notes && (
+                                            <p className="text-gray-600 mt-1">{abono.notes}</p>
+                                          )}
+                                        </div>
+                                        {user?.role === 'admin' && (
+                                          <Button
+                                            size="sm"
+                                            variant="ghost"
+                                            onClick={(e) => {
+                                              e.stopPropagation();
+                                              handleDeleteAbono(expense.id, abono.id);
+                                            }}
+                                            className="text-red-600 hover:text-red-700 h-6 w-6 p-0"
+                                            title="Eliminar abono (solo Admin)"
+                                          >
+                                            <Trash2 size={12} />
+                                          </Button>
+                                        )}
+                                      </div>
+                                    </div>
+                                  ))}
+                                </div>
+                                <p className="text-xs text-gray-500 mt-2 italic">
+                                  💡 Tip: Puedes eliminar un abono si fue registrado por error
+                                </p>
+                              </div>
+                            )}
+
                             {/* Acciones */}
                             <div className="flex gap-2 mt-4 pt-3 border-t">
                               {/* Botón Agregar Abono - Si tiene saldo pendiente (balance_due > 0) */}
