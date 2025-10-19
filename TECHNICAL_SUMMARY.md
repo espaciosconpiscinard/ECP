@@ -229,7 +229,7 @@ CORS_ORIGINS=*
 JWT_SECRET_KEY=<secret-key>
 
 # Frontend (.env)
-REACT_APP_BACKEND_URL=https://espanol-amigo-7.preview.emergentagent.com
+REACT_APP_BACKEND_URL=https://ecp-manager.preview.emergentagent.com
 ```
 
 ## 🚀 Deployment
