@@ -9,7 +9,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { Plus, Edit, Trash2, DollarSign, ChevronDown, ChevronUp, Search } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 
-const ExpensesNew = () => {
+const Expenses = () => {
   const { user } = useAuth();
   const [expenses, setExpenses] = useState([]);
   const [expenseCategories, setExpenseCategories] = useState([]);
