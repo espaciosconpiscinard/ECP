@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { 
   getExpenses, createExpense, updateExpense, deleteExpense,
-  addAbonoToExpense, getExpenseAbonos, deleteExpenseAbono 
+  addAbonoToExpense, getExpenseAbonos, deleteExpenseAbono,
+  getExpenseCategories
 } from '../api/api';
 import { Button } from './ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from './ui/card';
@@ -9,7 +10,7 @@ import { Input } from './ui/input';
 import { Label } from './ui/label';
 import { Alert, AlertDescription } from './ui/alert';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from './ui/dialog';
-import { Plus, Edit, Trash2, Filter, DollarSign, X } from 'lucide-react';
+import { Plus, Edit, Trash2, Filter, DollarSign, X, Bell } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 
 const Expenses = () => {
