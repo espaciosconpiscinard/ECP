@@ -10,6 +10,7 @@ import Categories from './components/Categories';
 import ExpenseCategories from './components/ExpenseCategories';
 import Customers from './components/Customers';
 import Expenses from './components/Expenses';
+import Users from './components/Users';
 import './App.css';
 
 const AppContent = () => {
@@ -44,6 +45,8 @@ const AppContent = () => {
         return <Customers />;
       case 'expenses':
         return <Expenses />;
+      case 'users':
+        return <Users />;
       default:
         return <Dashboard />;
     }
