@@ -483,6 +483,44 @@ async def delete_reservation(reservation_id: str, current_user: dict = Depends(r
         raise HTTPException(status_code=404, detail="Reservation not found")
     return {"message": "Reservation deleted successfully"}
 
+# ============ ABONOS TO RESERVATIONS ============
+
+@api_router.post("/reservations/{reservation_id}/abonos", response_model=Abono)
+async def add_abono_to_reservation(reservation_id: str, abono_data: AbonoCreate, current_user: dict = Depends(get_current_user)):
+    """Add a payment (abono) to a reservation"""
+    reservation = await db.reservations.find_one({"id": reservation_id}, {"_id": 0})
+    if not reservation:
+        raise HTTPException(status_code=404, detail="Reservation not found")
+    
+    # Create abono record
+    abono = Abono(**abono_data.model_dump(), created_by=current_user["id"])
+    abono_doc = prepare_doc_for_insert(abono.model_dump())
+    
+    # Store in reservation_abonos collection
+    abono_doc["reservation_id"] = reservation_id
+    await db.reservation_abonos.insert_one(abono_doc)
+    
+    # Update reservation amount_paid and balance_due
+    new_amount_paid = reservation.get("amount_paid", 0) + abono_data.amount
+    new_balance_due = calculate_balance(reservation.get("total_amount", 0), new_amount_paid)
+    
+    await db.reservations.update_one(
+        {"id": reservation_id},
+        {"$set": {
+            "amount_paid": new_amount_paid,
+            "balance_due": new_balance_due,
+            "updated_at": datetime.now(timezone.utc).isoformat()
+        }}
+    )
+    
+    return abono
+
+@api_router.get("/reservations/{reservation_id}/abonos", response_model=List[Abono])
+async def get_reservation_abonos(reservation_id: str, current_user: dict = Depends(get_current_user)):
+    """Get all abonos for a reservation"""
+    abonos = await db.reservation_abonos.find({"reservation_id": reservation_id}, {"_id": 0}).sort("payment_date", -1).to_list(100)
+    return [restore_datetimes(a, ["payment_date", "created_at"]) for a in abonos]
+
 # ============ VILLA OWNER ENDPOINTS ============
 
 @api_router.post("/owners", response_model=VillaOwner)
