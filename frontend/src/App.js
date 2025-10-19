@@ -7,6 +7,7 @@ import Dashboard from './components/Dashboard';
 import Reservations from './components/Reservations';
 import VillasManagement from './components/VillasManagement';
 import Categories from './components/Categories';
+import ExpenseCategories from './components/ExpenseCategories';
 import Customers from './components/Customers';
 import Expenses from './components/Expenses';
 import './App.css';
