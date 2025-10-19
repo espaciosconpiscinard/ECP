@@ -1,70 +1,42 @@
 import React, { useState, useEffect } from 'react';
-import { getExpenses, getExpenseCategories, createExpenseCategory, updateExpenseCategory, deleteExpenseCategory, createExpense, updateExpense, deleteExpense, addAbonoToExpense, getExpenseAbonos, deleteExpenseAbono } from '../api/api';
+import { getExpenses, createExpense, updateExpense, deleteExpense } from '../api/api';
 import { Button } from './ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from './ui/card';
 import { Input } from './ui/input';
 import { Label } from './ui/label';
 import { Alert, AlertDescription } from './ui/alert';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from './ui/dialog';
-import { Plus, Edit, Trash2, DollarSign, ChevronDown, ChevronUp, Search } from 'lucide-react';
+import { Plus, Edit, Trash2, Filter } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 
 const Expenses = () => {
   const { user } = useAuth();
   const [expenses, setExpenses] = useState([]);
-  const [expenseCategories, setExpenseCategories] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [isFormOpen, setIsFormOpen] = useState(false);
-  const [isCategoryFormOpen, setIsCategoryFormOpen] = useState(false);
   const [editingExpense, setEditingExpense] = useState(null);
-  const [searchTerm, setSearchTerm] = useState('');
-  const [expandedExpenses, setExpandedExpenses] = useState({});
-  const [isAbonoDialogOpen, setIsAbonoDialogOpen] = useState(false);
-  const [selectedExpense, setSelectedExpense] = useState(null);
-  const [expenseAbonos, setExpenseAbonos] = useState({});
-  const [viewMode, setViewMode] = useState('all'); // 'all' o 'reminders'
-  const [abonoFormData, setAbonoFormData] = useState({
-    amount: 0,
-    currency: 'DOP',
-    payment_method: 'efectivo',
-    payment_date: new Date().toISOString().split('T')[0],
-    notes: ''
-  });
-  
-  const [categoryFormData, setCategoryFormData] = useState({
-    name: '',
-    description: ''
-  });
-  
+  const [filterCategory, setFilterCategory] = useState('');
   const [formData, setFormData] = useState({
     category: 'otros',
-    expense_category_id: '',
     description: '',
     amount: 0,
     currency: 'DOP',
     expense_date: new Date().toISOString().split('T')[0],
-    payment_status: 'pending',
-    notes: '',
-    has_payment_reminder: false,
-    payment_reminder_day: null,
-    is_recurring: false
+    payment_status: 'paid',
+    notes: ''
   });
 
   useEffect(() => {
-    fetchData();
-  }, []);
+    fetchExpenses();
+  }, [filterCategory]);
 
-  const fetchData = async () => {
+  const fetchExpenses = async () => {
     try {
-      const [expensesResponse, categoriesResponse] = await Promise.all([
-        getExpenses(null, searchTerm || null),
-        getExpenseCategories()
-      ]);
-      setExpenses(expensesResponse.data);
-      setExpenseCategories(categoriesResponse.data);
+      const response = await getExpenses(filterCategory || null);
+      setExpenses(response.data);
     } catch (err) {
-      setError('Error al cargar datos');
+      setError('Error al cargar gastos');
       console.error(err);
     } finally {
       setLoading(false);
@@ -76,12 +48,17 @@ const Expenses = () => {
     setError('');
     
     try {
+      const dataToSend = {
+        ...formData,
+        expense_date: new Date(formData.expense_date).toISOString()
+      };
+      
       if (editingExpense) {
-        await updateExpense(editingExpense.id, formData);
+        await updateExpense(editingExpense.id, dataToSend);
       } else {
-        await createExpense(formData);
+        await createExpense(dataToSend);
       }
-      await fetchData();
+      await fetchExpenses();
       setIsFormOpen(false);
       resetForm();
     } catch (err) {
@@ -92,17 +69,13 @@ const Expenses = () => {
   const handleEdit = (expense) => {
     setEditingExpense(expense);
     setFormData({
-      category: expense.category || 'otros',
-      expense_category_id: expense.expense_category_id || '',
+      category: expense.category,
       description: expense.description,
       amount: expense.amount,
       currency: expense.currency,
       expense_date: expense.expense_date.split('T')[0],
       payment_status: expense.payment_status,
-      notes: expense.notes || '',
-      has_payment_reminder: expense.has_payment_reminder || false,
-      payment_reminder_day: expense.payment_reminder_day || null,
-      is_recurring: expense.is_recurring || false
+      notes: expense.notes || ''
     });
     setIsFormOpen(true);
   };
@@ -111,7 +84,7 @@ const Expenses = () => {
     if (window.confirm('¿Estás seguro de eliminar este gasto?')) {
       try {
         await deleteExpense(id);
-        await fetchData();
+        await fetchExpenses();
       } catch (err) {
         setError('Error al eliminar gasto');
       }
@@ -122,146 +95,13 @@ const Expenses = () => {
     setEditingExpense(null);
     setFormData({
       category: 'otros',
-      expense_category_id: '',
       description: '',
       amount: 0,
       currency: 'DOP',
       expense_date: new Date().toISOString().split('T')[0],
-      payment_status: 'pending',
-      notes: '',
-      has_payment_reminder: false,
-      payment_reminder_day: null,
-      is_recurring: false
-    });
-  };
-
-  const toggleExpand = async (expenseId) => {
-    const wasExpanded = expandedExpenses[expenseId];
-    
-    setExpandedExpenses(prev => ({
-      ...prev,
-      [expenseId]: !prev[expenseId]
-    }));
-    
-    // Si se está expandiendo (no colapsando), cargar los abonos
-    if (!wasExpanded && !expenseAbonos[expenseId]) {
-      try {
-        const response = await getExpenseAbonos(expenseId);
-        setExpenseAbonos(prev => ({
-          ...prev,
-          [expenseId]: response.data
-        }));
-      } catch (err) {
-        console.error('Error loading abonos:', err);
-      }
-    }
-  };
-
-  const handleDeleteAbono = async (expenseId, abonoId) => {
-    if (window.confirm('¿Estás seguro de eliminar este abono? Esta acción corregirá el saldo del gasto.')) {
-      try {
-        await deleteExpenseAbono(expenseId, abonoId);
-        // Recargar datos
-        await fetchData();
-        // Recargar abonos del gasto
-        const response = await getExpenseAbonos(expenseId);
-        setExpenseAbonos(prev => ({
-          ...prev,
-          [expenseId]: response.data
-        }));
-        alert('✅ Abono eliminado exitosamente. Saldo actualizado.');
-      } catch (err) {
-        setError('Error al eliminar abono');
-        console.error(err);
-      }
-    }
-  };
-
-  const handleCreateCategory = async (e) => {
-    e.preventDefault();
-    try {
-      await createExpenseCategory(categoryFormData);
-      await fetchData();
-      setIsCategoryFormOpen(false);
-      setCategoryFormData({ name: '', description: '' });
-      alert('✅ Categoría creada exitosamente');
-    } catch (err) {
-      setError('Error al crear categoría');
-      console.error(err);
-    }
-  };
-
-  const handleDeleteCategory = async (categoryId) => {
-    if (window.confirm('¿Estás seguro de eliminar esta categoría? Los gastos quedarán sin categoría asignada.')) {
-      try {
-        await deleteExpenseCategory(categoryId);
-        await fetchData();
-        alert('✅ Categoría eliminada exitosamente');
-      } catch (err) {
-        setError('Error al eliminar categoría');
-        console.error(err);
-      }
-    }
-  };
-
-  const handleAddAbono = (expense) => {
-    setSelectedExpense(expense);
-    setAbonoFormData({
-      amount: 0,
-      currency: expense.currency,
-      payment_method: 'efectivo',
-      payment_date: new Date().toISOString().split('T')[0],
+      payment_status: 'paid',
       notes: ''
     });
-    setIsAbonoDialogOpen(true);
-  };
-
-  const submitAbono = async (e) => {
-    e.preventDefault();
-    if (!selectedExpense) return;
-    
-    // Validar si el abono excede el saldo pendiente
-    const balanceDue = selectedExpense.balance_due || selectedExpense.amount;
-    const willBeOverpaid = abonoFormData.amount > balanceDue;
-    const overpayAmount = abonoFormData.amount - balanceDue;
-    
-    if (willBeOverpaid) {
-      const confirmOverpay = window.confirm(
-        `⚠️ ADVERTENCIA: Estás pagando de más.\n\n` +
-        `Saldo pendiente: ${formatCurrency(balanceDue, selectedExpense.currency)}\n` +
-        `Abono a registrar: ${formatCurrency(abonoFormData.amount, abonoFormData.currency)}\n` +
-        `Excedente: ${formatCurrency(overpayAmount, selectedExpense.currency)}\n\n` +
-        `El saldo final será negativo: -${formatCurrency(overpayAmount, selectedExpense.currency)}\n\n` +
-        `¿Deseas continuar de todos modos?`
-      );
-      
-      if (!confirmOverpay) {
-        return; // Cancelar si el usuario no confirma
-      }
-    }
-    
-    try {
-      await addAbonoToExpense(selectedExpense.id, abonoFormData);
-      setIsAbonoDialogOpen(false);
-      setSelectedExpense(null);
-      await fetchData();
-      
-      // Recargar abonos del gasto
-      const response = await getExpenseAbonos(selectedExpense.id);
-      setExpenseAbonos(prev => ({
-        ...prev,
-        [selectedExpense.id]: response.data
-      }));
-      
-      if (willBeOverpaid) {
-        alert(`✅ Abono registrado exitosamente.\n\n⚠️ Nota: El gasto tiene un excedente de pago de ${formatCurrency(overpayAmount, selectedExpense.currency)}`);
-      } else {
-        alert('✅ Abono registrado exitosamente');
-      }
-    } catch (err) {
-      setError('Error al registrar abono');
-      console.error(err);
-    }
   };
 
   const formatCurrency = (amount, currency) => {
@@ -271,83 +111,46 @@ const Expenses = () => {
 
   const getCategoryLabel = (category) => {
     const labels = {
-      'local': 'Local/Alquiler',
+      'local': 'Pago de Local',
       'nomina': 'Nómina',
-      'variable': 'Variable',
-      'pago_propietario': 'Pago Propietario',
+      'variable': 'Gasto Variable',
       'otros': 'Otros'
     };
     return labels[category] || category;
   };
 
-  // Filtrar gastos por búsqueda
-  const filteredExpenses = expenses.filter(e => 
-    e.description?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    getCategoryLabel(e.category).toLowerCase().includes(searchTerm.toLowerCase()) ||
-    expenseCategories.find(c => c.id === e.expense_category_id)?.name?.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  const getCategoryColor = (category) => {
+    const colors = {
+      'local': 'bg-blue-100 text-blue-800',
+      'nomina': 'bg-green-100 text-green-800',
+      'variable': 'bg-yellow-100 text-yellow-800',
+      'otros': 'bg-gray-100 text-gray-800'
+    };
+    return colors[category] || colors.otros;
+  };
 
-  // Agrupar gastos por categoría
-  const groupedExpenses = {};
-  filteredExpenses.forEach(expense => {
-    const key = expense.expense_category_id ? 
-      expenseCategories.find(c => c.id === expense.expense_category_id)?.name || expense.category :
-      getCategoryLabel(expense.category);
-    
-    if (!groupedExpenses[key]) {
-      groupedExpenses[key] = [];
-    }
-    groupedExpenses[key].push(expense);
-  });
-
-  // Ordenar categorías alfabéticamente
-  const sortedCategoryKeys = Object.keys(groupedExpenses).sort();
-
-  // Agrupar gastos con recordatorio por día del mes
-  const expensesWithReminders = expenses.filter(e => e.has_payment_reminder);
-  const groupedByReminderDay = {};
-  
-  expensesWithReminders.forEach(expense => {
-    const day = expense.payment_reminder_day;
-    if (day) {
-      if (!groupedByReminderDay[day]) {
-        groupedByReminderDay[day] = [];
-      }
-      groupedByReminderDay[day].push(expense);
-    }
-  });
-
-  // Ordenar días de menor a mayor
-  const sortedReminderDays = Object.keys(groupedByReminderDay).sort((a, b) => parseInt(a) - parseInt(b));
-
-  // Calcular totales
-  const totalExpensesDOP = expenses.filter(e => e.currency === 'DOP').reduce((sum, e) => sum + e.amount, 0);
-  const totalExpensesUSD = expenses.filter(e => e.currency === 'USD').reduce((sum, e) => sum + e.amount, 0);
-  const pendingExpensesDOP = expenses.filter(e => e.currency === 'DOP' && e.balance_due > 0).reduce((sum, e) => sum + e.balance_due, 0);
-  const pendingExpensesUSD = expenses.filter(e => e.currency === 'USD' && e.balance_due > 0).reduce((sum, e) => sum + e.balance_due, 0);
+  // Calculate totals
+  const totalDOP = expenses.filter(e => e.currency === 'DOP').reduce((sum, e) => sum + e.amount, 0);
+  const totalUSD = expenses.filter(e => e.currency === 'USD').reduce((sum, e) => sum + e.amount, 0);
 
   if (loading) {
-    return <div className="text-center py-8">Cargando...</div>;
+    return <div className="text-center py-8" data-testid="expenses-loading">Cargando...</div>;
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6" data-testid="expenses-page">
       <div className="flex justify-between items-center">
         <div>
-          <h2 className="text-3xl font-bold text-gray-900">Gastos</h2>
-          <p className="text-gray-500 mt-1">Gestiona los gastos del negocio</p>
+          <h2 className="text-3xl font-bold text-gray-900">Gastos y Compromisos</h2>
+          <p className="text-gray-500 mt-1">Registra y gestiona todos tus gastos</p>
         </div>
-        <div className="flex gap-2">
-          <Button variant="outline" onClick={() => setIsCategoryFormOpen(true)}>
-            📂 Categorías
-          </Button>
-          <Dialog open={isFormOpen} onOpenChange={setIsFormOpen}>
-            <DialogTrigger asChild>
-              <Button onClick={() => resetForm()}>
-                <Plus className="mr-2 h-4 w-4" /> Nuevo Gasto
-              </Button>
-            </DialogTrigger>
-            <DialogContent className="max-w-md">
+        <Dialog open={isFormOpen} onOpenChange={setIsFormOpen}>
+          <DialogTrigger asChild>
+            <Button onClick={() => resetForm()} data-testid="add-expense-button">
+              <Plus className="mr-2 h-4 w-4" /> Nuevo Gasto
+            </Button>
+          </DialogTrigger>
+          <DialogContent>
             <DialogHeader>
               <DialogTitle>
                 {editingExpense ? 'Editar Gasto' : 'Nuevo Gasto'}
@@ -355,46 +158,30 @@ const Expenses = () => {
             </DialogHeader>
             <form onSubmit={handleSubmit} className="space-y-4">
               <div>
-                <Label>Categoría Predefinida *</Label>
+                <Label>Categoría *</Label>
                 <select
                   value={formData.category}
                   onChange={(e) => setFormData({ ...formData, category: e.target.value })}
                   className="w-full p-2 border rounded-md"
                   required
+                  data-testid="category-select"
                 >
-                  <option value="pago_propietario">Pago Propietario</option>
-                  <option value="local">Local/Alquiler</option>
+                  <option value="local">Pago de Local</option>
                   <option value="nomina">Nómina</option>
-                  <option value="variable">Variable</option>
+                  <option value="variable">Gasto Variable</option>
                   <option value="otros">Otros</option>
                 </select>
               </div>
-
-              <div>
-                <Label>Categoría Personalizada (Opcional)</Label>
-                <select
-                  value={formData.expense_category_id}
-                  onChange={(e) => setFormData({ ...formData, expense_category_id: e.target.value })}
-                  className="w-full p-2 border rounded-md"
-                >
-                  <option value="">Sin categoría personalizada</option>
-                  {expenseCategories.map(c => (
-                    <option key={c.id} value={c.id}>{c.name}</option>
-                  ))}
-                </select>
-              </div>
-
               <div>
                 <Label>Descripción *</Label>
-                <textarea
+                <Input
                   value={formData.description}
                   onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                  className="w-full p-2 border rounded-md"
-                  rows="3"
                   required
+                  placeholder="Descripción del gasto"
+                  data-testid="description-input"
                 />
               </div>
-
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <Label>Monto *</Label>
@@ -403,8 +190,9 @@ const Expenses = () => {
                     step="0.01"
                     min="0"
                     value={formData.amount}
-                    onChange={(e) => setFormData({ ...formData, amount: parseFloat(e.target.value) || 0 })}
+                    onChange={(e) => setFormData({ ...formData, amount: parseFloat(e.target.value) })}
                     required
+                    data-testid="amount-input"
                   />
                 </div>
                 <div>
@@ -413,13 +201,13 @@ const Expenses = () => {
                     value={formData.currency}
                     onChange={(e) => setFormData({ ...formData, currency: e.target.value })}
                     className="w-full p-2 border rounded-md"
+                    data-testid="currency-select"
                   >
-                    <option value="DOP">DOP</option>
-                    <option value="USD">USD</option>
+                    <option value="DOP">Pesos Dominicanos (DOP)</option>
+                    <option value="USD">Dólares (USD)</option>
                   </select>
                 </div>
               </div>
-
               <div>
                 <Label>Fecha del Gasto *</Label>
                 <Input
@@ -427,81 +215,30 @@ const Expenses = () => {
                   value={formData.expense_date}
                   onChange={(e) => setFormData({ ...formData, expense_date: e.target.value })}
                   required
+                  data-testid="expense-date-input"
                 />
               </div>
-
               <div>
                 <Label>Estado de Pago *</Label>
                 <select
                   value={formData.payment_status}
                   onChange={(e) => setFormData({ ...formData, payment_status: e.target.value })}
                   className="w-full p-2 border rounded-md"
+                  data-testid="payment-status-select"
                 >
-                  <option value="pending">Pendiente</option>
                   <option value="paid">Pagado</option>
+                  <option value="pending">Pendiente</option>
                 </select>
               </div>
-
               <div>
                 <Label>Notas</Label>
                 <textarea
                   value={formData.notes}
                   onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
                   className="w-full p-2 border rounded-md"
-                  rows="2"
+                  rows="3"
+                  data-testid="notes-input"
                 />
-              </div>
-
-              {/* Recordatorio de Pago */}
-              <div className="border-t pt-4">
-                <div className="flex items-center mb-3">
-                  <input
-                    type="checkbox"
-                    id="has_reminder"
-                    checked={formData.has_payment_reminder}
-                    onChange={(e) => setFormData({ ...formData, has_payment_reminder: e.target.checked })}
-                    className="mr-2"
-                  />
-                  <Label htmlFor="has_reminder" className="cursor-pointer">
-                    🔔 Activar recordatorio de pago
-                  </Label>
-                </div>
-
-                {formData.has_payment_reminder && (
-                  <div className="space-y-3 bg-yellow-50 p-3 rounded-md">
-                    <div>
-                      <Label>Día del mes para pago (1-31) *</Label>
-                      <select
-                        value={formData.payment_reminder_day || ''}
-                        onChange={(e) => setFormData({ ...formData, payment_reminder_day: parseInt(e.target.value) })}
-                        className="w-full p-2 border rounded-md"
-                        required={formData.has_payment_reminder}
-                      >
-                        <option value="">Seleccionar día</option>
-                        {Array.from({ length: 31 }, (_, i) => i + 1).map(day => (
-                          <option key={day} value={day}>Día {day}</option>
-                        ))}
-                      </select>
-                    </div>
-
-                    <div className="flex items-center">
-                      <input
-                        type="checkbox"
-                        id="is_recurring"
-                        checked={formData.is_recurring}
-                        onChange={(e) => setFormData({ ...formData, is_recurring: e.target.checked })}
-                        className="mr-2"
-                      />
-                      <Label htmlFor="is_recurring" className="cursor-pointer text-sm">
-                        🔄 Gasto recurrente mensual
-                      </Label>
-                    </div>
-
-                    <p className="text-xs text-gray-600">
-                      💡 Los gastos recurrentes aparecerán en la vista de recordatorios cada mes
-                    </p>
-                  </div>
-                )}
               </div>
 
               {error && (
@@ -514,7 +251,7 @@ const Expenses = () => {
                 <Button type="button" variant="outline" onClick={() => setIsFormOpen(false)}>
                   Cancelar
                 </Button>
-                <Button type="submit">
+                <Button type="submit" data-testid="save-expense-button">
                   {editingExpense ? 'Actualizar' : 'Guardar'}
                 </Button>
               </div>
@@ -523,638 +260,123 @@ const Expenses = () => {
         </Dialog>
       </div>
 
-      {/* Resumen de totales */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-        <Card>
-          <CardContent className="pt-6">
-            <div className="text-sm text-gray-500">Total Gastos DOP</div>
-            <div className="text-2xl font-bold text-red-600">{formatCurrency(totalExpensesDOP, 'DOP')}</div>
+      {/* Summary Cards */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <Card data-testid="total-dop-card">
+          <CardHeader>
+            <CardTitle>Total Gastos (DOP)</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <p className="text-3xl font-bold text-red-600">{formatCurrency(totalDOP, 'DOP')}</p>
           </CardContent>
         </Card>
-        <Card>
-          <CardContent className="pt-6">
-            <div className="text-sm text-gray-500">Total Gastos USD</div>
-            <div className="text-2xl font-bold text-red-600">{formatCurrency(totalExpensesUSD, 'USD')}</div>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardContent className="pt-6">
-            <div className="text-sm text-gray-500">Pendientes DOP</div>
-            <div className="text-2xl font-bold text-orange-600">{formatCurrency(pendingExpensesDOP, 'DOP')}</div>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardContent className="pt-6">
-            <div className="text-sm text-gray-500">Pendientes USD</div>
-            <div className="text-2xl font-bold text-orange-600">{formatCurrency(pendingExpensesUSD, 'USD')}</div>
+        <Card data-testid="total-usd-card">
+          <CardHeader>
+            <CardTitle>Total Gastos (USD)</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <p className="text-3xl font-bold text-red-600">{formatCurrency(totalUSD, 'USD')}</p>
           </CardContent>
         </Card>
       </div>
 
-      {/* Buscador y Toggle de Vista */}
-      <div className="flex items-center justify-between gap-4">
-        <div className="flex items-center space-x-2 flex-1">
-          <Search className="text-gray-400" size={20} />
-          <Input
-            placeholder="Buscar por descripción o categoría..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            className="max-w-md"
-          />
-        </div>
-        
-        <div className="flex gap-2">
-          <Button
-            variant={viewMode === 'all' ? 'default' : 'outline'}
-            onClick={() => setViewMode('all')}
-            size="sm"
-          >
-            📋 Todos
-          </Button>
-          <Button
-            variant={viewMode === 'reminders' ? 'default' : 'outline'}
-            onClick={() => setViewMode('reminders')}
-            size="sm"
-          >
-            🔔 Recordatorios
-          </Button>
-        </div>
+      {/* Filter */}
+      <div className="flex items-center space-x-2">
+        <Filter className="text-gray-400" size={20} />
+        <select
+          value={filterCategory}
+          onChange={(e) => setFilterCategory(e.target.value)}
+          className="p-2 border rounded-md"
+          data-testid="filter-category-select"
+        >
+          <option value="">Todas las categorías</option>
+          <option value="local">Pago de Local</option>
+          <option value="nomina">Nómina</option>
+          <option value="variable">Gasto Variable</option>
+          <option value="otros">Otros</option>
+        </select>
       </div>
 
-      {error && !isFormOpen && (
-        <Alert variant="destructive">
-          <AlertDescription>{error}</AlertDescription>
-        </Alert>
-      )}
-
-      {/* Gastos agrupados por categoría O por recordatorios */}
-      {viewMode === 'all' ? (
-        // Vista normal: Todos los gastos agrupados por categoría
-        <div className="space-y-6">
-          {sortedCategoryKeys.map((categoryKey) => {
-            const categoryExpenses = groupedExpenses[categoryKey];
-            const categoryTotal = categoryExpenses.reduce((sum, e) => sum + (e.currency === 'DOP' ? e.amount : 0), 0);
-          
-          return (
-            <Card key={categoryKey}>
-              <CardHeader className="bg-gradient-to-r from-red-50 to-red-100">
-                <CardTitle className="flex items-center justify-between">
-                  <div className="flex items-center">
-                    <DollarSign className="mr-2 text-red-600" size={24} />
-                    <span className="text-xl">{categoryKey}</span>
-                    <span className="ml-2 text-sm text-gray-500">({categoryExpenses.length})</span>
-                  </div>
-                  <span className="text-lg font-semibold text-red-600">
-                    {formatCurrency(categoryTotal, 'DOP')}
-                  </span>
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="p-0">
-                <div className="divide-y">
-                  {categoryExpenses.map((expense) => {
-                    const isExpanded = expandedExpenses[expense.id];
-                    const isAutogenerated = expense.related_reservation_id;
-                    
-                    return (
-                      <div key={expense.id} className="hover:bg-gray-50 transition-colors">
-                        {/* Vista compacta */}
-                        <div
-                          className="p-4 cursor-pointer flex items-center justify-between"
-                          onClick={() => toggleExpand(expense.id)}
-                        >
-                          <div className="flex-1 grid grid-cols-4 gap-4 items-center">
-                            <div className="col-span-2">
-                              <p className="text-sm font-medium text-gray-900">{expense.description}</p>
-                              {isAutogenerated && (
-                                <span className="text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded">Auto-generado</span>
-                              )}
-                            </div>
-                            <div>
-                              <p className="text-sm">{new Date(expense.expense_date).toLocaleDateString('es-DO')}</p>
-                            </div>
-                            <div className="flex items-center justify-between">
-                              <div>
-                                {/* Mostrar balance_due (saldo restante) */}
-                                <p className={`text-sm font-semibold ${
-                                  expense.balance_due < 0 ? 'text-blue-600' : 
-                                  expense.balance_due === 0 ? 'text-green-600' : 
-                                  'text-red-600'
-                                }`}>
-                                  {formatCurrency(Math.abs(expense.balance_due || expense.amount), expense.currency)}
-                                  {expense.balance_due < 0 && ' (Excedente)'}
-                                  {expense.balance_due === 0 && ' (Pagado)'}
-                                </p>
-                                <span className={`text-xs px-2 py-1 rounded ${
-                                  expense.balance_due <= 0 ? 'bg-green-100 text-green-800' : 'bg-orange-100 text-orange-800'
-                                }`}>
-                                  {expense.balance_due <= 0 ? 'Pagado' : 'Pendiente'}
-                                </span>
-                              </div>
-                              {isExpanded ? <ChevronUp size={20} /> : <ChevronDown size={20} />}
-                            </div>
-                          </div>
-                        </div>
-
-                        {/* Vista expandida */}
-                        {isExpanded && (
-                          <div className="px-4 pb-4 bg-gray-50 border-t">
-                            <div className="grid grid-cols-2 gap-4 mt-3 text-sm">
-                              <div>
-                                <p className="text-xs text-gray-500 font-medium">CATEGORÍA:</p>
-                                <p className="text-gray-900">{categoryKey}</p>
-                              </div>
-                              <div>
-                                <p className="text-xs text-gray-500 font-medium">ESTADO:</p>
-                                <p className="text-gray-900">{expense.balance_due <= 0 ? 'Pagado' : 'Pendiente'}</p>
-                              </div>
-                              <div>
-                                <p className="text-xs text-gray-500 font-medium">MONTO ORIGINAL:</p>
-                                <p className="text-gray-900 font-semibold">{formatCurrency(expense.amount, expense.currency)}</p>
-                              </div>
-                              <div>
-                                <p className="text-xs text-gray-500 font-medium">TOTAL PAGADO:</p>
-                                <p className="text-green-600 font-semibold">{formatCurrency(expense.total_paid || 0, expense.currency)}</p>
-                              </div>
-                              <div className="col-span-2">
-                                <p className="text-xs text-gray-500 font-medium">SALDO RESTANTE:</p>
-                                <p className={`text-lg font-bold ${
-                                  expense.balance_due < 0 ? 'text-blue-600' : 
-                                  expense.balance_due === 0 ? 'text-green-600' : 
-                                  'text-red-600'
-                                }`}>
-                                  {expense.balance_due < 0 ? '-' : ''}{formatCurrency(Math.abs(expense.balance_due || expense.amount), expense.currency)}
-                                  {expense.balance_due < 0 && ' (Excedente de pago)'}
-                                  {expense.balance_due === 0 && ' (Totalmente pagado)'}
-                                </p>
-                              </div>
-                              <div>
-                                <p className="text-xs text-gray-500 font-medium">MONEDA:</p>
-                                <p className="text-gray-900">{expense.currency}</p>
-                              </div>
-                            </div>
-
-                            {/* Notas */}
-                            {expense.notes && (
-                              <div className="mt-3">
-                                <p className="text-xs text-gray-500 font-medium">NOTAS:</p>
-                                <p className="text-sm text-gray-700">{expense.notes}</p>
-                              </div>
-                            )}
-
-                            {/* Lista de Abonos */}
-                            {expenseAbonos[expense.id] && expenseAbonos[expense.id].length > 0 && (
-                              <div className="mt-3 bg-green-50 p-3 rounded-md border border-green-200">
-                                <p className="text-xs font-bold text-green-800 mb-2 flex items-center justify-between">
-                                  <span>📝 HISTORIAL DE ABONOS:</span>
-                                  <span className="text-xs text-gray-600">({expenseAbonos[expense.id].length} pagos)</span>
-                                </p>
-                                <div className="space-y-2">
-                                  {expenseAbonos[expense.id].map((abono, idx) => (
-                                    <div key={abono.id} className="bg-white p-2 rounded border border-green-300 text-xs">
-                                      <div className="flex justify-between items-start">
-                                        <div className="flex-1">
-                                          <div className="flex items-center gap-2">
-                                            <span className="font-semibold text-green-700">
-                                              {formatCurrency(abono.amount, abono.currency)}
-                                            </span>
-                                            <span className="text-gray-500">
-                                              • {new Date(abono.payment_date).toLocaleDateString('es-DO')}
-                                            </span>
-                                            <span className="text-gray-500 capitalize">
-                                              • {abono.payment_method}
-                                            </span>
-                                          </div>
-                                          {abono.notes && (
-                                            <p className="text-gray-600 mt-1">{abono.notes}</p>
-                                          )}
-                                        </div>
-                                        {user?.role === 'admin' && (
-                                          <Button
-                                            size="sm"
-                                            variant="ghost"
-                                            onClick={(e) => {
-                                              e.stopPropagation();
-                                              handleDeleteAbono(expense.id, abono.id);
-                                            }}
-                                            className="text-red-600 hover:text-red-700 h-6 w-6 p-0"
-                                            title="Eliminar abono (solo Admin)"
-                                          >
-                                            <Trash2 size={12} />
-                                          </Button>
-                                        )}
-                                      </div>
-                                    </div>
-                                  ))}
-                                </div>
-                                <p className="text-xs text-gray-500 mt-2 italic">
-                                  💡 Tip: Puedes eliminar un abono si fue registrado por error
-                                </p>
-                              </div>
-                            )}
-
-                            {/* Acciones */}
-                            <div className="flex gap-2 mt-4 pt-3 border-t">
-                              {/* Botón Agregar Abono - Si tiene saldo pendiente (balance_due > 0) */}
-                              {expense.balance_due > 0 && (
-                                <Button
-                                  size="sm"
-                                  variant="outline"
-                                  onClick={(e) => {
-                                    e.stopPropagation();
-                                    handleAddAbono(expense);
-                                  }}
-                                  className="flex-1 bg-green-50 text-green-700 hover:bg-green-100"
-                                >
-                                  💵 Agregar Abono
-                                </Button>
-                              )}
-                              
-                              {/* Editar/Eliminar solo si NO es auto-generado */}
-                              {!isAutogenerated && (
-                                <>
-                                  <Button
-                                    size="sm"
-                                    variant="outline"
-                                    onClick={(e) => {
-                                      e.stopPropagation();
-                                      handleEdit(expense);
-                                    }}
-                                    className="flex-1"
-                                  >
-                                    <Edit size={14} className="mr-1" /> Editar
-                                  </Button>
-                                  <Button
-                                    size="sm"
-                                    variant="outline"
-                                    onClick={(e) => {
-                                      e.stopPropagation();
-                                      handleDelete(expense.id);
-                                    }}
-                                    className="text-red-600 hover:text-red-700 hover:border-red-600"
-                                  >
-                                    <Trash2 size={14} />
-                                  </Button>
-                                </>
-                              )}
-                            </div>
-                            {isAutogenerated && (
-                              <div className="mt-3 p-2 bg-blue-50 rounded text-xs text-blue-800">
-                                ℹ️ Este gasto fue generado automáticamente por una reservación
-                              </div>
-                            )}
-                          </div>
-                        )}
-                      </div>
-                    );
-                  })}
-                </div>
-              </CardContent>
-            </Card>
-          );
-        })}
-
-        {filteredExpenses.length === 0 && (
-          <div className="text-center py-12">
-            <DollarSign size={64} className="mx-auto text-gray-300 mb-4" />
-            <p className="text-gray-500 text-lg">No hay gastos registrados</p>
-          </div>
-        )}
-        </div>
-      ) : (
-        // Vista de recordatorios: Gastos agrupados por día del mes
-        <div className="space-y-6">
-          {sortedReminderDays.length > 0 ? (
-            sortedReminderDays.map((day) => {
-              const dayExpenses = groupedByReminderDay[day];
-              const dayTotalDOP = dayExpenses.filter(e => e.currency === 'DOP').reduce((sum, e) => sum + e.amount, 0);
-              const dayPendingDOP = dayExpenses.filter(e => e.currency === 'DOP' && e.balance_due > 0).reduce((sum, e) => sum + e.balance_due, 0);
-              
-              return (
-                <Card key={day}>
-                  <CardHeader className="bg-gradient-to-r from-yellow-50 to-yellow-100">
-                    <CardTitle className="flex items-center justify-between">
-                      <div className="flex items-center">
-                        <span className="text-3xl font-bold text-yellow-600 mr-3">{day}</span>
-                        <div>
-                          <p className="text-lg">Día {day} de cada mes</p>
-                          <p className="text-sm text-gray-600">{dayExpenses.length} gasto(s) programado(s)</p>
-                        </div>
-                      </div>
-                      <div className="text-right">
-                        <p className="text-sm text-gray-600">Total:</p>
-                        <p className="text-lg font-bold text-red-600">{formatCurrency(dayTotalDOP, 'DOP')}</p>
-                        {dayPendingDOP > 0 && (
-                          <p className="text-sm text-orange-600">Pendiente: {formatCurrency(dayPendingDOP, 'DOP')}</p>
-                        )}
-                      </div>
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent className="p-0">
-                    <div className="divide-y">
-                      {dayExpenses.map((expense) => {
-                        const isExpanded = expandedExpenses[expense.id];
-                        const isPaid = expense.balance_due <= 0;
-                        
-                        return (
-                          <div key={expense.id} className={`hover:bg-gray-50 transition-colors ${isPaid ? 'opacity-60' : ''}`}>
-                            <div
-                              className="p-4 cursor-pointer flex items-center justify-between"
-                              onClick={() => toggleExpand(expense.id)}
+      {/* Expenses Table */}
+      <Card>
+        <CardHeader>
+          <CardTitle>Lista de Gastos ({expenses.length})</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="overflow-x-auto">
+            <table className="w-full" data-testid="expenses-table">
+              <thead>
+                <tr className="border-b">
+                  <th className="text-left p-2 text-sm font-medium">Fecha</th>
+                  <th className="text-left p-2 text-sm font-medium">Categoría</th>
+                  <th className="text-left p-2 text-sm font-medium">Descripción</th>
+                  <th className="text-right p-2 text-sm font-medium">Monto</th>
+                  <th className="text-center p-2 text-sm font-medium">Estado</th>
+                  <th className="text-center p-2 text-sm font-medium">Acciones</th>
+                </tr>
+              </thead>
+              <tbody>
+                {expenses.length > 0 ? (
+                  expenses.map((expense) => (
+                    <tr key={expense.id} className="border-b hover:bg-gray-50">
+                      <td className="p-2 text-sm">
+                        {new Date(expense.expense_date).toLocaleDateString('es-DO')}
+                      </td>
+                      <td className="p-2 text-sm">
+                        <span className={`px-2 py-1 rounded text-xs ${getCategoryColor(expense.category)}`}>
+                          {getCategoryLabel(expense.category)}
+                        </span>
+                      </td>
+                      <td className="p-2 text-sm">{expense.description}</td>
+                      <td className="p-2 text-sm text-right font-medium">
+                        {formatCurrency(expense.amount, expense.currency)}
+                      </td>
+                      <td className="p-2 text-sm text-center">
+                        <span className={`px-2 py-1 rounded text-xs ${
+                          expense.payment_status === 'paid' 
+                            ? 'bg-green-100 text-green-800' 
+                            : 'bg-orange-100 text-orange-800'
+                        }`}>
+                          {expense.payment_status === 'paid' ? 'Pagado' : 'Pendiente'}
+                        </span>
+                      </td>
+                      <td className="p-2 text-sm">
+                        <div className="flex justify-center space-x-2">
+                          <Button
+                            size="sm"
+                            variant="ghost"
+                            onClick={() => handleEdit(expense)}
+                            data-testid="edit-expense-button"
+                          >
+                            <Edit size={16} />
+                          </Button>
+                          {user?.role === 'admin' && (
+                            <Button
+                              size="sm"
+                              variant="ghost"
+                              onClick={() => handleDelete(expense.id)}
+                              className="text-red-600 hover:text-red-700"
+                              data-testid="delete-expense-button"
                             >
-                              <div className="flex-1 grid grid-cols-4 gap-4 items-center">
-                                <div className="col-span-2">
-                                  <p className="text-sm font-medium text-gray-900">{expense.description}</p>
-                                  {expense.is_recurring && (
-                                    <span className="text-xs bg-purple-100 text-purple-800 px-2 py-1 rounded mr-2">🔄 Recurrente</span>
-                                  )}
-                                  {isPaid && (
-                                    <span className="text-xs bg-green-100 text-green-800 px-2 py-1 rounded">✓ Pagado</span>
-                                  )}
-                                </div>
-                                <div>
-                                  <p className="text-sm">{new Date(expense.expense_date).toLocaleDateString('es-DO')}</p>
-                                </div>
-                                <div className="flex items-center justify-between">
-                                  <div>
-                                    <p className={`text-sm font-semibold ${
-                                      expense.balance_due < 0 ? 'text-blue-600' : 
-                                      expense.balance_due === 0 ? 'text-green-600' : 
-                                      'text-red-600'
-                                    }`}>
-                                      {formatCurrency(Math.abs(expense.balance_due || expense.amount), expense.currency)}
-                                      {expense.balance_due < 0 && ' (Excedente)'}
-                                      {expense.balance_due === 0 && ' (Pagado)'}
-                                    </p>
-                                  </div>
-                                  {isExpanded ? <ChevronUp size={20} /> : <ChevronDown size={20} />}
-                                </div>
-                              </div>
-                            </div>
-
-                            {/* Vista expandida igual que en vista normal */}
-                            {isExpanded && (
-                              <div className="px-4 pb-4 bg-gray-50 border-t">
-                                <div className="grid grid-cols-2 gap-4 mt-3 text-sm">
-                                  <div>
-                                    <p className="text-xs text-gray-500 font-medium">CATEGORÍA:</p>
-                                    <p className="text-gray-900">{getCategoryLabel(expense.category)}</p>
-                                  </div>
-                                  <div>
-                                    <p className="text-xs text-gray-500 font-medium">RECORDATORIO:</p>
-                                    <p className="text-gray-900">Día {expense.payment_reminder_day} de cada mes</p>
-                                  </div>
-                                </div>
-
-                                {/* Botón agregar abono si pendiente */}
-                                {expense.balance_due > 0 && (
-                                  <div className="mt-3">
-                                    <Button
-                                      size="sm"
-                                      onClick={(e) => {
-                                        e.stopPropagation();
-                                        handleAddAbono(expense);
-                                      }}
-                                      className="w-full bg-green-50 text-green-700 hover:bg-green-100"
-                                    >
-                                      💵 Registrar Pago
-                                    </Button>
-                                  </div>
-                                )}
-                              </div>
-                            )}
-                          </div>
-                        );
-                      })}
-                    </div>
-                  </CardContent>
-                </Card>
-              );
-            })
-          ) : (
-            <div className="text-center py-12">
-              <span className="text-6xl mb-4 block">🔔</span>
-              <p className="text-gray-500 text-lg">No hay gastos con recordatorios</p>
-              <p className="text-gray-400 text-sm mt-2">Activa recordatorios al crear gastos para verlos aquí</p>
-            </div>
-          )}
-        </div>
-      )}
-
-      {/* Diálogo de Agregar Abono */}
-      <Dialog open={isAbonoDialogOpen} onOpenChange={setIsAbonoDialogOpen}>
-        <DialogContent className="max-w-md">
-          <DialogHeader>
-            <DialogTitle>Agregar Abono al Gasto</DialogTitle>
-          </DialogHeader>
-          {selectedExpense && (
-            <div className="mb-4 p-3 bg-gray-50 rounded border-2 border-blue-200">
-              <p className="text-sm font-medium">{selectedExpense.description}</p>
-              <div className="mt-2 space-y-1 text-xs">
-                <div className="flex justify-between">
-                  <span className="text-gray-600">Monto original:</span>
-                  <span className="font-semibold">{formatCurrency(selectedExpense.amount, selectedExpense.currency)}</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-gray-600">Ya pagado:</span>
-                  <span className="text-green-600 font-semibold">{formatCurrency(selectedExpense.total_paid || 0, selectedExpense.currency)}</span>
-                </div>
-                <div className="flex justify-between border-t pt-1">
-                  <span className="text-gray-800 font-medium">Saldo pendiente:</span>
-                  <span className={`font-bold text-base ${
-                    selectedExpense.balance_due < 0 ? 'text-blue-600' : 
-                    selectedExpense.balance_due === 0 ? 'text-green-600' : 
-                    'text-red-600'
-                  }`}>
-                    {selectedExpense.balance_due < 0 ? '-' : ''}
-                    {formatCurrency(Math.abs(selectedExpense.balance_due || selectedExpense.amount), selectedExpense.currency)}
-                  </span>
-                </div>
-              </div>
-            </div>
-          )}
-          <form onSubmit={submitAbono} className="space-y-4">
-            {/* Tipo de Transacción */}
-            <div>
-              <Label>Tipo de Transacción *</Label>
-              <select
-                value={abonoFormData.amount >= 0 ? 'pago' : 'devolucion'}
-                onChange={(e) => {
-                  if (e.target.value === 'devolucion') {
-                    setAbonoFormData({ ...abonoFormData, amount: Math.abs(abonoFormData.amount) * -1 });
-                  } else {
-                    setAbonoFormData({ ...abonoFormData, amount: Math.abs(abonoFormData.amount) });
-                  }
-                }}
-                className="w-full p-2 border rounded-md"
-              >
-                <option value="pago">💵 Pago / Abono</option>
-                <option value="devolucion">↩️ Devolución / Corrección</option>
-              </select>
-              <p className="text-xs text-gray-500 mt-1">
-                {abonoFormData.amount < 0 ? 
-                  '⚠️ Una devolución reducirá el total pagado (útil para corregir excedentes)' :
-                  'Un pago aumentará el total pagado hacia el saldo'}
-              </p>
-            </div>
-
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <Label>Monto {abonoFormData.amount < 0 ? 'de la Devolución' : 'del Abono'} *</Label>
-                <Input
-                  type="number"
-                  step="0.01"
-                  min="0"
-                  value={Math.abs(abonoFormData.amount)}
-                  onChange={(e) => {
-                    const value = parseFloat(e.target.value) || 0;
-                    const isDevolucion = abonoFormData.amount < 0;
-                    setAbonoFormData({ ...abonoFormData, amount: isDevolucion ? -value : value });
-                  }}
-                  required
-                />
-                {selectedExpense && selectedExpense.balance_due > 0 && abonoFormData.amount >= 0 && (
-                  <p className="text-xs text-blue-600 mt-1">
-                    💡 Sugerido: {formatCurrency(selectedExpense.balance_due, selectedExpense.currency)}
-                  </p>
+                              <Trash2 size={16} />
+                            </Button>
+                          )}
+                        </div>
+                      </td>
+                    </tr>
+                  ))
+                ) : (
+                  <tr>
+                    <td colSpan="6" className="text-center py-8 text-gray-500">
+                      No hay gastos registrados
+                    </td>
+                  </tr>
                 )}
-                {selectedExpense && selectedExpense.balance_due < 0 && abonoFormData.amount < 0 && (
-                  <p className="text-xs text-blue-600 mt-1">
-                    💡 Excedente actual: {formatCurrency(Math.abs(selectedExpense.balance_due), selectedExpense.currency)}
-                  </p>
-                )}
-              </div>
-              <div>
-                <Label>Moneda *</Label>
-                <select
-                  value={abonoFormData.currency}
-                  onChange={(e) => setAbonoFormData({ ...abonoFormData, currency: e.target.value })}
-                  className="w-full p-2 border rounded-md"
-                >
-                  <option value="DOP">DOP</option>
-                  <option value="USD">USD</option>
-                </select>
-              </div>
-            </div>
-
-            <div>
-              <Label>Método de Pago *</Label>
-              <select
-                value={abonoFormData.payment_method}
-                onChange={(e) => setAbonoFormData({ ...abonoFormData, payment_method: e.target.value })}
-                className="w-full p-2 border rounded-md"
-              >
-                <option value="efectivo">Efectivo</option>
-                <option value="deposito">Depósito</option>
-                <option value="transferencia">Transferencia</option>
-                <option value="mixto">Mixto</option>
-              </select>
-            </div>
-
-            <div>
-              <Label>Fecha de Pago *</Label>
-              <Input
-                type="date"
-                value={abonoFormData.payment_date}
-                onChange={(e) => setAbonoFormData({ ...abonoFormData, payment_date: e.target.value })}
-                required
-              />
-            </div>
-
-            <div>
-              <Label>Notas</Label>
-              <textarea
-                value={abonoFormData.notes}
-                onChange={(e) => setAbonoFormData({ ...abonoFormData, notes: e.target.value })}
-                className="w-full p-2 border rounded-md"
-                rows="2"
-              />
-            </div>
-
-            <div className="flex justify-end space-x-2">
-              <Button type="button" variant="outline" onClick={() => setIsAbonoDialogOpen(false)}>
-                Cancelar
-              </Button>
-              <Button type="submit">
-                Registrar Abono
-              </Button>
-            </div>
-          </form>
-        </DialogContent>
-      </Dialog>
-
-      {/* Modal de Gestión de Categorías */}
-      <Dialog open={isCategoryFormOpen} onOpenChange={setIsCategoryFormOpen}>
-        <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
-          <DialogHeader>
-            <DialogTitle>Gestión de Categorías de Gastos</DialogTitle>
-          </DialogHeader>
-          
-          {/* Formulario para nueva categoría */}
-          <form onSubmit={handleCreateCategory} className="space-y-4 border-b pb-4">
-            <div className="grid grid-cols-3 gap-3">
-              <div className="col-span-2">
-                <Label>Nueva Categoría</Label>
-                <Input
-                  value={categoryFormData.name}
-                  onChange={(e) => setCategoryFormData({ ...categoryFormData, name: e.target.value })}
-                  placeholder="Ej: Luz, Internet, Local, Nómina..."
-                  required
-                />
-              </div>
-              <div className="flex items-end">
-                <Button type="submit" className="w-full">
-                  <Plus size={16} className="mr-1" /> Agregar
-                </Button>
-              </div>
-            </div>
-            <div>
-              <Label>Descripción (Opcional)</Label>
-              <Input
-                value={categoryFormData.description}
-                onChange={(e) => setCategoryFormData({ ...categoryFormData, description: e.target.value })}
-                placeholder="Descripción de la categoría"
-              />
-            </div>
-          </form>
-
-          {/* Lista de categorías existentes */}
-          <div>
-            <h3 className="font-semibold mb-3">Categorías Existentes ({expenseCategories.length})</h3>
-            {expenseCategories.length > 0 ? (
-              <div className="grid grid-cols-2 gap-3">
-                {expenseCategories.map(cat => (
-                  <div key={cat.id} className="border rounded-lg p-3 flex items-center justify-between hover:bg-gray-50">
-                    <div>
-                      <p className="font-medium">{cat.name}</p>
-                      {cat.description && (
-                        <p className="text-xs text-gray-500">{cat.description}</p>
-                      )}
-                    </div>
-                    <Button
-                      size="sm"
-                      variant="ghost"
-                      onClick={() => handleDeleteCategory(cat.id)}
-                      className="text-red-600 hover:text-red-700"
-                    >
-                      <Trash2 size={14} />
-                    </Button>
-                  </div>
-                ))}
-              </div>
-            ) : (
-              <p className="text-gray-500 text-center py-4">
-                No hay categorías creadas. Agrega tu primera categoría arriba.
-              </p>
-            )}
+              </tbody>
+            </table>
           </div>
-
-          <div className="flex justify-end pt-4 border-t">
-            <Button variant="outline" onClick={() => setIsCategoryFormOpen(false)}>
-              Cerrar
-            </Button>
-          </div>
-        </DialogContent>
-      </Dialog>
+        </CardContent>
+      </Card>
     </div>
   );
 };
