@@ -334,8 +334,6 @@ metadata:
 
 test_plan:
   current_focus:
-    - "Campo DNI opcional en modelo Customer"
-    - "Permitir eliminación de gastos auto-generados"
     - "Componente Customers - Agregar campo DNI"
     - "Componente Expenses - Mostrar botón eliminar para todos los gastos"
   stuck_tasks: []
