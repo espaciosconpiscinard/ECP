@@ -624,6 +624,10 @@ class BackendTester:
         print("\n👤 Employee Permission Tests")
         self.test_employee_permissions()
         
+        # Auto-expense creation flow
+        print("\n💰 Auto-Expense Creation Tests")
+        self.test_auto_expense_creation_flow()
+        
         # Summary
         print("\n" + "=" * 60)
         print("📊 TEST SUMMARY")
