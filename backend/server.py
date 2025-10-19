@@ -174,6 +174,61 @@ async def delete_customer(customer_id: str, current_user: dict = Depends(require
         raise HTTPException(status_code=404, detail="Customer not found")
     return {"message": "Customer deleted successfully"}
 
+# ============ CATEGORY ENDPOINTS ============
+
+@api_router.post("/categories", response_model=Category)
+async def create_category(category_data: CategoryCreate, current_user: dict = Depends(require_admin)):
+    """Create a new category (admin only)"""
+    category = Category(**category_data.model_dump(), created_by=current_user["id"])
+    doc = prepare_doc_for_insert(category.model_dump())
+    await db.categories.insert_one(doc)
+    return category
+
+@api_router.get("/categories", response_model=List[Category])
+async def get_categories(current_user: dict = Depends(get_current_user)):
+    """Get all categories ordered alphabetically"""
+    categories = await db.categories.find({"is_active": True}, {"_id": 0}).to_list(1000)
+    # Ordenar alfabéticamente por nombre
+    sorted_categories = sorted([restore_datetimes(c, ["created_at"]) for c in categories], key=lambda x: x.get("name", "").lower())
+    return sorted_categories
+
+@api_router.get("/categories/{category_id}", response_model=Category)
+async def get_category(category_id: str, current_user: dict = Depends(get_current_user)):
+    """Get a category by ID"""
+    category = await db.categories.find_one({"id": category_id}, {"_id": 0})
+    if not category:
+        raise HTTPException(status_code=404, detail="Category not found")
+    return restore_datetimes(category, ["created_at"])
+
+@api_router.put("/categories/{category_id}", response_model=Category)
+async def update_category(category_id: str, update_data: CategoryUpdate, current_user: dict = Depends(require_admin)):
+    """Update a category (admin only)"""
+    existing = await db.categories.find_one({"id": category_id}, {"_id": 0})
+    if not existing:
+        raise HTTPException(status_code=404, detail="Category not found")
+    
+    update_dict = {k: v for k, v in update_data.model_dump(exclude_unset=True).items() if v is not None}
+    
+    if update_dict:
+        await db.categories.update_one({"id": category_id}, {"$set": update_dict})
+    
+    updated = await db.categories.find_one({"id": category_id}, {"_id": 0})
+    return restore_datetimes(updated, ["created_at"])
+
+@api_router.delete("/categories/{category_id}")
+async def delete_category(category_id: str, current_user: dict = Depends(require_admin)):
+    """Delete a category (admin only) - villas quedan sin categoría"""
+    # Remover category_id de todas las villas que la tengan asignada
+    await db.villas.update_many(
+        {"category_id": category_id},
+        {"$set": {"category_id": None}}
+    )
+    
+    result = await db.categories.delete_one({"id": category_id})
+    if result.deleted_count == 0:
+        raise HTTPException(status_code=404, detail="Category not found")
+    return {"message": "Category deleted successfully, villas unassigned"}
+
 # ============ VILLA ENDPOINTS ============
 
 @api_router.post("/villas", response_model=Villa)
