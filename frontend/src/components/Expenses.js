@@ -325,12 +325,12 @@ const ExpensesNew = () => {
               <div>
                 <Label>Categoría Personalizada (Opcional)</Label>
                 <select
-                  value={formData.category_id}
-                  onChange={(e) => setFormData({ ...formData, category_id: e.target.value })}
+                  value={formData.expense_category_id}
+                  onChange={(e) => setFormData({ ...formData, expense_category_id: e.target.value })}
                   className="w-full p-2 border rounded-md"
                 >
                   <option value="">Sin categoría personalizada</option>
-                  {categories.map(c => (
+                  {expenseCategories.map(c => (
                     <option key={c.id} value={c.id}>{c.name}</option>
                   ))}
                 </select>
