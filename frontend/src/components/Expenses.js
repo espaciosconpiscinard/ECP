@@ -521,6 +521,7 @@ const Expenses = () => {
             </form>
           </DialogContent>
         </Dialog>
+      </div>
 
       {/* Resumen de totales */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
