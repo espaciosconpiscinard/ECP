@@ -60,12 +60,14 @@ const VillasManagementNew = () => {
 
   const fetchData = async () => {
     try {
-      const [villasResponse, categoriesResponse] = await Promise.all([
+      const [villasResponse, categoriesResponse, servicesResponse] = await Promise.all([
         getVillas(),
-        getCategories()
+        getCategories(),
+        getExtraServices()
       ]);
       setVillas(villasResponse.data);
       setCategories(categoriesResponse.data);
+      setServices(servicesResponse.data);
     } catch (err) {
       setError('Error al cargar datos');
       console.error(err);
