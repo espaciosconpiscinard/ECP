@@ -42,7 +42,14 @@ const Layout = ({ children, currentView, setCurrentView }) => {
             >
               {sidebarOpen ? <X size={24} /> : <Menu size={24} />}
             </button>
-            <h1 className="text-xl font-bold text-blue-600">Espacios Con Piscina</h1>
+            <div className="flex items-center space-x-3">
+              <img 
+                src="/logo.png" 
+                alt="Espacios Con Piscina Logo" 
+                className="h-10 w-auto"
+              />
+              <h1 className="text-xl font-bold text-blue-600 hidden sm:block">Espacios Con Piscina</h1>
+            </div>
           </div>
           <div className="flex items-center space-x-4">
             <div className="text-sm text-right" data-testid="user-info">
