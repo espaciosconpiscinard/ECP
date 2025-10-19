@@ -11,6 +11,7 @@ const Layout = ({ children, currentView, setCurrentView }) => {
   const menuItems = [
     { id: 'dashboard', label: 'Dashboard', icon: Home, roles: ['admin', 'employee'] },
     { id: 'reservations', label: 'Reservaciones', icon: FileText, roles: ['admin', 'employee'] },
+    { id: 'customers', label: 'Clientes', icon: Users, roles: ['admin', 'employee'] },
     { id: 'villas', label: 'Villas y Servicios', icon: Building, roles: ['admin', 'employee'] },
   ];
 
