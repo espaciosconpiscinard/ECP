@@ -243,7 +243,7 @@ class VillaOwner(VillaOwnerBase):
     created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
     created_by: str
 
-# ============ PAYMENT MODELS ============
+# ============ PAYMENT/ABONO MODELS ============
 class PaymentBase(BaseModel):
     owner_id: str
     amount: float
@@ -258,6 +258,23 @@ class Payment(PaymentBase):
     model_config = ConfigDict(extra="ignore")
     id: str = Field(default_factory=lambda: str(uuid.uuid4()))
     payment_date: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+    created_by: str
+
+# ============ ABONO (PAYMENT TO RESERVATION/EXPENSE) MODELS ============
+class AbonoBase(BaseModel):
+    amount: float
+    currency: Literal["DOP", "USD"] = "DOP"
+    payment_method: Literal["efectivo", "deposito", "transferencia", "mixto"] = "efectivo"
+    payment_date: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+    notes: Optional[str] = None
+
+class AbonoCreate(AbonoBase):
+    pass
+
+class Abono(AbonoBase):
+    model_config = ConfigDict(extra="ignore")
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
     created_by: str
 
 # ============ EXPENSE MODELS ============
