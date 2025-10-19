@@ -1,6 +1,10 @@
 {
-  "name": "frontend",
-  "version": "0.1.0",
+  "name": "espacios-con-piscina",
+  "version": "1.0.0",
+  "description": "Sistema de Gestión de Villas - Espacios Con Piscina",
+  "author": "Espacios Con Piscina",
+  "homepage": "./",
+  "main": "electron.js",
   "private": true,
   "dependencies": {
     "@hookform/resolvers": "^5.0.1",
@@ -57,7 +61,53 @@
   "scripts": {
     "start": "craco start",
     "build": "craco build",
-    "test": "craco test"
+    "test": "craco test",
+    "electron": "electron .",
+    "electron-dev": "concurrently \"cross-env BROWSER=none yarn start\" \"wait-on http://localhost:3000 && electron .\"",
+    "electron-build": "yarn build && electron-builder",
+    "electron-build-win": "yarn build && electron-builder --win --x64",
+    "postinstall": "electron-builder install-app-deps"
+  },
+  "build": {
+    "appId": "com.espaciosconpiscina.app",
+    "productName": "Espacios Con Piscina",
+    "files": [
+      "build/**/*",
+      "electron.js",
+      "node_modules/**/*",
+      "package.json"
+    ],
+    "directories": {
+      "buildResources": "public"
+    },
+    "win": {
+      "target": [
+        {
+          "target": "nsis",
+          "arch": [
+            "x64"
+          ]
+        }
+      ],
+      "icon": "public/logo.png",
+      "artifactName": "EspaciosConPiscina-Setup-${version}.${ext}"
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true,
+      "shortcutName": "Espacios Con Piscina",
+      "installerIcon": "public/logo.png",
+      "uninstallerIcon": "public/logo.png",
+      "license": false
+    },
+    "extraResources": [
+      {
+        "from": "public/logo.png",
+        "to": "logo.png"
+      }
+    ]
   },
   "browserslist": {
     "production": [
