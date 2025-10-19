@@ -925,78 +925,148 @@ const Reservations = () => {
         <CardHeader>
           <CardTitle>Lista de Reservaciones ({filteredReservations.length})</CardTitle>
         </CardHeader>
-        <CardContent>
-          <div className="overflow-x-auto">
-            <table className="w-full" data-testid="reservations-table">
-              <thead>
-                <tr className="border-b">
-                  <th className="text-left p-2 text-sm font-medium">Factura</th>
-                  <th className="text-left p-2 text-sm font-medium">Cliente</th>
-                  <th className="text-left p-2 text-sm font-medium">Villa</th>
-                  <th className="text-left p-2 text-sm font-medium">Check-in</th>
-                  <th className="text-right p-2 text-sm font-medium">Total</th>
-                  <th className="text-right p-2 text-sm font-medium">Pagado</th>
-                  <th className="text-right p-2 text-sm font-medium">Restante</th>
-                  <th className="text-center p-2 text-sm font-medium">Acciones</th>
-                </tr>
-              </thead>
-              <tbody>
-                {filteredReservations.length > 0 ? (
-                  filteredReservations.map((res) => (
-                    <tr key={res.id} className="border-b hover:bg-gray-50">
-                      <td className="p-2 text-sm">{res.invoice_number}</td>
-                      <td className="p-2 text-sm">{res.customer_name}</td>
-                      <td className="p-2 text-sm">{res.villa_name}</td>
-                      <td className="p-2 text-sm">{new Date(res.check_in).toLocaleDateString('es-DO')}</td>
-                      <td className="p-2 text-sm text-right">{formatCurrency(res.total_amount, res.currency)}</td>
-                      <td className="p-2 text-sm text-right">{formatCurrency(res.amount_paid, res.currency)}</td>
-                      <td className="p-2 text-sm text-right font-medium">
-                        <span className={res.balance_due > 0 ? 'text-orange-600' : 'text-green-600'}>
-                          {formatCurrency(res.balance_due, res.currency)}
-                        </span>
-                      </td>
-                      <td className="p-2 text-sm">
-                        <div className="flex justify-center space-x-2">
+        <CardContent className="p-0">
+          <div className="divide-y">
+            {filteredReservations.length > 0 ? (
+              filteredReservations.map((res) => {
+                const isExpanded = expandedReservations[res.id];
+                return (
+                  <div key={res.id} className="hover:bg-gray-50 transition-colors">
+                    {/* Vista compacta */}
+                    <div
+                      className="p-4 cursor-pointer flex items-center justify-between"
+                      onClick={() => toggleExpand(res.id)}
+                    >
+                      <div className="flex-1 grid grid-cols-5 gap-4 items-center">
+                        <div>
+                          <p className="text-sm font-medium text-gray-900">{res.customer_name}</p>
+                          <p className="text-xs text-gray-500">#{res.invoice_number}</p>
+                        </div>
+                        <div>
+                          <p className="text-sm font-medium">{res.villa_code}</p>
+                          <p className="text-xs text-gray-500">Villa</p>
+                        </div>
+                        <div>
+                          <p className="text-sm">{new Date(res.reservation_date).toLocaleDateString('es-DO')}</p>
+                          <p className="text-xs text-gray-500">{res.rental_type === 'pasadia' ? 'Pasadía' : res.rental_type === 'amanecida' ? 'Amanecida' : 'Evento'}</p>
+                        </div>
+                        <div>
+                          <p className="text-sm font-semibold text-green-600">{formatCurrency(res.amount_paid, res.currency)}</p>
+                          <p className="text-xs text-gray-500">Pagado</p>
+                        </div>
+                        <div className="flex items-center justify-between">
+                          <div>
+                            <p className={`text-sm font-semibold ${res.balance_due > 0 ? 'text-orange-600' : 'text-green-600'}`}>
+                              {formatCurrency(res.balance_due, res.currency)}
+                            </p>
+                            <p className="text-xs text-gray-500">Restante</p>
+                          </div>
+                          {isExpanded ? <ChevronUp size={20} /> : <ChevronDown size={20} />}
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Vista expandida */}
+                    {isExpanded && (
+                      <div className="px-4 pb-4 bg-gray-50 border-t">
+                        <div className="grid grid-cols-2 md:grid-cols-3 gap-4 mt-3 text-sm">
+                          <div>
+                            <p className="text-xs text-gray-500 font-medium">VILLA:</p>
+                            <p className="text-gray-900">{res.villa_code}</p>
+                          </div>
+                          <div>
+                            <p className="text-xs text-gray-500 font-medium">HORARIO:</p>
+                            <p className="text-gray-900">{res.check_in_time} - {res.check_out_time}</p>
+                          </div>
+                          <div>
+                            <p className="text-xs text-gray-500 font-medium">HUÉSPEDES:</p>
+                            <p className="text-gray-900">{res.guests} personas</p>
+                          </div>
+                          <div>
+                            <p className="text-xs text-gray-500 font-medium">TOTAL:</p>
+                            <p className="text-gray-900 font-semibold">{formatCurrency(res.total_amount, res.currency)}</p>
+                          </div>
+                          <div>
+                            <p className="text-xs text-gray-500 font-medium">DEPÓSITO:</p>
+                            <p className="text-gray-900">{formatCurrency(res.deposit || 0, res.currency)}</p>
+                          </div>
+                          <div>
+                            <p className="text-xs text-gray-500 font-medium">MÉTODO DE PAGO:</p>
+                            <p className="text-gray-900 capitalize">{res.payment_method}</p>
+                          </div>
+                        </div>
+
+                        {/* Servicios extras */}
+                        {res.extra_services && res.extra_services.length > 0 && (
+                          <div className="mt-3 bg-blue-50 p-3 rounded-md">
+                            <p className="text-xs font-bold text-blue-800 mb-2">SERVICIOS EXTRAS:</p>
+                            <div className="space-y-1 text-sm">
+                              {res.extra_services.map((service, idx) => (
+                                <div key={idx} className="flex justify-between">
+                                  <span>{service.service_name} (x{service.quantity})</span>
+                                  <span className="font-semibold">{formatCurrency(service.total, res.currency)}</span>
+                                </div>
+                              ))}
+                            </div>
+                          </div>
+                        )}
+
+                        {/* Notas */}
+                        {res.notes && (
+                          <div className="mt-3">
+                            <p className="text-xs text-gray-500 font-medium">NOTAS:</p>
+                            <p className="text-sm text-gray-700">{res.notes}</p>
+                          </div>
+                        )}
+
+                        {/* Acciones */}
+                        <div className="flex gap-2 mt-4 pt-3 border-t">
                           <Button
                             size="sm"
-                            variant="ghost"
-                            onClick={() => handlePrint(res)}
-                            data-testid="print-button"
+                            variant="outline"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handlePrint(res);
+                            }}
+                            className="flex-1"
                           >
-                            <Printer size={16} />
+                            <Printer size={14} className="mr-1" /> Imprimir
                           </Button>
                           <Button
                             size="sm"
-                            variant="ghost"
-                            onClick={() => handleEdit(res)}
-                            data-testid="edit-button"
+                            variant="outline"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleEdit(res);
+                            }}
+                            className="flex-1"
                           >
-                            <Edit size={16} />
+                            <Edit size={14} className="mr-1" /> Editar
                           </Button>
                           {user?.role === 'admin' && (
                             <Button
                               size="sm"
-                              variant="ghost"
-                              onClick={() => handleDelete(res.id)}
-                              className="text-red-600 hover:text-red-700"
-                              data-testid="delete-button"
+                              variant="outline"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handleDelete(res.id);
+                              }}
+                              className="text-red-600 hover:text-red-700 hover:border-red-600"
                             >
-                              <Trash2 size={16} />
+                              <Trash2 size={14} />
                             </Button>
                           )}
                         </div>
-                      </td>
-                    </tr>
-                  ))
-                ) : (
-                  <tr>
-                    <td colSpan="8" className="text-center py-8 text-gray-500">
-                      No hay reservaciones
-                    </td>
-                  </tr>
-                )}
-              </tbody>
-            </table>
+                      </div>
+                    )}
+                  </div>
+                );
+              })
+            ) : (
+              <div className="text-center py-12 text-gray-500">
+                No hay reservaciones
+              </div>
+            )}
           </div>
         </CardContent>
       </Card>
