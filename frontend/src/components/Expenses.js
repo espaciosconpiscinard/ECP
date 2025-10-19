@@ -203,6 +203,13 @@ const ExpensesNew = () => {
       setSelectedExpense(null);
       await fetchData();
       
+      // Recargar abonos del gasto
+      const response = await getExpenseAbonos(selectedExpense.id);
+      setExpenseAbonos(prev => ({
+        ...prev,
+        [selectedExpense.id]: response.data
+      }));
+      
       if (willBeOverpaid) {
         alert(`✅ Abono registrado exitosamente.\n\n⚠️ Nota: El gasto tiene un excedente de pago de ${formatCurrency(overpayAmount, selectedExpense.currency)}`);
       } else {
