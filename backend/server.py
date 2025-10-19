@@ -781,10 +781,23 @@ async def update_expense(expense_id: str, update_data: ExpenseUpdate, current_us
 
 @api_router.delete("/expenses/{expense_id}")
 async def delete_expense(expense_id: str, current_user: dict = Depends(require_admin)):
-    """Delete an expense (admin only)"""
-    result = await db.expenses.delete_one({"id": expense_id})
-    if result.deleted_count == 0:
+    """Delete an expense (admin only) - No permite eliminar gastos auto-generados"""
+    # Verificar si el gasto está auto-generado
+    expense = await db.expenses.find_one({"id": expense_id}, {"_id": 0})
+    if not expense:
         raise HTTPException(status_code=404, detail="Expense not found")
+    
+    if expense.get("related_reservation_id"):
+        raise HTTPException(
+            status_code=400, 
+            detail="No se puede eliminar un gasto auto-generado. Elimina la reservación asociada en su lugar."
+        )
+    
+    # Eliminar abonos asociados
+    await db.expense_abonos.delete_many({"expense_id": expense_id})
+    
+    # Eliminar el gasto
+    result = await db.expenses.delete_one({"id": expense_id})
     return {"message": "Expense deleted successfully"}
 
 # ============ ABONOS TO EXPENSES ============
