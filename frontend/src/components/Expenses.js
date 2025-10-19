@@ -133,12 +133,16 @@ const Expenses = () => {
     setEditingExpense(null);
     setFormData({
       category: 'otros',
+      expense_category_id: '',
       description: '',
       amount: 0,
       currency: 'DOP',
       expense_date: new Date().toISOString().split('T')[0],
       payment_status: 'paid',
-      notes: ''
+      notes: '',
+      has_payment_reminder: false,
+      payment_reminder_day: 1,
+      is_recurring: false
     });
   };
 
