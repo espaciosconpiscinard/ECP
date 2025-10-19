@@ -819,7 +819,126 @@ const ExpensesNew = () => {
             <p className="text-gray-500 text-lg">No hay gastos registrados</p>
           </div>
         )}
-      </div>
+        </div>
+      ) : (
+        // Vista de recordatorios: Gastos agrupados por día del mes
+        <div className="space-y-6">
+          {sortedReminderDays.length > 0 ? (
+            sortedReminderDays.map((day) => {
+              const dayExpenses = groupedByReminderDay[day];
+              const dayTotalDOP = dayExpenses.filter(e => e.currency === 'DOP').reduce((sum, e) => sum + e.amount, 0);
+              const dayPendingDOP = dayExpenses.filter(e => e.currency === 'DOP' && e.balance_due > 0).reduce((sum, e) => sum + e.balance_due, 0);
+              
+              return (
+                <Card key={day}>
+                  <CardHeader className="bg-gradient-to-r from-yellow-50 to-yellow-100">
+                    <CardTitle className="flex items-center justify-between">
+                      <div className="flex items-center">
+                        <span className="text-3xl font-bold text-yellow-600 mr-3">{day}</span>
+                        <div>
+                          <p className="text-lg">Día {day} de cada mes</p>
+                          <p className="text-sm text-gray-600">{dayExpenses.length} gasto(s) programado(s)</p>
+                        </div>
+                      </div>
+                      <div className="text-right">
+                        <p className="text-sm text-gray-600">Total:</p>
+                        <p className="text-lg font-bold text-red-600">{formatCurrency(dayTotalDOP, 'DOP')}</p>
+                        {dayPendingDOP > 0 && (
+                          <p className="text-sm text-orange-600">Pendiente: {formatCurrency(dayPendingDOP, 'DOP')}</p>
+                        )}
+                      </div>
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent className="p-0">
+                    <div className="divide-y">
+                      {dayExpenses.map((expense) => {
+                        const isExpanded = expandedExpenses[expense.id];
+                        const isPaid = expense.balance_due <= 0;
+                        
+                        return (
+                          <div key={expense.id} className={`hover:bg-gray-50 transition-colors ${isPaid ? 'opacity-60' : ''}`}>
+                            <div
+                              className="p-4 cursor-pointer flex items-center justify-between"
+                              onClick={() => toggleExpand(expense.id)}
+                            >
+                              <div className="flex-1 grid grid-cols-4 gap-4 items-center">
+                                <div className="col-span-2">
+                                  <p className="text-sm font-medium text-gray-900">{expense.description}</p>
+                                  {expense.is_recurring && (
+                                    <span className="text-xs bg-purple-100 text-purple-800 px-2 py-1 rounded mr-2">🔄 Recurrente</span>
+                                  )}
+                                  {isPaid && (
+                                    <span className="text-xs bg-green-100 text-green-800 px-2 py-1 rounded">✓ Pagado</span>
+                                  )}
+                                </div>
+                                <div>
+                                  <p className="text-sm">{new Date(expense.expense_date).toLocaleDateString('es-DO')}</p>
+                                </div>
+                                <div className="flex items-center justify-between">
+                                  <div>
+                                    <p className={`text-sm font-semibold ${
+                                      expense.balance_due < 0 ? 'text-blue-600' : 
+                                      expense.balance_due === 0 ? 'text-green-600' : 
+                                      'text-red-600'
+                                    }`}>
+                                      {formatCurrency(Math.abs(expense.balance_due || expense.amount), expense.currency)}
+                                      {expense.balance_due < 0 && ' (Excedente)'}
+                                      {expense.balance_due === 0 && ' (Pagado)'}
+                                    </p>
+                                  </div>
+                                  {isExpanded ? <ChevronUp size={20} /> : <ChevronDown size={20} />}
+                                </div>
+                              </div>
+                            </div>
+
+                            {/* Vista expandida igual que en vista normal */}
+                            {isExpanded && (
+                              <div className="px-4 pb-4 bg-gray-50 border-t">
+                                <div className="grid grid-cols-2 gap-4 mt-3 text-sm">
+                                  <div>
+                                    <p className="text-xs text-gray-500 font-medium">CATEGORÍA:</p>
+                                    <p className="text-gray-900">{getCategoryLabel(expense.category)}</p>
+                                  </div>
+                                  <div>
+                                    <p className="text-xs text-gray-500 font-medium">RECORDATORIO:</p>
+                                    <p className="text-gray-900">Día {expense.payment_reminder_day} de cada mes</p>
+                                  </div>
+                                </div>
+
+                                {/* Botón agregar abono si pendiente */}
+                                {expense.balance_due > 0 && (
+                                  <div className="mt-3">
+                                    <Button
+                                      size="sm"
+                                      onClick={(e) => {
+                                        e.stopPropagation();
+                                        handleAddAbono(expense);
+                                      }}
+                                      className="w-full bg-green-50 text-green-700 hover:bg-green-100"
+                                    >
+                                      💵 Registrar Pago
+                                    </Button>
+                                  </div>
+                                )}
+                              </div>
+                            )}
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </CardContent>
+                </Card>
+              );
+            })
+          ) : (
+            <div className="text-center py-12">
+              <span className="text-6xl mb-4 block">🔔</span>
+              <p className="text-gray-500 text-lg">No hay gastos con recordatorios</p>
+              <p className="text-gray-400 text-sm mt-2">Activa recordatorios al crear gastos para verlos aquí</p>
+            </div>
+          )}
+        </div>
+      )}
 
       {/* Diálogo de Agregar Abono */}
       <Dialog open={isAbonoDialogOpen} onOpenChange={setIsAbonoDialogOpen}>
