@@ -626,14 +626,31 @@ async def create_expense(expense_data: ExpenseCreate, current_user: dict = Depen
 async def get_expenses(
     category: Optional[str] = None,
     category_id: Optional[str] = None,
+    search: Optional[str] = None,
     current_user: dict = Depends(get_current_user)
 ):
-    """Get all expenses with optional filters"""
+    """Get all expenses with optional filters and search"""
     query = {}
     if category:
         query["category"] = category
     if category_id:
         query["category_id"] = category_id
+    
+    # Advanced search: invoice, villa, customer, owner
+    if search:
+        # Search in description and notes
+        search_query = {
+            "$or": [
+                {"description": {"$regex": search, "$options": "i"}},
+                {"notes": {"$regex": search, "$options": "i"}}
+            ]
+        }
+        
+        # If query already has conditions, combine with $and
+        if query:
+            query = {"$and": [query, search_query]}
+        else:
+            query = search_query
     
     expenses = await db.expenses.find(query, {"_id": 0}).sort("expense_date", -1).to_list(1000)
     return [restore_datetimes(e, ["expense_date", "created_at"]) for e in expenses]
