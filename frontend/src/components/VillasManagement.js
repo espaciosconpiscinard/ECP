@@ -799,7 +799,7 @@ const VillasManagementNew = () => {
                     <span className="text-gray-600">Precio:</span>
                     <span className="font-bold text-lg text-blue-600">
                       {service.currency === 'DOP' ? 'RD$' : '$'}
-                      {service.unit_price.toLocaleString('es-DO', {minimumFractionDigits: 2})}
+                      {(service.unit_price || 0).toLocaleString('es-DO', {minimumFractionDigits: 2})}
                     </span>
                   </div>
                   <div className="flex justify-between text-sm">
