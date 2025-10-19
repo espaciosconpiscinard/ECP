@@ -79,3 +79,4 @@ agenthub/agents/youtube/db
 # Mobile development
 android-sdk/ frontend/node_modules/electron/dist/electron
 frontend/node_modules/electron/dist/electron
+frontend/dist/win-unpacked/electron.exe

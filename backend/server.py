@@ -233,6 +233,86 @@ async def toggle_user_status(user_id: str, current_user: dict = Depends(require_
     
     return {"message": f"User {'activated' if new_status else 'deactivated'} successfully", "is_active": new_status}
 
+# ============ CONFIGURATION ENDPOINTS (ADMIN ONLY) ============
+
+@api_router.get("/config/invoice-counter")
+async def get_invoice_counter(current_user: dict = Depends(require_admin)):
+    """Get current invoice counter configuration (admin only)"""
+    counter = await db.invoice_counter.find_one({"counter_id": "main_counter"}, {"_id": 0})
+    
+    if not counter:
+        # Initialize counter with default value
+        counter_doc = {"counter_id": "main_counter", "current_number": 1600}
+        await db.invoice_counter.insert_one(counter_doc)
+        return {"counter_id": "main_counter", "current_number": 1600, "next_invoice": "1600"}
+    
+    return {
+        "counter_id": counter["counter_id"],
+        "current_number": counter["current_number"],
+        "next_invoice": str(counter["current_number"])
+    }
+
+@api_router.put("/config/invoice-counter")
+async def update_invoice_counter(
+    new_start: int,
+    current_user: dict = Depends(require_admin)
+):
+    """Update invoice counter starting number (admin only)"""
+    if new_start < 1:
+        raise HTTPException(status_code=400, detail="El número de factura debe ser mayor a 0")
+    
+    # Check if there are existing reservations
+    reservation_count = await db.reservations.count_documents({})
+    
+    # Update or create counter
+    await db.invoice_counter.update_one(
+        {"counter_id": "main_counter"},
+        {"$set": {"current_number": new_start}},
+        upsert=True
+    )
+    
+    return {
+        "message": "Contador de facturas actualizado exitosamente",
+        "new_start": new_start,
+        "next_invoice": str(new_start),
+        "warning": f"Ya existen {reservation_count} reservaciones en el sistema" if reservation_count > 0 else None
+    }
+
+@api_router.post("/config/reset-invoice-counter")
+async def reset_invoice_counter(
+    start_number: int,
+    confirm: bool,
+    current_user: dict = Depends(require_admin)
+):
+    """Reset invoice counter (admin only, requires confirmation)"""
+    if not confirm:
+        raise HTTPException(status_code=400, detail="Debes confirmar para resetear el contador")
+    
+    if start_number < 1:
+        raise HTTPException(status_code=400, detail="El número debe ser mayor a 0")
+    
+    # Check reservations
+    reservation_count = await db.reservations.count_documents({})
+    
+    if reservation_count > 0:
+        raise HTTPException(
+            status_code=400,
+            detail=f"No se puede resetear. Existen {reservation_count} reservaciones. Elimina las reservaciones primero o usa 'actualizar' en su lugar."
+        )
+    
+    # Reset counter
+    await db.invoice_counter.update_one(
+        {"counter_id": "main_counter"},
+        {"$set": {"current_number": start_number}},
+        upsert=True
+    )
+    
+    return {
+        "message": "Contador reseteado exitosamente",
+        "new_start": start_number,
+        "next_invoice": str(start_number)
+    }
+
 # ============ CUSTOMER ENDPOINTS ============
 
 @api_router.post("/customers", response_model=Customer)
