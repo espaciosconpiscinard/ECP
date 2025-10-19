@@ -675,6 +675,24 @@ const Reservations = () => {
                   </select>
                 </div>
 
+                {/* Precio Base de la Villa - EDITABLE */}
+                <div className="col-span-2 bg-blue-50 p-4 rounded-md border-2 border-blue-200">
+                  <Label className="font-bold text-blue-800">Precio Base de la Villa *</Label>
+                  <Input
+                    type="number"
+                    step="0.01"
+                    min="0"
+                    value={formData.base_price}
+                    onChange={(e) => setFormData({ ...formData, base_price: parseFloat(e.target.value) || 0 })}
+                    required
+                    className="mt-2"
+                    data-testid="base-price-input"
+                  />
+                  <p className="text-xs text-gray-600 mt-1">
+                    Este precio se autocompleta según la villa y tipo de renta seleccionado, pero puedes editarlo si necesitas aplicar un precio especial
+                  </p>
+                </div>
+
                 {/* Horas Extras */}
                 <div>
                   <Label>Horas Extras</Label>
