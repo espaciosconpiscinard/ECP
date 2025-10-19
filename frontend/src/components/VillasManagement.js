@@ -771,6 +771,80 @@ const VillasManagementNew = () => {
           </div>
         )}
       </div>
+
+      {/* Vista de Servicios */}
+      {itemType === 'service' && (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          {filteredServices.map((service) => (
+            <Card key={service.id} className={!service.is_active ? 'opacity-50' : ''}>
+              <CardHeader className="pb-3">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center space-x-2">
+                    <Package className="h-5 w-5 text-blue-600" />
+                    <CardTitle className="text-lg">{service.service_name}</CardTitle>
+                  </div>
+                  {!service.is_active && (
+                    <span className="text-xs px-2 py-1 bg-gray-200 text-gray-600 rounded">
+                      Inactivo
+                    </span>
+                  )}
+                </div>
+              </CardHeader>
+              <CardContent>
+                {service.description && (
+                  <p className="text-sm text-gray-600 mb-3">{service.description}</p>
+                )}
+                <div className="space-y-2 mb-4">
+                  <div className="flex justify-between text-sm">
+                    <span className="text-gray-600">Precio:</span>
+                    <span className="font-bold text-lg text-blue-600">
+                      {service.currency === 'DOP' ? 'RD$' : '$'}
+                      {service.unit_price.toLocaleString('es-DO', {minimumFractionDigits: 2})}
+                    </span>
+                  </div>
+                  <div className="flex justify-between text-sm">
+                    <span className="text-gray-600">Categoría:</span>
+                    <span className="text-gray-800 capitalize">
+                      {service.category === 'decoracion' ? 'Decoración' :
+                       service.category === 'entretenimiento' ? 'Entretenimiento' :
+                       service.category === 'comida_bebida' ? 'Comida y Bebida' :
+                       service.category === 'fotografia' ? 'Fotografía/Video' :
+                       service.category === 'transporte' ? 'Transporte' : 'Otros'}
+                    </span>
+                  </div>
+                </div>
+                {isAdmin && (
+                  <div className="flex justify-end space-x-2 pt-3 border-t">
+                    <Button
+                      size="sm"
+                      variant="ghost"
+                      onClick={() => handleEditService(service)}
+                      className="hover:bg-gray-100"
+                    >
+                      <Edit size={16} />
+                    </Button>
+                    <Button
+                      size="sm"
+                      variant="ghost"
+                      onClick={() => handleDeleteService(service.id)}
+                      className="text-red-600 hover:text-red-700 hover:bg-red-50"
+                    >
+                      <Trash2 size={16} />
+                    </Button>
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          ))}
+
+          {filteredServices.length === 0 && (
+            <div className="col-span-full text-center py-12">
+              <Package size={64} className="mx-auto text-gray-300 mb-4" />
+              <p className="text-gray-500 text-lg">No hay servicios que coincidan con la búsqueda</p>
+            </div>
+          )}
+        </div>
+      )}
     </div>
   );
 };
