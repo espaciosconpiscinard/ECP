@@ -26,6 +26,8 @@ const Reservations = () => {
   const [expandedReservations, setExpandedReservations] = useState({});
   const [isAbonoDialogOpen, setIsAbonoDialogOpen] = useState(false);
   const [selectedReservation, setSelectedReservation] = useState(null);
+  const [villaSearchTerm, setVillaSearchTerm] = useState('');
+  const [showVillaDropdown, setShowVillaDropdown] = useState(false);
   const [abonoFormData, setAbonoFormData] = useState({
     amount: 0,
     currency: 'DOP',
