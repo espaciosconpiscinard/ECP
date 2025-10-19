@@ -352,20 +352,20 @@ const Expenses = () => {
                           >
                             <Edit size={16} />
                           </Button>
-                          {user?.role === 'admin' && !expense.related_reservation_id && (
+                          {user?.role === 'admin' && (
                             <Button
                               size="sm"
                               variant="ghost"
                               onClick={() => handleDelete(expense.id)}
-                              className="text-red-600 hover:text-red-700"
+                              className="text-red-600 hover:text-red-700 hover:bg-red-50"
                               data-testid="delete-expense-button"
                             >
                               <Trash2 size={16} />
                             </Button>
                           )}
                           {expense.related_reservation_id && (
-                            <span className="text-xs text-gray-500 italic">
-                              Auto-generado - elimina la reservación
+                            <span className="text-xs text-gray-500 italic ml-2">
+                              (Auto-generado)
                             </span>
                           )}
                         </div>
