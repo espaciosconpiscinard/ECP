@@ -424,6 +424,14 @@ const Expenses = () => {
                       <td className="p-2 text-sm text-right font-medium">
                         {formatCurrency(expense.amount, expense.currency)}
                       </td>
+                      <td className="p-2 text-sm text-right">
+                        {formatCurrency(expense.total_paid || 0, expense.currency)}
+                      </td>
+                      <td className="p-2 text-sm text-right font-medium">
+                        <span className={expense.balance_due > 0 ? 'text-orange-600' : 'text-green-600'}>
+                          {formatCurrency(expense.balance_due || 0, expense.currency)}
+                        </span>
+                      </td>
                       <td className="p-2 text-sm text-center">
                         <span className={`px-2 py-1 rounded text-xs ${
                           expense.payment_status === 'paid' 
@@ -434,7 +442,16 @@ const Expenses = () => {
                         </span>
                       </td>
                       <td className="p-2 text-sm">
-                        <div className="flex justify-center space-x-2">
+                        <div className="flex justify-center space-x-1">
+                          <Button
+                            size="sm"
+                            variant="ghost"
+                            onClick={() => handleOpenAbonoDialog(expense)}
+                            className="text-green-600 hover:text-green-700 hover:bg-green-50"
+                            title="Agregar Abono"
+                          >
+                            <DollarSign size={16} />
+                          </Button>
                           <Button
                             size="sm"
                             variant="ghost"
@@ -466,7 +483,7 @@ const Expenses = () => {
                   ))
                 ) : (
                   <tr>
-                    <td colSpan="6" className="text-center py-8 text-gray-500">
+                    <td colSpan="8" className="text-center py-8 text-gray-500">
                       No hay gastos registrados
                     </td>
                   </tr>
