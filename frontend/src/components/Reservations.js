@@ -299,6 +299,34 @@ const Reservations = () => {
     }));
   };
 
+  const handleAddAbono = (reservation) => {
+    setSelectedReservation(reservation);
+    setAbonoFormData({
+      amount: 0,
+      currency: reservation.currency,
+      payment_method: 'efectivo',
+      payment_date: new Date().toISOString().split('T')[0],
+      notes: ''
+    });
+    setIsAbonoDialogOpen(true);
+  };
+
+  const submitAbono = async (e) => {
+    e.preventDefault();
+    if (!selectedReservation) return;
+    
+    try {
+      await addAbonoToReservation(selectedReservation.id, abonoFormData);
+      setIsAbonoDialogOpen(false);
+      setSelectedReservation(null);
+      await fetchData();
+      alert('Abono registrado exitosamente');
+    } catch (err) {
+      setError('Error al registrar abono');
+      console.error(err);
+    }
+  };
+
   const handlePrint = (reservation) => {
     const printWindow = window.open('', '', 'width=900,height=700');
     const balanceDue = reservation.balance_due || 0;
