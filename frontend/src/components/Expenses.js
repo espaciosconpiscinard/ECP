@@ -612,11 +612,28 @@ const Expenses = () => {
                         {new Date(expense.expense_date).toLocaleDateString('es-DO')}
                       </td>
                       <td className="p-2 text-sm">
-                        <span className={`px-2 py-1 rounded text-xs ${getCategoryColor(expense.category)}`}>
-                          {getCategoryLabel(expense.category)}
-                        </span>
+                        <div className="space-y-1">
+                          <span className={`px-2 py-1 rounded text-xs ${getCategoryColor(expense.category)}`}>
+                            {getCategoryLabel(expense.category)}
+                          </span>
+                          {getExpenseCategoryName(expense.expense_category_id) && (
+                            <div className="text-xs text-gray-600 font-semibold">
+                              📁 {getExpenseCategoryName(expense.expense_category_id)}
+                            </div>
+                          )}
+                        </div>
                       </td>
-                      <td className="p-2 text-sm">{expense.description}</td>
+                      <td className="p-2 text-sm">
+                        <div className="flex items-center space-x-2">
+                          <span>{expense.description}</span>
+                          {expense.has_payment_reminder && (
+                            <Bell size={14} className="text-orange-500" title={`Recordatorio día ${expense.payment_reminder_day}`} />
+                          )}
+                          {expense.is_recurring && (
+                            <span className="text-xs px-1 py-0.5 bg-blue-100 text-blue-700 rounded">Recurrente</span>
+                          )}
+                        </div>
+                      </td>
                       <td className="p-2 text-sm text-right font-medium">
                         {formatCurrency(expense.amount, expense.currency)}
                       </td>
