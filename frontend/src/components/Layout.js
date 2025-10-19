@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { Button } from './ui/button';
-import { Home, Users, FileText, DollarSign, Building, Menu, X, LogOut, Tag, UserCog, Settings } from 'lucide-react';
+import { Home, Users, FileText, DollarSign, Building, Menu, X, LogOut, Tag, UserCog, Settings, Receipt } from 'lucide-react';
 
 const Layout = ({ children, currentView, setCurrentView }) => {
   const { user, logout } = useAuth();
