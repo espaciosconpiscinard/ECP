@@ -1,22 +1,28 @@
 import React, { useState, useEffect } from 'react';
-import { getVillas, getCategories, createVilla, updateVilla, deleteVilla } from '../api/api';
+import { 
+  getVillas, getCategories, createVilla, updateVilla, deleteVilla,
+  getExtraServices, createExtraService, updateExtraService, deleteExtraService
+} from '../api/api';
 import { Button } from './ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from './ui/card';
 import { Input } from './ui/input';
 import { Label } from './ui/label';
 import { Alert, AlertDescription } from './ui/alert';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from './ui/dialog';
-import { Plus, Edit, Trash2, Building, ChevronDown, ChevronUp, Search } from 'lucide-react';
+import { Plus, Edit, Trash2, Building, ChevronDown, ChevronUp, Search, Package } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 
 const VillasManagementNew = () => {
   const { user } = useAuth();
+  const [itemType, setItemType] = useState('villa'); // 'villa' o 'service'
   const [villas, setVillas] = useState([]);
+  const [services, setServices] = useState([]);
   const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [editingVilla, setEditingVilla] = useState(null);
+  const [editingService, setEditingService] = useState(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [expandedVillas, setExpandedVillas] = useState({});
   
@@ -36,6 +42,15 @@ const VillasManagementNew = () => {
     owner_price_evento: 0,
     max_guests: 0,
     amenities: [],
+    is_active: true
+  });
+
+  const [serviceFormData, setServiceFormData] = useState({
+    service_name: '',
+    description: '',
+    unit_price: 0,
+    currency: 'DOP',
+    category: 'otros',
     is_active: true
   });
 
