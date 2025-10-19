@@ -107,12 +107,16 @@ const Expenses = () => {
     setEditingExpense(expense);
     setFormData({
       category: expense.category,
+      expense_category_id: expense.expense_category_id || '',
       description: expense.description,
       amount: expense.amount,
       currency: expense.currency,
       expense_date: expense.expense_date.split('T')[0],
       payment_status: expense.payment_status,
-      notes: expense.notes || ''
+      notes: expense.notes || '',
+      has_payment_reminder: expense.has_payment_reminder || false,
+      payment_reminder_day: expense.payment_reminder_day || 1,
+      is_recurring: expense.is_recurring || false
     });
     setIsFormOpen(true);
   };
