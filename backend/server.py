@@ -231,6 +231,51 @@ async def delete_category(category_id: str, current_user: dict = Depends(require
         raise HTTPException(status_code=404, detail="Category not found")
     return {"message": "Category deleted successfully, villas unassigned"}
 
+# ============ EXPENSE CATEGORY ENDPOINTS (SEPARATE) ============
+
+@api_router.post("/expense-categories", response_model=ExpenseCategory)
+async def create_expense_category(category_data: ExpenseCategoryCreate, current_user: dict = Depends(require_admin)):
+    """Create a new expense category (admin only)"""
+    category = ExpenseCategory(**category_data.model_dump(), created_by=current_user["id"])
+    doc = prepare_doc_for_insert(category.model_dump())
+    await db.expense_categories.insert_one(doc)
+    return category
+
+@api_router.get("/expense-categories", response_model=List[ExpenseCategory])
+async def get_expense_categories(current_user: dict = Depends(get_current_user)):
+    """Get all expense categories ordered alphabetically"""
+    categories = await db.expense_categories.find({"is_active": True}, {"_id": 0}).to_list(1000)
+    sorted_categories = sorted([restore_datetimes(c, ["created_at"]) for c in categories], key=lambda x: x.get("name", "").lower())
+    return sorted_categories
+
+@api_router.put("/expense-categories/{category_id}", response_model=ExpenseCategory)
+async def update_expense_category(category_id: str, update_data: ExpenseCategoryUpdate, current_user: dict = Depends(require_admin)):
+    """Update an expense category (admin only)"""
+    existing = await db.expense_categories.find_one({"id": category_id}, {"_id": 0})
+    if not existing:
+        raise HTTPException(status_code=404, detail="Expense category not found")
+    
+    update_dict = {k: v for k, v in update_data.model_dump(exclude_unset=True).items() if v is not None}
+    
+    if update_dict:
+        await db.expense_categories.update_one({"id": category_id}, {"$set": update_dict})
+    
+    updated = await db.expense_categories.find_one({"id": category_id}, {"_id": 0})
+    return restore_datetimes(updated, ["created_at"])
+
+@api_router.delete("/expense-categories/{category_id}")
+async def delete_expense_category(category_id: str, current_user: dict = Depends(require_admin)):
+    """Delete an expense category (admin only) - expenses quedan sin categoría"""
+    await db.expenses.update_many(
+        {"expense_category_id": category_id},
+        {"$set": {"expense_category_id": None}}
+    )
+    
+    result = await db.expense_categories.delete_one({"id": category_id})
+    if result.deleted_count == 0:
+        raise HTTPException(status_code=404, detail="Expense category not found")
+    return {"message": "Expense category deleted successfully, expenses unassigned"}
+
 # ============ VILLA ENDPOINTS ============
 
 @api_router.post("/villas", response_model=Villa)
