@@ -28,6 +28,8 @@ const Reservations = () => {
   const [selectedReservation, setSelectedReservation] = useState(null);
   const [villaSearchTerm, setVillaSearchTerm] = useState('');
   const [showVillaDropdown, setShowVillaDropdown] = useState(false);
+  const [customerSearchTerm, setCustomerSearchTerm] = useState('');
+  const [showCustomerDropdown, setShowCustomerDropdown] = useState(false);
   const [abonoFormData, setAbonoFormData] = useState({
     amount: 0,
     currency: 'DOP',
