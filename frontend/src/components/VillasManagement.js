@@ -279,10 +279,16 @@ const VillasManagementNew = () => {
             <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
               <DialogHeader>
                 <DialogTitle className="text-xl">
-                  {editingVilla ? 'Editar Villa' : 'Nueva Villa'}
+                  {itemType === 'villa' 
+                    ? (editingVilla ? 'Editar Villa' : 'Nueva Villa')
+                    : (editingService ? 'Editar Servicio' : 'Nuevo Servicio')
+                  }
                 </DialogTitle>
               </DialogHeader>
-              <form onSubmit={handleSubmit} className="space-y-4">
+
+              {/* Formulario de Villa */}
+              {itemType === 'villa' ? (
+                <form onSubmit={handleSubmit} className="space-y-4">
                 <div className="grid grid-cols-2 gap-4">
                   <div>
                     <Label>Código de Villa *</Label>
