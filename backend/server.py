@@ -388,8 +388,12 @@ async def create_reservation(reservation_data: ReservationCreate, current_user: 
     # Get next invoice number
     invoice_number = await get_next_invoice_number()
     
-    # Calculate balance
-    balance_due = calculate_balance(reservation_data.total_amount, reservation_data.amount_paid)
+    # Calculate balance: Total + Depósito - Pagado
+    balance_due = calculate_balance(
+        reservation_data.total_amount, 
+        reservation_data.amount_paid,
+        reservation_data.deposit
+    )
     
     reservation = Reservation(
         **reservation_data.model_dump(),
