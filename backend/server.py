@@ -21,7 +21,8 @@ from models import (
     PaymentCreate, Payment,
     AbonoCreate, Abono,
     ExpenseCreate, ExpenseUpdate, Expense,
-    DashboardStats, InvoiceCounter
+    DashboardStats, InvoiceCounter,
+    InvoiceTemplateCreate, InvoiceTemplateUpdate, InvoiceTemplate
 )
 from auth import (
     verify_password, get_password_hash, create_access_token,
