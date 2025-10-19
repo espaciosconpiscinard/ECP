@@ -101,3 +101,167 @@
 #====================================================================================================
 # Testing Data - Main Agent and testing sub agent both should log testing data below this section
 #====================================================================================================
+
+user_problem_statement: |
+  Sistema de gestión de villas "Espacios Con Piscina" con los siguientes requerimientos nuevos:
+  1. **Sistema de Categorías**: Crear, editar y eliminar categorías personalizadas para agrupar villas (solo Admin)
+  2. **Vista de Villas Mejorada**: 
+     - Vista de lista compacta mostrando: Código/Nombre, Precio Cliente, Pago Propietario (solo Admin)
+     - Al hacer clic expandir para ver detalles completos
+     - Buscador por nombre/código/categoría
+     - Agrupar villas por categoría (orden alfabético)
+  3. **Vista de Reservaciones Mejorada**:
+     - Vista lista compacta: Nombre cliente, Código villa, Fecha, Pago realizado, Restante
+     - Al hacer clic expandir detalles completos
+  4. **Control de Permisos por Rol**:
+     - Admin: ve todo (categorías, gastos, pago propietario)
+     - Empleado: solo ve info cliente (sin gastos, sin pago propietario, sin categorías)
+
+backend:
+  - task: "Modelo Category - CRUD completo"
+    implemented: true
+    working: true
+    file: "/app/backend/models.py, /app/backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: true
+        agent: "main"
+        comment: "Creado modelo Category con campos name, description, is_active. Implementados endpoints POST/GET/PUT/DELETE. Al eliminar categoría, villas quedan sin asignar."
+  
+  - task: "Villa model - Agregar category_id"
+    implemented: true
+    working: true
+    file: "/app/backend/models.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: true
+        agent: "main"
+        comment: "Agregado campo category_id opcional al modelo Villa"
+  
+  - task: "Endpoint de villas - Búsqueda y filtrado"
+    implemented: true
+    working: true
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: true
+        agent: "main"
+        comment: "Actualizado GET /api/villas para aceptar parámetros search (nombre/código) y category_id"
+
+frontend:
+  - task: "Componente Categories - CRUD"
+    implemented: true
+    working: true
+    file: "/app/frontend/src/components/Categories.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: true
+        agent: "main"
+        comment: "Creado componente Categories con vista grid, ordenamiento alfabético automático, CRUD completo"
+  
+  - task: "API client - Funciones de categorías"
+    implemented: true
+    working: true
+    file: "/app/frontend/src/api/api.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: true
+        agent: "main"
+        comment: "Agregadas funciones getCategories, createCategory, updateCategory, deleteCategory. Actualizado getVillas para búsqueda"
+  
+  - task: "Layout - Control de permisos por rol"
+    implemented: true
+    working: true
+    file: "/app/frontend/src/components/Layout.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: true
+        agent: "main"
+        comment: "Actualizado menú de navegación. Admin ve: Dashboard, Reservaciones, Villas, Categorías, Gastos. Empleado ve: Dashboard, Reservaciones, Villas"
+  
+  - task: "App.js - Ruta de categorías"
+    implemented: true
+    working: true
+    file: "/app/frontend/src/App.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: true
+        agent: "main"
+        comment: "Agregada ruta 'categories' al switch de vistas. Cambio de 'owners' a 'villas'"
+  
+  - task: "VillasManagement - Vista lista expandible"
+    implemented: true
+    working: true
+    file: "/app/frontend/src/components/VillasManagement.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: true
+        agent: "main"
+        comment: "Reescrito completamente. Vista lista compacta agrupada por categoría, expandible al hacer clic. Buscador funcional. Control de permisos: empleados no ven pago propietario. Solo admin puede editar/eliminar"
+  
+  - task: "Reservations - Vista lista expandible"
+    implemented: true
+    working: true
+    file: "/app/frontend/src/components/Reservations.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: true
+        agent: "main"
+        comment: "Actualizada tabla a vista lista expandible. Vista compacta: cliente, código villa, fecha, pagado, restante. Vista expandida: todos los detalles + acciones"
+
+metadata:
+  created_by: "main_agent"
+  version: "1.0"
+  test_sequence: 1
+  run_ui: false
+
+test_plan:
+  current_focus:
+    - "Verificar sistema de categorías funcional"
+    - "Verificar vista de villas con búsqueda y agrupación"
+    - "Verificar vista de reservaciones expandible"
+    - "Verificar permisos por rol (Admin vs Empleado)"
+  stuck_tasks: []
+  test_all: false
+  test_priority: "high_first"
+
+agent_communication:
+  - agent: "main"
+    message: |
+      Implementación completa de nuevas funcionalidades:
+      
+      BACKEND:
+      - Modelo Category con CRUD completo
+      - Villa.category_id agregado
+      - Endpoint /api/villas con búsqueda y filtrado
+      - Endpoint /api/categories con CRUD (solo admin)
+      
+      FRONTEND:
+      - Componente Categories (solo admin)
+      - VillasManagement completamente reescrito: lista expandible, búsqueda, agrupación por categoría
+      - Reservations con vista lista expandible
+      - Layout con control de permisos: empleados no ven Categorías ni Gastos
+      - Control de visibilidad de "pago propietario" según rol
+      
+      SIGUIENTE PASO:
+      - Testing backend de endpoints de categorías
+      - Testing frontend de flujos completos
+      - Verificar permisos por rol
