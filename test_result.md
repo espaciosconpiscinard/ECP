@@ -280,6 +280,7 @@ test_plan:
   stuck_tasks: []
   test_all: false
   test_priority: "completed"
+  latest_test: "Auto-creación de gastos en reservaciones - COMPLETADO ✅"
 
 agent_communication:
   - agent: "main"
