@@ -228,6 +228,12 @@ const Reservations = () => {
     if (villa) {
       setVillaSearchTerm(`${villa.code} - ${villa.name}`);
     }
+
+    // Encontrar el cliente para establecer el texto de búsqueda
+    const customer = customers.find(c => c.id === reservation.customer_id);
+    if (customer) {
+      setCustomerSearchTerm(customer.name);
+    }
     
     setFormData({
       customer_id: reservation.customer_id,
