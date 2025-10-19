@@ -13,6 +13,7 @@ from models import (
     UserCreate, UserLogin, User, UserResponse,
     CustomerCreate, Customer,
     CategoryCreate, CategoryUpdate, Category,
+    ExpenseCategoryCreate, ExpenseCategoryUpdate, ExpenseCategory,
     VillaCreate, Villa,
     ExtraServiceCreate, ExtraService,
     ReservationCreate, ReservationUpdate, Reservation,
