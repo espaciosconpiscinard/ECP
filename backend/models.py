@@ -47,7 +47,7 @@ class Customer(CustomerBase):
     created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
     created_by: str  # user_id
 
-# ============ CATEGORY MODELS ============
+# ============ CATEGORY MODELS (FOR VILLAS) ============
 class CategoryBase(BaseModel):
     name: str  # Nombre de la categoría (ej: "Premium", "Zona Norte", etc.)
     description: Optional[str] = None
@@ -62,6 +62,26 @@ class CategoryUpdate(BaseModel):
     is_active: Optional[bool] = None
 
 class Category(CategoryBase):
+    model_config = ConfigDict(extra="ignore")
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+    created_by: str
+
+# ============ EXPENSE CATEGORY MODELS (SEPARATE FROM VILLA CATEGORIES) ============
+class ExpenseCategoryBase(BaseModel):
+    name: str  # Luz, Internet, Local, Nómina, etc.
+    description: Optional[str] = None
+    is_active: bool = True
+
+class ExpenseCategoryCreate(ExpenseCategoryBase):
+    pass
+
+class ExpenseCategoryUpdate(BaseModel):
+    name: Optional[str] = None
+    description: Optional[str] = None
+    is_active: Optional[bool] = None
+
+class ExpenseCategory(ExpenseCategoryBase):
     model_config = ConfigDict(extra="ignore")
     id: str = Field(default_factory=lambda: str(uuid.uuid4()))
     created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
