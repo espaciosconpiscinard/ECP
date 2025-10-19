@@ -24,6 +24,15 @@ const Reservations = () => {
   const [selectedExtraServices, setSelectedExtraServices] = useState([]);
   const [showExtraServices, setShowExtraServices] = useState(false);
   const [expandedReservations, setExpandedReservations] = useState({});
+  const [isAbonoDialogOpen, setIsAbonoDialogOpen] = useState(false);
+  const [selectedReservation, setSelectedReservation] = useState(null);
+  const [abonoFormData, setAbonoFormData] = useState({
+    amount: 0,
+    currency: 'DOP',
+    payment_method: 'efectivo',
+    payment_date: new Date().toISOString().split('T')[0],
+    notes: ''
+  });
   
   const [formData, setFormData] = useState({
     customer_id: '',
