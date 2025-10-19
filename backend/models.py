@@ -300,7 +300,7 @@ class Abono(AbonoBase):
 # ============ EXPENSE MODELS ============
 class ExpenseBase(BaseModel):
     category: Literal["local", "nomina", "variable", "pago_propietario", "otros"] = "otros"
-    category_id: Optional[str] = None  # ID de categoría personalizada
+    expense_category_id: Optional[str] = None  # ID de categoría de gasto personalizada (luz, internet, etc.)
     description: str
     amount: float
     currency: Literal["DOP", "USD"] = "DOP"
@@ -308,6 +308,11 @@ class ExpenseBase(BaseModel):
     payment_status: Literal["pending", "paid"] = "pending"
     notes: Optional[str] = None
     related_reservation_id: Optional[str] = None  # Para gastos auto-generados por reservaciones
+    
+    # Recordatorio de pago recurrente
+    has_payment_reminder: bool = False
+    payment_reminder_day: Optional[int] = None  # Día del mes (1-31) para recordatorio
+    is_recurring: bool = False  # Si es un gasto recurrente mensual
 
 class ExpenseCreate(ExpenseBase):
     pass
