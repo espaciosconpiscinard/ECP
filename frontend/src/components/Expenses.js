@@ -257,7 +257,7 @@ const ExpensesNew = () => {
   const filteredExpenses = expenses.filter(e => 
     e.description?.toLowerCase().includes(searchTerm.toLowerCase()) ||
     getCategoryLabel(e.category).toLowerCase().includes(searchTerm.toLowerCase()) ||
-    categories.find(c => c.id === e.category_id)?.name?.toLowerCase().includes(searchTerm.toLowerCase())
+    expenseCategories.find(c => c.id === e.expense_category_id)?.name?.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   // Agrupar gastos por categoría
