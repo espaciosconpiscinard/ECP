@@ -432,3 +432,15 @@ class InvoiceTemplate(InvoiceTemplateBase):
     updated_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
     created_by: str
 
+# ============ LOGO MODEL ============
+class LogoConfig(BaseModel):
+    model_config = ConfigDict(extra="ignore")
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    config_id: str = "main_logo"  # Solo un logo principal
+    logo_data: Optional[str] = None  # Base64 encoded image
+    logo_filename: Optional[str] = None
+    logo_mimetype: Optional[str] = None
+    uploaded_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+    uploaded_by: str
+
+
