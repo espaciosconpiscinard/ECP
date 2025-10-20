@@ -49,6 +49,7 @@ const Customers = () => {
     try {
       const response = await getCustomers();
       setCustomers(response.data);
+      setFilteredCustomers(response.data);
     } catch (err) {
       setError('Error al cargar clientes');
       console.error(err);
