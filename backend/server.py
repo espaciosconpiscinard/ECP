@@ -384,6 +384,58 @@ async def reset_invoice_template(current_user: dict = Depends(require_admin)):
     
     return {"message": "Plantilla reseteada a valores por defecto", "template": default_template}
 
+# ============ LOGO ENDPOINTS (ADMIN ONLY) ============
+
+@api_router.get("/config/logo")
+async def get_logo(current_user: dict = Depends(get_current_user)):
+    """Get current logo (all users can view)"""
+    logo = await db.logo_config.find_one({"config_id": "main_logo"}, {"_id": 0})
+    
+    if not logo:
+        return {"logo_data": None, "logo_filename": None}
+    
+    return {
+        "logo_data": logo.get("logo_data"),
+        "logo_filename": logo.get("logo_filename"),
+        "logo_mimetype": logo.get("logo_mimetype")
+    }
+
+@api_router.post("/config/logo")
+async def upload_logo(
+    logo_data: str,
+    logo_filename: str,
+    logo_mimetype: str,
+    current_user: dict = Depends(require_admin)
+):
+    """Upload new logo (admin only)"""
+    logo_config = LogoConfig(
+        config_id="main_logo",
+        logo_data=logo_data,
+        logo_filename=logo_filename,
+        logo_mimetype=logo_mimetype,
+        uploaded_by=current_user["id"]
+    )
+    
+    doc = prepare_doc_for_insert(logo_config.model_dump())
+    
+    await db.logo_config.update_one(
+        {"config_id": "main_logo"},
+        {"$set": doc},
+        upsert=True
+    )
+    
+    return {"message": "Logo subido exitosamente", "logo_filename": logo_filename}
+
+@api_router.delete("/config/logo")
+async def delete_logo(current_user: dict = Depends(require_admin)):
+    """Delete logo (admin only)"""
+    result = await db.logo_config.delete_one({"config_id": "main_logo"})
+    
+    if result.deleted_count == 0:
+        return {"message": "No hay logo para eliminar"}
+    
+    return {"message": "Logo eliminado exitosamente"}
+
 # ============ CUSTOMER ENDPOINTS ============
 
 @api_router.post("/customers", response_model=Customer)
