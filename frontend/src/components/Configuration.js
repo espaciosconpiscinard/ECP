@@ -135,6 +135,9 @@ function Configuration() {
         </div>
       )}
 
+      {/* Logo Uploader */}
+      <LogoUploader />
+
       {/* Invoice Counter Configuration */}
       <div className="bg-white rounded-lg shadow-md p-6">
         <h3 className="text-xl font-semibold mb-4 flex items-center">
