@@ -1,11 +1,38 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { Button } from './ui/button';
 import { Home, Users, FileText, DollarSign, Building, Menu, X, LogOut, Tag, UserCog, Settings, Receipt } from 'lucide-react';
 
+const API_URL = process.env.REACT_APP_BACKEND_URL || '';
+
 const Layout = ({ children, currentView, setCurrentView }) => {
   const { user, logout } = useAuth();
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [logo, setLogo] = useState(null);
+
+  useEffect(() => {
+    fetchLogo();
+  }, []);
+
+  const fetchLogo = async () => {
+    try {
+      const token = localStorage.getItem('token');
+      const response = await fetch(`${API_URL}/api/config/logo`, {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+      
+      if (response.ok) {
+        const data = await response.json();
+        if (data.logo_data) {
+          setLogo(data.logo_data);
+        }
+      }
+    } catch (err) {
+      console.error('Error loading logo:', err);
+    }
+  };
 
   // Menú base para todos los usuarios
   const menuItems = [
