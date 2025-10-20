@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import LogoUploader from './LogoUploader';
 
 const API_URL = process.env.REACT_APP_BACKEND_URL || '';
 
