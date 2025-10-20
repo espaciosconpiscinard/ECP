@@ -448,8 +448,8 @@ async def create_customer(customer_data: CustomerCreate, current_user: dict = De
 
 @api_router.get("/customers", response_model=List[Customer])
 async def get_customers(current_user: dict = Depends(get_current_user)):
-    """Get all customers"""
-    customers = await db.customers.find({}, {"_id": 0}).to_list(1000)
+    """Get all customers ordered alphabetically by name"""
+    customers = await db.customers.find({}, {"_id": 0}).sort("name", 1).to_list(1000)
     return [restore_datetimes(c, ["created_at"]) for c in customers]
 
 @api_router.get("/customers/{customer_id}", response_model=Customer)
