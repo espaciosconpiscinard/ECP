@@ -310,6 +310,12 @@ class ExpenseBase(BaseModel):
     notes: Optional[str] = None
     related_reservation_id: Optional[str] = None  # Para gastos auto-generados por reservaciones
     
+    # Tipo de gasto
+    expense_type: Literal["fijo", "variable", "unico"] = "variable"  # fijo=recurrente, variable=con fecha, unico=sin fecha pago
+    
+    # Fecha de check-in de la reserva (para ordenar)
+    reservation_check_in: Optional[datetime] = None
+    
     # Recordatorio de pago recurrente
     has_payment_reminder: bool = False
     payment_reminder_day: Optional[int] = None  # Día del mes (1-31) para recordatorio
@@ -327,6 +333,8 @@ class ExpenseUpdate(BaseModel):
     expense_date: Optional[datetime] = None
     payment_status: Optional[Literal["pending", "paid"]] = None
     notes: Optional[str] = None
+    expense_type: Optional[Literal["fijo", "variable", "unico"]] = None
+    reservation_check_in: Optional[datetime] = None
     has_payment_reminder: Optional[bool] = None
     payment_reminder_day: Optional[int] = None
     is_recurring: Optional[bool] = None
