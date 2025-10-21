@@ -369,6 +369,14 @@ class DashboardStats(BaseModel):
     owners_balance_due_usd: float
     recent_reservations: List[Reservation]
     pending_payment_reservations: List[Reservation]
+    
+    # Compromisos del mes actual
+    commitments_count: int = 0
+    commitments_total_dop: float = 0
+    commitments_total_usd: float = 0
+    commitments_paid_count: int = 0
+    commitments_pending_count: int = 0
+    commitments_overdue_count: int = 0
 
 # ============ INVOICE TEMPLATE MODEL ============
 class InvoiceTemplateBase(BaseModel):
