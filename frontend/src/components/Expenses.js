@@ -395,6 +395,25 @@ const Expenses = () => {
                   <option value="otros">Otros</option>
                 </select>
               </div>
+
+              {/* Tipo de Gasto */}
+              <div>
+                <Label>Tipo de Gasto *</Label>
+                <select
+                  value={formData.expense_type}
+                  onChange={(e) => setFormData({ ...formData, expense_type: e.target.value })}
+                  className="w-full p-2 border rounded-md"
+                >
+                  <option value="variable">Variable (Con fecha de pago)</option>
+                  <option value="fijo">Fijo (Recurrente mensual)</option>
+                  <option value="unico">Único (Ya pagado, sin fecha)</option>
+                </select>
+                <p className="text-xs text-gray-500 mt-1">
+                  {formData.expense_type === 'variable' && 'Gasto con fecha específica de pago (ej: reservación)'}
+                  {formData.expense_type === 'fijo' && 'Gasto que se repite cada mes (ej: luz, internet)'}
+                  {formData.expense_type === 'unico' && 'Gasto ya pagado al momento de registro (ej: compra de impresora)'}
+                </p>
+              </div>
               
               <div>
                 <Label>Descripción *</Label>
