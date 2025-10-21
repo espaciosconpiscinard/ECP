@@ -712,7 +712,7 @@ const Expenses = () => {
       )}
 
       {/* Filter and Group */}
-      <div className="flex items-center justify-between">
+      <div className="flex items-center justify-between flex-wrap gap-4">
         <div className="flex items-center space-x-2">
           <Filter className="text-gray-400" size={20} />
           <select
@@ -722,11 +722,43 @@ const Expenses = () => {
             data-testid="filter-category-select"
           >
             <option value="">Todas las categorías</option>
+            <option value="compromiso">Compromiso</option>
             <option value="local">Pago de Local</option>
             <option value="nomina">Nómina</option>
             <option value="variable">Gasto Variable</option>
             <option value="pago_propietario">Pago Propietario</option>
             <option value="otros">Otros</option>
+          </select>
+        </div>
+        
+        <div className="flex items-center space-x-2">
+          <Label>Mes:</Label>
+          <select
+            value={selectedMonth}
+            onChange={(e) => setSelectedMonth(parseInt(e.target.value))}
+            className="p-2 border rounded-md"
+          >
+            <option value={0}>Enero</option>
+            <option value={1}>Febrero</option>
+            <option value={2}>Marzo</option>
+            <option value={3}>Abril</option>
+            <option value={4}>Mayo</option>
+            <option value={5}>Junio</option>
+            <option value={6}>Julio</option>
+            <option value={7}>Agosto</option>
+            <option value={8}>Septiembre</option>
+            <option value={9}>Octubre</option>
+            <option value={10}>Noviembre</option>
+            <option value={11}>Diciembre</option>
+          </select>
+          <select
+            value={selectedYear}
+            onChange={(e) => setSelectedYear(parseInt(e.target.value))}
+            className="p-2 border rounded-md"
+          >
+            {[2024, 2025, 2026].map(year => (
+              <option key={year} value={year}>{year}</option>
+            ))}
           </select>
         </div>
         
