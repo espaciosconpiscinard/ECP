@@ -10,12 +10,15 @@ import { Plus, Edit, Trash2, Printer, Search, X, ChevronDown, ChevronUp } from '
 import { useAuth } from '../context/AuthContext';
 import CustomerDialog from './CustomerDialog';
 
+const API_URL = process.env.REACT_APP_BACKEND_URL || '';
+
 const Reservations = () => {
   const { user } = useAuth();
   const [reservations, setReservations] = useState([]);
   const [customers, setCustomers] = useState([]);
   const [villas, setVillas] = useState([]);
   const [extraServices, setExtraServices] = useState([]);
+  const [logo, setLogo] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [searchTerm, setSearchTerm] = useState('');
