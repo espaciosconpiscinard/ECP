@@ -230,10 +230,19 @@ const Expenses = () => {
 
   // Función para filtrar y ordenar gastos por tipo
   const getFilteredAndSortedExpenses = () => {
+    // Mapear tabs a tipos del backend
+    const typeMap = {
+      'variables': 'variable',
+      'fijos': 'fijo',
+      'unicos': 'unico'
+    };
+    
+    const targetType = typeMap[activeTab];
+    
     // Filtrar por tipo de tab activo
     let filtered = expenses.filter(expense => {
       const type = expense.expense_type || 'variable';
-      return type === activeTab;
+      return type === targetType;
     });
 
     // Para gastos variables: ordenar por fecha de check-in (más próximos primero)
