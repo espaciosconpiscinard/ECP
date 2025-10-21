@@ -87,12 +87,17 @@ const VillasManagementNew = () => {
     try {
       if (editingVilla) {
         await updateVilla(editingVilla.id, formData);
+        alert('✅ Villa actualizada exitosamente');
+        setIsFormOpen(false);
+        resetForm();
       } else {
         await createVilla(formData);
+        alert('✅ Villa agregada exitosamente. Puedes agregar otra villa.');
+        // NO cerrar el formulario - mantenerlo abierto para agregar más
+        // setIsFormOpen(false);
+        resetForm();
       }
       await fetchData();
-      setIsFormOpen(false);
-      resetForm();
     } catch (err) {
       setError(err.response?.data?.detail || 'Error al guardar villa');
     }
