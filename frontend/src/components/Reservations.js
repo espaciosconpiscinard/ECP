@@ -41,6 +41,10 @@ const Reservations = () => {
     notes: ''
   });
   
+  // Estados para selección múltiple
+  const [selectedReservations, setSelectedReservations] = useState([]);
+  const [selectAllReservations, setSelectAllReservations] = useState(false);
+  
   const [formData, setFormData] = useState({
     customer_id: '',
     customer_name: '',
