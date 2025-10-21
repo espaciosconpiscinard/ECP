@@ -458,12 +458,16 @@ const Expenses = () => {
                   required
                   data-testid="category-select"
                 >
+                  <option value="compromiso">Compromiso (Crítico)</option>
                   <option value="local">Pago de Local</option>
                   <option value="nomina">Nómina</option>
                   <option value="variable">Gasto Variable</option>
                   <option value="pago_propietario">Pago Propietario</option>
                   <option value="otros">Otros</option>
                 </select>
+                <p className="text-xs text-gray-500 mt-1">
+                  {formData.category === 'compromiso' && '⚠️ Compromisos son gastos críticos que requieren atención especial'}
+                </p>
               </div>
 
               {/* Tipo de Gasto */}
