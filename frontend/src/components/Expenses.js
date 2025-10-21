@@ -300,6 +300,27 @@ const Expenses = () => {
     });
   };
 
+  // Función para obtener información de la reservación asociada
+  const getReservationInfo = (expense) => {
+    if (!expense.related_reservation_id) return null;
+    return reservations.find(r => r.id === expense.related_reservation_id);
+  };
+
+  // Función para obtener el número de factura (número de invoice)
+  const getInvoiceNumber = (expense) => {
+    const reservation = getReservationInfo(expense);
+    return reservation?.invoice_number || 0;
+  };
+
+  // Función para obtener propietarios únicos de las villas
+  const getUniqueOwners = () => {
+    const owners = new Set();
+    villas.forEach(villa => {
+      if (villa.owner) owners.add(villa.owner);
+    });
+    return Array.from(owners).sort();
+  };
+
   // Función para filtrar y ordenar gastos por tipo con prioridad de urgencia
   const getFilteredAndSortedExpenses = () => {
     // Mapear tabs a tipos del backend
