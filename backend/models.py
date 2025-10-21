@@ -36,6 +36,7 @@ class CustomerBase(BaseModel):
     email: Optional[str] = None
     identification: Optional[str] = None
     identification_document: Optional[str] = None  # Cedula/Pasaporte/RNC
+    dni: Optional[str] = None  # DNI field as requested
     address: Optional[str] = None
     notes: Optional[str] = None
 
