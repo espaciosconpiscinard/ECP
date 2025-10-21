@@ -29,6 +29,15 @@ const Expenses = () => {
   const [selectedMonth, setSelectedMonth] = useState(new Date().getMonth());
   const [selectedYear, setSelectedYear] = useState(new Date().getFullYear());
   
+  // Nuevos filtros y ordenamiento
+  const [sortBy, setSortBy] = useState('date'); // date, invoice, villa, owner, remaining
+  const [filterVilla, setFilterVilla] = useState('');
+  const [filterOwner, setFilterOwner] = useState('');
+  
+  // Estados para almacenar reservaciones y villas
+  const [reservations, setReservations] = useState([]);
+  const [villas, setVillas] = useState([]);
+  
   // Abono states
   const [isAbonoDialogOpen, setIsAbonoDialogOpen] = useState(false);
   const [selectedExpense, setSelectedExpense] = useState(null);
