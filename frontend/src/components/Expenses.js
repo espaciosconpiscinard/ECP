@@ -1248,7 +1248,7 @@ const Expenses = () => {
                     ))
                   ) : (
                     <tr>
-                      <td colSpan="8" className="text-center py-8 text-gray-500">
+                      <td colSpan={8 + (sortBy === 'invoice' ? 1 : 0) + ((sortBy === 'villa' || filterVilla) ? 1 : 0) + ((sortBy === 'owner' || filterOwner) ? 1 : 0)} className="text-center py-8 text-gray-500">
                         No hay gastos registrados
                       </td>
                     </tr>
