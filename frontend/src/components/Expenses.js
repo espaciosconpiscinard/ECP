@@ -1122,6 +1122,29 @@ const Expenses = () => {
                             )}
                           </div>
                         </td>
+                        {sortBy === 'invoice' && (
+                          <td className="p-2 text-sm">
+                            {getInvoiceNumber(expense)}
+                          </td>
+                        )}
+                        {(sortBy === 'villa' || filterVilla) && (
+                          <td className="p-2 text-sm">
+                            {(() => {
+                              const reservation = getReservationInfo(expense);
+                              return reservation?.villa_code || '-';
+                            })()}
+                          </td>
+                        )}
+                        {(sortBy === 'owner' || filterOwner) && (
+                          <td className="p-2 text-sm">
+                            {(() => {
+                              const reservation = getReservationInfo(expense);
+                              if (!reservation) return '-';
+                              const villa = villas.find(v => v.code === reservation.villa_code);
+                              return villa?.owner || '-';
+                            })()}
+                          </td>
+                        )}
                         <td className="p-2 text-sm">
                           <div className="flex items-center space-x-2">
                             {(() => {
