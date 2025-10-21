@@ -236,7 +236,15 @@ const Expenses = () => {
     return currency === 'DOP' ? `RD$ ${formatted}` : `$ ${formatted}`;
   };
 
-  // Función para filtrar y ordenar gastos por tipo
+  // Función para filtrar gastos por mes seleccionado
+  const filterByMonth = (expensesList) => {
+    return expensesList.filter(expense => {
+      const expenseDate = new Date(expense.expense_date);
+      return expenseDate.getMonth() === selectedMonth && expenseDate.getFullYear() === selectedYear;
+    });
+  };
+
+  // Función para filtrar y ordenar gastos por tipo con prioridad de urgencia
   const getFilteredAndSortedExpenses = () => {
     // Mapear tabs a tipos del backend
     const typeMap = {
@@ -253,46 +261,62 @@ const Expenses = () => {
       return type === targetType;
     });
 
-    // Para gastos variables: ordenar por fecha de check-in (más próximos primero)
-    if (activeTab === 'variables') {
-      const today = new Date();
-      today.setHours(0, 0, 0, 0);
+    // Filtrar por mes seleccionado
+    filtered = filterByMonth(filtered);
 
-      // Separar pendientes y pagados
-      const pending = filtered.filter(e => e.payment_status === 'pending');
-      const paid = filtered.filter(e => e.payment_status === 'paid');
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
 
-      // Ordenar pendientes por fecha de check-in
-      pending.sort((a, b) => {
-        const dateA = a.reservation_check_in ? new Date(a.reservation_check_in) : new Date(a.expense_date);
-        const dateB = b.reservation_check_in ? new Date(b.reservation_check_in) : new Date(b.expense_date);
-        
-        // Fechas futuras o pasadas pendientes van primero (más cercanas al hoy)
-        return Math.abs(dateA - today) - Math.abs(dateB - today);
-      });
+    // Clasificar gastos por urgencia
+    const overdue = []; // Vencidos (rojo)
+    const upcoming = []; // Próximos a vencer (naranja)
+    const future = []; // Futuros (normal)
+    const paid = []; // Pagados (verde)
 
-      // Ordenar pagados por fecha de gasto (más recientes primero)
-      paid.sort((a, b) => new Date(b.expense_date) - new Date(a.expense_date));
+    filtered.forEach(expense => {
+      if (expense.payment_status === 'paid') {
+        paid.push(expense);
+        return;
+      }
 
-      filtered = [...pending, ...paid];
-    }
+      const expenseDate = expense.reservation_check_in 
+        ? new Date(expense.reservation_check_in) 
+        : new Date(expense.expense_date);
+      expenseDate.setHours(0, 0, 0, 0);
 
-    // Para gastos fijos: ordenar por día de recordatorio
+      const daysUntil = Math.floor((expenseDate - today) / (1000 * 60 * 60 * 24));
+
+      if (daysUntil < 0) {
+        overdue.push({ ...expense, daysUntil, urgency: 'overdue' });
+      } else if (daysUntil <= 7) {
+        upcoming.push({ ...expense, daysUntil, urgency: 'upcoming' });
+      } else {
+        future.push({ ...expense, daysUntil, urgency: 'future' });
+      }
+    });
+
+    // Ordenar cada categoría
+    overdue.sort((a, b) => a.daysUntil - b.daysUntil); // Más atrasados primero
+    upcoming.sort((a, b) => a.daysUntil - b.daysUntil); // Más próximos primero
+    future.sort((a, b) => a.daysUntil - b.daysUntil);
+    paid.sort((a, b) => new Date(b.expense_date) - new Date(a.expense_date)); // Más recientes primero
+
+    // Para gastos fijos: también considerar día de recordatorio
     if (activeTab === 'fijos') {
-      filtered.sort((a, b) => {
-        if (a.payment_reminder_day && b.payment_reminder_day) {
-          return a.payment_reminder_day - b.payment_reminder_day;
-        }
-        return new Date(b.expense_date) - new Date(a.expense_date);
-      });
+      const sortByReminder = (arr) => {
+        return arr.sort((a, b) => {
+          if (a.payment_reminder_day && b.payment_reminder_day) {
+            return a.payment_reminder_day - b.payment_reminder_day;
+          }
+          return a.daysUntil - b.daysUntil;
+        });
+      };
+      sortByReminder(overdue);
+      sortByReminder(upcoming);
+      sortByReminder(future);
     }
 
-    // Para gastos únicos: ordenar por fecha de creación (más recientes primero)
-    if (activeTab === 'unicos') {
-      filtered.sort((a, b) => new Date(b.expense_date) - new Date(a.expense_date));
-    }
-
-    return filtered;
+    return [...overdue, ...upcoming, ...future, ...paid];
   };
 
   const getCategoryLabel = (category) => {
