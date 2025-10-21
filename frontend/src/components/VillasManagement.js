@@ -724,11 +724,21 @@ const VillasManagementNew = () => {
                   return (
                     <div key={villa.id} className="hover:bg-gray-50 transition-colors">
                       {/* Vista compacta */}
-                      <div
-                        className="p-4 cursor-pointer flex items-center justify-between"
-                        onClick={() => toggleExpand(villa.id)}
-                      >
-                        <div className="flex-1 grid grid-cols-4 gap-4 items-center">
+                      <div className="p-4 flex items-center justify-between">
+                        {user?.role === 'admin' && (
+                          <div className="mr-3" onClick={(e) => e.stopPropagation()}>
+                            <input
+                              type="checkbox"
+                              checked={selectedVillas.includes(villa.id)}
+                              onChange={() => handleSelectVilla(villa.id)}
+                              className="w-4 h-4 cursor-pointer"
+                            />
+                          </div>
+                        )}
+                        <div 
+                          className="flex-1 grid grid-cols-4 gap-4 items-center cursor-pointer"
+                          onClick={() => toggleExpand(villa.id)}
+                        >
                           <div>
                             <span className="font-bold text-blue-600">{villa.code}</span>
                             <p className="text-xs text-gray-500">{villa.name}</p>
