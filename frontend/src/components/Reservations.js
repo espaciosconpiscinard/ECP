@@ -76,7 +76,28 @@ const Reservations = () => {
 
   useEffect(() => {
     fetchData();
+    fetchLogo();
   }, []);
+
+  const fetchLogo = async () => {
+    try {
+      const token = localStorage.getItem('token');
+      const response = await fetch(`${API_URL}/api/config/logo`, {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+      
+      if (response.ok) {
+        const data = await response.json();
+        if (data.logo_data) {
+          setLogo(data.logo_data);
+        }
+      }
+    } catch (err) {
+      console.error('Error loading logo:', err);
+    }
+  };
 
   const fetchData = async () => {
     try {
