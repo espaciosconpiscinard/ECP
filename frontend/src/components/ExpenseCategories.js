@@ -84,6 +84,47 @@ const ExpenseCategories = () => {
     }
   };
 
+  // Funciones de selección múltiple
+  const handleSelectCategory = (categoryId) => {
+    setSelectedCategories(prev => {
+      if (prev.includes(categoryId)) {
+        return prev.filter(id => id !== categoryId);
+      } else {
+        return [...prev, categoryId];
+      }
+    });
+  };
+
+  const handleSelectAll = () => {
+    if (selectAll) {
+      setSelectedCategories([]);
+      setSelectAll(false);
+    } else {
+      setSelectedCategories(categories.map(c => c.id));
+      setSelectAll(true);
+    }
+  };
+
+  const handleDeleteSelected = async () => {
+    if (selectedCategories.length === 0) {
+      alert('No hay categorías seleccionadas');
+      return;
+    }
+    
+    if (window.confirm(`¿Estás seguro de eliminar ${selectedCategories.length} categoría(s)?`)) {
+      try {
+        await Promise.all(selectedCategories.map(id => deleteExpenseCategory(id)));
+        setSelectedCategories([]);
+        setSelectAll(false);
+        await fetchCategories();
+        alert('✅ Categorías eliminadas exitosamente');
+      } catch (err) {
+        setError('Error al eliminar categorías');
+        console.error(err);
+      }
+    }
+  };
+
   const resetForm = () => {
     setEditingCategory(null);
     setFormData({
