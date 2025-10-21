@@ -693,7 +693,21 @@ const VillasManagementNew = () => {
 
       {/* Vista de Villas */}
       {itemType === 'villa' && (
-        <div className="space-y-6">
+        <div className="space-y-4">
+          {selectedVillas.length > 0 && user?.role === 'admin' && (
+            <div className="flex items-center justify-between bg-blue-50 p-3 rounded-md">
+              <span className="text-sm font-medium">{selectedVillas.length} villa(s) seleccionada(s)</span>
+              <div className="flex space-x-2">
+                <Button onClick={handleSelectAllVillas} variant="outline" size="sm">
+                  {selectAllVillas ? 'Deseleccionar Todas' : 'Seleccionar Todas'}
+                </Button>
+                <Button onClick={handleDeleteSelectedVillas} variant="destructive" size="sm">
+                  <Trash2 size={16} className="mr-2" />
+                  Eliminar Seleccionadas
+                </Button>
+              </div>
+            </div>
+          )}
           {sortedCategories.map((category) => (
           <Card key={category.id}>
             <CardHeader className="bg-gradient-to-r from-blue-50 to-blue-100">
