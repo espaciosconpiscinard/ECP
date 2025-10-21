@@ -421,7 +421,47 @@ const Expenses = () => {
       sortByReminder(future);
     }
 
-    return [...overdue, ...upcoming, ...future, ...paid];
+    let result = [...overdue, ...upcoming, ...future, ...paid];
+
+    // Aplicar ordenamiento según selección
+    if (sortBy === 'invoice') {
+      // Ordenar por número de factura (menor a mayor)
+      result.sort((a, b) => {
+        const invoiceA = getInvoiceNumber(a);
+        const invoiceB = getInvoiceNumber(b);
+        return invoiceA - invoiceB;
+      });
+    } else if (sortBy === 'villa') {
+      // Ordenar por código de villa
+      result.sort((a, b) => {
+        const reservationA = getReservationInfo(a);
+        const reservationB = getReservationInfo(b);
+        const villaA = reservationA?.villa_code || '';
+        const villaB = reservationB?.villa_code || '';
+        return villaA.localeCompare(villaB);
+      });
+    } else if (sortBy === 'owner') {
+      // Ordenar por propietario
+      result.sort((a, b) => {
+        const reservationA = getReservationInfo(a);
+        const reservationB = getReservationInfo(b);
+        const villaA = villas.find(v => v.code === reservationA?.villa_code);
+        const villaB = villas.find(v => v.code === reservationB?.villa_code);
+        const ownerA = villaA?.owner || '';
+        const ownerB = villaB?.owner || '';
+        return ownerA.localeCompare(ownerB);
+      });
+    } else if (sortBy === 'remaining') {
+      // Ordenar por monto restante (menor a mayor)
+      result.sort((a, b) => {
+        const remainingA = a.balance_due || (a.amount - (a.total_paid || 0));
+        const remainingB = b.balance_due || (b.amount - (b.total_paid || 0));
+        return remainingA - remainingB;
+      });
+    }
+    // Si sortBy === 'date', mantener el orden de urgencia actual
+
+    return result;
   };
 
   const getCategoryLabel = (category) => {
