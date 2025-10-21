@@ -638,22 +638,67 @@ const Expenses = () => {
         </Dialog>
       </div>
 
-      {/* Summary Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <Card data-testid="total-dop-card">
-          <CardHeader>
-            <CardTitle>Total Gastos (DOP)</CardTitle>
+      {/* Summary Cards - Totales Desglosados */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        <Card className="border-red-200 bg-red-50" data-testid="total-compromisos-card">
+          <CardHeader className="pb-2">
+            <CardTitle className="text-sm font-medium text-red-800">⚠️ Total Compromisos (Mes)</CardTitle>
           </CardHeader>
           <CardContent>
-            <p className="text-3xl font-bold text-red-600">{formatCurrency(totalDOP, 'DOP')}</p>
+            <p className="text-2xl font-bold text-red-600">{formatCurrency(compromisosDOP, 'DOP')}</p>
+            {compromisosUSD > 0 && <p className="text-sm text-red-500">{formatCurrency(compromisosUSD, 'USD')}</p>}
+            <p className="text-xs text-gray-600 mt-1">
+              {compromisosPagados} pagados • {compromisosPendientes} pendientes
+              {compromisosVencidos > 0 && <span className="text-red-600 font-semibold"> • {compromisosVencidos} vencidos</span>}
+            </p>
           </CardContent>
         </Card>
-        <Card data-testid="total-usd-card">
-          <CardHeader>
-            <CardTitle>Total Gastos (USD)</CardTitle>
+        
+        <Card data-testid="total-fijos-card">
+          <CardHeader className="pb-2">
+            <CardTitle className="text-sm font-medium text-gray-600">🔁 Total Gastos Fijos (Mes)</CardTitle>
           </CardHeader>
           <CardContent>
-            <p className="text-3xl font-bold text-red-600">{formatCurrency(totalUSD, 'USD')}</p>
+            <p className="text-2xl font-bold text-blue-600">{formatCurrency(fijosDOP, 'DOP')}</p>
+            {fijosUSD > 0 && <p className="text-sm text-blue-500">{formatCurrency(fijosUSD, 'USD')}</p>}
+          </CardContent>
+        </Card>
+        
+        <Card data-testid="total-variables-card">
+          <CardHeader className="pb-2">
+            <CardTitle className="text-sm font-medium text-gray-600">📅 Total Gastos Variables (Mes)</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <p className="text-2xl font-bold text-orange-600">{formatCurrency(variablesDOP, 'DOP')}</p>
+            {variablesUSD > 0 && <p className="text-sm text-orange-500">{formatCurrency(variablesUSD, 'USD')}</p>}
+          </CardContent>
+        </Card>
+        
+        <Card data-testid="total-unicos-card">
+          <CardHeader className="pb-2">
+            <CardTitle className="text-sm font-medium text-gray-600">💰 Total Gastos Únicos (Mes)</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <p className="text-2xl font-bold text-green-600">{formatCurrency(unicosDOP, 'DOP')}</p>
+            {unicosUSD > 0 && <p className="text-sm text-green-500">{formatCurrency(unicosUSD, 'USD')}</p>}
+          </CardContent>
+        </Card>
+        
+        <Card className="md:col-span-2" data-testid="total-general-card">
+          <CardHeader className="pb-2">
+            <CardTitle className="text-sm font-medium text-gray-600">💵 Total General (Todos los gastos)</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="flex justify-between items-center">
+              <div>
+                <p className="text-2xl font-bold text-gray-800">{formatCurrency(totalDOP, 'DOP')}</p>
+                {totalUSD > 0 && <p className="text-lg text-gray-600">{formatCurrency(totalUSD, 'USD')}</p>}
+              </div>
+              <div className="text-right text-sm text-gray-500">
+                <p>Total acumulado</p>
+                <p>de todos los tiempos</p>
+              </div>
+            </div>
           </CardContent>
         </Card>
       </div>
