@@ -453,10 +453,8 @@ const Expenses = () => {
     } else if (sortBy === 'villa') {
       // Ordenar por código de villa, y por fecha dentro de la misma villa
       result.sort((a, b) => {
-        const reservationA = getReservationInfo(a);
-        const reservationB = getReservationInfo(b);
-        const villaA = reservationA?.villa_code || 'ZZZ'; // Sin villa va al final
-        const villaB = reservationB?.villa_code || 'ZZZ';
+        const villaA = getVillaCodeFromDescription(a) || 'ZZZ'; // Sin villa va al final
+        const villaB = getVillaCodeFromDescription(b) || 'ZZZ';
         
         if (villaA !== villaB) {
           return villaA.localeCompare(villaB);
