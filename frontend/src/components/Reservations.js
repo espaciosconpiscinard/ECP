@@ -1487,7 +1487,29 @@ const Reservations = () => {
 
       <Card>
         <CardHeader>
-          <CardTitle>Lista de Reservaciones ({filteredReservations.length})</CardTitle>
+          <div className="flex justify-between items-center">
+            <CardTitle>Lista de Reservaciones ({filteredReservations.length})</CardTitle>
+            {selectedReservations.length > 0 && user?.role === 'admin' && (
+              <div className="flex items-center space-x-2">
+                <Button
+                  onClick={handleDeleteSelectedReservations}
+                  variant="destructive"
+                  size="sm"
+                  className="flex items-center"
+                >
+                  <Trash2 size={16} className="mr-2" />
+                  Eliminar Seleccionadas ({selectedReservations.length})
+                </Button>
+                <Button
+                  onClick={handleSelectAllReservations}
+                  variant="outline"
+                  size="sm"
+                >
+                  {selectAllReservations ? 'Deseleccionar Todas' : 'Seleccionar Todas'}
+                </Button>
+              </div>
+            )}
+          </div>
         </CardHeader>
         <CardContent className="p-0">
           <div className="divide-y">
@@ -1497,11 +1519,21 @@ const Reservations = () => {
                 return (
                   <div key={res.id} className="hover:bg-gray-50 transition-colors">
                     {/* Vista compacta */}
-                    <div
-                      className="p-4 cursor-pointer flex items-center justify-between"
-                      onClick={() => toggleExpand(res.id)}
-                    >
-                      <div className="flex-1 grid grid-cols-5 gap-4 items-center">
+                    <div className="p-4 flex items-center justify-between">
+                      {user?.role === 'admin' && (
+                        <div className="mr-3" onClick={(e) => e.stopPropagation()}>
+                          <input
+                            type="checkbox"
+                            checked={selectedReservations.includes(res.id)}
+                            onChange={() => handleSelectReservation(res.id)}
+                            className="w-4 h-4 cursor-pointer"
+                          />
+                        </div>
+                      )}
+                      <div 
+                        className="flex-1 grid grid-cols-5 gap-4 items-center cursor-pointer"
+                        onClick={() => toggleExpand(res.id)}
+                      >
                         <div>
                           <p className="text-sm font-medium text-gray-900">{res.customer_name}</p>
                           <p className="text-xs text-gray-500">#{res.invoice_number}</p>
