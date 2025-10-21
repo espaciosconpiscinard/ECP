@@ -52,8 +52,8 @@ logger = logging.getLogger(__name__)
 
 # ============ HELPER FUNCTIONS ============
 
-async def get_next_invoice_number() -> str:
-    """Get next invoice number starting from 1600"""
+async def get_next_invoice_number() -> int:
+    """Get next available invoice number starting from 1600 - skips manually created numbers"""
     counter = await db.invoice_counter.find_one({"counter_id": "main_counter"})
     
     if not counter:
@@ -64,13 +64,27 @@ async def get_next_invoice_number() -> str:
     else:
         invoice_num = counter["current_number"]
     
-    # Increment counter
+    # Verificar si el número ya existe (por factura manual de admin)
+    # Si existe, buscar el siguiente número disponible
+    max_attempts = 100  # Evitar bucle infinito
+    attempts = 0
+    
+    while attempts < max_attempts:
+        existing = await db.reservations.find_one({"invoice_number": invoice_num}, {"_id": 0})
+        if not existing:
+            # Número disponible encontrado
+            break
+        # Número ya existe, probar el siguiente
+        invoice_num += 1
+        attempts += 1
+    
+    # Actualizar contador al siguiente número después del encontrado
     await db.invoice_counter.update_one(
         {"counter_id": "main_counter"},
         {"$set": {"current_number": invoice_num + 1}}
     )
     
-    return str(invoice_num)
+    return invoice_num
 
 def calculate_balance(total: float, paid: float, deposit: float = 0) -> float:
     """Calculate balance due - includes deposit in calculation"""
