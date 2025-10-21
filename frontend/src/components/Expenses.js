@@ -368,8 +368,8 @@ const Expenses = () => {
     // Aplicar filtros adicionales
     if (filterVilla) {
       filtered = filtered.filter(expense => {
-        const reservation = getReservationInfo(expense);
-        return reservation?.villa_code === filterVilla;
+        const villaCode = getVillaCodeFromDescription(expense);
+        return villaCode === filterVilla;
       });
     }
 
