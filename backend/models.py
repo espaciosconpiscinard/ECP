@@ -196,7 +196,7 @@ class ReservationBase(BaseModel):
     status: Literal["pending", "confirmed", "completed", "cancelled"] = "confirmed"
 
 class ReservationCreate(ReservationBase):
-    pass
+    invoice_number: Optional[int] = None  # Opcional: solo admin puede proporcionar número manual
 
 class ReservationUpdate(BaseModel):
     villa_id: Optional[str] = None
