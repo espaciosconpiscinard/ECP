@@ -1169,11 +1169,8 @@ const Expenses = () => {
                           </td>
                         )}
                         {(sortBy === 'villa' || filterVilla) && (
-                          <td className="p-2 text-sm">
-                            {(() => {
-                              const reservation = getReservationInfo(expense);
-                              return reservation?.villa_code || '-';
-                            })()}
+                          <td className="p-2 text-sm font-semibold text-blue-600">
+                            {getVillaCodeFromDescription(expense) || '-'}
                           </td>
                         )}
                         {(sortBy === 'owner' || filterOwner) && (
