@@ -133,6 +133,18 @@ backend:
         agent: "testing"
         comment: "✅ TESTED: Campo DNI completamente funcional. Cliente creado CON DNI (001-1234567-8) exitosamente. Cliente creado SIN DNI exitosamente (campo opcional). Campo DNI presente en respuestas GET /api/customers. Estructura de API correcta con campo DNI disponible."
   
+  - task: "Sistema de expense_type - Testing exhaustivo"
+    implemented: true
+    working: true
+    file: "/app/backend/server.py, /app/backend/models.py"
+    stuck_count: 0
+    priority: "critical"
+    needs_retesting: false
+    status_history:
+      - working: true
+        agent: "testing"
+        comment: "✅ TESTED: Sistema de expense_type completamente funcional. Verificados gastos existentes (2 variable, 3 fijo, 0 unico). Creación exitosa de gastos por tipo con campos específicos: Variable (reservation_check_in), Fijo (has_payment_reminder, payment_reminder_day, is_recurring), Único (payment_status: paid). Actualización de tipos funcional (variable → fijo). Eliminación por tipo verificada. Backend usa valores singulares correctos: 'variable', 'fijo', 'unico'. 11/11 tests pasaron."
+  
   - task: "Permitir eliminación de gastos auto-generados"
     implemented: true
     working: true
