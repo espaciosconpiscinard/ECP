@@ -1222,6 +1222,27 @@ const Reservations = () => {
                   </select>
                 </div>
 
+                {/* Número de Factura Manual - SOLO ADMIN */}
+                {user?.role === 'admin' && (
+                  <div className="col-span-2 bg-yellow-50 p-4 rounded-md border-2 border-yellow-300">
+                    <Label className="font-bold text-yellow-800">Número de Factura (Opcional - Solo Admin)</Label>
+                    <Input
+                      type="number"
+                      min="1"
+                      value={formData.invoice_number || ''}
+                      onChange={(e) => setFormData({ 
+                        ...formData, 
+                        invoice_number: e.target.value ? parseInt(e.target.value) : null 
+                      })}
+                      placeholder="Dejar vacío para asignación automática"
+                      className="mt-2"
+                    />
+                    <p className="text-xs text-gray-600 mt-1">
+                      ⚠️ Si ingresas un número manual (ej: 1300), el sistema automáticamente ajustará la numeración de los empleados para evitar duplicados.
+                    </p>
+                  </div>
+                )}
+
                 {/* Precio Base de la Villa - EDITABLE */}
                 <div className="col-span-2 bg-blue-50 p-4 rounded-md border-2 border-blue-200">
                   <Label className="font-bold text-blue-800">Precio Base de la Villa *</Label>
