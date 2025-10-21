@@ -1208,6 +1208,38 @@ async def get_dashboard_stats(current_user: dict = Depends(get_current_user)):
     ).sort("created_at", -1).limit(10).to_list(10)
     pending_payment_reservations = [restore_datetimes(r, ["reservation_date", "created_at", "updated_at"]) for r in pending_payment_reservations_raw]
     
+    # Calcular compromisos del mes actual
+    from datetime import datetime, timezone
+    now = datetime.now(timezone.utc)
+    current_month = now.month
+    current_year = now.year
+    
+    # Obtener todos los gastos con categoría "compromiso" del mes actual
+    commitments = []
+    for expense in all_expenses:
+        if expense.get("category") == "compromiso":
+            expense_date = expense.get("expense_date")
+            if isinstance(expense_date, str):
+                expense_date = datetime.fromisoformat(expense_date.replace('Z', '+00:00'))
+            if expense_date and expense_date.month == current_month and expense_date.year == current_year:
+                commitments.append(expense)
+    
+    commitments_count = len(commitments)
+    commitments_total_dop = sum(c.get("amount", 0) for c in commitments if c.get("currency") == "DOP")
+    commitments_total_usd = sum(c.get("amount", 0) for c in commitments if c.get("currency") == "USD")
+    commitments_paid_count = len([c for c in commitments if c.get("payment_status") == "paid"])
+    commitments_pending_count = len([c for c in commitments if c.get("payment_status") == "pending"])
+    
+    # Contar compromisos vencidos (pendientes con fecha pasada)
+    commitments_overdue_count = 0
+    for commitment in commitments:
+        if commitment.get("payment_status") == "pending":
+            expense_date = commitment.get("expense_date")
+            if isinstance(expense_date, str):
+                expense_date = datetime.fromisoformat(expense_date.replace('Z', '+00:00'))
+            if expense_date and expense_date.date() < now.date():
+                commitments_overdue_count += 1
+    
     return DashboardStats(
         total_reservations=total_reservations,
         pending_reservations=pending_reservations,
@@ -1221,7 +1253,13 @@ async def get_dashboard_stats(current_user: dict = Depends(get_current_user)):
         owners_balance_due_dop=owners_balance_due_dop,
         owners_balance_due_usd=owners_balance_due_usd,
         recent_reservations=recent_reservations,
-        pending_payment_reservations=pending_payment_reservations
+        pending_payment_reservations=pending_payment_reservations,
+        commitments_count=commitments_count,
+        commitments_total_dop=commitments_total_dop,
+        commitments_total_usd=commitments_total_usd,
+        commitments_paid_count=commitments_paid_count,
+        commitments_pending_count=commitments_pending_count,
+        commitments_overdue_count=commitments_overdue_count
     )
 
 # ============ HEALTH CHECK ============
