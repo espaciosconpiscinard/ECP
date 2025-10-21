@@ -321,6 +321,7 @@ const Expenses = () => {
 
   const getCategoryLabel = (category) => {
     const labels = {
+      'compromiso': 'Compromiso',
       'local': 'Pago de Local',
       'nomina': 'Nómina',
       'variable': 'Gasto Variable',
@@ -332,6 +333,7 @@ const Expenses = () => {
 
   const getCategoryColor = (category) => {
     const colors = {
+      'compromiso': 'bg-red-100 text-red-800 font-semibold',
       'local': 'bg-blue-100 text-blue-800',
       'nomina': 'bg-green-100 text-green-800',
       'variable': 'bg-yellow-100 text-yellow-800',
@@ -339,6 +341,14 @@ const Expenses = () => {
       'otros': 'bg-gray-100 text-gray-800'
     };
     return colors[category] || colors.otros;
+  };
+  
+  // Función para obtener color de urgencia
+  const getUrgencyColor = (expense) => {
+    if (expense.urgency === 'overdue') return 'bg-red-50 border-l-4 border-red-500';
+    if (expense.urgency === 'upcoming') return 'bg-orange-50 border-l-4 border-orange-500';
+    if (expense.payment_status === 'paid') return 'bg-green-50';
+    return 'bg-white';
   };
 
   const getExpenseCategoryName = (categoryId) => {
