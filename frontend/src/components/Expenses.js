@@ -425,38 +425,68 @@ const Expenses = () => {
 
     // Aplicar ordenamiento según selección
     if (sortBy === 'invoice') {
-      // Ordenar por número de factura (menor a mayor)
+      // Ordenar por número de factura (menor a mayor), y por fecha dentro del mismo número
       result.sort((a, b) => {
         const invoiceA = getInvoiceNumber(a);
         const invoiceB = getInvoiceNumber(b);
-        return invoiceA - invoiceB;
+        if (invoiceA !== invoiceB) {
+          return invoiceA - invoiceB;
+        }
+        // Mismo número de factura, ordenar por fecha
+        const dateA = new Date(a.expense_date);
+        const dateB = new Date(b.expense_date);
+        return dateA - dateB;
       });
     } else if (sortBy === 'villa') {
-      // Ordenar por código de villa
+      // Ordenar por código de villa, y por fecha dentro de la misma villa
       result.sort((a, b) => {
         const reservationA = getReservationInfo(a);
         const reservationB = getReservationInfo(b);
-        const villaA = reservationA?.villa_code || '';
-        const villaB = reservationB?.villa_code || '';
-        return villaA.localeCompare(villaB);
+        const villaA = reservationA?.villa_code || 'ZZZ'; // Sin villa va al final
+        const villaB = reservationB?.villa_code || 'ZZZ';
+        
+        if (villaA !== villaB) {
+          return villaA.localeCompare(villaB);
+        }
+        
+        // Misma villa, ordenar por fecha
+        const dateA = new Date(a.expense_date);
+        const dateB = new Date(b.expense_date);
+        return dateA - dateB;
       });
     } else if (sortBy === 'owner') {
-      // Ordenar por propietario
+      // Ordenar por propietario, y por fecha dentro del mismo propietario
       result.sort((a, b) => {
         const reservationA = getReservationInfo(a);
         const reservationB = getReservationInfo(b);
         const villaA = villas.find(v => v.code === reservationA?.villa_code);
         const villaB = villas.find(v => v.code === reservationB?.villa_code);
-        const ownerA = villaA?.owner || '';
-        const ownerB = villaB?.owner || '';
-        return ownerA.localeCompare(ownerB);
+        const ownerA = villaA?.owner || 'ZZZ'; // Sin propietario va al final
+        const ownerB = villaB?.owner || 'ZZZ';
+        
+        if (ownerA !== ownerB) {
+          return ownerA.localeCompare(ownerB);
+        }
+        
+        // Mismo propietario, ordenar por fecha
+        const dateA = new Date(a.expense_date);
+        const dateB = new Date(b.expense_date);
+        return dateA - dateB;
       });
     } else if (sortBy === 'remaining') {
-      // Ordenar por monto restante (menor a mayor)
+      // Ordenar por monto restante (menor a mayor), y por fecha si es el mismo monto
       result.sort((a, b) => {
         const remainingA = a.balance_due || (a.amount - (a.total_paid || 0));
         const remainingB = b.balance_due || (b.amount - (b.total_paid || 0));
-        return remainingA - remainingB;
+        
+        if (remainingA !== remainingB) {
+          return remainingA - remainingB;
+        }
+        
+        // Mismo monto restante, ordenar por fecha
+        const dateA = new Date(a.expense_date);
+        const dateB = new Date(b.expense_date);
+        return dateA - dateB;
       });
     }
     // Si sortBy === 'date', mantener el orden de urgencia actual
