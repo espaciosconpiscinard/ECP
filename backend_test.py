@@ -818,6 +818,334 @@ class BackendTester:
         else:
             self.log_test("Create Manual Expense", False, "Failed to create manual expense for comparison", manual_expense_result)
     
+    def test_existing_expenses_with_types(self):
+        """Test verification of existing expenses with expense_type field"""
+        print("\n📋 Testing Existing Expenses with Types")
+        
+        # Get all expenses
+        result = self.make_request("GET", "/expenses", token=self.admin_token)
+        
+        if not result.get("success"):
+            self.log_test("Get All Expenses", False, "Failed to get expenses", result)
+            return
+        
+        expenses = result["data"]
+        self.log_test("Get All Expenses", True, f"Retrieved {len(expenses)} expenses")
+        
+        # Verify expense_type field presence and values
+        expenses_with_type = []
+        valid_types = ['variable', 'fijo', 'unico']
+        
+        for expense in expenses:
+            expense_type = expense.get("expense_type")
+            if expense_type:
+                if expense_type in valid_types:
+                    expenses_with_type.append({
+                        "id": expense.get("id"),
+                        "description": expense.get("description"),
+                        "type": expense_type,
+                        "amount": expense.get("amount")
+                    })
+                else:
+                    self.log_test("Invalid Expense Type", False, f"Invalid expense_type '{expense_type}' found in expense: {expense.get('description')}")
+        
+        if expenses_with_type:
+            # Count by type
+            variable_count = len([e for e in expenses_with_type if e["type"] == "variable"])
+            fijo_count = len([e for e in expenses_with_type if e["type"] == "fijo"])
+            unico_count = len([e for e in expenses_with_type if e["type"] == "unico"])
+            
+            self.log_test("Existing Expenses by Type", True, 
+                         f"Found expenses: {variable_count} variable, {fijo_count} fijo, {unico_count} unico")
+            
+            # Log details of existing expenses
+            print("   📊 Existing expenses breakdown:")
+            for expense in expenses_with_type:
+                print(f"      - {expense['type'].upper()}: {expense['description']} (${expense['amount']})")
+        else:
+            self.log_test("Existing Expenses by Type", True, "No expenses with expense_type found (expected for new system)")
+    
+    def test_create_variable_expense(self):
+        """Test creation of variable expense with specific fields"""
+        print("\n🔄 Testing Variable Expense Creation")
+        
+        variable_expense_data = {
+            "category": "otros",
+            "description": "Compra de materiales de construcción",
+            "amount": 5000.0,
+            "currency": "DOP",
+            "expense_date": "2025-01-25T00:00:00Z",
+            "payment_status": "pending",
+            "expense_type": "variable",
+            "reservation_check_in": "2025-01-25T00:00:00Z",
+            "notes": "Gasto variable para mejoras de villa"
+        }
+        
+        result = self.make_request("POST", "/expenses", variable_expense_data, self.admin_token)
+        
+        if result.get("success"):
+            created_expense = result["data"]
+            
+            # Verify all fields
+            checks = []
+            
+            if created_expense.get("expense_type") == "variable":
+                checks.append("✓ expense_type: variable")
+            else:
+                checks.append(f"✗ expense_type: {created_expense.get('expense_type')} (expected: variable)")
+            
+            if created_expense.get("amount") == 5000.0:
+                checks.append("✓ amount: 5000.0")
+            else:
+                checks.append(f"✗ amount: {created_expense.get('amount')} (expected: 5000.0)")
+            
+            if created_expense.get("currency") == "DOP":
+                checks.append("✓ currency: DOP")
+            else:
+                checks.append(f"✗ currency: {created_expense.get('currency')} (expected: DOP)")
+            
+            if created_expense.get("payment_status") == "pending":
+                checks.append("✓ payment_status: pending")
+            else:
+                checks.append(f"✗ payment_status: {created_expense.get('payment_status')} (expected: pending)")
+            
+            # Check if reservation_check_in is present (variable-specific field)
+            if "reservation_check_in" in created_expense:
+                checks.append("✓ reservation_check_in: present")
+            else:
+                checks.append("✗ reservation_check_in: missing")
+            
+            all_checks_passed = all("✓" in check for check in checks)
+            
+            if all_checks_passed:
+                self.log_test("Create Variable Expense", True, f"Variable expense created successfully:\n   " + "\n   ".join(checks))
+                return created_expense
+            else:
+                self.log_test("Create Variable Expense", False, f"Variable expense creation issues:\n   " + "\n   ".join(checks))
+        else:
+            self.log_test("Create Variable Expense", False, "Failed to create variable expense", result)
+        
+        return None
+    
+    def test_create_fijo_expense(self):
+        """Test creation of fijo (fixed) expense with recurring fields"""
+        print("\n🔁 Testing Fijo Expense Creation")
+        
+        fijo_expense_data = {
+            "category": "otros",
+            "description": "Servicio de agua mensual",
+            "amount": 800.0,
+            "currency": "DOP",
+            "expense_date": "2025-01-21T00:00:00Z",
+            "payment_status": "pending",
+            "expense_type": "fijo",
+            "has_payment_reminder": True,
+            "payment_reminder_day": 5,
+            "is_recurring": True,
+            "notes": "Gasto fijo mensual de agua"
+        }
+        
+        result = self.make_request("POST", "/expenses", fijo_expense_data, self.admin_token)
+        
+        if result.get("success"):
+            created_expense = result["data"]
+            
+            # Verify all fields
+            checks = []
+            
+            if created_expense.get("expense_type") == "fijo":
+                checks.append("✓ expense_type: fijo")
+            else:
+                checks.append(f"✗ expense_type: {created_expense.get('expense_type')} (expected: fijo)")
+            
+            if created_expense.get("amount") == 800.0:
+                checks.append("✓ amount: 800.0")
+            else:
+                checks.append(f"✗ amount: {created_expense.get('amount')} (expected: 800.0)")
+            
+            if created_expense.get("has_payment_reminder") is True:
+                checks.append("✓ has_payment_reminder: true")
+            else:
+                checks.append(f"✗ has_payment_reminder: {created_expense.get('has_payment_reminder')} (expected: true)")
+            
+            if created_expense.get("payment_reminder_day") == 5:
+                checks.append("✓ payment_reminder_day: 5")
+            else:
+                checks.append(f"✗ payment_reminder_day: {created_expense.get('payment_reminder_day')} (expected: 5)")
+            
+            if created_expense.get("is_recurring") is True:
+                checks.append("✓ is_recurring: true")
+            else:
+                checks.append(f"✗ is_recurring: {created_expense.get('is_recurring')} (expected: true)")
+            
+            all_checks_passed = all("✓" in check for check in checks)
+            
+            if all_checks_passed:
+                self.log_test("Create Fijo Expense", True, f"Fijo expense created successfully:\n   " + "\n   ".join(checks))
+                return created_expense
+            else:
+                self.log_test("Create Fijo Expense", False, f"Fijo expense creation issues:\n   " + "\n   ".join(checks))
+        else:
+            self.log_test("Create Fijo Expense", False, "Failed to create fijo expense", result)
+        
+        return None
+    
+    def test_create_unico_expense(self):
+        """Test creation of unico (one-time) expense with paid status"""
+        print("\n💰 Testing Unico Expense Creation")
+        
+        unico_expense_data = {
+            "category": "otros",
+            "description": "Compra de escritorio para oficina",
+            "amount": 15000.0,
+            "currency": "DOP",
+            "expense_date": "2025-01-20T00:00:00Z",
+            "payment_status": "paid",
+            "expense_type": "unico",
+            "notes": "Gasto único ya pagado"
+        }
+        
+        result = self.make_request("POST", "/expenses", unico_expense_data, self.admin_token)
+        
+        if result.get("success"):
+            created_expense = result["data"]
+            
+            # Verify all fields
+            checks = []
+            
+            if created_expense.get("expense_type") == "unico":
+                checks.append("✓ expense_type: unico")
+            else:
+                checks.append(f"✗ expense_type: {created_expense.get('expense_type')} (expected: unico)")
+            
+            if created_expense.get("amount") == 15000.0:
+                checks.append("✓ amount: 15000.0")
+            else:
+                checks.append(f"✗ amount: {created_expense.get('amount')} (expected: 15000.0)")
+            
+            if created_expense.get("payment_status") == "paid":
+                checks.append("✓ payment_status: paid")
+            else:
+                checks.append(f"✗ payment_status: {created_expense.get('payment_status')} (expected: paid)")
+            
+            if created_expense.get("currency") == "DOP":
+                checks.append("✓ currency: DOP")
+            else:
+                checks.append(f"✗ currency: {created_expense.get('currency')} (expected: DOP)")
+            
+            all_checks_passed = all("✓" in check for check in checks)
+            
+            if all_checks_passed:
+                self.log_test("Create Unico Expense", True, f"Unico expense created successfully:\n   " + "\n   ".join(checks))
+                return created_expense
+            else:
+                self.log_test("Create Unico Expense", False, f"Unico expense creation issues:\n   " + "\n   ".join(checks))
+        else:
+            self.log_test("Create Unico Expense", False, "Failed to create unico expense", result)
+        
+        return None
+    
+    def test_update_expense_type(self):
+        """Test updating expense type"""
+        print("\n🔄 Testing Expense Type Update")
+        
+        # First create a test expense
+        test_expense_data = {
+            "category": "otros",
+            "description": "Test expense for type update",
+            "amount": 1000.0,
+            "currency": "DOP",
+            "expense_date": "2025-01-22T00:00:00Z",
+            "payment_status": "pending",
+            "expense_type": "variable"
+        }
+        
+        create_result = self.make_request("POST", "/expenses", test_expense_data, self.admin_token)
+        
+        if not create_result.get("success"):
+            self.log_test("Create Test Expense for Update", False, "Failed to create test expense", create_result)
+            return
+        
+        created_expense = create_result["data"]
+        expense_id = created_expense["id"]
+        
+        self.log_test("Create Test Expense for Update", True, f"Created test expense with ID: {expense_id}")
+        
+        # Update the expense type from 'variable' to 'fijo'
+        update_data = {
+            "expense_type": "fijo",
+            "has_payment_reminder": True,
+            "payment_reminder_day": 10,
+            "is_recurring": True
+        }
+        
+        update_result = self.make_request("PUT", f"/expenses/{expense_id}", update_data, self.admin_token)
+        
+        if update_result.get("success"):
+            updated_expense = update_result["data"]
+            
+            if updated_expense.get("expense_type") == "fijo":
+                self.log_test("Update Expense Type", True, f"Expense type successfully updated from 'variable' to 'fijo'")
+                
+                # Verify the new fields were added
+                if updated_expense.get("has_payment_reminder") is True:
+                    self.log_test("Update Expense Fields", True, "Fijo-specific fields added successfully")
+                else:
+                    self.log_test("Update Expense Fields", False, "Fijo-specific fields not properly updated")
+            else:
+                self.log_test("Update Expense Type", False, f"Expense type not updated correctly: {updated_expense.get('expense_type')}")
+        else:
+            self.log_test("Update Expense Type", False, "Failed to update expense type", update_result)
+    
+    def test_delete_expenses_by_type(self):
+        """Test deletion of expenses by type"""
+        print("\n🗑️ Testing Expense Deletion by Type")
+        
+        # Get all expenses first
+        expenses_result = self.make_request("GET", "/expenses", token=self.admin_token)
+        
+        if not expenses_result.get("success"):
+            self.log_test("Get Expenses for Deletion", False, "Failed to get expenses", expenses_result)
+            return
+        
+        expenses = expenses_result["data"]
+        
+        # Find expenses by type that we created in previous tests
+        variable_expenses = [e for e in expenses if e.get("expense_type") == "variable" and "materiales" in e.get("description", "")]
+        fijo_expenses = [e for e in expenses if e.get("expense_type") == "fijo" and "agua" in e.get("description", "")]
+        unico_expenses = [e for e in expenses if e.get("expense_type") == "unico" and "escritorio" in e.get("description", "")]
+        
+        deletion_tests = [
+            ("Variable", variable_expenses),
+            ("Fijo", fijo_expenses),
+            ("Unico", unico_expenses)
+        ]
+        
+        for expense_type, expense_list in deletion_tests:
+            if expense_list:
+                expense_to_delete = expense_list[0]  # Take the first one
+                expense_id = expense_to_delete["id"]
+                
+                delete_result = self.make_request("DELETE", f"/expenses/{expense_id}", token=self.admin_token)
+                
+                if delete_result.get("success"):
+                    self.log_test(f"Delete {expense_type} Expense", True, f"{expense_type} expense deleted successfully")
+                    
+                    # Verify deletion
+                    verify_result = self.make_request("GET", "/expenses", token=self.admin_token)
+                    if verify_result.get("success"):
+                        remaining_expenses = verify_result["data"]
+                        still_exists = any(e.get("id") == expense_id for e in remaining_expenses)
+                        
+                        if not still_exists:
+                            self.log_test(f"Verify {expense_type} Expense Deletion", True, f"{expense_type} expense successfully removed from list")
+                        else:
+                            self.log_test(f"Verify {expense_type} Expense Deletion", False, f"{expense_type} expense still appears in list")
+                else:
+                    self.log_test(f"Delete {expense_type} Expense", False, f"Failed to delete {expense_type} expense", delete_result)
+            else:
+                self.log_test(f"Find {expense_type} Expense for Deletion", False, f"No {expense_type} expense found for deletion test")
+    
     def run_all_tests(self):
         """Run all backend tests"""
         print("🚀 Starting Backend Testing Suite for Category System")
