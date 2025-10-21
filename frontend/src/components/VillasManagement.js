@@ -871,11 +871,36 @@ const VillasManagementNew = () => {
 
       {/* Vista de Servicios */}
       {itemType === 'service' && (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        <div className="space-y-4">
+          {selectedServices.length > 0 && user?.role === 'admin' && (
+            <div className="flex items-center justify-between bg-green-50 p-3 rounded-md">
+              <span className="text-sm font-medium">{selectedServices.length} servicio(s) seleccionado(s)</span>
+              <div className="flex space-x-2">
+                <Button onClick={handleSelectAllServices} variant="outline" size="sm">
+                  {selectAllServices ? 'Deseleccionar Todos' : 'Seleccionar Todos'}
+                </Button>
+                <Button onClick={handleDeleteSelectedServices} variant="destructive" size="sm">
+                  <Trash2 size={16} className="mr-2" />
+                  Eliminar Seleccionados
+                </Button>
+              </div>
+            </div>
+          )}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {filteredServices.map((service) => (
             <Card key={service.id} className={!service.is_active ? 'opacity-50' : ''}>
               <CardHeader className="pb-3">
                 <div className="flex items-center justify-between">
+                  {user?.role === 'admin' && (
+                    <input
+                      type="checkbox"
+                      checked={selectedServices.includes(service.id)}
+                      onChange={() => handleSelectService(service.id)}
+                      className="w-4 h-4 cursor-pointer mr-2"
+                      onClick={(e) => e.stopPropagation()}
+                    />
+                  )}
+                  <div className="flex-1 flex items-center justify-between">
                   <div className="flex items-center space-x-2">
                     <Package className="h-5 w-5 text-blue-600" />
                     <CardTitle className="text-lg">{service.name}</CardTitle>
