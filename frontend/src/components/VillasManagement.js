@@ -26,6 +26,12 @@ const VillasManagementNew = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [expandedVillas, setExpandedVillas] = useState({});
   
+  // Estados para selección múltiple
+  const [selectedVillas, setSelectedVillas] = useState([]);
+  const [selectAllVillas, setSelectAllVillas] = useState(false);
+  const [selectedServices, setSelectedServices] = useState([]);
+  const [selectAllServices, setSelectAllServices] = useState(false);
+  
   const [formData, setFormData] = useState({
     code: '',
     name: '',
