@@ -209,6 +209,88 @@ const VillasManagementNew = () => {
     }
   };
 
+  // ============ FUNCIONES DE SELECCIÓN MÚLTIPLE - VILLAS ============
+  const handleSelectVilla = (villaId) => {
+    setSelectedVillas(prev => {
+      if (prev.includes(villaId)) {
+        return prev.filter(id => id !== villaId);
+      } else {
+        return [...prev, villaId];
+      }
+    });
+  };
+
+  const handleSelectAllVillas = () => {
+    if (selectAllVillas) {
+      setSelectedVillas([]);
+      setSelectAllVillas(false);
+    } else {
+      setSelectedVillas(filteredVillas.map(v => v.id));
+      setSelectAllVillas(true);
+    }
+  };
+
+  const handleDeleteSelectedVillas = async () => {
+    if (selectedVillas.length === 0) {
+      alert('No hay villas seleccionadas');
+      return;
+    }
+    
+    if (window.confirm(`¿Estás seguro de eliminar ${selectedVillas.length} villa(s)?`)) {
+      try {
+        await Promise.all(selectedVillas.map(id => deleteVilla(id)));
+        setSelectedVillas([]);
+        setSelectAllVillas(false);
+        await fetchData();
+        alert('✅ Villas eliminadas exitosamente');
+      } catch (err) {
+        setError('Error al eliminar villas');
+        console.error(err);
+      }
+    }
+  };
+
+  // ============ FUNCIONES DE SELECCIÓN MÚLTIPLE - SERVICIOS ============
+  const handleSelectService = (serviceId) => {
+    setSelectedServices(prev => {
+      if (prev.includes(serviceId)) {
+        return prev.filter(id => id !== serviceId);
+      } else {
+        return [...prev, serviceId];
+      }
+    });
+  };
+
+  const handleSelectAllServices = () => {
+    if (selectAllServices) {
+      setSelectedServices([]);
+      setSelectAllServices(false);
+    } else {
+      setSelectedServices(filteredServices.map(s => s.id));
+      setSelectAllServices(true);
+    }
+  };
+
+  const handleDeleteSelectedServices = async () => {
+    if (selectedServices.length === 0) {
+      alert('No hay servicios seleccionados');
+      return;
+    }
+    
+    if (window.confirm(`¿Estás seguro de eliminar ${selectedServices.length} servicio(s)?`)) {
+      try {
+        await Promise.all(selectedServices.map(id => deleteExtraService(id)));
+        setSelectedServices([]);
+        setSelectAllServices(false);
+        await fetchData();
+        alert('✅ Servicios eliminados exitosamente');
+      } catch (err) {
+        setError('Error al eliminar servicios');
+        console.error(err);
+      }
+    }
+  };
+
   const resetServiceForm = () => {
     setEditingService(null);
     setServiceFormData({
