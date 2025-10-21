@@ -241,16 +241,29 @@ const Customers = () => {
 
       <Card>
         <CardHeader>
-          <div className="flex justify-between items-center">
+          <div className="flex justify-between items-center flex-wrap gap-4">
             <CardTitle>Lista de Clientes ({filteredCustomers.length})</CardTitle>
-            <div className="w-64">
-              <input
-                type="text"
-                placeholder="Buscar por nombre, teléfono, email..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
-              />
+            <div className="flex items-center space-x-2">
+              {selectedCustomers.length > 0 && user?.role === 'admin' && (
+                <Button
+                  onClick={handleDeleteSelected}
+                  variant="destructive"
+                  size="sm"
+                  className="flex items-center"
+                >
+                  <Trash2 size={16} className="mr-2" />
+                  Eliminar Seleccionados ({selectedCustomers.length})
+                </Button>
+              )}
+              <div className="w-64">
+                <input
+                  type="text"
+                  placeholder="Buscar por nombre, teléfono, email..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
+                />
+              </div>
             </div>
           </div>
         </CardHeader>
@@ -259,6 +272,17 @@ const Customers = () => {
             <table className="w-full">
               <thead>
                 <tr className="border-b">
+                  {user?.role === 'admin' && (
+                    <th className="text-left p-2 text-sm font-medium w-12">
+                      <input
+                        type="checkbox"
+                        checked={selectAll}
+                        onChange={handleSelectAll}
+                        className="w-4 h-4 cursor-pointer"
+                        title="Seleccionar todos"
+                      />
+                    </th>
+                  )}
                   <th className="text-left p-2 text-sm font-medium">Nombre</th>
                   <th className="text-left p-2 text-sm font-medium">Teléfono</th>
                   <th className="text-left p-2 text-sm font-medium">Cedula/Pasaporte/RNC</th>
