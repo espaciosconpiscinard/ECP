@@ -228,6 +228,56 @@ const Expenses = () => {
     return currency === 'DOP' ? `RD$ ${formatted}` : `$ ${formatted}`;
   };
 
+  // Función para filtrar y ordenar gastos por tipo
+  const getFilteredAndSortedExpenses = () => {
+    // Filtrar por tipo de tab activo
+    let filtered = expenses.filter(expense => {
+      const type = expense.expense_type || 'variable';
+      return type === activeTab;
+    });
+
+    // Para gastos variables: ordenar por fecha de check-in (más próximos primero)
+    if (activeTab === 'variables') {
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+
+      // Separar pendientes y pagados
+      const pending = filtered.filter(e => e.payment_status === 'pending');
+      const paid = filtered.filter(e => e.payment_status === 'paid');
+
+      // Ordenar pendientes por fecha de check-in
+      pending.sort((a, b) => {
+        const dateA = a.reservation_check_in ? new Date(a.reservation_check_in) : new Date(a.expense_date);
+        const dateB = b.reservation_check_in ? new Date(b.reservation_check_in) : new Date(b.expense_date);
+        
+        // Fechas futuras o pasadas pendientes van primero (más cercanas al hoy)
+        return Math.abs(dateA - today) - Math.abs(dateB - today);
+      });
+
+      // Ordenar pagados por fecha de gasto (más recientes primero)
+      paid.sort((a, b) => new Date(b.expense_date) - new Date(a.expense_date));
+
+      filtered = [...pending, ...paid];
+    }
+
+    // Para gastos fijos: ordenar por día de recordatorio
+    if (activeTab === 'fijos') {
+      filtered.sort((a, b) => {
+        if (a.payment_reminder_day && b.payment_reminder_day) {
+          return a.payment_reminder_day - b.payment_reminder_day;
+        }
+        return new Date(b.expense_date) - new Date(a.expense_date);
+      });
+    }
+
+    // Para gastos únicos: ordenar por fecha de creación (más recientes primero)
+    if (activeTab === 'unicos') {
+      filtered.sort((a, b) => new Date(b.expense_date) - new Date(a.expense_date));
+    }
+
+    return filtered;
+  };
+
   const getCategoryLabel = (category) => {
     const labels = {
       'local': 'Pago de Local',
@@ -257,7 +307,8 @@ const Expenses = () => {
 
   const groupExpensesByCategory = () => {
     const grouped = {};
-    expenses.forEach(expense => {
+    const filteredExpenses = getFilteredAndSortedExpenses();
+    filteredExpenses.forEach(expense => {
       const categoryId = expense.expense_category_id;
       const categoryName = categoryId ? getExpenseCategoryName(categoryId) : 'Sin Categoría';
       
