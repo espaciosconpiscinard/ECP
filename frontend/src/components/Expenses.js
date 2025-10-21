@@ -657,10 +657,53 @@ const Expenses = () => {
         </div>
       </div>
 
+      {/* Tabs para Tipos de Gastos */}
+      <div className="bg-white rounded-lg shadow-md mb-4">
+        <div className="flex border-b">
+          <button
+            onClick={() => setActiveTab('variables')}
+            className={`flex-1 py-3 px-4 font-medium transition-colors ${
+              activeTab === 'variables'
+                ? 'border-b-2 border-blue-600 text-blue-600 bg-blue-50'
+                : 'text-gray-600 hover:bg-gray-50'
+            }`}
+          >
+            📅 Variables ({expenses.filter(e => (e.expense_type || 'variable') === 'variables').length})
+          </button>
+          <button
+            onClick={() => setActiveTab('fijos')}
+            className={`flex-1 py-3 px-4 font-medium transition-colors ${
+              activeTab === 'fijos'
+                ? 'border-b-2 border-blue-600 text-blue-600 bg-blue-50'
+                : 'text-gray-600 hover:bg-gray-50'
+            }`}
+          >
+            🔁 Fijos ({expenses.filter(e => e.expense_type === 'fijos').length})
+          </button>
+          <button
+            onClick={() => setActiveTab('unicos')}
+            className={`flex-1 py-3 px-4 font-medium transition-colors ${
+              activeTab === 'unicos'
+                ? 'border-b-2 border-blue-600 text-blue-600 bg-blue-50'
+                : 'text-gray-600 hover:bg-gray-50'
+            }`}
+          >
+            💰 Únicos ({expenses.filter(e => e.expense_type === 'unicos').length})
+          </button>
+        </div>
+      </div>
+
       {/* Expenses Table */}
       <Card>
         <CardHeader>
-          <CardTitle>Lista de Gastos ({expenses.length})</CardTitle>
+          <CardTitle>
+            {activeTab === 'variables' && '📅 Gastos Variables (Con fecha de pago)'}
+            {activeTab === 'fijos' && '🔁 Gastos Fijos (Recurrentes mensuales)'}
+            {activeTab === 'unicos' && '💰 Gastos Únicos (Ya pagados)'}
+            <span className="text-sm font-normal text-gray-500 ml-2">
+              ({getFilteredAndSortedExpenses().length})
+            </span>
+          </CardTitle>
         </CardHeader>
         <CardContent>
           {!groupByCategory ? (
@@ -679,8 +722,8 @@ const Expenses = () => {
                   </tr>
                 </thead>
                 <tbody>
-                  {expenses.length > 0 ? (
-                    expenses.map((expense) => (
+                  {getFilteredAndSortedExpenses().length > 0 ? (
+                    getFilteredAndSortedExpenses().map((expense) => (
                       <tr key={expense.id} className="border-b hover:bg-gray-50">
                         <td className="p-2 text-sm">
                           {new Date(expense.expense_date).toLocaleDateString('es-DO')}
