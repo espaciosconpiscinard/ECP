@@ -113,6 +113,8 @@ const Expenses = () => {
       expense_date: expense.expense_date.split('T')[0],
       payment_status: expense.payment_status,
       notes: expense.notes || '',
+      expense_type: expense.expense_type || 'variable',
+      reservation_check_in: expense.reservation_check_in || null,
       has_payment_reminder: expense.has_payment_reminder || false,
       payment_reminder_day: expense.payment_reminder_day || 1,
       is_recurring: expense.is_recurring || false
