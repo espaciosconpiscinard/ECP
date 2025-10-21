@@ -1092,6 +1092,9 @@ const Expenses = () => {
                   <tr className="border-b">
                     <th className="text-left p-2 text-sm font-medium">Fecha</th>
                     <th className="text-left p-2 text-sm font-medium">Categoría</th>
+                    {sortBy === 'invoice' && <th className="text-left p-2 text-sm font-medium">Factura #</th>}
+                    {(sortBy === 'villa' || filterVilla) && <th className="text-left p-2 text-sm font-medium">Villa</th>}
+                    {(sortBy === 'owner' || filterOwner) && <th className="text-left p-2 text-sm font-medium">Propietario</th>}
                     <th className="text-left p-2 text-sm font-medium">Descripción</th>
                     <th className="text-right p-2 text-sm font-medium">Monto</th>
                     <th className="text-right p-2 text-sm font-medium">Pagado</th>
