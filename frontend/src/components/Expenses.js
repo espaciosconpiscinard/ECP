@@ -407,19 +407,27 @@ const Expenses = () => {
   
   // Calculate totals por mes seleccionado
   const monthExpenses = filterByMonth(expenses);
+  const pendingFromPrevious = getPendingFromPreviousMonths();
   
-  // Totales por tipo (mes actual)
-  const compromisosDOP = monthExpenses.filter(e => e.category === 'compromiso' && e.currency === 'DOP').reduce((sum, e) => sum + e.amount, 0);
-  const compromisosUSD = monthExpenses.filter(e => e.category === 'compromiso' && e.currency === 'USD').reduce((sum, e) => sum + e.amount, 0);
+  // Combinar gastos del mes actual con pendientes de meses anteriores
+  const allRelevantExpenses = [...monthExpenses, ...pendingFromPrevious];
   
-  const fijosDOP = monthExpenses.filter(e => e.expense_type === 'fijo' && e.currency === 'DOP').reduce((sum, e) => sum + e.amount, 0);
-  const fijosUSD = monthExpenses.filter(e => e.expense_type === 'fijo' && e.currency === 'USD').reduce((sum, e) => sum + e.amount, 0);
+  // Totales por tipo (mes actual + pendientes anteriores)
+  const compromisosDOP = allRelevantExpenses.filter(e => e.category === 'compromiso' && e.currency === 'DOP').reduce((sum, e) => sum + e.amount, 0);
+  const compromisosUSD = allRelevantExpenses.filter(e => e.category === 'compromiso' && e.currency === 'USD').reduce((sum, e) => sum + e.amount, 0);
   
-  const variablesDOP = monthExpenses.filter(e => e.expense_type === 'variable' && e.currency === 'DOP').reduce((sum, e) => sum + e.amount, 0);
-  const variablesUSD = monthExpenses.filter(e => e.expense_type === 'variable' && e.currency === 'USD').reduce((sum, e) => sum + e.amount, 0);
+  const fijosDOP = allRelevantExpenses.filter(e => e.expense_type === 'fijo' && e.currency === 'DOP').reduce((sum, e) => sum + e.amount, 0);
+  const fijosUSD = allRelevantExpenses.filter(e => e.expense_type === 'fijo' && e.currency === 'USD').reduce((sum, e) => sum + e.amount, 0);
   
-  const unicosDOP = monthExpenses.filter(e => e.expense_type === 'unico' && e.currency === 'DOP').reduce((sum, e) => sum + e.amount, 0);
-  const unicosUSD = monthExpenses.filter(e => e.expense_type === 'unico' && e.currency === 'USD').reduce((sum, e) => sum + e.amount, 0);
+  const variablesDOP = allRelevantExpenses.filter(e => e.expense_type === 'variable' && e.currency === 'DOP').reduce((sum, e) => sum + e.amount, 0);
+  const variablesUSD = allRelevantExpenses.filter(e => e.expense_type === 'variable' && e.currency === 'USD').reduce((sum, e) => sum + e.amount, 0);
+  
+  const unicosDOP = allRelevantExpenses.filter(e => e.expense_type === 'unico' && e.currency === 'DOP').reduce((sum, e) => sum + e.amount, 0);
+  const unicosUSD = allRelevantExpenses.filter(e => e.expense_type === 'unico' && e.currency === 'USD').reduce((sum, e) => sum + e.amount, 0);
+  
+  // Totales de pendientes de meses anteriores
+  const pendingPreviousDOP = pendingFromPrevious.filter(e => e.currency === 'DOP').reduce((sum, e) => sum + e.amount, 0);
+  const pendingPreviousUSD = pendingFromPrevious.filter(e => e.currency === 'USD').reduce((sum, e) => sum + e.amount, 0);
   
   // Compromisos del mes
   const compromisosDelMes = monthExpenses.filter(e => e.category === 'compromiso');
