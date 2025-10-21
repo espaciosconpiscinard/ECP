@@ -376,9 +376,38 @@ const Expenses = () => {
     }).sort((a, b) => a.payment_reminder_day - b.payment_reminder_day);
   };
 
-  // Calculate totals
+  // Calculate totals generales
   const totalDOP = expenses.filter(e => e.currency === 'DOP').reduce((sum, e) => sum + e.amount, 0);
   const totalUSD = expenses.filter(e => e.currency === 'USD').reduce((sum, e) => sum + e.amount, 0);
+  
+  // Calculate totals por mes seleccionado
+  const monthExpenses = filterByMonth(expenses);
+  
+  // Totales por tipo (mes actual)
+  const compromisosDOP = monthExpenses.filter(e => e.category === 'compromiso' && e.currency === 'DOP').reduce((sum, e) => sum + e.amount, 0);
+  const compromisosUSD = monthExpenses.filter(e => e.category === 'compromiso' && e.currency === 'USD').reduce((sum, e) => sum + e.amount, 0);
+  
+  const fijosDOP = monthExpenses.filter(e => e.expense_type === 'fijo' && e.currency === 'DOP').reduce((sum, e) => sum + e.amount, 0);
+  const fijosUSD = monthExpenses.filter(e => e.expense_type === 'fijo' && e.currency === 'USD').reduce((sum, e) => sum + e.amount, 0);
+  
+  const variablesDOP = monthExpenses.filter(e => e.expense_type === 'variable' && e.currency === 'DOP').reduce((sum, e) => sum + e.amount, 0);
+  const variablesUSD = monthExpenses.filter(e => e.expense_type === 'variable' && e.currency === 'USD').reduce((sum, e) => sum + e.amount, 0);
+  
+  const unicosDOP = monthExpenses.filter(e => e.expense_type === 'unico' && e.currency === 'DOP').reduce((sum, e) => sum + e.amount, 0);
+  const unicosUSD = monthExpenses.filter(e => e.expense_type === 'unico' && e.currency === 'USD').reduce((sum, e) => sum + e.amount, 0);
+  
+  // Compromisos del mes
+  const compromisosDelMes = monthExpenses.filter(e => e.category === 'compromiso');
+  const compromisosPagados = compromisosDelMes.filter(e => e.payment_status === 'paid').length;
+  const compromisosPendientes = compromisosDelMes.filter(e => e.payment_status === 'pending').length;
+  const compromisosVencidos = compromisosDelMes.filter(e => {
+    if (e.payment_status === 'paid') return false;
+    const expenseDate = new Date(e.expense_date);
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    return expenseDate < today;
+  }).length;
+  
   const upcomingPayments = getUpcomingPayments();
 
   if (loading) {
