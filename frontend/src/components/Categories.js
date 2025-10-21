@@ -214,14 +214,33 @@ const Categories = () => {
 
       <Card>
         <CardHeader>
-          <CardTitle>Lista de Categorías ({categories.length})</CardTitle>
+          <div className="flex justify-between items-center">
+            <CardTitle>Lista de Categorías ({categories.length})</CardTitle>
+            {selectedCategories.length > 0 && (
+              <div className="flex items-center space-x-2">
+                <Button onClick={handleSelectAll} variant="outline" size="sm">
+                  {selectAll ? 'Deseleccionar Todas' : 'Seleccionar Todas'}
+                </Button>
+                <Button onClick={handleDeleteSelected} variant="destructive" size="sm">
+                  <Trash2 size={16} className="mr-2" />
+                  Eliminar Seleccionadas ({selectedCategories.length})
+                </Button>
+              </div>
+            )}
+          </div>
         </CardHeader>
         <CardContent>
           {categories.length > 0 ? (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
               {categories.map((category) => (
-                <div key={category.id} className="border rounded-lg p-4 hover:shadow-md transition-shadow">
-                  <div className="flex items-start justify-between mb-2">
+                <div key={category.id} className="border rounded-lg p-4 hover:shadow-md transition-shadow relative">
+                  <input
+                    type="checkbox"
+                    checked={selectedCategories.includes(category.id)}
+                    onChange={() => handleSelectCategory(category.id)}
+                    className="absolute top-2 right-2 w-4 h-4 cursor-pointer"
+                  />
+                  <div className="flex items-start justify-between mb-2 pr-6">
                     <div className="flex items-center">
                       <Tag className="text-blue-600 mr-2" size={20} />
                       <h3 className="font-bold text-lg">{category.name}</h3>
