@@ -167,13 +167,17 @@ const VillasManagementNew = () => {
     try {
       if (editingService) {
         await updateExtraService(editingService.id, serviceFormData);
+        alert('✅ Servicio actualizado exitosamente');
+        setIsFormOpen(false);
+        resetServiceForm();
       } else {
         await createExtraService(serviceFormData);
+        alert('✅ Servicio agregado exitosamente. Puedes agregar otro servicio.');
+        // NO cerrar el formulario - mantenerlo abierto
+        // setIsFormOpen(false);
+        resetServiceForm();
       }
       await fetchData();
-      setIsFormOpen(false);
-      resetServiceForm();
-      alert('✅ Servicio guardado exitosamente');
     } catch (err) {
       console.error('Error al guardar servicio:', err);
       const errorMsg = err.response?.data?.detail 
