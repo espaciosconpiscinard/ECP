@@ -954,6 +954,7 @@ const VillasManagementNew = () => {
               <p className="text-gray-500 text-lg">No hay servicios que coincidan con la búsqueda</p>
             </div>
           )}
+          </div>
         </div>
       )}
     </div>
