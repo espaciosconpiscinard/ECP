@@ -25,6 +25,10 @@ const Expenses = () => {
   const [groupByCategory, setGroupByCategory] = useState(false);
   const [activeTab, setActiveTab] = useState('variables'); // variables, fijos, unicos
   
+  // Filtro de mes/año
+  const [selectedMonth, setSelectedMonth] = useState(new Date().getMonth());
+  const [selectedYear, setSelectedYear] = useState(new Date().getFullYear());
+  
   // Abono states
   const [isAbonoDialogOpen, setIsAbonoDialogOpen] = useState(false);
   const [selectedExpense, setSelectedExpense] = useState(null);
