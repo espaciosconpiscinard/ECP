@@ -235,6 +235,21 @@ frontend:
       - working: false
         agent: "user"
         comment: "Usuario reportó que el botón de eliminar gastos manuales no estaba visible o funcional"
+  
+  - task: "Componente Expenses - Sistema de Tabs por Tipo (Variables/Fijos/Únicos)"
+    implemented: true
+    working: true
+    file: "/app/frontend/src/components/Expenses.js"
+    stuck_count: 0
+    priority: "critical"
+    needs_retesting: false
+    status_history:
+      - working: false
+        agent: "user"
+        comment: "Usuario reportó que gastos nuevos (fijos, variables con recordatorios) no aparecían en lista detallada, solo suma. Tabs mostrando contadores en 0. Problema: mismatch plural/singular en filtros de tabs."
+      - working: true
+        agent: "main"
+        comment: "BUG CORREGIDO: Filtros de tabs usaban valores plurales ('variables', 'fijos', 'unicos') pero backend envía singulares ('variable', 'fijo', 'unico'). Correcciones aplicadas: 1) Líneas 680,690,700 - contadores de tabs corregidos para usar valores singulares. 2) handleEdit() actualizado para incluir expense_type y reservation_check_in. 3) resetForm() actualizado para incluir expense_type y reservation_check_in. VERIFICADO: Tab Variables muestra 1 gasto correctamente, Tab Fijos muestra 2 gastos correctamente, Tab Únicos muestra 0 gastos. Filtrado y ordenamiento funcionando perfectamente."
 
   - task: "Componente Categories - CRUD"
     implemented: true
