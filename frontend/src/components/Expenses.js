@@ -23,6 +23,7 @@ const Expenses = () => {
   const [editingExpense, setEditingExpense] = useState(null);
   const [filterCategory, setFilterCategory] = useState('');
   const [groupByCategory, setGroupByCategory] = useState(false);
+  const [activeTab, setActiveTab] = useState('variables'); // variables, fijos, unicos
   
   // Abono states
   const [isAbonoDialogOpen, setIsAbonoDialogOpen] = useState(false);
@@ -45,6 +46,8 @@ const Expenses = () => {
     expense_date: new Date().toISOString().split('T')[0],
     payment_status: 'paid',
     notes: '',
+    expense_type: 'variable', // fijo, variable, unico
+    reservation_check_in: null,
     has_payment_reminder: false,
     payment_reminder_day: 1,
     is_recurring: false
