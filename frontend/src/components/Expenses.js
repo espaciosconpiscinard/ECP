@@ -244,6 +244,21 @@ const Expenses = () => {
     });
   };
 
+  // Función para obtener gastos pendientes de meses anteriores
+  const getPendingFromPreviousMonths = () => {
+    const selectedDate = new Date(selectedYear, selectedMonth, 1);
+    
+    return expenses.filter(expense => {
+      // Solo gastos pendientes
+      if (expense.payment_status !== 'pending') return false;
+      
+      const expenseDate = new Date(expense.expense_date);
+      
+      // Solo gastos de meses anteriores al seleccionado
+      return expenseDate < selectedDate;
+    });
+  };
+
   // Función para filtrar y ordenar gastos por tipo con prioridad de urgencia
   const getFilteredAndSortedExpenses = () => {
     // Mapear tabs a tipos del backend
