@@ -50,13 +50,17 @@ const ExpenseCategories = () => {
     try {
       if (editingCategory) {
         await updateExpenseCategory(editingCategory.id, formData);
+        alert('✅ Categoría actualizada exitosamente');
+        setIsFormOpen(false);
+        resetForm();
       } else {
         await createExpenseCategory(formData);
+        alert('✅ Categoría agregada exitosamente. Puedes agregar otra categoría.');
+        // NO cerrar el formulario - mantenerlo abierto
+        // setIsFormOpen(false);
+        resetForm();
       }
       await fetchCategories();
-      setIsFormOpen(false);
-      resetForm();
-      alert('✅ Categoría guardada exitosamente');
     } catch (err) {
       setError(err.response?.data?.detail || 'Error al guardar categoría');
     }
