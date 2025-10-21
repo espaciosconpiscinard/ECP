@@ -69,6 +69,8 @@ const Expenses = () => {
   useEffect(() => {
     fetchExpenses();
     fetchExpenseCategories();
+    fetchReservations();
+    fetchVillas();
   }, [filterCategory, selectedMonth, selectedYear]);
 
   const fetchExpenseCategories = async () => {
