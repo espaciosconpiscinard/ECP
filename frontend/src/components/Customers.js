@@ -18,6 +18,10 @@ const Customers = () => {
   const [error, setError] = useState('');
   const [isFormOpen, setIsFormOpen] = useState(false);
   
+  // Estados para selección múltiple
+  const [selectedCustomers, setSelectedCustomers] = useState([]);
+  const [selectAll, setSelectAll] = useState(false);
+  
   const [formData, setFormData] = useState({
     name: '',
     phone: '',
