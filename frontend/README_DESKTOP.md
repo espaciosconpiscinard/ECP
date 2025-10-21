@@ -31,7 +31,7 @@ Sistema completo de gestión de villas con:
 ## 💻 Versiones Disponibles
 
 ### Versión Web (Actual)
-Accede desde cualquier navegador: https://espacios-piscina-1.preview.emergentagent.com
+Accede desde cualquier navegador: https://pool-spaces.preview.emergentagent.com
 
 ### Versión Desktop (En Desarrollo)
 Aplicación de escritorio para Windows con:

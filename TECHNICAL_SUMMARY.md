@@ -229,7 +229,7 @@ CORS_ORIGINS=*
 JWT_SECRET_KEY=<secret-key>
 
 # Frontend (.env)
-REACT_APP_BACKEND_URL=https://espacios-piscina-1.preview.emergentagent.com
+REACT_APP_BACKEND_URL=https://pool-spaces.preview.emergentagent.com
 ```
 
 ## 🚀 Deployment

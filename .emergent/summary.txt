@@ -1,19 +1,31 @@
 <analysis>
-The AI engineer successfully led the development of a full-stack villa management application, Espacios Con Piscina, through an iterative process driven by user feedback. Key achievements include implementing comprehensive reservation and expense management (with features like Abonos, custom categories, and reminders), dynamic calculation logic, and a highly customizable invoice system. The engineer adeptly handled UI adjustments, backend model synchronizations, and numerous bug fixes, demonstrating a robust problem-solving approach. The Villas y Servicios section was revamped to separate villas and extra services with dedicated forms and listings. The trajectory highlights the AI's ability to adapt to changing requirements, rectify errors (e.g., syntax, runtime, logic), and ensure consistent data flow. The most recent focus shifted from feature development to addressing user questions about user management and application deployment.
+The AI engineer successfully progressed the Espacios Con Piscina application from initial feature set to a robust management tool, adapting to dynamic user requirements. The trajectory highlights the shift from local MongoDB to cloud-based MongoDB Atlas, addressing numerous technical challenges including SSL connection issues, Python library compatibility, and Node.js memory limits. Key features implemented include comprehensive user management with role-based dashboard visibility, a customizable invoice system with editable templates and starting counter, and a refined expense tracker featuring custom categories, recurring payments, and ordering logic. Initially, efforts were made to create a desktop  application using Electron, but this was ultimately deprioritized due to persistent local environment issues (Git, network, permissions, icon errors) and user's pivot to a web-based solution for easier updates. The current focus is on fixing a bug in the expense display logic and preparing for web deployment.
 </analysis>
 
 <product_requirements>
-The user requires a comprehensive Espacios Con Piscina application for villa management, encompassing user roles (admin/employee), and robust reservation/client management with detailed payment tracking (total, paid, deposit, remaining). Invoices must be customizable, editable, support multi-currency, flexible pricing, extra services, payment methods, and starting invoice numbers. Villa management needs fields like , , , , and optional ITBIS. An expense tracker and a statistical dashboard are also needed.
-Evolving needs include: a professional invoice redesign (with logo, , full villa description, and specific colors); Villas y Servicios section with a selector for Villas or Services, separate forms for each, and distinct listings;  (partial payments) for reservations and expenses; enhanced expense management with user-creatable categories (CRUD), payment reminders (day of month, recurring), grouping, and improved search; cascade deletion for reservations, and allowing deletion of auto-generated expenses; and a dedicated customer management section with optional  and a search feature in reservations.
+The user initially requested a comprehensive Espacios Con Piscina villa management application with user roles (admin/employee), robust reservation/client management including detailed payment tracking (total, paid, deposit, remaining), and customizable, editable invoices supporting multi-currency, flexible pricing, extra services, payment methods, and starting invoice numbers. Villa management needs , , , , and optional ITBIS. An expense tracker and a statistical dashboard were also specified.
+
+Evolving needs led to:
+1.  **Professional Invoice Redesign**: Logo, , full villa description, specific colors. This was further expanded to an in-app **Invoice Editor** for custom fields, policies, and design.
+2.  **Villas y Servicios Revamp**: Selector for Villas/Services, separate forms and listings.
+3.  **Abonos (Partial Payments)**: For reservations and expenses (implemented in existing ).
+4.  **Enhanced Expense Management**: User-creatable categories (CRUD), payment reminders (day of month, recurring), grouping, improved search. New requirement added: **ordering by reservation date**, **prioritizing upcoming/overdue expenses**, **separating Fixed/Variable/Unique expenses**, and **Unique expenses without payment dates**.
+5.  **Cascade Deletion for Reservations** and **Deletion of Auto-Generated Expenses** (already implemented).
+6.  **Customer Management**: Optional , search feature in reservations. New requirement added: **Customer searcher and alphabetical listing**.
+7.  **User Management**: Ability for admin to create user accounts and roles.
+8.  **Application Deployment**: Initially, a desktop  installer (for Windows 10/11, accessible locally/remotely, no constant server), later shifted to a **web-based solution** due to build complexities.
+9.  **Dynamic Logo Management**: User requested to remove hardcoded logo and implement an in-app uploader in Configuración for application header and invoices.
 </product_requirements>
 
 <key_technical_concepts>
--   **Full-stack Development:** React (Frontend), FastAPI (Backend), MongoDB (Database).
+-   **Full-stack Development:** React (Frontend), FastAPI (Backend), MongoDB Atlas (Cloud Database).
 -   **Authentication:** JWT, Role-Based Access Control.
 -   **Styling:** Tailwind CSS.
 -   **Data Modeling:** Pydantic for schema validation.
 -   **API Design:** RESTful with  prefix, environment variables.
 -   **State Management:** React , .
+-   **Desktop App Packaging:** Electron (though later deprioritized).
+-   **Database Migration**: Local to MongoDB Atlas.
 </key_technical_concepts>
 
 <code_architecture>
@@ -22,52 +34,78 @@ The application uses a standard full-stack architecture with  and  directories.
 
 
 -   ****:
-    -   **Importance:** Defines Pydantic models for data schema and validation.
-    -   **Changes:**  model updated to include optional .  updated to  and  (from  and ).
+    -   **Importance:** Stores environment variables, including .
+    -   **Changes:**  was updated to point to MongoDB Atlas connection string.
 -   ****:
-    -   **Importance:** Main FastAPI application defining API routes.
-    -   **Changes:**  modified to allow deletion of  expenses.  function updated to correctly include  in  calculation, and all its calls were updated.  endpoint modified to include .
+    -   **Importance:** Defines Pydantic data models for the backend API.
+    -   **Changes:**
+        -    model includes optional .
+        -    updated.
+        -    updated to include .
+        -   New  model added for customizable invoice fields.
+        -   New  model added to store logo details (base64 encoded image).
+-   ****:
+    -   **Importance:** Main FastAPI application with all API routes.
+    -   **Changes:**
+        -    allows auto-generated expense deletion.
+        -    updated for .
+        -    includes .
+        -   New endpoints added for **User Management** ().
+        -   New endpoints added for **Invoice Counter Configuration** (, ).
+        -   New endpoints added for **Invoice Template Management** ().
+        -   New endpoints added for **Logo Management** (, , ).
+        -    modified to sort results alphabetically by .
+-   ****:
+    -   **Importance:** Temporary script to migrate data from local MongoDB to MongoDB Atlas.
+    -   **Changes:** Created to facilitate the migration, included connection string with  due to SSL issues, and handled / updates.
 -   ****:
     -   **Importance:** Main React component for routing.
-    -   **Changes:** Added route for .
+    -   **Changes:** Added routes for , , .
 -   ****:
     -   **Importance:** Defines overall UI layout and navigation.
-    -   **Changes:** Added navigation link for Categorías de Gastos. Integrated the user-uploaded  into the header.
--   ****:
-    -   **Importance:** Manages client reservations and invoice generation.
-    -   **Changes:** Form updated to include Fecha Desde and Fecha Hasta for amanecida rental type, and  in form state. The invoice generation logic was extensively redesigned multiple times to meet user's aesthetic, content, and language preferences, including the logo, full villa description, , Spanish text, and specific color schemes. A significant bug with duplicated invoice rendering code was identified and fixed.
--   ****:
-    -   **Importance:** Manages business expenses.
-    -   **Changes:** Heavily refactored to integrate  functionality (states, functions, UI for adding payments, Pagado/Restante columns). Implemented custom expense categories, payment reminder fields (, , ), and group-by-category view. Frontend form rendering for expenses was entirely replaced to include these new fields. Fixed a syntax error due to accidental code duplication.
--   ****:
-    -   **Importance:** Manages customer details.
-    -   **Changes:** The  field was changed to  (with label Cedula/Pasaporte/RNC) in both the customer form and the display table.
--   ****:
-    -   **Importance:** Manages villa and extra service details.
-    -   **Changes:** Implemented a tab selector to switch between Villa and Servicio views. Added dedicated forms and display logic for both. Corrected rendering errors for service prices (). Improved error handling for service submission by converting Pydantic error objects to strings. Ensured services and villas are displayed exclusively based on the selected tab. Synchronized frontend field names (, ) with backend  model.
--   ****:
-    -   **Importance:** *Newly created* component for CRUD operations on user-defined expense categories.
+    -   **Changes:** Added navigation links for Usuarios, Configuración, Editor de Facturas. Integrated the dynamic logo fetched from the backend.
 -   ****:
     -   **Importance:** Displays application statistics.
-    -   **Changes:** Replaced  with  in the display of recent reservations.
+    -   **Changes:** Modified to hide expense-related and pending payment information for non-admin users.
 -   ****:
-    -   **Importance:** User-uploaded business logo.
-    -   **Changes:** Downloaded and used in  and invoice.
+    -   **Importance:** Manages client reservations and invoice generation.
+    -   **Changes:** Invoice generation logic was heavily customized multiple times. Now fetches and uses the dynamic logo from the backend for invoices.
 -   ****:
-    -   **Importance:** *Newly created* script.
-    -   **Changes:** Initiated as a simple Python script to demonstrate adding users via the backend API.
-
+    -   **Importance:** Manages business expenses.
+    -   **Changes:** Refactored for  functionality, custom categories, payment reminders. Significantly updated to include  field in the form, and to filter/sort expenses by  and , prioritizing upcoming/overdue payments. Tabs for Fijos, Variables, Únicos added.
+-   ****:
+    -   **Importance:** Manages customer details.
+    -   **Changes:**  field changed to . A search input field was added, and customers are now displayed in alphabetical order.
+-   ****:
+    -   **Importance:** *Newly created* component for CRUD operations on user accounts.
+-   ****:
+    -   **Importance:** *Newly created* component for system-wide settings.
+    -   **Changes:** Now includes the Invoice Counter configuration and the  component.
+-   ****:
+    -   **Importance:** *Newly created* component for visual customization of invoice templates.
+-   ****:
+    -   **Importance:** *Newly created* component for uploading, previewing, and deleting the application's logo, storing it in the database.
+-   ****:
+    -   **Importance:** Entry point for the Electron desktop application (created but now deprioritized).
+-   ****:
+    -   **Importance:** Defines frontend project metadata and scripts.
+    -   **Changes:** Updated to include Electron-related dependencies and scripts. Multiple attempts to remove hardcoded  references in the  build configuration were made.
 </code_architecture>
 
 <pending_tasks>
--   **Frontend Expense Management:** Complete the robust implementation of recurring expense logic and ensure payment reminders function automatically and are clearly displayed.
--   **Deployment Guidance:** Provide detailed documentation on how to deploy the application for team usage.
+-   **Frontend Expense Management (Bug Fix):** Correct the filtering logic in  where tabs use plural types ('variables', 'fijos', 'unicos') but the backend model/data uses singular ('variable', 'fijo', 'unico'), causing expense details not to display correctly.
+-   **Deployment Guidance (Web Version):** Provide detailed documentation and steps on how to deploy the application as a web application for team usage (shifted from desktop .exe).
 </pending_tasks>
 
 <current_work>
-Immediately prior to this summary request, the AI engineer was addressing the user's questions about ongoing application management. Specifically, the user inquired about how to add new users to the system and how to deploy the codebase for their team's use. The AI engineer responded by confirming the existence of a registration endpoint and began creating a Python script, , to illustrate how to programmatically add users via the backend API. The subsequent plan involved developing comprehensive deployment documentation. Therefore, the current work is in the initial phase of preparing guidance for user management and deployment, specifically by starting an example script for user creation.
+Immediately prior to this summary request, the AI engineer was in the process of implementing several new features requested by the user. These included:
+1.  **Dynamic Logo Management**: A backend model (), API endpoints, and a frontend  component (integrated into ) were created. The  header and  invoice generation were updated to fetch and use this dynamic logo.
+2.  **Customer Enhancements**: The backend API () was modified to return customers sorted alphabetically. The frontend  component was updated to include a search input field and display the sorted list.
+3.  **Advanced Expense Management**: The  model in  was extended with an  field (fijo, variable, unico). The  frontend component underwent a significant refactoring to incorporate this new type. It now includes state for  and , filtering and sorting logic based on  (prioritizing upcoming and overdue expenses), an  field in the form, and interactive tabs (Fixed, Variable, Unique) to view expenses.
+
+After implementing these features and restarting services, the user reported a critical bug: newly added expenses (fixed, variable, with reminders) were not appearing in the detailed list below the summary, only the sum was shown, and the intended sorting by date was not working. Upon reviewing the user's feedback and screenshot, the AI engineer identified the immediate problem as a mismatch between the plural names used for the expense type tabs in the frontend (, , ) and the singular values expected by the backend model (, , ). This mismatch is preventing the correct display and filtering of expenses.
 </current_work>
 
 <optional_next_step>
-Complete the  script and prepare the deployment documentation.
+Correct the plural/singular mismatch in  to ensure expense details display correctly in the tabs.
 </optional_next_step>
