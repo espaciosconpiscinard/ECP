@@ -526,3 +526,39 @@ agent_communication:
       📊 RESULTADO FINAL: 13/13 pruebas pasaron exitosamente
       - Campo DNI opcional en Customer ✅ WORKING
       - Eliminación gastos auto-generados ✅ WORKING
+  
+  - agent: "main"
+    message: |
+      🐛 BUG CRÍTICO CORREGIDO - SISTEMA DE TABS DE GASTOS ✅
+      
+      PROBLEMA REPORTADO:
+      - Gastos nuevos (fijos, variables con recordatorios) NO aparecían en lista detallada
+      - Solo se mostraba la suma total, no el detalle
+      - Contadores de tabs mostrando valores incorrectos
+      - Ordenamiento por fecha no funcionaba
+      
+      CAUSA RAÍZ IDENTIFICADA:
+      - Mismatch plural/singular: tabs usaban 'variables'/'fijos'/'unicos' pero backend envía 'variable'/'fijo'/'unico'
+      - Filtros de getFilteredAndSortedExpenses() correctos, pero contadores de tabs incorrectos
+      - handleEdit() no cargaba expense_type al editar
+      - resetForm() no inicializaba expense_type
+      
+      CORRECCIONES APLICADAS:
+      1. ✅ Línea 680: expenses.filter(e => (e.expense_type || 'variable') === 'variable') 
+      2. ✅ Línea 690: expenses.filter(e => e.expense_type === 'fijo')
+      3. ✅ Línea 700: expenses.filter(e => e.expense_type === 'unico')
+      4. ✅ handleEdit() - agregado expense_type y reservation_check_in
+      5. ✅ resetForm() - agregado expense_type: 'variable' y reservation_check_in: null
+      
+      VERIFICACIÓN MANUAL COMPLETADA:
+      - Tab Variables: muestra 1 gasto ("luz" RD$ 2,000) ✅
+      - Tab Fijos: muestra 2 gastos ("local" RD$ 30,000, "internet" RD$ 1,500) ✅
+      - Tab Únicos: muestra 0 gastos (mensaje correcto) ✅
+      - Contadores funcionando correctamente ✅
+      - Filtrado por tipo funcionando ✅
+      - Ordenamiento por fecha funcionando ✅
+      
+      SIGUIENTE PASO:
+      - Testing automatizado completo de todos los flujos de gastos
+      - Verificar creación de nuevos gastos en cada tipo
+      - Verificar edición y eliminación
