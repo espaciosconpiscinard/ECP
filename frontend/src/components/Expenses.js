@@ -885,7 +885,7 @@ const Expenses = () => {
                 <tbody>
                   {getFilteredAndSortedExpenses().length > 0 ? (
                     getFilteredAndSortedExpenses().map((expense) => (
-                      <tr key={expense.id} className="border-b hover:bg-gray-50">
+                      <tr key={expense.id} className={`border-b hover:bg-gray-100 ${getUrgencyColor(expense)}`}>
                         <td className="p-2 text-sm">
                           {new Date(expense.expense_date).toLocaleDateString('es-DO')}
                         </td>
