@@ -352,6 +352,23 @@ const Expenses = () => {
     // Combinar gastos del mes con pendientes de meses anteriores
     filtered = [...monthFiltered, ...pendingFiltered];
 
+    // Aplicar filtros adicionales
+    if (filterVilla) {
+      filtered = filtered.filter(expense => {
+        const reservation = getReservationInfo(expense);
+        return reservation?.villa_code === filterVilla;
+      });
+    }
+
+    if (filterOwner) {
+      filtered = filtered.filter(expense => {
+        const reservation = getReservationInfo(expense);
+        if (!reservation) return false;
+        const villa = villas.find(v => v.code === reservation.villa_code);
+        return villa?.owner === filterOwner;
+      });
+    }
+
     const today = new Date();
     today.setHours(0, 0, 0, 0);
 
