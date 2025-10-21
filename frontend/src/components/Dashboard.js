@@ -121,6 +121,58 @@ const Dashboard = () => {
         )}
       </div>
 
+      {/* Compromisos del Mes - Solo Admin */}
+      {isAdmin && (
+        <Card className="border-red-200 bg-red-50" data-testid="commitments-card">
+          <CardHeader>
+            <CardTitle className="flex items-center text-red-800">
+              <AlertCircle className="mr-2 h-5 w-5 text-red-600" />
+              ⚠️ Compromisos del Mes Actual
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+              <div className="bg-white rounded-lg p-4 border border-red-200">
+                <p className="text-sm text-gray-600">Total Compromisos</p>
+                <p className="text-2xl font-bold text-red-600">
+                  {formatCurrency(stats?.commitments_total_dop || 0, 'DOP')}
+                </p>
+                <p className="text-xs text-gray-500 mt-1">
+                  {stats?.commitments_count || 0} compromisos
+                </p>
+              </div>
+              <div className="bg-white rounded-lg p-4 border border-green-200">
+                <p className="text-sm text-gray-600">Pagados</p>
+                <p className="text-2xl font-bold text-green-600">
+                  {stats?.commitments_paid_count || 0}
+                </p>
+                <p className="text-xs text-gray-500 mt-1">
+                  ✅ Cumplidos
+                </p>
+              </div>
+              <div className="bg-white rounded-lg p-4 border border-orange-200">
+                <p className="text-sm text-gray-600">Pendientes</p>
+                <p className="text-2xl font-bold text-orange-600">
+                  {stats?.commitments_pending_count || 0}
+                </p>
+                {(stats?.commitments_overdue_count || 0) > 0 && (
+                  <p className="text-xs text-red-600 font-semibold mt-1">
+                    🔴 {stats.commitments_overdue_count} vencidos
+                  </p>
+                )}
+              </div>
+            </div>
+            {(stats?.commitments_overdue_count || 0) > 0 && (
+              <Alert variant="destructive" className="bg-red-100 border-red-300">
+                <AlertDescription className="text-red-800">
+                  <strong>¡ATENCIÓN!</strong> Tienes {stats.commitments_overdue_count} compromiso(s) vencido(s) que requieren acción inmediata.
+                </AlertDescription>
+              </Alert>
+            )}
+          </CardContent>
+        </Card>
+      )}
+
       {/* Revenue and Expenses - Solo Admin */}
       {isAdmin && (
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
