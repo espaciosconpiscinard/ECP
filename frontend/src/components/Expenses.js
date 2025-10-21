@@ -312,6 +312,19 @@ const Expenses = () => {
     return reservation?.invoice_number || 0;
   };
 
+  // Función para extraer código de villa de la descripción si no hay reservación
+  const getVillaCodeFromDescription = (expense) => {
+    // Si hay reservación, usar su villa_code
+    const reservation = getReservationInfo(expense);
+    if (reservation) return reservation.villa_code;
+    
+    // Si no hay reservación, intentar extraer de la descripción
+    const description = expense.description || '';
+    // Buscar patrón ECPV seguido de letras (ej: ECPVAH, ECPVWLSL, ECPVSH)
+    const match = description.match(/ECPV[A-Z]+/i);
+    return match ? match[0].toUpperCase() : null;
+  };
+
   // Función para obtener propietarios únicos de las villas
   const getUniqueOwners = () => {
     const owners = new Set();
