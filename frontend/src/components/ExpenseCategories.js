@@ -251,11 +251,12 @@ const ExpenseCategories = () => {
                     <Tag className="h-5 w-5 text-blue-600" />
                     <CardTitle className="text-lg">{category.name}</CardTitle>
                   </div>
-                  {!category.is_active && (
-                    <span className="text-xs px-2 py-1 bg-gray-200 text-gray-600 rounded">
-                      Inactiva
-                    </span>
-                  )}
+                    {!category.is_active && (
+                      <span className="text-xs px-2 py-1 bg-gray-200 text-gray-600 rounded">
+                        Inactiva
+                      </span>
+                    )}
+                  </div>
                 </div>
               </CardHeader>
               <CardContent>
