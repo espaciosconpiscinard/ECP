@@ -864,6 +864,15 @@ class BackendTester:
         self.test_customer_dni_field()
         self.test_auto_generated_expense_deletion()
         
+        # EXPENSE TYPE SYSTEM TESTS
+        print("\n💸 Expense Type System Tests")
+        self.test_existing_expenses_with_types()
+        self.test_create_variable_expense()
+        self.test_create_fijo_expense()
+        self.test_create_unico_expense()
+        self.test_update_expense_type()
+        self.test_delete_expenses_by_type()
+        
         # Summary
         print("\n" + "=" * 60)
         print("📊 TEST SUMMARY")
