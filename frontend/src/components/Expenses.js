@@ -852,6 +852,19 @@ const Expenses = () => {
         </div>
       </div>
 
+      {/* Alerta de Gastos Pendientes de Meses Anteriores */}
+      {pendingFromPrevious.length > 0 && (
+        <Alert className="bg-yellow-50 border-yellow-300">
+          <AlertCircle className="h-4 w-4 text-yellow-600" />
+          <AlertDescription className="text-yellow-800">
+            <strong>⚠️ Gastos Pendientes de Meses Anteriores:</strong> Tienes {pendingFromPrevious.length} gasto(s) pendiente(s) de meses anteriores por un total de{' '}
+            <strong className="text-red-600">{formatCurrency(pendingPreviousDOP, 'DOP')}</strong>
+            {pendingPreviousUSD > 0 && <> y <strong className="text-red-600">{formatCurrency(pendingPreviousUSD, 'USD')}</strong></>}.
+            Estos gastos se muestran en la lista con un indicador especial.
+          </AlertDescription>
+        </Alert>
+      )}
+
       {/* Tabs para Tipos de Gastos */}
       <div className="bg-white rounded-lg shadow-md mb-4">
         <div className="flex border-b">
