@@ -681,7 +681,7 @@ const Expenses = () => {
                 : 'text-gray-600 hover:bg-gray-50'
             }`}
           >
-            📅 Variables ({expenses.filter(e => (e.expense_type || 'variable') === 'variables').length})
+            📅 Variables ({expenses.filter(e => (e.expense_type || 'variable') === 'variable').length})
           </button>
           <button
             onClick={() => setActiveTab('fijos')}
@@ -691,7 +691,7 @@ const Expenses = () => {
                 : 'text-gray-600 hover:bg-gray-50'
             }`}
           >
-            🔁 Fijos ({expenses.filter(e => e.expense_type === 'fijos').length})
+            🔁 Fijos ({expenses.filter(e => e.expense_type === 'fijo').length})
           </button>
           <button
             onClick={() => setActiveTab('unicos')}
@@ -701,7 +701,7 @@ const Expenses = () => {
                 : 'text-gray-600 hover:bg-gray-50'
             }`}
           >
-            💰 Únicos ({expenses.filter(e => e.expense_type === 'unicos').length})
+            💰 Únicos ({expenses.filter(e => e.expense_type === 'unico').length})
           </button>
         </div>
       </div>
