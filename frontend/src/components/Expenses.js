@@ -277,7 +277,18 @@ const Expenses = () => {
     });
 
     // Filtrar por mes seleccionado
-    filtered = filterByMonth(filtered);
+    const monthFiltered = filterByMonth(filtered);
+    
+    // Agregar pendientes de meses anteriores (solo pendientes)
+    const pendingFiltered = filtered.filter(expense => {
+      if (expense.payment_status !== 'pending') return false;
+      const expenseDate = new Date(expense.expense_date);
+      const selectedDate = new Date(selectedYear, selectedMonth, 1);
+      return expenseDate < selectedDate;
+    });
+    
+    // Combinar gastos del mes con pendientes de meses anteriores
+    filtered = [...monthFiltered, ...pendingFiltered];
 
     const today = new Date();
     today.setHours(0, 0, 0, 0);
