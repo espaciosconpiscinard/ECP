@@ -145,6 +145,8 @@ const Expenses = () => {
       expense_date: new Date().toISOString().split('T')[0],
       payment_status: 'paid',
       notes: '',
+      expense_type: 'variable',
+      reservation_check_in: null,
       has_payment_reminder: false,
       payment_reminder_day: 1,
       is_recurring: false
