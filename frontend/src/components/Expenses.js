@@ -10,7 +10,7 @@ import { Input } from './ui/input';
 import { Label } from './ui/label';
 import { Alert, AlertDescription } from './ui/alert';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from './ui/dialog';
-import { Plus, Edit, Trash2, Filter, DollarSign, X, Bell } from 'lucide-react';
+import { Plus, Edit, Trash2, Filter, DollarSign, X, Bell, AlertCircle } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 
 const Expenses = () => {
