@@ -17,6 +17,10 @@ const ExpenseCategories = () => {
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [editingCategory, setEditingCategory] = useState(null);
   
+  // Estados para selección múltiple
+  const [selectedCategories, setSelectedCategories] = useState([]);
+  const [selectAll, setSelectAll] = useState(false);
+  
   const [formData, setFormData] = useState({
     name: '',
     description: '',
