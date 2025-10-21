@@ -80,6 +80,36 @@ const Expenses = () => {
     }
   };
 
+  const fetchReservations = async () => {
+    try {
+      const response = await fetch(`${import.meta.env.VITE_BACKEND_URL || process.env.REACT_APP_BACKEND_URL}/api/reservations`, {
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem('token')}`
+        }
+      });
+      if (!response.ok) throw new Error('Error al cargar reservaciones');
+      const data = await response.json();
+      setReservations(data);
+    } catch (err) {
+      console.error('Error fetching reservations:', err);
+    }
+  };
+
+  const fetchVillas = async () => {
+    try {
+      const response = await fetch(`${import.meta.env.VITE_BACKEND_URL || process.env.REACT_APP_BACKEND_URL}/api/villas`, {
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem('token')}`
+        }
+      });
+      if (!response.ok) throw new Error('Error al cargar villas');
+      const data = await response.json();
+      setVillas(data);
+    } catch (err) {
+      console.error('Error fetching villas:', err);
+    }
+  };
+
   const fetchExpenses = async () => {
     try {
       const response = await getExpenses(filterCategory || null);
