@@ -910,64 +910,116 @@ const Expenses = () => {
       )}
 
       {/* Filter and Group */}
-      <div className="flex items-center justify-between flex-wrap gap-4">
-        <div className="flex items-center space-x-2">
-          <Filter className="text-gray-400" size={20} />
-          <select
-            value={filterCategory}
-            onChange={(e) => setFilterCategory(e.target.value)}
-            className="p-2 border rounded-md"
-            data-testid="filter-category-select"
-          >
-            <option value="">Todas las categorías</option>
-            <option value="compromiso">Compromiso</option>
-            <option value="local">Pago de Local</option>
-            <option value="nomina">Nómina</option>
-            <option value="variable">Gasto Variable</option>
-            <option value="pago_propietario">Pago Propietario</option>
-            <option value="otros">Otros</option>
-          </select>
+      <div className="bg-white rounded-lg shadow-md p-4 space-y-4">
+        {/* Primera fila: Categoría y Mes */}
+        <div className="flex items-center justify-between flex-wrap gap-4">
+          <div className="flex items-center space-x-2">
+            <Filter className="text-gray-400" size={20} />
+            <select
+              value={filterCategory}
+              onChange={(e) => setFilterCategory(e.target.value)}
+              className="p-2 border rounded-md"
+              data-testid="filter-category-select"
+            >
+              <option value="">Todas las categorías</option>
+              <option value="compromiso">Compromiso</option>
+              <option value="local">Pago de Local</option>
+              <option value="nomina">Nómina</option>
+              <option value="variable">Gasto Variable</option>
+              <option value="pago_propietario">Pago Propietario</option>
+              <option value="otros">Otros</option>
+            </select>
+          </div>
+          
+          <div className="flex items-center space-x-2">
+            <Label>Mes:</Label>
+            <select
+              value={selectedMonth}
+              onChange={(e) => setSelectedMonth(parseInt(e.target.value))}
+              className="p-2 border rounded-md"
+            >
+              <option value={0}>Enero</option>
+              <option value={1}>Febrero</option>
+              <option value={2}>Marzo</option>
+              <option value={3}>Abril</option>
+              <option value={4}>Mayo</option>
+              <option value={5}>Junio</option>
+              <option value={6}>Julio</option>
+              <option value={7}>Agosto</option>
+              <option value={8}>Septiembre</option>
+              <option value={9}>Octubre</option>
+              <option value={10}>Noviembre</option>
+              <option value={11}>Diciembre</option>
+            </select>
+            <select
+              value={selectedYear}
+              onChange={(e) => setSelectedYear(parseInt(e.target.value))}
+              className="p-2 border rounded-md"
+            >
+              {[2024, 2025, 2026].map(year => (
+                <option key={year} value={year}>{year}</option>
+              ))}
+            </select>
+          </div>
         </div>
-        
-        <div className="flex items-center space-x-2">
-          <Label>Mes:</Label>
-          <select
-            value={selectedMonth}
-            onChange={(e) => setSelectedMonth(parseInt(e.target.value))}
-            className="p-2 border rounded-md"
+
+        {/* Segunda fila: Ordenamiento y Filtros Avanzados */}
+        <div className="flex items-center justify-between flex-wrap gap-4 border-t pt-4">
+          <div className="flex items-center space-x-2">
+            <Label className="font-semibold">Ordenar por:</Label>
+            <select
+              value={sortBy}
+              onChange={(e) => setSortBy(e.target.value)}
+              className="p-2 border rounded-md bg-blue-50"
+            >
+              <option value="date">📅 Fecha / Urgencia</option>
+              <option value="invoice">🧾 Número de Factura</option>
+              <option value="villa">🏠 Villa</option>
+              <option value="owner">👤 Propietario</option>
+              <option value="remaining">💵 Monto Restante</option>
+            </select>
+          </div>
+
+          <div className="flex items-center space-x-2">
+            <Label>Filtrar Villa:</Label>
+            <select
+              value={filterVilla}
+              onChange={(e) => setFilterVilla(e.target.value)}
+              className="p-2 border rounded-md"
+            >
+              <option value="">Todas las villas</option>
+              {villas.map(villa => (
+                <option key={villa.id} value={villa.code}>
+                  {villa.code} - {villa.name}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          <div className="flex items-center space-x-2">
+            <Label>Filtrar Propietario:</Label>
+            <select
+              value={filterOwner}
+              onChange={(e) => setFilterOwner(e.target.value)}
+              className="p-2 border rounded-md"
+            >
+              <option value="">Todos los propietarios</option>
+              {getUniqueOwners().map(owner => (
+                <option key={owner} value={owner}>{owner}</option>
+              ))}
+            </select>
+          </div>
+
+          <button
+            onClick={() => {
+              setSortBy('date');
+              setFilterVilla('');
+              setFilterOwner('');
+            }}
+            className="px-3 py-2 text-sm bg-gray-200 hover:bg-gray-300 rounded-md"
           >
-            <option value={0}>Enero</option>
-            <option value={1}>Febrero</option>
-            <option value={2}>Marzo</option>
-            <option value={3}>Abril</option>
-            <option value={4}>Mayo</option>
-            <option value={5}>Junio</option>
-            <option value={6}>Julio</option>
-            <option value={7}>Agosto</option>
-            <option value={8}>Septiembre</option>
-            <option value={9}>Octubre</option>
-            <option value={10}>Noviembre</option>
-            <option value={11}>Diciembre</option>
-          </select>
-          <select
-            value={selectedYear}
-            onChange={(e) => setSelectedYear(parseInt(e.target.value))}
-            className="p-2 border rounded-md"
-          >
-            {[2024, 2025, 2026].map(year => (
-              <option key={year} value={year}>{year}</option>
-            ))}
-          </select>
-        </div>
-        
-        <div className="flex items-center space-x-2">
-          <input
-            type="checkbox"
-            checked={groupByCategory}
-            onChange={(e) => setGroupByCategory(e.target.checked)}
-            id="group_by_category"
-          />
-          <Label htmlFor="group_by_category">Agrupar por Categoría</Label>
+            🔄 Limpiar Filtros
+          </button>
         </div>
       </div>
 
