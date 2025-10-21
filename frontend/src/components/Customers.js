@@ -89,6 +89,49 @@ const Customers = () => {
     }
   };
 
+  // Manejar selección individual
+  const handleSelectCustomer = (customerId) => {
+    setSelectedCustomers(prev => {
+      if (prev.includes(customerId)) {
+        return prev.filter(id => id !== customerId);
+      } else {
+        return [...prev, customerId];
+      }
+    });
+  };
+
+  // Manejar seleccionar todos
+  const handleSelectAll = () => {
+    if (selectAll) {
+      setSelectedCustomers([]);
+      setSelectAll(false);
+    } else {
+      setSelectedCustomers(filteredCustomers.map(c => c.id));
+      setSelectAll(true);
+    }
+  };
+
+  // Eliminar seleccionados
+  const handleDeleteSelected = async () => {
+    if (selectedCustomers.length === 0) {
+      alert('No hay clientes seleccionados');
+      return;
+    }
+    
+    if (window.confirm(`¿Estás seguro de eliminar ${selectedCustomers.length} cliente(s)?`)) {
+      try {
+        // Eliminar todos los seleccionados
+        await Promise.all(selectedCustomers.map(id => deleteCustomer(id)));
+        setSelectedCustomers([]);
+        setSelectAll(false);
+        await fetchCustomers();
+      } catch (err) {
+        setError('Error al eliminar clientes');
+        console.error(err);
+      }
+    }
+  };
+
   const resetForm = () => {
     setFormData({
       name: '',
