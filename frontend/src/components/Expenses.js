@@ -950,28 +950,43 @@ const Expenses = () => {
                         </td>
                         <td className="p-2 text-sm">
                           <div className="flex items-center space-x-2">
-                            {expense.urgency === 'overdue' && (
-                              <span className="text-xs px-2 py-1 bg-red-600 text-white rounded font-semibold" title="Vencido">
-                                🔴 {Math.abs(expense.daysUntil)}d vencido
-                              </span>
-                            )}
-                            {expense.urgency === 'upcoming' && (
-                              <span className="text-xs px-2 py-1 bg-orange-500 text-white rounded font-semibold" title="Próximo a vencer">
-                                🟠 {expense.daysUntil}d restantes
-                              </span>
-                            )}
-                            {expense.category === 'compromiso' && (
-                              <span className="text-xs px-2 py-1 bg-red-100 text-red-800 rounded font-bold" title="Compromiso Crítico">
-                                ⚠️ COMPROMISO
-                              </span>
-                            )}
-                            <span>{expense.description}</span>
-                            {expense.has_payment_reminder && (
-                              <Bell size={14} className="text-orange-500" title={`Recordatorio día ${expense.payment_reminder_day}`} />
-                            )}
-                            {expense.is_recurring && (
-                              <span className="text-xs px-1 py-0.5 bg-blue-100 text-blue-700 rounded">Recurrente</span>
-                            )}
+                            {(() => {
+                              const expenseDate = new Date(expense.expense_date);
+                              const selectedDate = new Date(selectedYear, selectedMonth, 1);
+                              const isPreviousMonth = expenseDate < selectedDate && expense.payment_status === 'pending';
+                              
+                              return (
+                                <>
+                                  {isPreviousMonth && (
+                                    <span className="text-xs px-2 py-1 bg-yellow-600 text-white rounded font-bold" title="Pendiente de mes anterior">
+                                      📆 MES ANTERIOR
+                                    </span>
+                                  )}
+                                  {expense.urgency === 'overdue' && (
+                                    <span className="text-xs px-2 py-1 bg-red-600 text-white rounded font-semibold" title="Vencido">
+                                      🔴 {Math.abs(expense.daysUntil)}d vencido
+                                    </span>
+                                  )}
+                                  {expense.urgency === 'upcoming' && (
+                                    <span className="text-xs px-2 py-1 bg-orange-500 text-white rounded font-semibold" title="Próximo a vencer">
+                                      🟠 {expense.daysUntil}d restantes
+                                    </span>
+                                  )}
+                                  {expense.category === 'compromiso' && (
+                                    <span className="text-xs px-2 py-1 bg-red-100 text-red-800 rounded font-bold" title="Compromiso Crítico">
+                                      ⚠️ COMPROMISO
+                                    </span>
+                                  )}
+                                  <span>{expense.description}</span>
+                                  {expense.has_payment_reminder && (
+                                    <Bell size={14} className="text-orange-500" title={`Recordatorio día ${expense.payment_reminder_day}`} />
+                                  )}
+                                  {expense.is_recurring && (
+                                    <span className="text-xs px-1 py-0.5 bg-blue-100 text-blue-700 rounded">Recurrente</span>
+                                  )}
+                                </>
+                              );
+                            })()}
                           </div>
                         </td>
                         <td className="p-2 text-sm text-right font-medium">
