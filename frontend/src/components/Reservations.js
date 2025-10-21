@@ -311,6 +311,48 @@ const Reservations = () => {
     }
   };
 
+  // Manejar selección individual de reservaciones
+  const handleSelectReservation = (reservationId) => {
+    setSelectedReservations(prev => {
+      if (prev.includes(reservationId)) {
+        return prev.filter(id => id !== reservationId);
+      } else {
+        return [...prev, reservationId];
+      }
+    });
+  };
+
+  // Manejar seleccionar todas las reservaciones
+  const handleSelectAllReservations = () => {
+    if (selectAllReservations) {
+      setSelectedReservations([]);
+      setSelectAllReservations(false);
+    } else {
+      setSelectedReservations(filteredReservations.map(r => r.id));
+      setSelectAllReservations(true);
+    }
+  };
+
+  // Eliminar reservaciones seleccionadas
+  const handleDeleteSelectedReservations = async () => {
+    if (selectedReservations.length === 0) {
+      alert('No hay reservaciones seleccionadas');
+      return;
+    }
+    
+    if (window.confirm(`¿Estás seguro de eliminar ${selectedReservations.length} reservación(es)?`)) {
+      try {
+        await Promise.all(selectedReservations.map(id => deleteReservation(id)));
+        setSelectedReservations([]);
+        setSelectAllReservations(false);
+        await fetchData();
+      } catch (err) {
+        setError('Error al eliminar reservaciones');
+        console.error(err);
+      }
+    }
+  };
+
   const resetForm = () => {
     setEditingReservation(null);
     setSelectedExtraServices([]);
