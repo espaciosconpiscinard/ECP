@@ -294,6 +294,16 @@ const Customers = () => {
                 {filteredCustomers.length > 0 ? (
                   filteredCustomers.map((customer) => (
                     <tr key={customer.id} className="border-b hover:bg-gray-50">
+                      {user?.role === 'admin' && (
+                        <td className="p-2 text-sm">
+                          <input
+                            type="checkbox"
+                            checked={selectedCustomers.includes(customer.id)}
+                            onChange={() => handleSelectCustomer(customer.id)}
+                            className="w-4 h-4 cursor-pointer"
+                          />
+                        </td>
+                      )}
                       <td className="p-2 text-sm">{customer.name}</td>
                       <td className="p-2 text-sm">
                         <div className="flex items-center">
