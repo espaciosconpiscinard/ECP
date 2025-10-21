@@ -694,8 +694,8 @@ async def create_reservation(reservation_data: ReservationCreate, current_user: 
     # Si el usuario es admin y proporciona un invoice_number, usarlo
     # De lo contrario, obtener el siguiente número disponible
     if hasattr(reservation_data, 'invoice_number') and reservation_data.invoice_number is not None and current_user.get("role") == "admin":
-        # Admin proporcionó un número manual
-        invoice_number = reservation_data.invoice_number
+        # Admin proporcionó un número manual - convertir a string
+        invoice_number = str(reservation_data.invoice_number)
         
         # Verificar si ya existe
         existing = await db.reservations.find_one({"invoice_number": invoice_number}, {"_id": 0})
@@ -703,7 +703,8 @@ async def create_reservation(reservation_data: ReservationCreate, current_user: 
             raise HTTPException(status_code=400, detail=f"El número de factura {invoice_number} ya existe")
     else:
         # Obtener siguiente número automático disponible
-        invoice_number = await get_next_invoice_number()
+        invoice_number_int = await get_next_invoice_number()
+        invoice_number = str(invoice_number_int)
     
     # Calculate balance: Total + Depósito - Pagado
     balance_due = calculate_balance(
