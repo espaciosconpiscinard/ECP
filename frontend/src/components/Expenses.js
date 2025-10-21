@@ -60,7 +60,7 @@ const Expenses = () => {
   useEffect(() => {
     fetchExpenses();
     fetchExpenseCategories();
-  }, [filterCategory]);
+  }, [filterCategory, selectedMonth, selectedYear]);
 
   const fetchExpenseCategories = async () => {
     try {
