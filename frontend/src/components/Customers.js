@@ -69,9 +69,10 @@ const Customers = () => {
     try {
       await createCustomer(formData);
       await fetchCustomers();
-      setIsFormOpen(false);
+      // NO cerrar el formulario - mantenerlo abierto
+      // setIsFormOpen(false);
       resetForm();
-      alert('✅ Cliente agregado exitosamente');
+      alert('✅ Cliente agregado exitosamente. Puedes agregar otro cliente.');
     } catch (err) {
       setError(err.response?.data?.detail || 'Error al guardar cliente');
     }
