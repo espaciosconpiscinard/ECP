@@ -685,7 +685,7 @@ const Reservations = () => {
             <!-- Header -->
             <div class="header">
               <div class="header-left">
-                <img src="/logo.png" alt="Logo" class="logo" />
+                ${logo ? `<img src="${logo}" alt="Logo" class="logo" />` : '<div style="width: 80px; height: 80px; background: #0ea5e9; border-radius: 10px; display: flex; align-items: center; justify-content: center; color: white; font-size: 24px; font-weight: bold;">EC</div>'}
                 <div class="brand-info">
                   <div class="brand-name">ESPACIOS CON PISCINA</div>
                   <div class="brand-tagline">ECP, SRL</div>
