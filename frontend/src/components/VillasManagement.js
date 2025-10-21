@@ -905,11 +905,12 @@ const VillasManagementNew = () => {
                     <Package className="h-5 w-5 text-blue-600" />
                     <CardTitle className="text-lg">{service.name}</CardTitle>
                   </div>
-                  {!service.is_active && (
-                    <span className="text-xs px-2 py-1 bg-gray-200 text-gray-600 rounded">
-                      Inactivo
-                    </span>
-                  )}
+                    {!service.is_active && (
+                      <span className="text-xs px-2 py-1 bg-gray-200 text-gray-600 rounded">
+                        Inactivo
+                      </span>
+                    )}
+                  </div>
                 </div>
               </CardHeader>
               <CardContent>
