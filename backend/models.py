@@ -301,7 +301,7 @@ class Abono(AbonoBase):
 
 # ============ EXPENSE MODELS ============
 class ExpenseBase(BaseModel):
-    category: Literal["local", "nomina", "variable", "pago_propietario", "otros"] = "otros"
+    category: Literal["local", "nomina", "variable", "pago_propietario", "compromiso", "otros"] = "otros"
     expense_category_id: Optional[str] = None  # ID de categoría de gasto personalizada (luz, internet, etc.)
     description: str
     amount: float
