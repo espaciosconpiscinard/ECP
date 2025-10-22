@@ -946,6 +946,62 @@ const Reservations = () => {
     r.invoice_number?.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
+  // Calcular totales de reservaciones
+  const calculateReservationTotals = () => {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    
+    const totalReservations = filteredReservations.length;
+    
+    // Reservaciones pendientes (futuras - que aún no han pasado su fecha)
+    const upcomingReservations = filteredReservations.filter(r => {
+      const reservationDate = new Date(r.reservation_date);
+      reservationDate.setHours(0, 0, 0, 0);
+      return reservationDate >= today;
+    }).length;
+    
+    // Total pagado (suma de amount_paid)
+    const totalPaid = filteredReservations.reduce((sum, r) => {
+      return sum + (r.amount_paid || 0);
+    }, 0);
+    
+    // Total restante (suma de balance_due)
+    const totalRemaining = filteredReservations.reduce((sum, r) => {
+      return sum + (r.balance_due || 0);
+    }, 0);
+    
+    // Agrupar por moneda
+    const totalPaidDOP = filteredReservations
+      .filter(r => r.currency === 'DOP')
+      .reduce((sum, r) => sum + (r.amount_paid || 0), 0);
+    
+    const totalPaidUSD = filteredReservations
+      .filter(r => r.currency === 'USD')
+      .reduce((sum, r) => sum + (r.amount_paid || 0), 0);
+    
+    const totalRemainingDOP = filteredReservations
+      .filter(r => r.currency === 'DOP')
+      .reduce((sum, r) => sum + (r.balance_due || 0), 0);
+    
+    const totalRemainingUSD = filteredReservations
+      .filter(r => r.currency === 'USD')
+      .reduce((sum, r) => sum + (r.balance_due || 0), 0);
+    
+    return {
+      totalReservations,
+      upcomingReservations,
+      totalPaid,
+      totalRemaining,
+      totalPaidDOP,
+      totalPaidUSD,
+      totalRemainingDOP,
+      totalRemainingUSD
+    };
+  };
+  
+  const totals = calculateReservationTotals();
+
+
   // Filtrar y ordenar villas alfabéticamente
   const filteredVillas = villas
     .filter(v => 
