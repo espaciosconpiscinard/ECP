@@ -463,7 +463,7 @@ test_plan:
   stuck_tasks: []
   test_all: false
   test_priority: "high_first"
-  latest_test: "Pendiente - Nuevas funcionalidades de invoice_number en abonos y sistema de importación"
+  latest_test: "Completado - Sistema de invoice_number para abonos completamente funcional. Pendiente: Sistema de importación Excel (complejo, se hará manualmente)"
 
 agent_communication:
   - agent: "main"
