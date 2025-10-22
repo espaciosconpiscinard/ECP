@@ -1596,7 +1596,14 @@ const Reservations = () => {
                       >
                         <div>
                           <p className="text-sm font-medium text-gray-900">{res.customer_name}</p>
-                          <p className="text-xs text-gray-500">#{res.invoice_number}</p>
+                          <p className="text-xs text-gray-500">
+                            #{res.invoice_number}
+                            {reservationAbonos[res.id] && reservationAbonos[res.id].length > 0 && (
+                              <span className="text-purple-600 ml-1">
+                                (Abonos: {reservationAbonos[res.id].map(a => `#${a.invoice_number}`).join(', ')})
+                              </span>
+                            )}
+                          </p>
                         </div>
                         <div>
                           <p className="text-sm font-medium">{res.villa_code}</p>
