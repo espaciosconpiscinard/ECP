@@ -1201,6 +1201,10 @@ class BackendTester:
         self.test_update_expense_type()
         self.test_delete_expenses_by_type()
         
+        # INVOICE NUMBER SYSTEM TESTS FOR ABONOS
+        print("\n🧾 Invoice Number System Tests for Abonos")
+        self.test_invoice_number_system_for_abonos()
+        
         # Summary
         print("\n" + "=" * 60)
         print("📊 TEST SUMMARY")
