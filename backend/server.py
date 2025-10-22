@@ -1296,6 +1296,52 @@ async def health_check():
     """Health check endpoint"""
     return {"status": "healthy", "service": "espacios-con-piscina-api"}
 
+# ============ EXPORT/IMPORT ENDPOINTS ============
+from backend.export_service import create_excel_template, export_data_to_excel
+
+@api_router.get("/export/template")
+async def download_template(current_user: dict = Depends(get_current_user)):
+    """Descargar plantilla Excel vacía para importación"""
+    if current_user.get("role") != "admin":
+        raise HTTPException(status_code=403, detail="Solo administradores pueden descargar plantillas")
+    
+    template = create_excel_template()
+    
+    return StreamingResponse(
+        template,
+        media_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+        headers={
+            "Content-Disposition": f"attachment; filename=Plantilla_Importacion_Espacios_Con_Piscina.xlsx"
+        }
+    )
+
+@api_router.get("/export/{data_type}")
+async def export_data(data_type: str, current_user: dict = Depends(get_current_user)):
+    """Exportar datos existentes a Excel"""
+    if current_user.get("role") != "admin":
+        raise HTTPException(status_code=403, detail="Solo administradores pueden exportar datos")
+    
+    valid_types = ["customers", "villas", "reservations", "expenses"]
+    if data_type not in valid_types:
+        raise HTTPException(status_code=400, detail=f"Tipo inválido. Debe ser: {', '.join(valid_types)}")
+    
+    excel_file = await export_data_to_excel(db, data_type)
+    
+    type_names = {
+        "customers": "Clientes",
+        "villas": "Villas",
+        "reservations": "Reservaciones",
+        "expenses": "Gastos"
+    }
+    
+    return StreamingResponse(
+        excel_file,
+        media_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+        headers={
+            "Content-Disposition": f"attachment; filename={type_names[data_type]}_Export.xlsx"
+        }
+    )
+
 # Include router in app
 app.include_router(api_router)
 
