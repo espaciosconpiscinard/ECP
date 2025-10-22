@@ -230,6 +230,11 @@ const Expenses = () => {
         payment_date: new Date(abonoFormData.payment_date).toISOString()
       };
       
+      // Solo incluir invoice_number si se proporcionó
+      if (!dataToSend.invoice_number || dataToSend.invoice_number.trim() === '') {
+        delete dataToSend.invoice_number;
+      }
+      
       await addAbonoToExpense(selectedExpense.id, dataToSend);
       
       // Refresh abonos list
@@ -245,7 +250,8 @@ const Expenses = () => {
         currency: selectedExpense.currency,
         payment_method: 'efectivo',
         payment_date: new Date().toISOString().split('T')[0],
-        notes: ''
+        notes: '',
+        invoice_number: ''
       });
       
       alert('✅ Abono agregado exitosamente');
