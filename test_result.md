@@ -456,9 +456,6 @@ metadata:
 
 test_plan:
   current_focus:
-    - "Invoice number para abonos - Modelo y validación"
-    - "Invoice number para abonos de reservaciones - Endpoint"
-    - "Invoice number para abonos de gastos - Endpoint"
     - "Sistema de importación Excel - Backend"
     - "Reservations - Campo invoice_number en formulario de abono"
     - "Expenses - Campo invoice_number en formulario de abono"
