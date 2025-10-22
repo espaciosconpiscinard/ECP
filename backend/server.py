@@ -908,13 +908,28 @@ async def delete_reservation(reservation_id: str, current_user: dict = Depends(r
 
 @api_router.post("/reservations/{reservation_id}/abonos", response_model=Abono)
 async def add_abono_to_reservation(reservation_id: str, abono_data: AbonoCreate, current_user: dict = Depends(get_current_user)):
-    """Add a payment (abono) to a reservation"""
+    """Add a payment (abono) to a reservation - each abono gets its own invoice number"""
     reservation = await db.reservations.find_one({"id": reservation_id}, {"_id": 0})
     if not reservation:
         raise HTTPException(status_code=404, detail="Reservation not found")
     
-    # Create abono record
-    abono = Abono(**abono_data.model_dump(), created_by=current_user["id"])
+    # Handle invoice_number generation
+    if abono_data.invoice_number:
+        # Admin provided manual invoice number - validate it's available
+        if current_user.get("role") != "admin":
+            raise HTTPException(status_code=403, detail="Only admins can specify manual invoice numbers")
+        
+        invoice_num_str = str(abono_data.invoice_number)
+        is_available = await validate_invoice_number_available(invoice_num_str)
+        if not is_available:
+            raise HTTPException(status_code=400, detail=f"Invoice number {invoice_num_str} is already in use")
+        invoice_number = invoice_num_str
+    else:
+        # Auto-generate invoice number for employee/admin
+        invoice_number = str(await get_next_invoice_number())
+    
+    # Create abono record with invoice_number
+    abono = Abono(**abono_data.model_dump(), invoice_number=invoice_number, created_by=current_user["id"])
     abono_doc = prepare_doc_for_insert(abono.model_dump())
     
     # Store in reservation_abonos collection
