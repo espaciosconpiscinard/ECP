@@ -237,15 +237,18 @@ backend:
   
   - task: "Invoice number para abonos de reservaciones - Endpoint"
     implemented: true
-    working: "NA"
+    working: true
     file: "/app/backend/server.py"
     stuck_count: 0
     priority: "high"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
       - working: "NA"
         agent: "main"
         comment: "Modificado endpoint POST /api/reservations/{id}/abonos: Si admin proporciona invoice_number manual, se valida disponibilidad. Si no se proporciona o es empleado, se auto-genera. Valida que solo admin puede especificar números manuales."
+      - working: true
+        agent: "testing"
+        comment: "✅ TESTED: Endpoint POST /api/reservations/{id}/abonos completamente funcional. Empleado crea abono con invoice_number auto-generado (5821) ✅. Admin crea abono con invoice_number manual (9999) ✅. Validación de duplicados rechaza correctamente (400 error) ✅. Empleado no puede especificar invoice_number manual (403 Forbidden) ✅. Todos los abonos tienen invoice_number en GET /api/reservations/{id}/abonos ✅."
   
   - task: "Invoice number para abonos de gastos - Endpoint"
     implemented: true
