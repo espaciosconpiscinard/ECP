@@ -469,7 +469,22 @@ const Reservations = () => {
     }
   };
 
-  const handlePrint = (reservation) => {
+  const handlePrint = async (reservation) => {
+    // Cargar los abonos de esta reservación
+    let abonos = [];
+    try {
+      const response = await fetch(`${API_URL}/api/reservations/${reservation.id}/abonos`, {
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem('token')}`
+        }
+      });
+      if (response.ok) {
+        abonos = await response.json();
+      }
+    } catch (err) {
+      console.error('Error loading abonos for print:', err);
+    }
+    
     const printWindow = window.open('', '', 'width=900,height=700');
     const balanceDue = reservation.balance_due || 0;
     
