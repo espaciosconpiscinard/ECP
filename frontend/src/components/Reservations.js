@@ -995,15 +995,16 @@ const Reservations = () => {
                   })()}
                         <tfoot>
                           <tr>
-                            <td colspan="3" style="text-align: right; font-weight: bold;">Total Abonos:</td>
+                            <td colspan="3" style="text-align: right; font-weight: bold;">Total Pagos:</td>
                             <td style="text-align: right; font-weight: bold; color: #0ea5e9;">
-                              ${reservation.currency === 'DOP' ? 'RD$' : '$'}${abonos.reduce((sum, a) => sum + a.amount, 0).toLocaleString('es-DO', {minimumFractionDigits: 2})}
+                              ${reservation.currency === 'DOP' ? 'RD$' : '$'}${reservation.amount_paid.toLocaleString('es-DO', {minimumFractionDigits: 2})}
                             </td>
                           </tr>
                         </tfoot>
                       </table>
                     </div>
-                  ` : ''}
+                  ` : '';
+                  })()}
                   
                   <div class="total-line grand-total">
                     <span>RESTANTE A PAGAR</span>
