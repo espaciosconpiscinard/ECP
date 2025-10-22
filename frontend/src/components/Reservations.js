@@ -948,62 +948,45 @@ const Reservations = () => {
                     <span>Monto Pagado</span>
                     <span>${reservation.currency === 'DOP' ? 'RD$' : '$'}${reservation.amount_paid.toLocaleString('es-DO', {minimumFractionDigits: 2})}</span>
                   </div>
+
                   
-                  ${(() => {
+                  ${
                     // Calcular pago inicial (total pagado - suma de abonos)
-                    const totalAbonos = abonos.reduce((sum, a) => sum + a.amount, 0);
-                    const pagoInicial = reservation.amount_paid - totalAbonos;
-                    const tieneHistorial = pagoInicial > 0 || abonos.length > 0;
-                    
-                    return tieneHistorial ? `
-                    <div class="abonos-section">
-                      <div class="abonos-title">📋 Historial de Pagos</div>
-                      <table class="abonos-table">
-                        <thead>
-                          <tr>
-                            <th>Factura #</th>
-                            <th>Fecha</th>
-                            <th>Método</th>
-                            <th>Monto</th>
-                          </tr>
-                        </thead>
-                        <tbody>
-                          ${pagoInicial > 0 ? `
-                            <tr style="background: #e0f2fe;">
-                              <td><strong>#${reservation.invoice_number}</strong> <span style="font-size: 9px; color: #0369a1;">(INICIAL)</span></td>
-                              <td>${new Date(reservation.reservation_date).toLocaleDateString('es-DO')}</td>
-                              <td>${reservation.payment_method}</td>
-                              <td style="text-align: right; font-weight: bold;">${reservation.currency === 'DOP' ? 'RD$' : '$'}${pagoInicial.toLocaleString('es-DO', {minimumFractionDigits: 2})}</td>
-                            </tr>
-                          ` : ''}
-                          ${abonos.map(abono => `
-                            <tr>
-                              <td><strong>#${abono.invoice_number}</strong></td>
-                              <td>${new Date(abono.payment_date).toLocaleDateString('es-DO')}</td>
-                              <td>${abono.payment_method}</td>
-                              <td style="text-align: right; font-weight: bold;">${reservation.currency === 'DOP' ? 'RD$' : '$'}${abono.amount.toLocaleString('es-DO', {minimumFractionDigits: 2})}</td>
-                            </tr>
-                            ${abono.notes ? `
-                              <tr>
-                                <td colspan="4" style="padding: 5px 10px; font-size: 11px; color: #666; font-style: italic;">
-                                  📝 ${abono.notes}
-                                </td>
-                              </tr>
-                            ` : ''}
-                          `).join('')}
-                        </tbody>
-                        <tfoot>
-                          <tr>
-                            <td colspan="3" style="text-align: right; font-weight: bold;">Total Pagos:</td>
-                            <td style="text-align: right; font-weight: bold; color: #0ea5e9;">
-                              ${reservation.currency === 'DOP' ? 'RD$' : '$'}${reservation.amount_paid.toLocaleString('es-DO', {minimumFractionDigits: 2})}
-                            </td>
-                          </tr>
-                        </tfoot>
-                      </table>
-                    </div>
-                  ` : '';
-                  })()}
+                    (() => {
+                      const totalAbonos = abonos.reduce((sum, a) => sum + a.amount, 0);
+                      const pagoInicial = reservation.amount_paid - totalAbonos;
+                      const hasHistory = pagoInicial > 0 || abonos.length > 0;
+                      
+                      if (!hasHistory) return '';
+                      
+                      let historyHtml = '<div class="abonos-section"><div class="abonos-title">📋 Historial de Pagos</div><table class="abonos-table"><thead><tr><th>Factura #</th><th>Fecha</th><th>Método</th><th>Monto</th></tr></thead><tbody>';
+                      
+                      // Pago inicial
+                      if (pagoInicial > 0) {
+                        historyHtml += '<tr style="background: #e0f2fe;"><td><strong>#' + reservation.invoice_number + '</strong> <span style="font-size: 9px; color: #0369a1;">(INICIAL)</span></td>';
+                        historyHtml += '<td>' + new Date(reservation.reservation_date).toLocaleDateString('es-DO') + '</td>';
+                        historyHtml += '<td>' + reservation.payment_method + '</td>';
+                        historyHtml += '<td style="text-align: right; font-weight: bold;">' + (reservation.currency === 'DOP' ? 'RD$' : '$') + pagoInicial.toLocaleString('es-DO', {minimumFractionDigits: 2}) + '</td></tr>';
+                      }
+                      
+                      // Abonos
+                      abonos.forEach(abono => {
+                        historyHtml += '<tr><td><strong>#' + abono.invoice_number + '</strong></td>';
+                        historyHtml += '<td>' + new Date(abono.payment_date).toLocaleDateString('es-DO') + '</td>';
+                        historyHtml += '<td>' + abono.payment_method + '</td>';
+                        historyHtml += '<td style="text-align: right; font-weight: bold;">' + (reservation.currency === 'DOP' ? 'RD$' : '$') + abono.amount.toLocaleString('es-DO', {minimumFractionDigits: 2}) + '</td></tr>';
+                        
+                        if (abono.notes) {
+                          historyHtml += '<tr><td colspan="4" style="padding: 5px 10px; font-size: 11px; color: #666; font-style: italic;">📝 ' + abono.notes + '</td></tr>';
+                        }
+                      });
+                      
+                      historyHtml += '</tbody><tfoot><tr><td colspan="3" style="text-align: right; font-weight: bold;">Total Pagos:</td>';
+                      historyHtml += '<td style="text-align: right; font-weight: bold; color: #0ea5e9;">' + (reservation.currency === 'DOP' ? 'RD$' : '$') + reservation.amount_paid.toLocaleString('es-DO', {minimumFractionDigits: 2}) + '</td></tr></tfoot></table></div>';
+                      
+                      return historyHtml;
+                    })()
+                  }
                   
                   <div class="total-line grand-total">
                     <span>RESTANTE A PAGAR</span>
