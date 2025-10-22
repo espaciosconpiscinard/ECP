@@ -229,6 +229,72 @@ function Configuration() {
               })}
             </div>
           </div>
+          
+          <div className="bg-orange-50 p-4 rounded-md border border-orange-200 mt-4">
+            <h4 className="font-semibold text-orange-900 mb-2">📤 Importar Datos desde Excel</h4>
+            <p className="text-sm text-gray-700 mb-3">
+              Sube el archivo Excel que llenaste (plantilla descargada arriba) para importar masivamente tus datos históricos.
+            </p>
+            <p className="text-xs text-red-600 font-semibold mb-3">
+              ⚠️ IMPORTANTE: Para reservaciones con owner_price mayor a 0, el sistema creará automáticamente el gasto de "Pago Propietario" en estado PENDIENTE. Luego puedes marcar los que ya pagaste.
+            </p>
+            <input
+              type="file"
+              id="import-excel-file"
+              accept=".xlsx,.xls"
+              className="hidden"
+              onChange={async (e) => {
+                const file = e.target.files[0];
+                if (!file) return;
+                
+                if (!window.confirm(`¿Estás seguro de importar el archivo "${file.name}"?\n\nEsto creará/actualizará datos en la base de datos.`)) {
+                  e.target.value = '';
+                  return;
+                }
+                
+                try {
+                  const formData = new FormData();
+                  formData.append('file', file);
+                  
+                  const response = await fetch(`${API_URL}/api/import/excel`, {
+                    method: 'POST',
+                    headers: {
+                      'Authorization': `Bearer ${localStorage.getItem('token')}`
+                    },
+                    body: formData
+                  });
+                  
+                  if (!response.ok) {
+                    const errorData = await response.json();
+                    throw new Error(errorData.detail || 'Error al importar');
+                  }
+                  
+                  const result = await response.json();
+                  
+                  alert(result.summary);
+                  
+                  // Mostrar errores si hay
+                  if (result.details) {
+                    const allErrors = Object.values(result.details).flatMap(r => r.errors || []);
+                    if (allErrors.length > 0) {
+                      console.log('Errores de importación:', allErrors);
+                    }
+                  }
+                  
+                  e.target.value = ''; // Reset input
+                } catch (err) {
+                  alert(`❌ Error al importar: ${err.message}`);
+                  e.target.value = '';
+                }
+              }}
+            />
+            <button
+              onClick={() => document.getElementById('import-excel-file').click()}
+              className="px-4 py-2 bg-orange-600 text-white rounded-md hover:bg-orange-700 font-medium"
+            >
+              📥 Seleccionar Archivo Excel para Importar
+            </button>
+          </div>
         </div>
       </div>
 
