@@ -120,6 +120,25 @@ const Reservations = () => {
       setCustomers(custResponse.data);
       setVillas(villasResponse.data);
       setExtraServices(servicesResponse.data);
+      
+      // Cargar abonos de cada reservación para mostrar sus invoice_numbers
+      const abonosMap = {};
+      for (const reservation of resResponse.data) {
+        try {
+          const abonosResponse = await fetch(`${API_URL}/api/reservations/${reservation.id}/abonos`, {
+            headers: {
+              'Authorization': `Bearer ${localStorage.getItem('token')}`
+            }
+          });
+          if (abonosResponse.ok) {
+            const abonos = await abonosResponse.json();
+            abonosMap[reservation.id] = abonos;
+          }
+        } catch (err) {
+          console.error(`Error loading abonos for reservation ${reservation.id}:`, err);
+        }
+      }
+      setReservationAbonos(abonosMap);
     } catch (err) {
       setError('Error al cargar datos');
       console.error(err);
