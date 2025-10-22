@@ -220,6 +220,55 @@ backend:
         agent: "testing"
         comment: "✅ TESTED: Auto-creación de gastos completamente funcional. Al crear reservación con owner_price: 8000.0, se genera automáticamente gasto con category: 'pago_propietario', amount: 8000.0, description: 'Pago propietario villa ECPVSH - Factura #1605', payment_status: 'pending', related_reservation_id vinculado correctamente. Todos los campos requeridos presentes."
 
+  - task: "Invoice number para abonos - Modelo y validación"
+    implemented: true
+    working: "NA"
+    file: "/app/backend/models.py, /app/backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Modificado modelo Abono: agregado invoice_number (str) obligatorio después de creación, opcional en AbonoCreate para admin. Actualizada función get_next_invoice_number para verificar duplicados en reservation_abonos y expense_abonos. Creada función validate_invoice_number_available para validar números manuales."
+  
+  - task: "Invoice number para abonos de reservaciones - Endpoint"
+    implemented: true
+    working: "NA"
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Modificado endpoint POST /api/reservations/{id}/abonos: Si admin proporciona invoice_number manual, se valida disponibilidad. Si no se proporciona o es empleado, se auto-genera. Valida que solo admin puede especificar números manuales."
+  
+  - task: "Invoice number para abonos de gastos - Endpoint"
+    implemented: true
+    working: "NA"
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Modificado endpoint POST /api/expenses/{id}/abonos: Misma lógica que reservaciones - admin puede especificar invoice_number manual (validado), empleado obtiene auto-generado."
+  
+  - task: "Sistema de importación Excel - Backend"
+    implemented: true
+    working: "NA"
+    file: "/app/backend/server.py, /app/backend/import_service.py"
+    stuck_count: 0
+    priority: "medium"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Sistema de importación ya existía. Endpoint POST /api/import/excel procesa archivo Excel con múltiples hojas (Clientes, Villas, Reservaciones, Gastos). Al importar reservaciones con owner_price > 0, auto-genera gastos en estado 'pending' (NO PAGADO) según OPCION A del usuario. Validación de duplicados de invoice_number activa."
+
+
 frontend:
   - task: "Componente Customers - Agregar campo DNI"
     implemented: true
