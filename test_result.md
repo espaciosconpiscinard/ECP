@@ -252,15 +252,18 @@ backend:
   
   - task: "Invoice number para abonos de gastos - Endpoint"
     implemented: true
-    working: "NA"
+    working: true
     file: "/app/backend/server.py"
     stuck_count: 0
     priority: "high"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
       - working: "NA"
         agent: "main"
         comment: "Modificado endpoint POST /api/expenses/{id}/abonos: Misma lógica que reservaciones - admin puede especificar invoice_number manual (validado), empleado obtiene auto-generado."
+      - working: true
+        agent: "testing"
+        comment: "✅ TESTED: Endpoint POST /api/expenses/{id}/abonos completamente funcional. Empleado crea abono con invoice_number auto-generado (5822) ✅. Admin crea abono con invoice_number manual (7777) ✅. Validación cross-collection rechaza duplicados de reservation_abonos (400 error) ✅. Todos los abonos de gastos tienen invoice_number en GET /api/expenses/{id}/abonos ✅. Sistema mantiene integridad entre colecciones."
   
   - task: "Sistema de importación Excel - Backend"
     implemented: true
