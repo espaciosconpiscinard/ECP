@@ -138,6 +138,100 @@ function Configuration() {
       {/* Logo Uploader */}
       <LogoUploader />
 
+      {/* Import/Export Section */}
+      <div className="bg-white rounded-lg shadow-md p-6 mb-6">
+        <h3 className="text-xl font-semibold mb-4 flex items-center">
+          <span className="text-2xl mr-2">📥📤</span>
+          Importar / Exportar Datos
+        </h3>
+        <div className="space-y-4">
+          <div className="bg-blue-50 p-4 rounded-md border border-blue-200">
+            <h4 className="font-semibold text-blue-900 mb-2">📋 Descargar Plantilla de Importación</h4>
+            <p className="text-sm text-gray-700 mb-3">
+              Descarga una plantilla Excel con todas las secciones (Clientes, Villas, Reservaciones, Gastos) para llenar offline y luego importar.
+            </p>
+            <button
+              onClick={async () => {
+                try {
+                  const response = await fetch(`${API_URL}/api/export/template`, {
+                    headers: {
+                      'Authorization': `Bearer ${localStorage.getItem('token')}`
+                    }
+                  });
+                  if (!response.ok) throw new Error('Error al descargar plantilla');
+                  
+                  const blob = await response.blob();
+                  const url = window.URL.createObjectURL(blob);
+                  const a = document.createElement('a');
+                  a.href = url;
+                  a.download = 'Plantilla_Importacion_Espacios_Con_Piscina.xlsx';
+                  document.body.appendChild(a);
+                  a.click();
+                  window.URL.revokeObjectURL(url);
+                  document.body.removeChild(a);
+                  
+                  alert('✅ Plantilla descargada exitosamente');
+                } catch (err) {
+                  alert('❌ Error al descargar plantilla: ' + err.message);
+                }
+              }}
+              className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 font-medium"
+            >
+              📥 Descargar Plantilla Excel
+            </button>
+          </div>
+          
+          <div className="bg-green-50 p-4 rounded-md border border-green-200">
+            <h4 className="font-semibold text-green-900 mb-2">📤 Exportar Datos Existentes</h4>
+            <p className="text-sm text-gray-700 mb-3">
+              Exporta tus datos actuales a Excel para hacer respaldo o edición masiva.
+            </p>
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
+              {['customers', 'villas', 'reservations', 'expenses'].map(type => {
+                const names = {
+                  customers: 'Clientes',
+                  villas: 'Villas',
+                  reservations: 'Reservaciones',
+                  expenses: 'Gastos'
+                };
+                return (
+                  <button
+                    key={type}
+                    onClick={async () => {
+                      try {
+                        const response = await fetch(`${API_URL}/api/export/${type}`, {
+                          headers: {
+                            'Authorization': `Bearer ${localStorage.getItem('token')}`
+                          }
+                        });
+                        if (!response.ok) throw new Error('Error al exportar');
+                        
+                        const blob = await response.blob();
+                        const url = window.URL.createObjectURL(blob);
+                        const a = document.createElement('a');
+                        a.href = url;
+                        a.download = `${names[type]}_Export.xlsx`;
+                        document.body.appendChild(a);
+                        a.click();
+                        window.URL.revokeObjectURL(url);
+                        document.body.removeChild(a);
+                        
+                        alert(`✅ ${names[type]} exportados exitosamente`);
+                      } catch (err) {
+                        alert(`❌ Error al exportar ${names[type]}: ` + err.message);
+                      }
+                    }}
+                    className="px-3 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 text-sm font-medium"
+                  >
+                    {names[type]}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+        </div>
+      </div>
+
       {/* Invoice Counter Configuration */}
       <div className="bg-white rounded-lg shadow-md p-6">
         <h3 className="text-xl font-semibold mb-4 flex items-center">
