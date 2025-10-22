@@ -421,13 +421,28 @@ const Reservations = () => {
     if (!selectedReservation) return;
     
     try {
-      await addAbonoToReservation(selectedReservation.id, abonoFormData);
+      // Preparar datos del abono, incluyendo invoice_number solo si se proporcionó
+      const abonoData = { ...abonoFormData };
+      if (!abonoData.invoice_number || abonoData.invoice_number.trim() === '') {
+        delete abonoData.invoice_number;
+      }
+      
+      await addAbonoToReservation(selectedReservation.id, abonoData);
       setIsAbonoDialogOpen(false);
       setSelectedReservation(null);
+      // Resetear formulario de abono
+      setAbonoFormData({
+        amount: 0,
+        currency: 'DOP',
+        payment_method: 'efectivo',
+        payment_date: new Date().toISOString().split('T')[0],
+        notes: '',
+        invoice_number: ''
+      });
       await fetchData();
       alert('Abono registrado exitosamente');
     } catch (err) {
-      setError('Error al registrar abono');
+      setError(err.response?.data?.detail || 'Error al registrar abono');
       console.error(err);
     }
   };
