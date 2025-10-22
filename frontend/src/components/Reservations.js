@@ -38,7 +38,8 @@ const Reservations = () => {
     currency: 'DOP',
     payment_method: 'efectivo',
     payment_date: new Date().toISOString().split('T')[0],
-    notes: ''
+    notes: '',
+    invoice_number: ''  // Número de factura para el abono (solo admin)
   });
   
   // Estados para selección múltiple
