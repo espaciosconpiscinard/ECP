@@ -101,6 +101,26 @@ def calculate_balance(total: float, paid: float, deposit: float = 0) -> float:
     """Calculate balance due - includes deposit in calculation"""
     return max(0, total + deposit - paid)
 
+async def validate_invoice_number_available(invoice_num: str) -> bool:
+    """Check if an invoice number is available (not used in reservations or abonos)"""
+    # Verificar en reservations
+    existing_reservation = await db.reservations.find_one({"invoice_number": invoice_num}, {"_id": 0})
+    if existing_reservation:
+        return False
+    
+    # Verificar en abonos de reservaciones
+    existing_res_abono = await db.reservation_abonos.find_one({"invoice_number": invoice_num}, {"_id": 0})
+    if existing_res_abono:
+        return False
+    
+    # Verificar en abonos de gastos
+    existing_exp_abono = await db.expense_abonos.find_one({"invoice_number": invoice_num}, {"_id": 0})
+    if existing_exp_abono:
+        return False
+    
+    return True
+
+
 # ============ AUTH ENDPOINTS ============
 
 @api_router.post("/auth/register", response_model=UserResponse)
