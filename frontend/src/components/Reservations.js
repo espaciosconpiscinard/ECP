@@ -949,9 +949,15 @@ const Reservations = () => {
                     <span>${reservation.currency === 'DOP' ? 'RD$' : '$'}${reservation.amount_paid.toLocaleString('es-DO', {minimumFractionDigits: 2})}</span>
                   </div>
                   
-                  ${abonos.length > 0 ? `
+                  ${(() => {
+                    // Calcular pago inicial (total pagado - suma de abonos)
+                    const totalAbonos = abonos.reduce((sum, a) => sum + a.amount, 0);
+                    const pagoInicial = reservation.amount_paid - totalAbonos;
+                    const tieneHistorial = pagoInicial > 0 || abonos.length > 0;
+                    
+                    return tieneHistorial ? `
                     <div class="abonos-section">
-                      <div class="abonos-title">📋 Historial de Abonos</div>
+                      <div class="abonos-title">📋 Historial de Pagos</div>
                       <table class="abonos-table">
                         <thead>
                           <tr>
@@ -962,6 +968,14 @@ const Reservations = () => {
                           </tr>
                         </thead>
                         <tbody>
+                          ${pagoInicial > 0 ? `
+                            <tr style="background: #e0f2fe;">
+                              <td><strong>#${reservation.invoice_number}</strong> <span style="font-size: 9px; color: #0369a1;">(INICIAL)</span></td>
+                              <td>${new Date(reservation.reservation_date).toLocaleDateString('es-DO')}</td>
+                              <td>${reservation.payment_method}</td>
+                              <td style="text-align: right; font-weight: bold;">${reservation.currency === 'DOP' ? 'RD$' : '$'}${pagoInicial.toLocaleString('es-DO', {minimumFractionDigits: 2})}</td>
+                            </tr>
+                          ` : ''}
                           ${abonos.map(abono => `
                             <tr>
                               <td><strong>#${abono.invoice_number}</strong></td>
@@ -977,7 +991,8 @@ const Reservations = () => {
                               </tr>
                             ` : ''}
                           `).join('')}
-                        </tbody>
+                        </tbody>` : '';
+                  })()}
                         <tfoot>
                           <tr>
                             <td colspan="3" style="text-align: right; font-weight: bold;">Total Abonos:</td>
