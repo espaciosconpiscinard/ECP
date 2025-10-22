@@ -447,12 +447,17 @@ metadata:
 
 test_plan:
   current_focus:
-    - "Componente Customers - Agregar campo DNI"
-    - "Componente Expenses - Mostrar botón eliminar para todos los gastos"
+    - "Invoice number para abonos - Modelo y validación"
+    - "Invoice number para abonos de reservaciones - Endpoint"
+    - "Invoice number para abonos de gastos - Endpoint"
+    - "Sistema de importación Excel - Backend"
+    - "Reservations - Campo invoice_number en formulario de abono"
+    - "Expenses - Campo invoice_number en formulario de abono"
+    - "Configuration - Botón de importación Excel"
   stuck_tasks: []
   test_all: false
   test_priority: "high_first"
-  latest_test: "Sistema de expense_type testing completado exitosamente - 11/11 tests pasaron"
+  latest_test: "Pendiente - Nuevas funcionalidades de invoice_number en abonos y sistema de importación"
 
 agent_communication:
   - agent: "main"
