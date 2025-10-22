@@ -120,6 +120,20 @@ const Expenses = () => {
     try {
       const response = await getExpenses(filterCategory || null);
       setExpenses(response.data);
+      
+      // Cargar abonos de cada gasto para mostrar sus invoice_numbers
+      const abonosMap = {};
+      for (const expense of response.data) {
+        try {
+          const abonosResponse = await getExpenseAbonos(expense.id);
+          if (abonosResponse.data) {
+            abonosMap[expense.id] = abonosResponse.data;
+          }
+        } catch (err) {
+          console.error(`Error loading abonos for expense ${expense.id}:`, err);
+        }
+      }
+      setExpenseAbonos(abonosMap);
     } catch (err) {
       setError('Error al cargar gastos');
       console.error(err);
