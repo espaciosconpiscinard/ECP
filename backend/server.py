@@ -929,7 +929,9 @@ async def add_abono_to_reservation(reservation_id: str, abono_data: AbonoCreate,
         invoice_number = str(await get_next_invoice_number())
     
     # Create abono record with invoice_number
-    abono = Abono(**abono_data.model_dump(), invoice_number=invoice_number, created_by=current_user["id"])
+    abono_dict = abono_data.model_dump()
+    abono_dict["invoice_number"] = invoice_number  
+    abono = Abono(**abono_dict, created_by=current_user["id"])
     abono_doc = prepare_doc_for_insert(abono.model_dump())
     
     # Store in reservation_abonos collection
@@ -1213,7 +1215,9 @@ async def add_abono_to_expense(expense_id: str, abono_data: AbonoCreate, current
         invoice_number = str(await get_next_invoice_number())
     
     # Create abono record with invoice_number
-    abono = Abono(**abono_data.model_dump(), invoice_number=invoice_number, created_by=current_user["id"])
+    abono_dict = abono_data.model_dump()
+    abono_dict["invoice_number"] = invoice_number  
+    abono = Abono(**abono_dict, created_by=current_user["id"])
     abono_doc = prepare_doc_for_insert(abono.model_dump())
     
     # Store in expense_abonos collection
