@@ -1345,6 +1345,89 @@ async def export_data(data_type: str, current_user: dict = Depends(get_current_u
         }
     )
 
+@api_router.post("/import/excel")
+async def import_from_excel(
+    file: UploadFile = File(...),
+    current_user: dict = Depends(get_current_user)
+):
+    """Importar datos desde archivo Excel completo"""
+    if current_user.get("role") != "admin":
+        raise HTTPException(status_code=403, detail="Solo administradores pueden importar datos")
+    
+    if not file.filename.endswith(('.xlsx', '.xls')):
+        raise HTTPException(status_code=400, detail="El archivo debe ser Excel (.xlsx o .xls)")
+    
+    try:
+        # Leer archivo Excel
+        contents = await file.read()
+        excel_file = pd.ExcelFile(contents)
+        
+        results = {
+            'customers': {'created': 0, 'updated': 0, 'errors': []},
+            'villas': {'created': 0, 'updated': 0, 'errors': []},
+            'reservations': {'created': 0, 'updated': 0, 'expenses_created': 0, 'errors': []},
+            'expenses': {'created': 0, 'updated': 0, 'errors': []}
+        }
+        
+        # Importar Clientes
+        if '👥 Clientes' in excel_file.sheet_names:
+            df_customers = pd.read_excel(contents, sheet_name='👥 Clientes', skiprows=[1])  # Skip fila de ejemplo
+            df_customers = df_customers[~df_customers['Nombre Completo*'].astype(str).str.contains('Juan Pérez', na=False)]
+            if not df_customers.empty:
+                created, updated, errors = await import_customers(df_customers, db)
+                results['customers'] = {'created': created, 'updated': updated, 'errors': errors}
+        
+        # Importar Villas
+        if '🏠 Villas' in excel_file.sheet_names:
+            df_villas = pd.read_excel(contents, sheet_name='🏠 Villas', skiprows=[1])
+            df_villas = df_villas[~df_villas['Código Villa*'].astype(str).str.contains('ECPVSH', na=False)]
+            if not df_villas.empty:
+                created, updated, errors = await import_villas(df_villas, db)
+                results['villas'] = {'created': created, 'updated': updated, 'errors': errors}
+        
+        # Importar Reservaciones (y crear gastos automáticos - OPCIÓN A)
+        if '🎫 Reservaciones' in excel_file.sheet_names:
+            df_reservations = pd.read_excel(contents, sheet_name='🎫 Reservaciones', skiprows=[1])
+            df_reservations = df_reservations[~df_reservations['Número Factura*'].astype(str).str.contains('5815', na=False)]
+            if not df_reservations.empty:
+                res_created, res_updated, exp_created, errors = await import_reservations(df_reservations, db)
+                results['reservations'] = {
+                    'created': res_created, 
+                    'updated': res_updated, 
+                    'expenses_created': exp_created,
+                    'errors': errors
+                }
+        
+        # Importar Gastos adicionales
+        if '💰 Gastos' in excel_file.sheet_names:
+            df_expenses = pd.read_excel(contents, sheet_name='💰 Gastos', skiprows=[1])
+            df_expenses = df_expenses[~df_expenses['Descripción*'].astype(str).str.contains('Pago de luz', na=False)]
+            if not df_expenses.empty:
+                created, updated, errors = await import_expenses(df_expenses, db)
+                results['expenses'] = {'created': created, 'updated': updated, 'errors': errors}
+        
+        # Generar resumen
+        summary = f"""
+✅ IMPORTACIÓN COMPLETADA
+
+👥 Clientes: {results['customers']['created']} creados, {results['customers']['updated']} actualizados
+🏠 Villas: {results['villas']['created']} creadas, {results['villas']['updated']} actualizadas
+🎫 Reservaciones: {results['reservations']['created']} creadas, {results['reservations']['updated']} actualizadas
+💰 Gastos Propietario: {results['reservations']['expenses_created']} creados automáticamente
+💰 Gastos Adicionales: {results['expenses']['created']} creados
+
+Total errores: {sum(len(r.get('errors', [])) for r in results.values())}
+        """
+        
+        return {
+            "success": True,
+            "summary": summary,
+            "details": results
+        }
+        
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error al procesar archivo: {str(e)}")
+
 # Include router in app
 app.include_router(api_router)
 
