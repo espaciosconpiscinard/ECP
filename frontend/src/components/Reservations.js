@@ -1590,6 +1590,71 @@ const Reservations = () => {
         </Dialog>
       </div>
 
+      {/* Tarjetas de Totales */}
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+        {/* Total de Reservaciones */}
+        <Card>
+          <CardHeader className="pb-3">
+            <CardTitle className="text-sm font-medium text-gray-600">📋 Total Reservaciones</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold text-blue-600">{totals.totalReservations}</div>
+            <p className="text-xs text-gray-500 mt-1">Todas las reservaciones</p>
+          </CardContent>
+        </Card>
+
+        {/* Reservaciones Pendientes/Futuras */}
+        <Card>
+          <CardHeader className="pb-3">
+            <CardTitle className="text-sm font-medium text-gray-600">📅 Reservaciones Pendientes</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold text-orange-600">{totals.upcomingReservations}</div>
+            <p className="text-xs text-gray-500 mt-1">Futuras (no han pasado)</p>
+          </CardContent>
+        </Card>
+
+        {/* Total Pagado */}
+        <Card>
+          <CardHeader className="pb-3">
+            <CardTitle className="text-sm font-medium text-gray-600">💰 Total Pagado</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-1">
+              <div className="text-xl font-bold text-green-600">
+                RD$ {totals.totalPaidDOP.toLocaleString('es-DO', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+              </div>
+              {totals.totalPaidUSD > 0 && (
+                <div className="text-sm font-semibold text-green-500">
+                  US$ {totals.totalPaidUSD.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                </div>
+              )}
+            </div>
+            <p className="text-xs text-gray-500 mt-1">Suma de pagos realizados</p>
+          </CardContent>
+        </Card>
+
+        {/* Total Restante */}
+        <Card>
+          <CardHeader className="pb-3">
+            <CardTitle className="text-sm font-medium text-gray-600">⚠️ Total Restante</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-1">
+              <div className="text-xl font-bold text-red-600">
+                RD$ {totals.totalRemainingDOP.toLocaleString('es-DO', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+              </div>
+              {totals.totalRemainingUSD > 0 && (
+                <div className="text-sm font-semibold text-red-500">
+                  US$ {totals.totalRemainingUSD.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                </div>
+              )}
+            </div>
+            <p className="text-xs text-gray-500 mt-1">Saldos pendientes</p>
+          </CardContent>
+        </Card>
+      </div>
+
       <div className="flex items-center space-x-2">
         <Search className="text-gray-400" size={20} />
         <Input
