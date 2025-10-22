@@ -46,6 +46,9 @@ const Reservations = () => {
   const [selectedReservations, setSelectedReservations] = useState([]);
   const [selectAllReservations, setSelectAllReservations] = useState(false);
   
+  // Estado para almacenar los abonos de cada reservación (para mostrar invoice_numbers)
+  const [reservationAbonos, setReservationAbonos] = useState({});
+  
   const [formData, setFormData] = useState({
     customer_id: '',
     customer_name: '',
