@@ -1237,6 +1237,11 @@ const Expenses = () => {
                                     </span>
                                   )}
                                   <span>{expense.description}</span>
+                                  {expenseAbonos[expense.id] && expenseAbonos[expense.id].length > 0 && (
+                                    <div className="text-xs text-purple-600 font-medium mt-1">
+                                      (Abonos: {expenseAbonos[expense.id].map(a => `#${a.invoice_number}`).join(', ')})
+                                    </div>
+                                  )}
                                   {expense.has_payment_reminder && (
                                     <Bell size={14} className="text-orange-500" title={`Recordatorio día ${expense.payment_reminder_day}`} />
                                   )}
