@@ -65,14 +65,24 @@ async def get_next_invoice_number() -> int:
     else:
         invoice_num = counter["current_number"]
     
-    # Verificar si el número ya existe (por factura manual de admin)
+    # Verificar si el número ya existe en reservations o abonos (por factura manual de admin)
     # Si existe, buscar el siguiente número disponible
     max_attempts = 100  # Evitar bucle infinito
     attempts = 0
     
     while attempts < max_attempts:
-        existing = await db.reservations.find_one({"invoice_number": invoice_num}, {"_id": 0})
-        if not existing:
+        invoice_str = str(invoice_num)
+        
+        # Verificar en reservations
+        existing_reservation = await db.reservations.find_one({"invoice_number": invoice_str}, {"_id": 0})
+        
+        # Verificar en abonos de reservaciones
+        existing_res_abono = await db.reservation_abonos.find_one({"invoice_number": invoice_str}, {"_id": 0})
+        
+        # Verificar en abonos de gastos
+        existing_exp_abono = await db.expense_abonos.find_one({"invoice_number": invoice_str}, {"_id": 0})
+        
+        if not existing_reservation and not existing_res_abono and not existing_exp_abono:
             # Número disponible encontrado
             break
         # Número ya existe, probar el siguiente
