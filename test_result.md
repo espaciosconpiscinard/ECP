@@ -399,6 +399,43 @@ frontend:
         agent: "main"
         comment: "Actualizada tabla a vista lista expandible. Vista compacta: cliente, código villa, fecha, pagado, restante. Vista expandida: todos los detalles + acciones"
       - working: true
+
+  - task: "Reservations - Campo invoice_number en formulario de abono"
+    implemented: true
+    working: "NA"
+    file: "/app/frontend/src/components/Reservations.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Agregado campo invoice_number al formulario de abonos. Solo visible para admin. Placeholder indica 'Dejar vacío para auto-generar'. submitAbono modificado para enviar invoice_number solo si se proporcionó. Formulario se resetea correctamente incluyendo invoice_number."
+  
+  - task: "Expenses - Campo invoice_number en formulario de abono"
+    implemented: true
+    working: "NA"
+    file: "/app/frontend/src/components/Expenses.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Agregado campo invoice_number al formulario de abonos de gastos. Solo visible para admin. handleAbonoSubmit modificado para enviar invoice_number solo si se proporcionó. Historial de abonos actualizado para mostrar badge con invoice_number de cada abono."
+  
+  - task: "Configuration - Botón de importación Excel"
+    implemented: true
+    working: "NA"
+    file: "/app/frontend/src/components/Configuration.js"
+    stuck_count: 0
+    priority: "medium"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Botón de importación ya existía. Envía archivo Excel a /api/import/excel. Muestra resumen de importación con contadores de creados/actualizados. Incluye advertencia sobre auto-creación de gastos de propietario en estado PENDIENTE."
+
         agent: "testing"
         comment: "✅ TESTED: Vista expandible funcional. Página carga correctamente con estructura de lista expandible. No hay reservaciones para probar expansión, pero interfaz está lista. Formulario de nueva reservación disponible."
 
