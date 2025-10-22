@@ -291,11 +291,12 @@ class AbonoBase(BaseModel):
     notes: Optional[str] = None
 
 class AbonoCreate(AbonoBase):
-    pass
+    invoice_number: Optional[str] = None  # Opcional: solo admin puede proporcionar número manual
 
 class Abono(AbonoBase):
     model_config = ConfigDict(extra="ignore")
     id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    invoice_number: str  # Número de factura único para este abono
     created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
     created_by: str
 
