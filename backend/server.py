@@ -1297,7 +1297,7 @@ async def health_check():
     return {"status": "healthy", "service": "espacios-con-piscina-api"}
 
 # ============ EXPORT/IMPORT ENDPOINTS ============
-from backend.export_service import create_excel_template, export_data_to_excel
+from export_service import create_excel_template, export_data_to_excel
 
 @api_router.get("/export/template")
 async def download_template(current_user: dict = Depends(get_current_user)):
