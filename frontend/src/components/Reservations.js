@@ -905,6 +905,48 @@ const Reservations = () => {
                     <span>Monto Pagado</span>
                     <span>${reservation.currency === 'DOP' ? 'RD$' : '$'}${reservation.amount_paid.toLocaleString('es-DO', {minimumFractionDigits: 2})}</span>
                   </div>
+                  
+                  ${abonos.length > 0 ? `
+                    <div class="abonos-section">
+                      <div class="abonos-title">📋 Historial de Abonos</div>
+                      <table class="abonos-table">
+                        <thead>
+                          <tr>
+                            <th>Factura #</th>
+                            <th>Fecha</th>
+                            <th>Método</th>
+                            <th>Monto</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          ${abonos.map(abono => `
+                            <tr>
+                              <td><strong>#${abono.invoice_number}</strong></td>
+                              <td>${new Date(abono.payment_date).toLocaleDateString('es-DO')}</td>
+                              <td>${abono.payment_method}</td>
+                              <td style="text-align: right; font-weight: bold;">${reservation.currency === 'DOP' ? 'RD$' : '$'}${abono.amount.toLocaleString('es-DO', {minimumFractionDigits: 2})}</td>
+                            </tr>
+                            ${abono.notes ? `
+                              <tr>
+                                <td colspan="4" style="padding: 5px 10px; font-size: 11px; color: #666; font-style: italic;">
+                                  📝 ${abono.notes}
+                                </td>
+                              </tr>
+                            ` : ''}
+                          `).join('')}
+                        </tbody>
+                        <tfoot>
+                          <tr>
+                            <td colspan="3" style="text-align: right; font-weight: bold;">Total Abonos:</td>
+                            <td style="text-align: right; font-weight: bold; color: #0ea5e9;">
+                              ${reservation.currency === 'DOP' ? 'RD$' : '$'}${abonos.reduce((sum, a) => sum + a.amount, 0).toLocaleString('es-DO', {minimumFractionDigits: 2})}
+                            </td>
+                          </tr>
+                        </tfoot>
+                      </table>
+                    </div>
+                  ` : ''}
+                  
                   <div class="total-line grand-total">
                     <span>RESTANTE A PAGAR</span>
                     <span>${reservation.currency === 'DOP' ? 'RD$' : '$'}${balanceDue.toLocaleString('es-DO', {minimumFractionDigits: 2})}</span>
