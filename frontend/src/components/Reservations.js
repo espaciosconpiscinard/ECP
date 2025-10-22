@@ -1771,6 +1771,22 @@ const Reservations = () => {
               />
             </div>
 
+            {/* Campo de número de factura - solo visible para admin */}
+            {user?.role === 'admin' && (
+              <div>
+                <Label>Número de Factura (Opcional)</Label>
+                <Input
+                  type="text"
+                  value={abonoFormData.invoice_number}
+                  onChange={(e) => setAbonoFormData({ ...abonoFormData, invoice_number: e.target.value })}
+                  placeholder="Dejar vacío para auto-generar"
+                />
+                <p className="text-xs text-gray-500 mt-1">
+                  Si no se especifica, se generará automáticamente
+                </p>
+              </div>
+            )}
+
             <div>
               <Label>Notas</Label>
               <textarea
