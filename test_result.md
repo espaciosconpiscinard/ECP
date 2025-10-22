@@ -711,3 +711,45 @@ agent_communication:
       - Sistema de expense_type completamente funcional
       - Bug de tabs Variables/Fijos/Únicos previamente corregido
       - Backend y frontend sincronizados con valores singulares
+
+
+  - agent: "main"
+    message: |
+      🎯 NUEVAS FUNCIONALIDADES IMPLEMENTADAS - INVOICE NUMBER EN ABONOS + IMPORTACIÓN EXCEL
+      
+      BACKEND:
+      1. ✅ Sistema de Invoice Number para Abonos (Reservaciones y Gastos)
+         - Modelo Abono actualizado: invoice_number (str) obligatorio en modelo final
+         - AbonoCreate: invoice_number opcional para admin
+         - get_next_invoice_number(): ahora verifica duplicados en reservations, reservation_abonos y expense_abonos
+         - validate_invoice_number_available(): valida números manuales ingresados por admin
+         - POST /api/reservations/{id}/abonos: genera invoice_number auto o valida manual (admin only)
+         - POST /api/expenses/{id}/abonos: genera invoice_number auto o valida manual (admin only)
+      
+      2. ✅ Sistema de Importación Excel (Verificado que ya existía)
+         - POST /api/import/excel: procesa archivo Excel con múltiples hojas
+         - Importa: Clientes, Villas, Reservaciones, Gastos
+         - Validación de duplicados por invoice_number activa
+         - Auto-generación de gastos de propietario en estado "NO PAGADO" (OPCION A)
+      
+      FRONTEND:
+      1. ✅ Reservations.js
+         - Campo invoice_number agregado a formulario de abonos (solo admin)
+         - submitAbono: envía invoice_number solo si se proporcionó
+         - Formulario se resetea correctamente incluyendo invoice_number
+      
+      2. ✅ Expenses.js
+         - Campo invoice_number agregado a formulario de abonos (solo admin)
+         - handleAbonoSubmit: envía invoice_number solo si se proporcionó
+         - Historial de abonos muestra badge con invoice_number
+      
+      3. ✅ Configuration.js
+         - Botón de importación Excel ya existía y funcional
+         - Muestra resumen de importación con contadores
+         - Advertencia sobre auto-creación de gastos
+      
+      SIGUIENTE PASO:
+      - Testing backend: Endpoints de abonos con invoice_number (auto-generado y manual)
+      - Validación de duplicados
+      - Sistema de importación Excel
+      - Testing frontend según decisión del usuario
