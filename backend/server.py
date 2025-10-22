@@ -1311,7 +1311,7 @@ async def download_template(current_user: dict = Depends(get_current_user)):
         template,
         media_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
         headers={
-            "Content-Disposition": f"attachment; filename=Plantilla_Importacion_Espacios_Con_Piscina.xlsx"
+            "Content-Disposition": "attachment; filename=Plantilla_Importacion_Espacios_Con_Piscina.xlsx"
         }
     )
 
