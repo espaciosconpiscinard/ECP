@@ -762,3 +762,48 @@ agent_communication:
       - Validación de duplicados
       - Sistema de importación Excel
       - Testing frontend según decisión del usuario
+  
+  - agent: "testing"
+    message: |
+      🎯 INVOICE NUMBER SYSTEM TESTING COMPLETADO - TODOS LOS TESTS PASARON ✅
+      
+      ✅ FUNCIONALIDADES VERIFICADAS:
+      
+      🧾 SISTEMA DE INVOICE NUMBER PARA ABONOS:
+      - Modelo Abono con invoice_number obligatorio ✅ funcional
+      - AbonoCreate con invoice_number opcional para admin ✅ funcional
+      - get_next_invoice_number() genera números únicos y consecutivos ✅ verificado
+      - validate_invoice_number_available() previene duplicados ✅ funcional
+      
+      📋 ABONOS DE RESERVACIONES:
+      - Empleado crea abono con invoice_number auto-generado ✅ (5821)
+      - Admin crea abono con invoice_number manual ✅ (9999)
+      - Validación de duplicados rechaza correctamente ✅ (400 error)
+      - Empleado NO puede especificar invoice_number manual ✅ (403 Forbidden)
+      - GET /api/reservations/{id}/abonos muestra invoice_number ✅ verificado
+      
+      💰 ABONOS DE GASTOS:
+      - Empleado crea abono con invoice_number auto-generado ✅ (5822)
+      - Admin crea abono con invoice_number manual ✅ (7777)
+      - Validación cross-collection rechaza duplicados ✅ (400 error)
+      - GET /api/expenses/{id}/abonos muestra invoice_number ✅ verificado
+      
+      🔢 NÚMEROS AUTO-GENERADOS ÚNICOS:
+      - Múltiples abonos generan números únicos ✅ [5823, 5824, 5825]
+      - Números son consecutivos ✅ verificado
+      - Sistema evita duplicados en todas las colecciones ✅ funcional
+      
+      🎯 CRITERIOS DE ÉXITO CUMPLIDOS:
+      ✅ Abonos auto-generan invoice_number cuando no se proporciona
+      ✅ Admin puede especificar invoice_number manual
+      ✅ Empleado NO puede especificar invoice_number manual (403)
+      ✅ Validación de duplicados funciona (400 si ya existe)
+      ✅ Números se incrementan correctamente
+      ✅ Sistema verifica duplicados en todas las colecciones (reservations, reservation_abonos, expense_abonos)
+      ✅ GET de abonos muestra invoice_number correctamente
+      
+      📊 RESULTADO FINAL: 16/16 pruebas de invoice_number pasaron exitosamente
+      - Sistema de invoice_number para abonos completamente funcional
+      - Validación de duplicados cross-collection operativa
+      - Permisos por rol implementados correctamente
+      - Auto-generación de números únicos y consecutivos verificada
