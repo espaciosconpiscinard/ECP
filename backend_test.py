@@ -1146,6 +1146,385 @@ class BackendTester:
             else:
                 self.log_test(f"Find {expense_type} Expense for Deletion", False, f"No {expense_type} expense found for deletion test")
     
+    def test_invoice_number_system_for_abonos(self):
+        """Comprehensive testing of invoice number system for abonos"""
+        print("\n🧾 Testing Invoice Number System for Abonos")
+        
+        # Step 1: Create test customer and reservation for testing
+        print("   📋 Setting up test data...")
+        
+        # Create test customer
+        customer_data = {
+            "name": "Test Cliente Abonos",
+            "phone": "809-555-9999",
+            "email": "test.abonos@email.com",
+            "address": "Santo Domingo, RD"
+        }
+        
+        customer_result = self.make_request("POST", "/customers", customer_data, self.admin_token)
+        if not customer_result.get("success"):
+            self.log_test("Create Test Customer for Abonos", False, "Failed to create test customer", customer_result)
+            return
+        
+        test_customer = customer_result["data"]
+        self.log_test("Create Test Customer for Abonos", True, f"Created customer: {test_customer['name']}")
+        
+        # Get a villa for testing
+        villas_result = self.make_request("GET", "/villas", token=self.admin_token)
+        if not villas_result.get("success") or not villas_result["data"]:
+            self.log_test("Get Villa for Abonos Test", False, "No villas available")
+            return
+        
+        test_villa = villas_result["data"][0]
+        
+        # Create reservation with owner_price > 0 to auto-generate expense
+        reservation_data = {
+            "customer_id": test_customer["id"],
+            "customer_name": test_customer["name"],
+            "villa_id": test_villa["id"],
+            "villa_code": test_villa["code"],
+            "rental_type": "pasadia",
+            "reservation_date": "2025-01-15T00:00:00Z",
+            "check_in_time": "10:00 AM",
+            "check_out_time": "8:00 PM",
+            "guests": 6,
+            "base_price": 20000.0,
+            "owner_price": 12000.0,  # This will auto-generate an expense
+            "subtotal": 20000.0,
+            "total_amount": 20000.0,
+            "amount_paid": 5000.0,
+            "currency": "DOP",
+            "status": "confirmed",
+            "notes": "Test reservation for invoice number testing"
+        }
+        
+        reservation_result = self.make_request("POST", "/reservations", reservation_data, self.admin_token)
+        if not reservation_result.get("success"):
+            self.log_test("Create Test Reservation", False, "Failed to create test reservation", reservation_result)
+            return
+        
+        test_reservation = reservation_result["data"]
+        self.log_test("Create Test Reservation", True, f"Created reservation #{test_reservation['invoice_number']}")
+        
+        # Find the auto-generated expense
+        expenses_result = self.make_request("GET", "/expenses", token=self.admin_token)
+        if not expenses_result.get("success"):
+            self.log_test("Get Expenses for Abonos Test", False, "Failed to get expenses")
+            return
+        
+        auto_expense = None
+        for expense in expenses_result["data"]:
+            if (expense.get("category") == "pago_propietario" and 
+                expense.get("related_reservation_id") == test_reservation["id"]):
+                auto_expense = expense
+                break
+        
+        if not auto_expense:
+            self.log_test("Find Auto-Generated Expense", False, "Auto-generated expense not found")
+            return
+        
+        self.log_test("Find Auto-Generated Expense", True, f"Found auto-generated expense: {auto_expense['id']}")
+        
+        # TEST 1.1: Employee creates abono with auto-generated invoice_number (reservation)
+        print("\n   🧾 Test 1.1: Employee abono with auto-generated invoice_number (reservation)")
+        
+        abono_data_employee = {
+            "amount": 1000.0,
+            "currency": "DOP",
+            "payment_method": "efectivo",
+            "payment_date": "2025-01-15T10:00:00Z",
+            "notes": "Primer abono - auto-generado"
+        }
+        
+        abono_result = self.make_request("POST", f"/reservations/{test_reservation['id']}/abonos", 
+                                       abono_data_employee, self.employee_token)
+        
+        if abono_result.get("success"):
+            created_abono = abono_result["data"]
+            if created_abono.get("invoice_number"):
+                self.log_test("Employee Abono Auto-Generated Invoice (Reservation)", True, 
+                             f"Employee abono created with auto-generated invoice_number: {created_abono['invoice_number']}")
+                employee_invoice_num = created_abono["invoice_number"]
+            else:
+                self.log_test("Employee Abono Auto-Generated Invoice (Reservation)", False, 
+                             "Employee abono missing invoice_number")
+                return
+        else:
+            self.log_test("Employee Abono Auto-Generated Invoice (Reservation)", False, 
+                         "Failed to create employee abono", abono_result)
+            return
+        
+        # Verify abono appears in reservation abonos list
+        abonos_result = self.make_request("GET", f"/reservations/{test_reservation['id']}/abonos", 
+                                        token=self.employee_token)
+        
+        if abonos_result.get("success"):
+            abonos = abonos_result["data"]
+            found_abono = any(a.get("invoice_number") == employee_invoice_num for a in abonos)
+            if found_abono:
+                self.log_test("Verify Employee Abono in List (Reservation)", True, 
+                             f"Employee abono with invoice_number {employee_invoice_num} found in list")
+            else:
+                self.log_test("Verify Employee Abono in List (Reservation)", False, 
+                             "Employee abono not found in reservation abonos list")
+        else:
+            self.log_test("Get Reservation Abonos", False, "Failed to get reservation abonos", abonos_result)
+        
+        # TEST 1.2: Admin creates abono with manual invoice_number (reservation)
+        print("\n   🧾 Test 1.2: Admin abono with manual invoice_number (reservation)")
+        
+        manual_invoice_num = "9999"
+        abono_data_admin = {
+            "amount": 500.0,
+            "currency": "DOP",
+            "payment_method": "transferencia",
+            "payment_date": "2025-01-16T10:00:00Z",
+            "notes": "Segundo abono - número manual",
+            "invoice_number": manual_invoice_num
+        }
+        
+        admin_abono_result = self.make_request("POST", f"/reservations/{test_reservation['id']}/abonos", 
+                                             abono_data_admin, self.admin_token)
+        
+        if admin_abono_result.get("success"):
+            admin_abono = admin_abono_result["data"]
+            if admin_abono.get("invoice_number") == manual_invoice_num:
+                self.log_test("Admin Manual Invoice Number (Reservation)", True, 
+                             f"Admin abono created with manual invoice_number: {manual_invoice_num}")
+            else:
+                self.log_test("Admin Manual Invoice Number (Reservation)", False, 
+                             f"Admin abono has wrong invoice_number: {admin_abono.get('invoice_number')}")
+        else:
+            self.log_test("Admin Manual Invoice Number (Reservation)", False, 
+                         "Failed to create admin abono with manual invoice_number", admin_abono_result)
+        
+        # TEST 1.3: Try to create duplicate invoice_number (should fail)
+        print("\n   🧾 Test 1.3: Duplicate invoice_number validation (reservation)")
+        
+        duplicate_abono_data = {
+            "amount": 300.0,
+            "currency": "DOP",
+            "payment_method": "efectivo",
+            "payment_date": "2025-01-17T10:00:00Z",
+            "notes": "Intento de duplicado",
+            "invoice_number": manual_invoice_num  # Same as previous
+        }
+        
+        duplicate_result = self.make_request("POST", f"/reservations/{test_reservation['id']}/abonos", 
+                                           duplicate_abono_data, self.admin_token)
+        
+        if duplicate_result.get("status_code") == 400:
+            error_message = duplicate_result.get("data", {}).get("detail", "")
+            if "already in use" in error_message or "ya existe" in error_message:
+                self.log_test("Duplicate Invoice Number Validation (Reservation)", True, 
+                             f"Duplicate invoice_number correctly rejected: {error_message}")
+            else:
+                self.log_test("Duplicate Invoice Number Validation (Reservation)", False, 
+                             f"Wrong error message: {error_message}")
+        else:
+            self.log_test("Duplicate Invoice Number Validation (Reservation)", False, 
+                         f"Duplicate invoice_number not rejected. Status: {duplicate_result.get('status_code')}")
+        
+        # TEST 1.4: Employee cannot specify manual invoice_number
+        print("\n   🧾 Test 1.4: Employee forbidden from manual invoice_number (reservation)")
+        
+        employee_manual_data = {
+            "amount": 200.0,
+            "currency": "DOP",
+            "payment_method": "efectivo",
+            "payment_date": "2025-01-18T10:00:00Z",
+            "notes": "Empleado intenta número manual",
+            "invoice_number": "8888"
+        }
+        
+        employee_manual_result = self.make_request("POST", f"/reservations/{test_reservation['id']}/abonos", 
+                                                 employee_manual_data, self.employee_token)
+        
+        if employee_manual_result.get("status_code") == 403:
+            self.log_test("Employee Manual Invoice Forbidden (Reservation)", True, 
+                         "Employee correctly forbidden from specifying manual invoice_number")
+        else:
+            self.log_test("Employee Manual Invoice Forbidden (Reservation)", False, 
+                         f"Employee manual invoice_number not properly forbidden. Status: {employee_manual_result.get('status_code')}")
+        
+        # TEST 2: EXPENSE ABONOS TESTING
+        print("\n   💰 Testing Invoice Numbers for Expense Abonos")
+        
+        # TEST 2.1: Employee creates abono with auto-generated invoice_number (expense)
+        print("\n   🧾 Test 2.1: Employee abono with auto-generated invoice_number (expense)")
+        
+        expense_abono_employee = {
+            "amount": 2000.0,
+            "currency": "DOP",
+            "payment_method": "efectivo",
+            "payment_date": "2025-01-19T10:00:00Z",
+            "notes": "Abono a gasto - auto-generado"
+        }
+        
+        expense_abono_result = self.make_request("POST", f"/expenses/{auto_expense['id']}/abonos", 
+                                               expense_abono_employee, self.employee_token)
+        
+        if expense_abono_result.get("success"):
+            expense_abono = expense_abono_result["data"]
+            if expense_abono.get("invoice_number"):
+                self.log_test("Employee Abono Auto-Generated Invoice (Expense)", True, 
+                             f"Employee expense abono created with auto-generated invoice_number: {expense_abono['invoice_number']}")
+                expense_employee_invoice = expense_abono["invoice_number"]
+            else:
+                self.log_test("Employee Abono Auto-Generated Invoice (Expense)", False, 
+                             "Employee expense abono missing invoice_number")
+        else:
+            self.log_test("Employee Abono Auto-Generated Invoice (Expense)", False, 
+                         "Failed to create employee expense abono", expense_abono_result)
+        
+        # TEST 2.2: Admin creates abono with manual invoice_number (expense)
+        print("\n   🧾 Test 2.2: Admin abono with manual invoice_number (expense)")
+        
+        manual_expense_invoice = "7777"
+        expense_abono_admin = {
+            "amount": 1500.0,
+            "currency": "DOP",
+            "payment_method": "transferencia",
+            "payment_date": "2025-01-20T10:00:00Z",
+            "notes": "Abono a gasto - número manual",
+            "invoice_number": manual_expense_invoice
+        }
+        
+        admin_expense_abono_result = self.make_request("POST", f"/expenses/{auto_expense['id']}/abonos", 
+                                                     expense_abono_admin, self.admin_token)
+        
+        if admin_expense_abono_result.get("success"):
+            admin_expense_abono = admin_expense_abono_result["data"]
+            if admin_expense_abono.get("invoice_number") == manual_expense_invoice:
+                self.log_test("Admin Manual Invoice Number (Expense)", True, 
+                             f"Admin expense abono created with manual invoice_number: {manual_expense_invoice}")
+            else:
+                self.log_test("Admin Manual Invoice Number (Expense)", False, 
+                             f"Admin expense abono has wrong invoice_number: {admin_expense_abono.get('invoice_number')}")
+        else:
+            self.log_test("Admin Manual Invoice Number (Expense)", False, 
+                         "Failed to create admin expense abono with manual invoice_number", admin_expense_abono_result)
+        
+        # TEST 2.3: Cross-collection validation (use reservation invoice_number in expense abono)
+        print("\n   🧾 Test 2.3: Cross-collection duplicate validation")
+        
+        cross_duplicate_data = {
+            "amount": 800.0,
+            "currency": "DOP",
+            "payment_method": "efectivo",
+            "payment_date": "2025-01-21T10:00:00Z",
+            "notes": "Intento usar número de reservación",
+            "invoice_number": manual_invoice_num  # Use the reservation invoice number
+        }
+        
+        cross_duplicate_result = self.make_request("POST", f"/expenses/{auto_expense['id']}/abonos", 
+                                                 cross_duplicate_data, self.admin_token)
+        
+        if cross_duplicate_result.get("status_code") == 400:
+            error_message = cross_duplicate_result.get("data", {}).get("detail", "")
+            if "already in use" in error_message or "ya existe" in error_message:
+                self.log_test("Cross-Collection Duplicate Validation", True, 
+                             f"Cross-collection duplicate correctly rejected: {error_message}")
+            else:
+                self.log_test("Cross-Collection Duplicate Validation", False, 
+                             f"Wrong error message for cross-collection duplicate: {error_message}")
+        else:
+            self.log_test("Cross-Collection Duplicate Validation", False, 
+                         f"Cross-collection duplicate not rejected. Status: {cross_duplicate_result.get('status_code')}")
+        
+        # TEST 3: Verify get_next_invoice_number avoids duplicates
+        print("\n   🧾 Test 3: Verify unique auto-generated invoice numbers")
+        
+        # Create multiple abonos without specifying invoice_number
+        auto_generated_numbers = []
+        
+        for i in range(3):
+            auto_abono_data = {
+                "amount": 100.0 + (i * 50),
+                "currency": "DOP",
+                "payment_method": "efectivo",
+                "payment_date": f"2025-01-{22+i}T10:00:00Z",
+                "notes": f"Auto abono #{i+1}"
+            }
+            
+            auto_result = self.make_request("POST", f"/reservations/{test_reservation['id']}/abonos", 
+                                          auto_abono_data, self.employee_token)
+            
+            if auto_result.get("success"):
+                auto_abono = auto_result["data"]
+                invoice_num = auto_abono.get("invoice_number")
+                if invoice_num:
+                    auto_generated_numbers.append(invoice_num)
+        
+        # Check if all numbers are unique
+        if len(auto_generated_numbers) == 3:
+            unique_numbers = set(auto_generated_numbers)
+            if len(unique_numbers) == 3:
+                self.log_test("Unique Auto-Generated Numbers", True, 
+                             f"All auto-generated numbers are unique: {auto_generated_numbers}")
+                
+                # Check if numbers are consecutive (they should be)
+                sorted_numbers = sorted([int(num) for num in auto_generated_numbers])
+                is_consecutive = all(sorted_numbers[i] == sorted_numbers[i-1] + 1 for i in range(1, len(sorted_numbers)))
+                
+                if is_consecutive:
+                    self.log_test("Consecutive Invoice Numbers", True, 
+                                 f"Auto-generated numbers are consecutive: {sorted_numbers}")
+                else:
+                    self.log_test("Consecutive Invoice Numbers", False, 
+                                 f"Auto-generated numbers are not consecutive: {sorted_numbers}")
+            else:
+                self.log_test("Unique Auto-Generated Numbers", False, 
+                             f"Duplicate auto-generated numbers found: {auto_generated_numbers}")
+        else:
+            self.log_test("Create Multiple Auto Abonos", False, 
+                         f"Failed to create 3 auto abonos. Created: {len(auto_generated_numbers)}")
+        
+        # FINAL VERIFICATION: Get all abonos and verify invoice_number presence
+        print("\n   🧾 Final Verification: All abonos have invoice_number")
+        
+        # Get reservation abonos
+        final_res_abonos = self.make_request("GET", f"/reservations/{test_reservation['id']}/abonos", 
+                                           token=self.admin_token)
+        
+        if final_res_abonos.get("success"):
+            res_abonos = final_res_abonos["data"]
+            abonos_with_invoice = [a for a in res_abonos if a.get("invoice_number")]
+            
+            if len(abonos_with_invoice) == len(res_abonos):
+                self.log_test("All Reservation Abonos Have Invoice Numbers", True, 
+                             f"All {len(res_abonos)} reservation abonos have invoice_number")
+            else:
+                self.log_test("All Reservation Abonos Have Invoice Numbers", False, 
+                             f"Only {len(abonos_with_invoice)}/{len(res_abonos)} reservation abonos have invoice_number")
+        
+        # Get expense abonos
+        final_exp_abonos = self.make_request("GET", f"/expenses/{auto_expense['id']}/abonos", 
+                                           token=self.admin_token)
+        
+        if final_exp_abonos.get("success"):
+            exp_abonos = final_exp_abonos["data"]
+            exp_abonos_with_invoice = [a for a in exp_abonos if a.get("invoice_number")]
+            
+            if len(exp_abonos_with_invoice) == len(exp_abonos):
+                self.log_test("All Expense Abonos Have Invoice Numbers", True, 
+                             f"All {len(exp_abonos)} expense abonos have invoice_number")
+            else:
+                self.log_test("All Expense Abonos Have Invoice Numbers", False, 
+                             f"Only {len(exp_abonos_with_invoice)}/{len(exp_abonos)} expense abonos have invoice_number")
+        
+        print(f"\n   🎯 INVOICE NUMBER SYSTEM TEST SUMMARY COMPLETE")
+        
+        # Summary of what was tested
+        print("   ✅ Tested Features:")
+        print("      - Auto-generation of invoice_number for employee abonos")
+        print("      - Manual invoice_number specification for admin abonos")
+        print("      - Duplicate invoice_number validation (400 error)")
+        print("      - Employee forbidden from manual invoice_number (403 error)")
+        print("      - Cross-collection duplicate validation")
+        print("      - Unique and consecutive auto-generated numbers")
+        print("      - Invoice_number presence in all abonos")
+    
     def run_all_tests(self):
         """Run all backend tests"""
         print("🚀 Starting Backend Testing Suite for Category System")
