@@ -222,15 +222,18 @@ backend:
 
   - task: "Invoice number para abonos - Modelo y validación"
     implemented: true
-    working: "NA"
+    working: true
     file: "/app/backend/models.py, /app/backend/server.py"
     stuck_count: 0
     priority: "high"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
       - working: "NA"
         agent: "main"
         comment: "Modificado modelo Abono: agregado invoice_number (str) obligatorio después de creación, opcional en AbonoCreate para admin. Actualizada función get_next_invoice_number para verificar duplicados en reservation_abonos y expense_abonos. Creada función validate_invoice_number_available para validar números manuales."
+      - working: true
+        agent: "testing"
+        comment: "✅ TESTED: Sistema de invoice_number completamente funcional. Modelo Abono con invoice_number obligatorio verificado. Función get_next_invoice_number genera números únicos y consecutivos (5821, 5822, 5823). Función validate_invoice_number_available previene duplicados correctamente. Validación cross-collection funciona entre reservation_abonos y expense_abonos."
   
   - task: "Invoice number para abonos de reservaciones - Endpoint"
     implemented: true
