@@ -682,6 +682,49 @@ const Reservations = () => {
               padding: 15px;
             }
             
+            /* Abonos Section */
+            .abonos-section {
+              margin: 20px 0;
+              padding: 15px;
+              background: #f0f9ff;
+              border-radius: 8px;
+              border: 2px solid #0ea5e9;
+            }
+            .abonos-title {
+              font-size: 14px;
+              font-weight: 700;
+              color: #0369a1;
+              margin-bottom: 10px;
+              text-transform: uppercase;
+            }
+            .abonos-table {
+              width: 100%;
+              border-collapse: collapse;
+              font-size: 11px;
+            }
+            .abonos-table thead {
+              background: #0ea5e9;
+              color: white;
+            }
+            .abonos-table th {
+              padding: 8px;
+              text-align: left;
+              font-weight: 600;
+            }
+            .abonos-table tbody tr {
+              border-bottom: 1px solid #ddd;
+            }
+            .abonos-table tbody td {
+              padding: 8px;
+            }
+            .abonos-table tfoot {
+              background: #e0f2fe;
+              font-weight: 700;
+            }
+            .abonos-table tfoot td {
+              padding: 10px 8px;
+            }
+            
             /* Payment & Notes */
             .extra-info {
               margin: 30px 0;
