@@ -1504,6 +1504,11 @@ const Expenses = () => {
                           <span className="text-xs px-2 py-1 bg-blue-100 text-blue-800 rounded">
                             {abono.payment_method}
                           </span>
+                          {abono.invoice_number && (
+                            <span className="text-xs px-2 py-1 bg-purple-100 text-purple-800 rounded font-mono">
+                              Factura #{abono.invoice_number}
+                            </span>
+                          )}
                         </div>
                         {abono.notes && (
                           <p className="text-sm text-gray-500 mt-1">{abono.notes}</p>
