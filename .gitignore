@@ -57,3 +57,7 @@ Con
 Piscina.exe
 frontend/node_modules/electron/dist/electron
 frontend/dist/win-unpacked/resources/app.asar
+-e 
+# Environment files
+*.env
+*.env.*
