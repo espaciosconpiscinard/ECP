@@ -150,17 +150,9 @@ async def register(user_data: UserCreate):
 @api_router.post("/auth/login")
 async def login(credentials: UserLogin):
     """Login and get access token"""
-    print(f"[DEBUG] Login attempt for username: {credentials.username}")
     user = await db.users.find_one({"username": credentials.username}, {"_id": 0})
-    print(f"[DEBUG] User found: {user is not None}")
-    
-    if user:
-        print(f"[DEBUG] User has password_hash: {'password_hash' in user}")
-        pwd_valid = verify_password(credentials.password, user["password_hash"])
-        print(f"[DEBUG] Password valid: {pwd_valid}")
     
     if not user or not verify_password(credentials.password, user["password_hash"]):
-        print(f"[DEBUG] Login failed - user: {user is not None}, pwd_check: {verify_password(credentials.password, user['password_hash']) if user else 'N/A'}")
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Incorrect username or password"
