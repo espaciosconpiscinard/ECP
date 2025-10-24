@@ -1492,6 +1492,124 @@ Total errores: {sum(len(r.get('errors', [])) for r in results.values())}
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error al procesar archivo: {str(e)}")
 
+
+
+# ============ HIERARCHICAL EXPORT/IMPORT ENDPOINTS ============
+from hierarchical_export_service import (
+    generate_customers_template,
+    generate_villa_categories_template,
+    generate_villas_template,
+    generate_services_template,
+    generate_expense_categories_template,
+    generate_reservations_template,
+    get_all_templates_info
+)
+
+@api_router.get("/import/templates/info")
+async def get_templates_info(current_user: dict = Depends(get_current_user)):
+    """Obtener información de todas las plantillas disponibles"""
+    if current_user.get("role") != "admin":
+        raise HTTPException(status_code=403, detail="Solo administradores pueden acceder")
+    
+    templates_info = await get_all_templates_info(db)
+    return {"templates": templates_info}
+
+@api_router.get("/import/template/customers")
+async def download_customers_template(current_user: dict = Depends(get_current_user)):
+    """PASO 1: Descargar plantilla de Clientes"""
+    if current_user.get("role") != "admin":
+        raise HTTPException(status_code=403, detail="Solo administradores pueden descargar plantillas")
+    
+    template = generate_customers_template()
+    
+    return StreamingResponse(
+        template,
+        media_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+        headers={
+            "Content-Disposition": "attachment; filename=Paso_1_Clientes.xlsx"
+        }
+    )
+
+@api_router.get("/import/template/villa-categories")
+async def download_villa_categories_template(current_user: dict = Depends(get_current_user)):
+    """PASO 2: Descargar plantilla de Categorías de Villas"""
+    if current_user.get("role") != "admin":
+        raise HTTPException(status_code=403, detail="Solo administradores pueden descargar plantillas")
+    
+    template = generate_villa_categories_template()
+    
+    return StreamingResponse(
+        template,
+        media_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+        headers={
+            "Content-Disposition": "attachment; filename=Paso_2_Categorias_Villas.xlsx"
+        }
+    )
+
+@api_router.get("/import/template/villas")
+async def download_villas_template(current_user: dict = Depends(get_current_user)):
+    """PASO 3: Descargar plantilla de Villas (con dropdown de categorías)"""
+    if current_user.get("role") != "admin":
+        raise HTTPException(status_code=403, detail="Solo administradores pueden descargar plantillas")
+    
+    template = await generate_villas_template(db)
+    
+    return StreamingResponse(
+        template,
+        media_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+        headers={
+            "Content-Disposition": "attachment; filename=Paso_3_Villas.xlsx"
+        }
+    )
+
+@api_router.get("/import/template/services")
+async def download_services_template(current_user: dict = Depends(get_current_user)):
+    """PASO 4: Descargar plantilla de Servicios Extra"""
+    if current_user.get("role") != "admin":
+        raise HTTPException(status_code=403, detail="Solo administradores pueden descargar plantillas")
+    
+    template = generate_services_template()
+    
+    return StreamingResponse(
+        template,
+        media_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+        headers={
+            "Content-Disposition": "attachment; filename=Paso_4_Servicios_Extra.xlsx"
+        }
+    )
+
+@api_router.get("/import/template/expense-categories")
+async def download_expense_categories_template(current_user: dict = Depends(get_current_user)):
+    """PASO 5: Descargar plantilla de Categorías de Gastos"""
+    if current_user.get("role") != "admin":
+        raise HTTPException(status_code=403, detail="Solo administradores pueden descargar plantillas")
+    
+    template = generate_expense_categories_template()
+    
+    return StreamingResponse(
+        template,
+        media_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+        headers={
+            "Content-Disposition": "attachment; filename=Paso_5_Categorias_Gastos.xlsx"
+        }
+    )
+
+@api_router.get("/import/template/reservations")
+async def download_reservations_template(current_user: dict = Depends(get_current_user)):
+    """PASO 6: Descargar plantilla de Reservaciones (con dropdowns de clientes, villas, servicios)"""
+    if current_user.get("role") != "admin":
+        raise HTTPException(status_code=403, detail="Solo administradores pueden descargar plantillas")
+    
+    template = await generate_reservations_template(db)
+    
+    return StreamingResponse(
+        template,
+        media_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+        headers={
+            "Content-Disposition": "attachment; filename=Paso_6_Reservaciones.xlsx"
+        }
+    )
+
 # Include router in app
 app.include_router(api_router)
 
