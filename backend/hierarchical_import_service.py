@@ -393,7 +393,8 @@ async def import_reservations(file_content: bytes, db) -> Dict:
                     'notes': str(row.get('Notas', '')).strip() if pd.notna(row.get('Notas')) else '',
                     'extra_services': [],
                     'status': 'confirmed',
-                    'created_at': datetime.now(timezone.utc).isoformat()
+                    'created_at': datetime.now(timezone.utc).isoformat(),
+                    'created_by': 'import_system'
                 }
                 
                 # Calcular balance_due
