@@ -6,7 +6,7 @@ Sistema completo para gestionar el negocio de alquiler de villas, incluyendo res
 
 ### Acceso al Sistema
 
-La aplicación está disponible en: `https://villa-expense-mgr.preview.emergentagent.com`
+La aplicación está disponible en: `https://espacios-manager.preview.emergentagent.com`
 
 ### Usuarios Predefinidos
 
