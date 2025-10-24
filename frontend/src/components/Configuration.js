@@ -138,12 +138,22 @@ function Configuration() {
       {/* Logo Uploader */}
       <LogoUploader />
 
-      {/* Import/Export Section */}
+      {/* Import/Export Section - Hierarchical */}
       <div className="bg-white rounded-lg shadow-md p-6 mb-6">
         <h3 className="text-xl font-semibold mb-4 flex items-center">
           <span className="text-2xl mr-2">📥📤</span>
-          Importar / Exportar Datos
+          Importar Datos - Sistema Jerárquico
         </h3>
+        
+        <div className="bg-blue-50 p-4 rounded-md border-2 border-blue-300 mb-6">
+          <h4 className="font-bold text-blue-900 mb-2">ℹ️ Instrucciones Importantes</h4>
+          <ol className="text-sm text-gray-700 space-y-2 list-decimal list-inside">
+            <li><strong>Sigue el orden</strong>: Descarga y completa las plantillas en el orden indicado (1→6)</li>
+            <li><strong>Listas desplegables</strong>: Las plantillas incluyen dropdowns automáticos con tus datos actuales</li>
+            <li><strong>Paso por paso</strong>: Completa y carga cada paso antes de continuar al siguiente</li>
+            <li><strong>Validaciones</strong>: Excel te ayudará con listas y formatos correctos</li>
+          </ol>
+        </div>
         <div className="space-y-4">
           <div className="bg-blue-50 p-4 rounded-md border border-blue-200">
             <h4 className="font-semibold text-blue-900 mb-2">📋 Descargar Plantilla de Importación</h4>
