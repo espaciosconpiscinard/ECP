@@ -33,7 +33,8 @@ async def import_customers(file_content: bytes, db) -> Dict:
                     'phone': str(row.get('Teléfono', '')).strip() if pd.notna(row.get('Teléfono')) else '',
                     'cedula': str(row.get('Cédula/RNC', '')).strip() if pd.notna(row.get('Cédula/RNC')) else '',
                     'address': str(row.get('Dirección', '')).strip() if pd.notna(row.get('Dirección')) else '',
-                    'created_at': datetime.now(timezone.utc).isoformat()
+                    'created_at': datetime.now(timezone.utc).isoformat(),
+                    'created_by': 'import_system'
                 }
                 
                 # Verificar si ya existe (por nombre exacto)
