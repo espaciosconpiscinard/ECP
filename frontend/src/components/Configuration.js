@@ -127,6 +127,74 @@ function Configuration() {
     }
   };
 
+  const downloadTemplate = async (templateKey, filename) => {
+    try {
+      setLoadingTemplates(true);
+      const token = localStorage.getItem('token');
+      const response = await fetch(`${API_URL}/api/import/template/${templateKey}`, {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+      
+      if (!response.ok) throw new Error('Error al descargar plantilla');
+      
+      const blob = await response.blob();
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      window.URL.revokeObjectURL(url);
+      document.body.removeChild(a);
+      
+      alert(`✅ Plantilla "${filename}" descargada exitosamente`);
+    } catch (err) {
+      alert(`❌ Error al descargar: ${err.message}`);
+    } finally {
+      setLoadingTemplates(false);
+    }
+  };
+
+  const handleImportFile = async (templateKey, file) => {
+    if (!file) return;
+    
+    if (!window.confirm(`¿Importar "${file.name}"?\n\nEsto agregará/actualizará datos en la base de datos.`)) {
+      return;
+    }
+    
+    try {
+      setLoadingTemplates(true);
+      const formData = new FormData();
+      formData.append('file', file);
+      
+      const response = await fetch(`${API_URL}/api/import/${templateKey}`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem('token')}`
+        },
+        body: formData
+      });
+      
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.detail || 'Error al importar');
+      }
+      
+      const result = await response.json();
+      alert(`✅ Importación exitosa!\n\n${result.summary || result.message}`);
+      
+      // Recargar info de plantillas para actualizar contadores
+      await fetchTemplatesInfo();
+    } catch (err) {
+      alert(`❌ Error al importar: ${err.message}`);
+    } finally {
+      setLoadingTemplates(false);
+    }
+  };
+
+
   if (loading) {
     return (
       <div className="flex items-center justify-center h-64">
