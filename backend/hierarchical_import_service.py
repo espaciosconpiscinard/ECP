@@ -172,7 +172,8 @@ async def import_villas(file_content: bytes, db) -> Dict:
                     'default_checkin': str(row.get('Horario Check-in', '08:00')).strip() if pd.notna(row.get('Horario Check-in')) else '08:00',
                     'default_checkout': str(row.get('Horario Check-out', '18:00')).strip() if pd.notna(row.get('Horario Check-out')) else '18:00',
                     'category_id': category_id,
-                    'created_at': datetime.now(timezone.utc).isoformat()
+                    'created_at': datetime.now(timezone.utc).isoformat(),
+                    'created_by': 'import_system'
                 }
                 
                 # Verificar si ya existe
