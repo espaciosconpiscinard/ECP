@@ -10,6 +10,8 @@ function Configuration() {
   const [success, setSuccess] = useState('');
   const [newStartNumber, setNewStartNumber] = useState('');
   const [showResetConfirm, setShowResetConfirm] = useState(false);
+  const [templatesInfo, setTemplatesInfo] = useState([]);
+  const [loadingTemplates, setLoadingTemplates] = useState(false);
 
   useEffect(() => {
     fetchConfig();
