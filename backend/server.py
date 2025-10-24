@@ -1789,9 +1789,6 @@ async def import_reservations_file(file: UploadFile = File(...), current_user: d
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error al importar: {str(e)}")
 
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
 
 # Shutdown event
 @app.on_event("shutdown")
