@@ -161,17 +161,29 @@ async def import_villas(file_content: bytes, db) -> Dict:
                     if category:
                         category_id = category['id']
                 
-                # Preparar datos
+                # Convertir precio único a precios por tipo
+                client_price_val = float(client_price)
+                owner_price_val = float(row.get('Precio Propietario', 0)) if pd.notna(row.get('Precio Propietario')) else 0
+                
+                # Preparar datos con el esquema correcto del modelo
                 villa_data = {
                     'id': str(uuid.uuid4()),
                     'code': code,
                     'name': name,
-                    'client_price': float(client_price),
-                    'owner_price': float(row.get('Precio Propietario', 0)) if pd.notna(row.get('Precio Propietario')) else 0,
                     'description': str(row.get('Descripción', '')).strip() if pd.notna(row.get('Descripción')) else '',
-                    'default_checkin': str(row.get('Horario Check-in', '08:00')).strip() if pd.notna(row.get('Horario Check-in')) else '08:00',
-                    'default_checkout': str(row.get('Horario Check-out', '18:00')).strip() if pd.notna(row.get('Horario Check-out')) else '18:00',
+                    'phone': None,
                     'category_id': category_id,
+                    'default_check_in_time': str(row.get('Horario Check-in', '9:00 AM')).strip() if pd.notna(row.get('Horario Check-in')) else '9:00 AM',
+                    'default_check_out_time': str(row.get('Horario Check-out', '8:00 PM')).strip() if pd.notna(row.get('Horario Check-out')) else '8:00 PM',
+                    'default_price_pasadia': client_price_val,
+                    'default_price_amanecida': client_price_val,
+                    'default_price_evento': client_price_val,
+                    'owner_price_pasadia': owner_price_val,
+                    'owner_price_amanecida': owner_price_val,
+                    'owner_price_evento': owner_price_val,
+                    'max_guests': 0,
+                    'amenities': [],
+                    'is_active': True,
                     'created_at': datetime.now(timezone.utc).isoformat(),
                     'created_by': 'import_system'
                 }
