@@ -56,3 +56,4 @@ frontend/dist/win-unpacked/Espacios
 Con
 Piscina.exe
 frontend/node_modules/electron/dist/electron
+frontend/dist/win-unpacked/resources/app.asar
