@@ -15,7 +15,26 @@ function Configuration() {
 
   useEffect(() => {
     fetchConfig();
+    fetchTemplatesInfo();
   }, []);
+
+  const fetchTemplatesInfo = async () => {
+    try {
+      const token = localStorage.getItem('token');
+      const response = await fetch(`${API_URL}/api/import/templates/info`, {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+      
+      if (response.ok) {
+        const data = await response.json();
+        setTemplatesInfo(data.templates || []);
+      }
+    } catch (err) {
+      console.error('Error al cargar info de plantillas:', err);
+    }
+  };
 
   const fetchConfig = async () => {
     try {
