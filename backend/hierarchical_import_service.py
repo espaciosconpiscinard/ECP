@@ -290,7 +290,8 @@ async def import_expense_categories(file_content: bytes, db) -> Dict:
                     'id': str(uuid.uuid4()),
                     'name': name,
                     'description': str(row.get('Descripción', '')).strip() if pd.notna(row.get('Descripción')) else '',
-                    'created_at': datetime.now(timezone.utc).isoformat()
+                    'created_at': datetime.now(timezone.utc).isoformat(),
+                    'created_by': 'import_system'
                 }
                 
                 # Verificar si ya existe
