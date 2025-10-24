@@ -1620,15 +1620,6 @@ app.add_middleware(
     allow_origins=os.environ.get('CORS_ORIGINS', '*').split(','),
 
 
-# Import functions
-from hierarchical_import_service import (
-    import_customers,
-    import_villa_categories,
-    import_villas,
-    import_services,
-    import_expense_categories,
-    import_reservations
-)
 
 @api_router.post("/import/customers")
 async def import_customers_file(file: UploadFile = File(...), current_user: dict = Depends(get_current_user)):
