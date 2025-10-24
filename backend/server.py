@@ -1629,8 +1629,9 @@ app.add_middleware(
     CORSMiddleware,
     allow_credentials=True,
     allow_origins=os.environ.get('CORS_ORIGINS', '*').split(','),
-
-
+    allow_methods=["*"],
+    allow_headers=["*"]
+)
 
 @api_router.post("/import/customers")
 async def import_customers_file(file: UploadFile = File(...), current_user: dict = Depends(get_current_user)):
