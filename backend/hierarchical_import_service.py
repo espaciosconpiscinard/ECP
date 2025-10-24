@@ -234,7 +234,8 @@ async def import_services(file_content: bytes, db) -> Dict:
                     'name': name,
                     'price': float(price),
                     'description': str(row.get('Descripción', '')).strip() if pd.notna(row.get('Descripción')) else '',
-                    'created_at': datetime.now(timezone.utc).isoformat()
+                    'created_at': datetime.now(timezone.utc).isoformat(),
+                    'created_by': 'import_system'
                 }
                 
                 # Verificar si ya existe
