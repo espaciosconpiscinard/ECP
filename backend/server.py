@@ -1505,6 +1505,17 @@ from hierarchical_export_service import (
     get_all_templates_info
 )
 
+
+from hierarchical_import_service import (
+    import_customers,
+    import_villa_categories,
+    import_villas,
+    import_services,
+    import_expense_categories,
+    import_reservations
+)
+
+
 @api_router.get("/import/templates/info")
 async def get_templates_info(current_user: dict = Depends(get_current_user)):
     """Obtener información de todas las plantillas disponibles"""
