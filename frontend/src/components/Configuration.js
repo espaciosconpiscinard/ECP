@@ -243,8 +243,225 @@ function Configuration() {
             <li><strong>Validaciones</strong>: Excel te ayudará con listas y formatos correctos</li>
           </ol>
         </div>
+        
+        {/* Plantillas Jerárquicas */}
         <div className="space-y-4">
-          <div className="bg-blue-50 p-4 rounded-md border border-blue-200">
+          {templatesInfo.map((template) => {
+            const templateConfigs = {
+              'customers': { key: 'customers', filename: 'Paso_1_Clientes.xlsx' },
+              'villa_categories': { key: 'villa-categories', filename: 'Paso_2_Categorias_Villas.xlsx' },
+              'villas': { key: 'villas', filename: 'Paso_3_Villas.xlsx' },
+              'services': { key: 'services', filename: 'Paso_4_Servicios_Extra.xlsx' },
+              'expense_categories': { key: 'expense-categories', filename: 'Paso_5_Categorias_Gastos.xlsx' },
+              'reservations': { key: 'reservations', filename: 'Paso_6_Reservaciones.xlsx' }
+            };
+            
+            const templateConfig = templateConfigs[template.key];
+            if (!templateConfig) return null;
+            
+            return (
+              <div key={template.key} className="bg-white border-2 border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow">
+                <div className="flex items-start justify-between">
+                  <div className="flex-1">
+                    <div className="flex items-center space-x-3 mb-2">
+                      <div className="flex items-center justify-center w-10 h-10 rounded-full bg-blue-100 text-blue-700 font-bold text-lg">
+                        {template.step}
+                      </div>
+                      <div>
+                        <h4 className="font-bold text-gray-900 text-lg">
+                          {template.icon} {template.name}
+                          {template.required && <span className="ml-2 text-xs bg-red-100 text-red-700 px-2 py-1 rounded">Obligatorio</span>}
+                        </h4>
+                        <p className="text-sm text-gray-600">{template.description}</p>
+                      </div>
+                    </div>
+                    
+                    <div className="flex items-center space-x-4 mt-3">
+                      <div className="text-sm">
+                        <span className="font-semibold text-gray-700">Registros actuales:</span>
+                        <span className="ml-2 px-2 py-1 bg-gray-100 rounded font-mono">{template.count}</span>
+                      </div>
+                      
+                      {template.depends_on && (
+                        <div className="text-xs text-orange-600">
+                          <span className="font-semibold">Requiere:</span> {template.depends_on.map(d => templatesInfo.find(t => t.key === d)?.name).filter(Boolean).join(', ')}
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                  
+                  <div className="flex flex-col space-y-2 ml-4">
+                    <button
+                      onClick={() => downloadTemplate(templateConfig.key, templateConfig.filename)}
+                      disabled={loadingTemplates}
+                      className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 font-medium text-sm disabled:opacity-50 whitespace-nowrap"
+                    >
+                      📥 Descargar Plantilla
+                    </button>
+                    
+                    <label className="cursor-pointer">
+                      <input
+                        type="file"
+                        accept=".xlsx,.xls"
+                        className="hidden"
+                        onChange={(e) => {
+                          const file = e.target.files[0];
+                          if (file) {
+                            handleImportFile(templateConfig.key, file);
+                            e.target.value = '';
+                          }
+                        }}
+                        disabled={loadingTemplates}
+                      />
+                      <div className="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 font-medium text-sm text-center disabled:opacity-50">
+                        📤 Importar Archivo
+                      </div>
+                    </label>
+                  </div>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+        
+        {/* Sección de Exportar Datos Existentes */}
+        <div className="mt-6 bg-green-50 p-4 rounded-md border border-green-200">
+          <h4 className="font-semibold text-green-900 mb-2">📤 Exportar Datos Existentes (Respaldo)</h4>
+          <p className="text-sm text-gray-700 mb-3">
+            Exporta tus datos actuales a Excel para hacer respaldo.
+          </p>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
+            {['customers', 'villas', 'reservations', 'expenses'].map(type => {
+              const names = {
+                customers: 'Clientes',
+                villas: 'Villas',
+                reservations: 'Reservaciones',
+                expenses: 'Gastos'
+              };
+              return (
+                <button
+                  key={type}
+                  onClick={async () => {
+                    try {
+                      const response = await fetch(`${API_URL}/api/export/${type}`, {
+                        headers: {
+                          'Authorization': `Bearer ${localStorage.getItem('token')}`
+                        }
+                      });
+                      if (!response.ok) throw new Error('Error al exportar');
+                      
+                      const blob = await response.blob();
+                      const url = window.URL.createObjectURL(blob);
+                      const a = document.createElement('a');
+                      a.href = url;
+                      a.download = `${names[type]}_Export.xlsx`;
+                      document.body.appendChild(a);
+                      a.click();
+                      window.URL.revokeObjectURL(url);
+                      document.body.removeChild(a);
+                      
+                      alert(`✅ ${names[type]} exportados exitosamente`);
+                    } catch (err) {
+                      alert(`❌ Error al exportar ${names[type]}: ` + err.message);
+                    }
+                  }}
+                  className="px-3 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 text-sm font-medium"
+                >
+                  {names[type]}
+                </button>
+              );
+            })}
+          </div>
+        </div>
+        
+        {/* Old Template Section - Keep for backward compatibility */}
+        <div className="mt-6 bg-gray-50 p-4 rounded-md border border-gray-300">
+          <h4 className="font-semibold text-gray-700 mb-2">📋 Plantilla Completa (Método Antiguo)</h4>
+          <p className="text-sm text-gray-600 mb-3">
+            Plantilla con todas las secciones en un solo archivo (método anterior).
+          </p>
+          <div className="flex space-x-2">
+            <button
+              onClick={async () => {
+                try {
+                  const response = await fetch(`${API_URL}/api/export/template`, {
+                    headers: {
+                      'Authorization': `Bearer ${localStorage.getItem('token')}`
+                    }
+                  });
+                  if (!response.ok) throw new Error('Error al descargar plantilla');
+                  
+                  const blob = await response.blob();
+                  const url = window.URL.createObjectURL(blob);
+                  const a = document.createElement('a');
+                  a.href = url;
+                  a.download = 'Plantilla_Completa.xlsx';
+                  document.body.appendChild(a);
+                  a.click();
+                  window.URL.revokeObjectURL(url);
+                  document.body.removeChild(a);
+                  
+                  alert('✅ Plantilla descargada');
+                } catch (err) {
+                  alert('❌ Error: ' + err.message);
+                }
+              }}
+              className="px-4 py-2 bg-gray-600 text-white rounded-md hover:bg-gray-700 font-medium text-sm"
+            >
+              📥 Descargar
+            </button>
+            
+            <label className="cursor-pointer">
+              <input
+                type="file"
+                accept=".xlsx,.xls"
+                className="hidden"
+                onChange={async (e) => {
+                  const file = e.target.files[0];
+                  if (!file) return;
+                  
+                  if (!window.confirm(`¿Importar "${file.name}"?`)) {
+                    e.target.value = '';
+                    return;
+                  }
+                  
+                  try {
+                    const formData = new FormData();
+                    formData.append('file', file);
+                    
+                    const response = await fetch(`${API_URL}/api/import/excel`, {
+                      method: 'POST',
+                      headers: {
+                        'Authorization': `Bearer ${localStorage.getItem('token')}`
+                      },
+                      body: formData
+                    });
+                    
+                    if (!response.ok) {
+                      const errorData = await response.json();
+                      throw new Error(errorData.detail || 'Error al importar');
+                    }
+                    
+                    const result = await response.json();
+                    alert(result.summary);
+                    await fetchTemplatesInfo();
+                    e.target.value = '';
+                  } catch (err) {
+                    alert(`❌ Error: ${err.message}`);
+                    e.target.value = '';
+                  }
+                }}
+              />
+              <div className="px-4 py-2 bg-gray-600 text-white rounded-md hover:bg-gray-700 font-medium text-sm text-center">
+                📤 Importar
+              </div>
+            </label>
+          </div>
+        </div>
+      </div>
+      
+      {/* Continue with rest of old code - need to remove/replace old section */}
+      <div className="bg-blue-50 p-4 rounded-md border border-blue-200" style={{display: 'none'}}>
             <h4 className="font-semibold text-blue-900 mb-2">📋 Descargar Plantilla de Importación</h4>
             <p className="text-sm text-gray-700 mb-3">
               Descarga una plantilla Excel con todas las secciones (Clientes, Villas, Reservaciones, Gastos) para llenar offline y luego importar.
