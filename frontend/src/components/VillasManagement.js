@@ -137,7 +137,7 @@ const VillasManagementNew = () => {
       max_guests: villa.max_guests || 0,
       amenities: villa.amenities || [],
       is_active: villa.is_active !== false,
-      use_flexible_pricing: villa.use_flexible_pricing || false,
+      use_flexible_pricing: true,  // SIEMPRE true
       flexible_prices: villa.flexible_prices || { pasadia: [], amanecida: [], evento: [] }
     });
     setFlexiblePrices(villa.flexible_prices || { pasadia: [], amanecida: [], evento: [] });
