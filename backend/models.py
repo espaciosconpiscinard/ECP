@@ -92,12 +92,15 @@ class ExpenseCategory(ExpenseCategoryBase):
     created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
     created_by: str
 
-# ============ PRICING TIER MODEL ============
-class PricingTier(BaseModel):
-    min_people: int
-    max_people: int
+# ============ FLEXIBLE PRICE MODEL ============
+class FlexiblePrice(BaseModel):
     client_price: float
     owner_price: float
+
+class FlexiblePrices(BaseModel):
+    pasadia: List[FlexiblePrice] = []
+    amanecida: List[FlexiblePrice] = []
+    evento: List[FlexiblePrice] = []
 
 # ============ VILLA MODELS ============
 class VillaBase(BaseModel):
@@ -121,9 +124,9 @@ class VillaBase(BaseModel):
     owner_price_amanecida: float = 0.0
     owner_price_evento: float = 0.0
     
-    # Sistema de precios variables por rangos de personas (NUEVO)
-    use_pricing_tiers: bool = False  # Si es True, usar pricing_tiers en lugar de precios fijos
-    pricing_tiers: Optional[List[PricingTier]] = []  # Rangos de precios
+    # Sistema de precios flexibles (NUEVO - sin rangos, solo listas ordenadas)
+    use_flexible_pricing: bool = False  # Si es True, usar flexible_prices
+    flexible_prices: Optional[FlexiblePrices] = None  # Precios flexibles por tipo
     
     max_guests: int = 0
     amenities: List[str] = []  # Piscina, Jacuzzi, BBQ, etc.
