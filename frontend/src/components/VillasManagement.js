@@ -94,13 +94,19 @@ const VillasManagementNew = () => {
     setError('');
     
     try {
+      // Actualizar formData con los precios flexibles antes de guardar
+      const dataToSave = {
+        ...formData,
+        flexible_prices: flexiblePrices
+      };
+      
       if (editingVilla) {
-        await updateVilla(editingVilla.id, formData);
+        await updateVilla(editingVilla.id, dataToSave);
         alert('✅ Villa actualizada exitosamente');
         setIsFormOpen(false);
         resetForm();
       } else {
-        await createVilla(formData);
+        await createVilla(dataToSave);
         alert('✅ Villa agregada exitosamente. Puedes agregar otra villa.');
         // NO cerrar el formulario - mantenerlo abierto para agregar más
         // setIsFormOpen(false);
