@@ -14,6 +14,8 @@ function Commissions() {
   const [editAmount, setEditAmount] = useState(0);
   const [editNotes, setEditNotes] = useState('');
   const [selectedUser, setSelectedUser] = useState('all');
+  const [selectedMonth, setSelectedMonth] = useState('all');
+  const [selectedFortnight, setSelectedFortnight] = useState('all');
 
   useEffect(() => {
     fetchCommissions();
