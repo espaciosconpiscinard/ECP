@@ -376,16 +376,29 @@ const Expenses = () => {
       return type === targetType;
     });
 
+    // Filtrar por estado de pago (NUEVO)
+    if (paymentStatusFilter === 'pending') {
+      filtered = filtered.filter(expense => expense.payment_status === 'pending');
+    } else if (paymentStatusFilter === 'paid') {
+      filtered = filtered.filter(expense => expense.payment_status === 'paid');
+    }
+    // Si es 'all', no filtramos por payment_status
+
     // Filtrar por mes seleccionado
     const monthFiltered = filterByMonth(filtered);
     
-    // Agregar pendientes de meses anteriores (solo pendientes)
-    const pendingFiltered = filtered.filter(expense => {
-      if (expense.payment_status !== 'pending') return false;
-      const expenseDate = new Date(expense.expense_date);
-      const selectedDate = new Date(selectedYear, selectedMonth, 1);
-      return expenseDate < selectedDate;
-    });
+    // Agregar pendientes de meses anteriores (solo si filtro es 'pending' o 'all')
+    let pendingFiltered = [];
+    if (paymentStatusFilter !== 'paid') {
+      pendingFiltered = expenses.filter(expense => {
+        const type = expense.expense_type || 'variable';
+        if (type !== targetType) return false;
+        if (expense.payment_status !== 'pending') return false;
+        const expenseDate = new Date(expense.expense_date);
+        const selectedDate = new Date(selectedYear, selectedMonth, 1);
+        return expenseDate < selectedDate;
+      });
+    }
     
     // Combinar gastos del mes con pendientes de meses anteriores
     filtered = [...monthFiltered, ...pendingFiltered];
