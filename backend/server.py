@@ -173,6 +173,13 @@ async def login(credentials: UserLogin):
     if not user.get("is_active", True):
         raise HTTPException(status_code=400, detail="User account is inactive")
     
+    # Validar aprobación de cuenta
+    if not user.get("is_approved", True):
+        raise HTTPException(
+            status_code=403, 
+            detail="Cuenta pendiente de aprobación por administrador"
+        )
+    
     access_token = create_access_token(
         data={
             "sub": user["id"],
