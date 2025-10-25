@@ -172,17 +172,30 @@ const VillasManagementNew = () => {
     });
   };
 
-  // ============ PRICING TIERS FUNCTIONS ============
-  const handleAddPricingTier = () => {
-    const updatedTiers = [...(formData.pricing_tiers || []), newTier];
-    setFormData({ ...formData, pricing_tiers: updatedTiers });
-    setNewTier({ min_people: 1, max_people: 10, client_price: 0, owner_price: 0 });
-    setShowPricingTierModal(false);
+  // ============ FLEXIBLE PRICING FUNCTIONS ============
+  const handleAddFlexiblePrice = (rentalType) => {
+    const newPrice = { client_price: 0, owner_price: 0 };
+    setFlexiblePrices({
+      ...flexiblePrices,
+      [rentalType]: [...flexiblePrices[rentalType], newPrice]
+    });
   };
 
-  const handleRemovePricingTier = (index) => {
-    const updatedTiers = formData.pricing_tiers.filter((_, i) => i !== index);
-    setFormData({ ...formData, pricing_tiers: updatedTiers });
+  const handleRemoveFlexiblePrice = (rentalType, index) => {
+    const updated = flexiblePrices[rentalType].filter((_, i) => i !== index);
+    setFlexiblePrices({
+      ...flexiblePrices,
+      [rentalType]: updated
+    });
+  };
+
+  const handleUpdateFlexiblePrice = (rentalType, index, field, value) => {
+    const updated = [...flexiblePrices[rentalType]];
+    updated[index][field] = parseFloat(value) || 0;
+    setFlexiblePrices({
+      ...flexiblePrices,
+      [rentalType]: updated
+    });
   };
 
   // ============ SERVICIOS FUNCTIONS ============
