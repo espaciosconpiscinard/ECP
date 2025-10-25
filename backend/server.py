@@ -1385,14 +1385,24 @@ async def get_dashboard_stats(current_user: dict = Depends(get_current_user)):
     owners_balance_due_dop = sum(o.get("balance_due", 0) for o in all_owners)
     owners_balance_due_usd = 0
     
+    # Obtener reservaciones recientes - filtrar las que tengan todos los campos requeridos
     recent_reservations_raw = await db.reservations.find({}, {"_id": 0}).sort("created_at", -1).limit(5).to_list(5)
-    recent_reservations = [restore_datetimes(r, ["reservation_date", "created_at", "updated_at"]) for r in recent_reservations_raw]
+    recent_reservations = []
+    for r in recent_reservations_raw:
+        # Solo agregar si tiene campos críticos
+        if all(key in r for key in ['check_in_time', 'check_out_time', 'base_price', 'subtotal']):
+            recent_reservations.append(restore_datetimes(r, ["reservation_date", "created_at", "updated_at"]))
     
+    # Obtener reservaciones con pagos pendientes - filtrar las que tengan todos los campos requeridos
     pending_payment_reservations_raw = await db.reservations.find(
         {"balance_due": {"$gt": 0}},
         {"_id": 0}
     ).sort("created_at", -1).limit(10).to_list(10)
-    pending_payment_reservations = [restore_datetimes(r, ["reservation_date", "created_at", "updated_at"]) for r in pending_payment_reservations_raw]
+    pending_payment_reservations = []
+    for r in pending_payment_reservations_raw:
+        # Solo agregar si tiene campos críticos
+        if all(key in r for key in ['check_in_time', 'check_out_time', 'base_price', 'subtotal']):
+            pending_payment_reservations.append(restore_datetimes(r, ["reservation_date", "created_at", "updated_at"]))
     
     # Calcular compromisos del mes actual
     from datetime import datetime, timezone
