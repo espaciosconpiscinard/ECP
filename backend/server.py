@@ -1191,6 +1191,83 @@ async def delete_commission(commission_id: str, current_user: dict = Depends(req
         raise HTTPException(status_code=404, detail="Commission not found")
     return {"message": "Commission deleted successfully"}
 
+@api_router.post("/commissions/{commission_id}/mark-paid")
+async def mark_commission_paid(commission_id: str, current_user: dict = Depends(require_admin)):
+    """Mark commission as paid (admin only)"""
+    existing = await db.commissions.find_one({"id": commission_id})
+    if not existing:
+        raise HTTPException(status_code=404, detail="Commission not found")
+    
+    paid_date = datetime.now(timezone.utc).isoformat()
+    
+    await db.commissions.update_one(
+        {"id": commission_id},
+        {"$set": {"paid": True, "paid_date": paid_date}}
+    )
+    
+    return {"message": "Commission marked as paid", "paid_date": paid_date}
+
+@api_router.post("/commissions/{commission_id}/mark-unpaid")
+async def mark_commission_unpaid(commission_id: str, current_user: dict = Depends(require_admin)):
+    """Mark commission as unpaid (admin only)"""
+    existing = await db.commissions.find_one({"id": commission_id})
+    if not existing:
+        raise HTTPException(status_code=404, detail="Commission not found")
+    
+    await db.commissions.update_one(
+        {"id": commission_id},
+        {"$set": {"paid": False, "paid_date": None}}
+    )
+    
+    return {"message": "Commission marked as unpaid"}
+
+@api_router.post("/commissions/pay-fortnight")
+async def pay_fortnight_commissions(
+    user_id: str,
+    fortnight: int,  # 1 o 2 (primera o segunda quincena)
+    month: int,
+    year: int,
+    current_user: dict = Depends(require_admin)
+):
+    """Pay all unpaid commissions for a user in a specific fortnight"""
+    # Determinar rango de fechas según quincena
+    if fortnight == 1:
+        start_day = 1
+        end_day = 14
+    else:  # fortnight == 2
+        start_day = 15
+        # Último día del mes
+        if month == 2:
+            end_day = 28 if year % 4 != 0 else 29
+        elif month in [4, 6, 9, 11]:
+            end_day = 30
+        else:
+            end_day = 31
+    
+    start_date = f"{year}-{month:02d}-{start_day:02d}"
+    end_date = f"{year}-{month:02d}-{end_day:02d}"
+    
+    paid_date = datetime.now(timezone.utc).isoformat()
+    
+    # Actualizar todas las comisiones no pagadas del usuario en esa quincena
+    result = await db.commissions.update_many(
+        {
+            "user_id": user_id,
+            "paid": False,
+            "reservation_date": {
+                "$gte": start_date,
+                "$lte": end_date
+            }
+        },
+        {"$set": {"paid": True, "paid_date": paid_date}}
+    )
+    
+    return {
+        "message": f"Paid {result.modified_count} commissions for fortnight {fortnight}",
+        "count": result.modified_count,
+        "paid_date": paid_date
+    }
+
 # ============ VILLA OWNER ENDPOINTS ============
 
 @api_router.post("/owners", response_model=VillaOwner)
