@@ -24,6 +24,7 @@ const Login = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
+    setSuccess('');
     setLoading(true);
 
     if (isLogin) {
@@ -35,9 +36,15 @@ const Login = () => {
       const result = await register(formData);
       if (result.success) {
         setIsLogin(true);
-        setFormData({ username: '', password: '', email: '', full_name: '', role: 'employee' });
+        setFormData({ username: '', password: '', email: '', full_name: '', role: 'employee', admin_code: '' });
         setError('');
-        alert('Usuario registrado exitosamente. Por favor inicia sesión.');
+        
+        // Mostrar mensaje apropiado según el rol
+        if (formData.role === 'admin') {
+          setSuccess('✅ Administrador registrado exitosamente. Ya puedes iniciar sesión.');
+        } else {
+          setSuccess('✅ Cuenta creada. Espera la aprobación del administrador para iniciar sesión.');
+        }
       } else {
         setError(result.error);
       }
