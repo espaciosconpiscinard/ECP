@@ -24,6 +24,7 @@ class User(UserBase):
     password_hash: str
     created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
     is_active: bool = True
+    is_approved: bool = True  # Nuevo campo: aprobación de cuenta
 
 class UserResponse(UserBase):
     id: str
