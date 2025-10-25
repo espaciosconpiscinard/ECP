@@ -48,7 +48,9 @@ const VillasManagementNew = () => {
     owner_price_evento: 0,
     max_guests: 0,
     amenities: [],
-    is_active: true
+    is_active: true,
+    use_pricing_tiers: false,
+    pricing_tiers: []
   });
 
   const [serviceFormData, setServiceFormData] = useState({
