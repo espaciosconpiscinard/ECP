@@ -1465,6 +1465,121 @@ async def health_check():
     """Health check endpoint"""
     return {"status": "healthy", "service": "espacios-con-piscina-api"}
 
+# ============ BACKUP/RESTORE SYSTEM ============
+import json
+from bson import json_util
+
+@api_router.get("/backup/download")
+async def download_full_backup(current_user: dict = Depends(require_admin)):
+    """Descargar backup completo de toda la base de datos"""
+    try:
+        backup_data = {
+            "backup_date": datetime.now(timezone.utc).isoformat(),
+            "app_version": "1.0",
+            "collections": {}
+        }
+        
+        # Colecciones a respaldar
+        collections_to_backup = [
+            "users", "customers", "categories", "expense_categories",
+            "villas", "extra_services", "reservations", "villa_owners",
+            "expenses", "reservation_abonos", "expense_abonos",
+            "invoice_counter", "invoice_templates", "logo_config"
+        ]
+        
+        for collection_name in collections_to_backup:
+            collection = db[collection_name]
+            # Obtener todos los documentos
+            documents = await collection.find({}, {"_id": 0}).to_list(None)
+            backup_data["collections"][collection_name] = documents
+        
+        # Convertir a JSON
+        json_str = json.dumps(backup_data, indent=2, default=json_util.default, ensure_ascii=False)
+        
+        # Crear nombre de archivo con fecha
+        filename = f"espacios_backup_{datetime.now().strftime('%Y%m%d_%H%M%S')}.json"
+        
+        # Retornar como descarga
+        return StreamingResponse(
+            io.BytesIO(json_str.encode('utf-8')),
+            media_type="application/json",
+            headers={"Content-Disposition": f"attachment; filename={filename}"}
+        )
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error al crear backup: {str(e)}")
+
+@api_router.post("/backup/restore")
+async def restore_from_backup(file: UploadFile = File(...), current_user: dict = Depends(require_admin)):
+    """Restaurar backup completo - CUIDADO: Sobrescribe datos existentes"""
+    try:
+        # Leer archivo
+        content = await file.read()
+        backup_data = json.loads(content.decode('utf-8'))
+        
+        if "collections" not in backup_data:
+            raise HTTPException(status_code=400, detail="Formato de backup inválido")
+        
+        restored_collections = []
+        errors = []
+        
+        for collection_name, documents in backup_data["collections"].items():
+            try:
+                collection = db[collection_name]
+                
+                if documents:  # Solo si hay documentos
+                    # Eliminar datos existentes (CUIDADO!)
+                    await collection.delete_many({})
+                    
+                    # Insertar documentos del backup
+                    if documents:
+                        await collection.insert_many(documents)
+                    
+                    restored_collections.append({
+                        "collection": collection_name,
+                        "documents": len(documents)
+                    })
+            except Exception as e:
+                errors.append({
+                    "collection": collection_name,
+                    "error": str(e)
+                })
+        
+        return {
+            "message": "Backup restaurado exitosamente",
+            "restored": restored_collections,
+            "errors": errors if errors else None,
+            "backup_date": backup_data.get("backup_date", "Desconocida")
+        }
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error al restaurar backup: {str(e)}")
+
+@api_router.get("/backup/info")
+async def get_backup_info(current_user: dict = Depends(require_admin)):
+    """Obtener información de estadísticas de la base de datos para backup"""
+    try:
+        collections_info = []
+        
+        collection_names = [
+            "users", "customers", "categories", "expense_categories",
+            "villas", "extra_services", "reservations", "villa_owners",
+            "expenses", "reservation_abonos", "expense_abonos"
+        ]
+        
+        for collection_name in collection_names:
+            collection = db[collection_name]
+            count = await collection.count_documents({})
+            collections_info.append({
+                "name": collection_name,
+                "count": count
+            })
+        
+        return {
+            "total_collections": len(collections_info),
+            "collections": collections_info
+        }
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error al obtener info: {str(e)}")
+
 # ============ EXPORT/IMPORT ENDPOINTS ============
 from export_service import create_excel_template, export_data_to_excel
 from import_service import import_customers, import_villas, import_reservations, import_expenses
