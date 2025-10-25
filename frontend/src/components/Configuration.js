@@ -351,6 +351,134 @@ function Configuration() {
         </div>
       </div>
 
+      {/* RESET SYSTEM - DANGER ZONE */}
+      <div className="bg-gradient-to-r from-red-100 to-red-200 rounded-lg shadow-lg p-6 mb-6 border-4 border-red-600">
+        <h3 className="text-2xl font-bold mb-2 flex items-center text-red-900">
+          <span className="text-3xl mr-3">🚨</span>
+          ZONA DE PELIGRO: Borrar Todo el Sistema
+        </h3>
+        <p className="text-sm text-red-800 font-semibold mb-4">
+          ⚠️ <strong>EXTREMADAMENTE PELIGROSO:</strong> Este botón eliminará PERMANENTEMENTE todos los datos del sistema.
+        </p>
+        
+        <div className="bg-white p-5 rounded-lg border-4 border-red-500">
+          <h4 className="font-bold text-red-900 mb-3 text-lg flex items-center">
+            <span className="text-2xl mr-2">💣</span>
+            Reset Completo del Sistema
+          </h4>
+          
+          <div className="bg-red-50 p-4 rounded border-2 border-red-300 mb-4">
+            <p className="text-sm text-red-900 font-semibold mb-2">⚠️ ESTO ELIMINARÁ PERMANENTEMENTE:</p>
+            <ul className="text-xs text-red-800 space-y-1 list-disc list-inside">
+              <li>✗ Todos los clientes</li>
+              <li>✗ Todas las villas</li>
+              <li>✗ Todas las reservaciones</li>
+              <li>✗ Todos los gastos</li>
+              <li>✗ Todas las categorías</li>
+              <li>✗ Todos los servicios</li>
+              <li>✗ Todos los propietarios</li>
+              <li>✗ Todas las facturas</li>
+              <li>✗ Todas las configuraciones</li>
+              <li>✗ Usuarios empleados (admins se mantienen)</li>
+            </ul>
+            <p className="text-xs text-red-900 font-bold mt-2">
+              ✅ SE MANTIENE: Solo cuentas de administrador
+            </p>
+          </div>
+
+          <div className="space-y-3">
+            <div>
+              <label className="block text-sm font-bold text-red-900 mb-1">
+                Código de Administrador (requerido):
+              </label>
+              <input
+                type="text"
+                id="reset-admin-code"
+                placeholder="Ingresa código secreto de admin"
+                className="w-full px-3 py-2 border-2 border-red-400 rounded text-sm uppercase"
+                maxLength={10}
+              />
+              <p className="text-xs text-gray-600 mt-1">Necesitas el código secreto usado para crear administradores</p>
+            </div>
+
+            <button
+              onClick={async () => {
+                const code = document.getElementById('reset-admin-code').value.trim();
+                
+                if (!code) {
+                  alert('⚠️ Debes ingresar el código de administrador');
+                  return;
+                }
+                
+                // Triple confirmación
+                if (!window.confirm(`🚨 ADVERTENCIA CRÍTICA 🚨\n\n¿Estás ABSOLUTAMENTE SEGURO de borrar TODO el sistema?\n\nEsto eliminará:\n- Todos los clientes\n- Todas las villas\n- Todas las reservaciones\n- Todos los gastos\n- Todo excepto admins\n\n¿CONTINUAR?`)) {
+                  return;
+                }
+                
+                if (!window.confirm(`⚠️ SEGUNDA CONFIRMACIÓN ⚠️\n\n¿REALMENTE quieres eliminar TODOS los datos?\n\nEsta acción es IRREVERSIBLE.\n\nSolo se mantendrán las cuentas de administrador.\n\n¿CONTINUAR?`)) {
+                  return;
+                }
+                
+                const finalConfirm = prompt('⚠️ CONFIRMACIÓN FINAL ⚠️\n\nEscribe exactamente: BORRAR TODO\n\nPara confirmar la eliminación completa:');
+                
+                if (finalConfirm !== 'BORRAR TODO') {
+                  alert('❌ Acción cancelada. No se escribió correctamente.');
+                  return;
+                }
+                
+                try {
+                  const token = localStorage.getItem('token');
+                  const response = await fetch(`${API_URL}/api/system/reset-all?admin_code=${encodeURIComponent(code)}`, {
+                    method: 'POST',
+                    headers: {
+                      'Authorization': `Bearer ${token}`,
+                      'Content-Type': 'application/json'
+                    }
+                  });
+                  
+                  if (!response.ok) {
+                    const error = await response.json();
+                    throw new Error(error.detail || 'Error al resetear sistema');
+                  }
+                  
+                  const result = await response.json();
+                  
+                  let message = `✅ SISTEMA RESETEADO COMPLETAMENTE\n\n`;
+                  message += `⚠️ ${result.warning}\n\n`;
+                  message += `Datos eliminados:\n`;
+                  result.deleted.forEach(d => {
+                    message += `- ${d.collection}: ${d.deleted} documentos\n`;
+                  });
+                  
+                  alert(message);
+                  
+                  // Limpiar campo
+                  document.getElementById('reset-admin-code').value = '';
+                  
+                  // Recargar página
+                  window.location.href = '/';
+                } catch (err) {
+                  alert(`❌ Error: ${err.message}\n\nSi el código es incorrecto, verifica que sea el mismo usado para crear administradores.`);
+                }
+              }}
+              className="w-full px-6 py-4 bg-red-600 text-white rounded-lg hover:bg-red-700 font-bold text-lg border-4 border-red-800 shadow-lg"
+            >
+              🗑️ BORRAR TODO EL SISTEMA (IRREVERSIBLE)
+            </button>
+          </div>
+
+          <div className="mt-4 bg-yellow-50 p-3 rounded border border-yellow-400">
+            <h5 className="font-semibold text-yellow-900 text-sm mb-1">💡 Recomendación antes de usar:</h5>
+            <p className="text-xs text-gray-700">
+              <strong>1. DESCARGA BACKUP COMPLETO</strong> (arriba) antes de resetear<br/>
+              <strong>2. GUARDA EL BACKUP</strong> en lugar seguro<br/>
+              <strong>3. VERIFICA</strong> que tienes el código de administrador correcto<br/>
+              <strong>4. ENTONCES</strong> puedes resetear si realmente lo necesitas
+            </p>
+          </div>
+        </div>
+      </div>
+
       {/* Import/Export Section - Hierarchical */}
       <div className="bg-white rounded-lg shadow-md p-6 mb-6">
         <h3 className="text-xl font-semibold mb-4 flex items-center">
