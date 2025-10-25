@@ -20,6 +20,15 @@ function Commissions() {
     fetchStats();
   }, []);
 
+  useEffect(() => {
+    // Filtrar comisiones por usuario seleccionado
+    if (selectedUser === 'all') {
+      setFilteredCommissions(commissions);
+    } else {
+      setFilteredCommissions(commissions.filter(c => c.user_id === selectedUser));
+    }
+  }, [selectedUser, commissions]);
+
   const fetchCommissions = async () => {
     try {
       const token = localStorage.getItem('token');
