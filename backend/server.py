@@ -217,6 +217,14 @@ async def get_me(current_user: dict = Depends(get_current_user)):
 async def get_users(current_user: dict = Depends(require_admin)):
     """Get all users (admin only)"""
     users = await db.users.find({}, {"_id": 0, "password_hash": 0}).to_list(1000)
+    
+    # Asegurar que todos los usuarios tengan los campos requeridos
+    for user in users:
+        if "is_active" not in user:
+            user["is_active"] = True
+        if "is_approved" not in user:
+            user["is_approved"] = True
+    
     return [restore_datetimes(u, ["created_at"]) for u in users]
 
 @api_router.get("/users/{user_id}", response_model=UserResponse)
