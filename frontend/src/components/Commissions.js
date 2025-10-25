@@ -268,7 +268,21 @@ function Commissions() {
           <h3 className="text-xl font-bold mb-4">📋 Historial de Comisiones</h3>
           
           {/* Filtros */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+            {/* Filtro por Estado */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">🔵 Estado:</label>
+              <select
+                value={selectedStatus}
+                onChange={(e) => setSelectedStatus(e.target.value)}
+                className="w-full px-3 py-2 border-2 border-gray-300 rounded-lg focus:border-blue-500 focus:outline-none"
+              >
+                <option value="pending">⏳ Pendientes</option>
+                <option value="paid">✅ Pagadas</option>
+                <option value="all">📋 Todas</option>
+              </select>
+            </div>
+
             {/* Filtro por Usuario */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">👤 Empleado:</label>
