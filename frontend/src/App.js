@@ -54,6 +54,8 @@ const AppContent = () => {
         return <Configuration />;
       case 'invoice-editor':
         return <InvoiceEditor />;
+      case 'commissions':
+        return <Commissions />;
       default:
         return <Dashboard />;
     }
