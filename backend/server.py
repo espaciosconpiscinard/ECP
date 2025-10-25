@@ -911,6 +911,32 @@ async def create_reservation(reservation_data: ReservationCreate, current_user: 
                     {"$set": {"total_owed": new_total, "balance_due": new_balance}}
                 )
     
+    # AUTO-CREAR COMISIÓN PARA EL USUARIO
+    try:
+        # Obtener info de la villa
+        villa = await db.villas.find_one({"id": reservation_data.villa_id}, {"_id": 0})
+        villa_code = villa.get("code", "N/A") if villa else "N/A"
+        villa_name = villa.get("name", "N/A") if villa else "N/A"
+        
+        commission_data = CommissionCreate(
+            reservation_id=reservation.id,
+            user_id=current_user["id"],
+            user_name=current_user.get("full_name", current_user.get("username", "Unknown")),
+            villa_code=villa_code,
+            villa_name=villa_name,
+            customer_name=reservation_data.customer_name,
+            reservation_date=reservation_data.reservation_date.isoformat() if isinstance(reservation_data.reservation_date, datetime) else reservation_data.reservation_date,
+            amount=250.0,  # Comisión por defecto
+            notes=f"Comisión por reservación #{invoice_number}"
+        )
+        
+        commission = Commission(**commission_data.model_dump(), created_by=current_user["id"])
+        comm_doc = prepare_doc_for_insert(commission.model_dump())
+        await db.commissions.insert_one(comm_doc)
+    except Exception as e:
+        # Si falla la comisión, no fallar la reservación
+        print(f"Error creating commission: {e}")
+    
     return reservation
 
 @api_router.get("/reservations", response_model=List[Reservation])
