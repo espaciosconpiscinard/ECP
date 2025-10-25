@@ -400,6 +400,8 @@ class Commission(CommissionBase):
 class CommissionUpdate(BaseModel):
     amount: Optional[float] = None
     notes: Optional[str] = None
+    paid: Optional[bool] = None
+    paid_date: Optional[str] = None
 
 # ============ DASHBOARD MODELS ============
 class DashboardStats(BaseModel):
