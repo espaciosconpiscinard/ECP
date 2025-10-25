@@ -1352,6 +1352,36 @@ const Reservations = () => {
                   />
                 )}
 
+                {/* SELECTOR DE PRECIOS FLEXIBLES */}
+                {showPriceSelector && selectedVillaFlexiblePrices && (
+                  <div className="col-span-2 bg-purple-50 p-4 rounded-lg border-2 border-purple-300">
+                    <h4 className="font-bold text-purple-900 mb-3">💰 Selecciona el Precio para esta Reservación</h4>
+                    <div className="space-y-2">
+                      {selectedVillaFlexiblePrices[formData.rental_type]?.map((priceOption, index) => (
+                        <button
+                          key={index}
+                          type="button"
+                          onClick={() => handleSelectFlexiblePrice(priceOption)}
+                          className="w-full p-3 bg-white hover:bg-purple-100 border-2 border-purple-200 hover:border-purple-400 rounded-lg text-left transition-colors"
+                        >
+                          <div className="flex justify-between items-center">
+                            <div>
+                              <span className="font-semibold text-purple-900">
+                                {priceOption.people_count || `Opción ${index + 1}`}
+                              </span>
+                            </div>
+                            <div className="text-right">
+                              <p className="text-sm text-blue-700">Cliente: <span className="font-bold">RD$ {priceOption.client_price?.toLocaleString()}</span></p>
+                              <p className="text-sm text-green-700">Propietario: <span className="font-bold">RD$ {priceOption.owner_price?.toLocaleString()}</span></p>
+                            </div>
+                          </div>
+                        </button>
+                      ))}
+                    </div>
+                    <p className="text-xs text-gray-600 mt-2">💡 Puedes editar los precios manualmente después de seleccionar</p>
+                  </div>
+                )}
+
                 {/* Fecha según tipo de renta */}
                 {formData.rental_type === 'pasadia' ? (
                   <div className="col-span-2">
