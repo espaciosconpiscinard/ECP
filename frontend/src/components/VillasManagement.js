@@ -182,7 +182,7 @@ const VillasManagementNew = () => {
 
   // ============ FLEXIBLE PRICING FUNCTIONS ============
   const handleAddFlexiblePrice = (rentalType) => {
-    const newPrice = { client_price: 0, owner_price: 0 };
+    const newPrice = { people_count: '', client_price: 0, owner_price: 0 };
     setFlexiblePrices({
       ...flexiblePrices,
       [rentalType]: [...flexiblePrices[rentalType], newPrice]
