@@ -70,6 +70,8 @@ const Reservations = () => {
     owner_price: 0,
     extra_hours: 0,
     extra_hours_cost: 0,
+    extra_people: 0,
+    extra_people_cost: 0,
     extra_services: [],
     extra_services_total: 0,
     subtotal: 0,
