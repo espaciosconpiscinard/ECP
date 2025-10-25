@@ -571,6 +571,62 @@ const VillasManagementNew = () => {
                     </div>
                   </div>
 
+                  {/* SISTEMA DE PRECIOS VARIABLES */}
+                  <div className="col-span-2 bg-purple-50 p-4 rounded-md border-2 border-purple-200">
+                    <div className="flex justify-between items-center mb-3">
+                      <h3 className="font-bold text-lg text-purple-800">🔢 Precios Variables por Personas (Opcional)</h3>
+                      <label className="flex items-center gap-2 cursor-pointer">
+                        <input
+                          type="checkbox"
+                          checked={formData.use_pricing_tiers}
+                          onChange={(e) => setFormData({ ...formData, use_pricing_tiers: e.target.checked })}
+                          className="w-5 h-5"
+                        />
+                        <span className="text-sm font-medium">Activar</span>
+                      </label>
+                    </div>
+                    
+                    {formData.use_pricing_tiers && (
+                      <div className="space-y-3">
+                        <p className="text-sm text-gray-600 mb-2">
+                          Configura diferentes precios según el número de personas. Esto sobrescribirá los precios fijos de arriba.
+                        </p>
+                        
+                        <button
+                          type="button"
+                          onClick={() => setShowPricingTierModal(true)}
+                          className="px-4 py-2 bg-purple-600 text-white rounded hover:bg-purple-700 font-medium"
+                        >
+                          + Agregar Rango de Precio
+                        </button>
+
+                        {/* Lista de rangos */}
+                        {formData.pricing_tiers && formData.pricing_tiers.length > 0 && (
+                          <div className="space-y-2 mt-3">
+                            {formData.pricing_tiers.map((tier, index) => (
+                              <div key={index} className="bg-white p-3 rounded border flex justify-between items-center">
+                                <div className="flex-1">
+                                  <span className="font-semibold text-purple-800">
+                                    {tier.min_people}-{tier.max_people} personas:
+                                  </span>
+                                  <span className="ml-3 text-blue-600">Cliente: ${tier.client_price}</span>
+                                  <span className="ml-3 text-green-600">Propietario: ${tier.owner_price}</span>
+                                </div>
+                                <button
+                                  type="button"
+                                  onClick={() => handleRemovePricingTier(index)}
+                                  className="text-red-600 hover:text-red-800 font-bold"
+                                >
+                                  🗑️ Eliminar
+                                </button>
+                              </div>
+                            ))}
+                          </div>
+                        )}
+                      </div>
+                    )}
+                  </div>
+
                   <div>
                     <Label>Máximo de Huéspedes</Label>
                     <Input
