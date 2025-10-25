@@ -226,14 +226,16 @@ function Commissions() {
               </tr>
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
-              {commissions.length === 0 ? (
+              {filteredCommissions.length === 0 ? (
                 <tr>
                   <td colSpan="7" className="px-4 py-8 text-center text-gray-500">
-                    No hay comisiones registradas
+                    {selectedUser === 'all' 
+                      ? 'No hay comisiones registradas' 
+                      : 'Este empleado no tiene comisiones registradas'}
                   </td>
                 </tr>
               ) : (
-                commissions.map((commission) => (
+                filteredCommissions.map((commission) => (
                   <tr key={commission.id} className="hover:bg-gray-50">
                     <td className="px-4 py-3 text-sm text-gray-900">
                       {commission.reservation_date}
