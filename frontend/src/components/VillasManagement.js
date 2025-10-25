@@ -33,7 +33,6 @@ const VillasManagementNew = () => {
   const [selectAllServices, setSelectAllServices] = useState(false);
   
   // Estados para pricing tiers
-  const [showPricingTierModal, setShowPricingTierModal] = useState(false);
   const [newTier, setNewTier] = useState({ min_people: 1, max_people: 10, client_price: 0, owner_price: 0 });
   
   const [formData, setFormData] = useState({
