@@ -1368,7 +1368,12 @@ async def get_dashboard_stats(current_user: dict = Depends(get_current_user)):
     all_reservations = await db.reservations.find({}, {"_id": 0}).to_list(10000)
     
     total_reservations = len(all_reservations)
-    pending_reservations = len([r for r in all_reservations if r.get("balance_due", 0) > 0])
+    # Solo contar como pendiente si balance_due > 0 Y tiene campos requeridos
+    pending_reservations = len([
+        r for r in all_reservations 
+        if r.get("balance_due", 0) > 0 
+        and all(key in r for key in ['check_in_time', 'check_out_time', 'base_price', 'subtotal'])
+    ])
     
     total_revenue_dop = sum(r.get("amount_paid", 0) for r in all_reservations if r.get("currency") == "DOP")
     total_revenue_usd = sum(r.get("amount_paid", 0) for r in all_reservations if r.get("currency") == "USD")
