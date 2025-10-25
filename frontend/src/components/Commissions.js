@@ -272,7 +272,7 @@ function Commissions() {
             <tbody className="bg-white divide-y divide-gray-200">
               {filteredCommissions.length === 0 ? (
                 <tr>
-                  <td colSpan="7" className="px-4 py-8 text-center text-gray-500">
+                  <td colSpan="8" className="px-4 py-8 text-center text-gray-500">
                     {selectedUser === 'all' 
                       ? 'No hay comisiones registradas' 
                       : 'Este empleado no tiene comisiones registradas'}
@@ -280,7 +280,21 @@ function Commissions() {
                 </tr>
               ) : (
                 filteredCommissions.map((commission) => (
-                  <tr key={commission.id} className="hover:bg-gray-50">
+                  <tr key={commission.id} className={`hover:bg-gray-50 ${commission.paid ? 'bg-green-50' : 'bg-white'}`}>
+                    <td className="px-4 py-3 text-center">
+                      <input
+                        type="checkbox"
+                        checked={commission.paid || false}
+                        onChange={() => handleTogglePaid(commission.id, commission.paid)}
+                        className="w-5 h-5 cursor-pointer"
+                        title={commission.paid ? 'Marcar como NO pagado' : 'Marcar como pagado'}
+                      />
+                      {commission.paid && commission.paid_date && (
+                        <p className="text-xs text-green-600 mt-1">
+                          {new Date(commission.paid_date).toLocaleDateString()}
+                        </p>
+                      )}
+                    </td>
                     <td className="px-4 py-3 text-sm text-gray-900">
                       {commission.reservation_date}
                     </td>
