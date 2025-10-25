@@ -166,6 +166,12 @@ const Login = () => {
                 <AlertDescription>{error}</AlertDescription>
               </Alert>
             )}
+            
+            {success && (
+              <Alert className="bg-green-50 border-green-200" data-testid="success-alert">
+                <AlertDescription className="text-green-800">{success}</AlertDescription>
+              </Alert>
+            )}
 
             <Button 
               type="submit" 
