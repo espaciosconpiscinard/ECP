@@ -30,6 +30,7 @@ class UserResponse(UserBase):
     id: str
     created_at: datetime
     is_active: bool
+    is_approved: bool
 
 # ============ CUSTOMER MODELS ============
 class CustomerBase(BaseModel):
