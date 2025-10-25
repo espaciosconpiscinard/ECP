@@ -13,9 +13,11 @@ const Login = () => {
     password: '',
     email: '',
     full_name: '',
-    role: 'employee'
+    role: 'employee',
+    admin_code: ''
   });
   const [error, setError] = useState('');
+  const [success, setSuccess] = useState('');
   const [loading, setLoading] = useState(false);
   const { login, register } = useAuth();
 
