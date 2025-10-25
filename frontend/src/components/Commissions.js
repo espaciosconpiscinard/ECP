@@ -282,17 +282,38 @@ function Commissions() {
                 filteredCommissions.map((commission) => (
                   <tr key={commission.id} className={`hover:bg-gray-50 ${commission.paid ? 'bg-green-50' : 'bg-white'}`}>
                     <td className="px-4 py-3 text-center">
-                      <input
-                        type="checkbox"
-                        checked={commission.paid || false}
-                        onChange={() => handleTogglePaid(commission.id, commission.paid)}
-                        className="w-5 h-5 cursor-pointer"
-                        title={commission.paid ? 'Marcar como NO pagado' : 'Marcar como pagado'}
-                      />
-                      {commission.paid && commission.paid_date && (
-                        <p className="text-xs text-green-600 mt-1">
-                          {new Date(commission.paid_date).toLocaleDateString()}
-                        </p>
+                      {commission.paid ? (
+                        <div>
+                          <span className="inline-block px-2 py-1 bg-green-600 text-white rounded text-xs font-bold mb-1">
+                            ✅ PAGADO
+                          </span>
+                          {commission.paid_date && (
+                            <p className="text-xs text-green-600">
+                              {new Date(commission.paid_date).toLocaleDateString()}
+                            </p>
+                          )}
+                          <button
+                            onClick={() => {
+                              if (window.confirm('¿Revertir a NO PAGADO?')) {
+                                handleTogglePaid(commission.id, commission.paid);
+                              }
+                            }}
+                            className="mt-1 px-2 py-1 bg-gray-400 text-white rounded text-xs hover:bg-gray-500"
+                          >
+                            Revertir
+                          </button>
+                        </div>
+                      ) : (
+                        <button
+                          onClick={() => {
+                            if (window.confirm('¿Marcar esta comisión como PAGADA?')) {
+                              handleTogglePaid(commission.id, commission.paid);
+                            }
+                          }}
+                          className="px-3 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 font-medium text-sm"
+                        >
+                          💰 Marcar Pagado
+                        </button>
                       )}
                     </td>
                     <td className="px-4 py-3 text-sm text-gray-900">
