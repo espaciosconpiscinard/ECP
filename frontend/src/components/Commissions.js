@@ -115,6 +115,25 @@ function Commissions() {
     }
   };
 
+  const handleTogglePaid = async (commissionId, currentPaidStatus) => {
+    try {
+      const token = localStorage.getItem('token');
+      const endpoint = currentPaidStatus ? 'mark-unpaid' : 'mark-paid';
+      
+      const response = await fetch(`${API_URL}/api/commissions/${commissionId}/${endpoint}`, {
+        method: 'POST',
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+
+      if (!response.ok) throw new Error('Error al actualizar estado de pago');
+
+      await fetchCommissions();
+      await fetchStats();
+    } catch (err) {
+      alert('❌ Error: ' + err.message);
+    }
+  };
+
   if (user?.role !== 'admin') {
     return (
       <div className="text-center py-8">
