@@ -233,6 +233,13 @@ async def get_user(user_id: str, current_user: dict = Depends(require_admin)):
     user = await db.users.find_one({"id": user_id}, {"_id": 0, "password_hash": 0})
     if not user:
         raise HTTPException(status_code=404, detail="User not found")
+    
+    # Asegurar que el usuario tenga los campos requeridos
+    if "is_active" not in user:
+        user["is_active"] = True
+    if "is_approved" not in user:
+        user["is_approved"] = True
+    
     return restore_datetimes(user, ["created_at"])
 
 @api_router.put("/users/{user_id}", response_model=UserResponse)
