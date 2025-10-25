@@ -135,40 +135,48 @@ function Commissions() {
         <p className="text-gray-500 mt-1">Seguimiento automático de comisiones por reservaciones</p>
       </div>
 
-      {/* Estadísticas */}
+      {/* Cards por Usuario (Acumulado Individual) */}
+      {stats?.by_user && stats.by_user.length > 0 && (
+        <div>
+          <h3 className="text-xl font-bold mb-3">👥 Comisiones Acumuladas por Empleado</h3>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {stats.by_user.map((userStat) => (
+              <div key={userStat.user_id} className="bg-gradient-to-br from-blue-50 to-purple-50 p-5 rounded-lg border-2 border-blue-200 shadow-sm hover:shadow-md transition-shadow">
+                <div className="flex items-center gap-3 mb-3">
+                  <div className="w-12 h-12 rounded-full bg-blue-600 flex items-center justify-center text-white font-bold text-xl">
+                    {userStat.user_name.charAt(0).toUpperCase()}
+                  </div>
+                  <div className="flex-1">
+                    <p className="font-bold text-gray-900 text-lg">{userStat.user_name}</p>
+                    <p className="text-xs text-gray-600">{userStat.commission_count} reservaciones</p>
+                  </div>
+                </div>
+                <div className="bg-white p-3 rounded border border-blue-300">
+                  <p className="text-xs text-gray-600 mb-1">Total Acumulado</p>
+                  <p className="text-2xl font-bold text-blue-700">
+                    RD$ {userStat.total_commissions?.toLocaleString()}
+                  </p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Estadísticas Generales */}
       {stats && (
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <div className="bg-blue-50 p-4 rounded-lg border-2 border-blue-200">
-            <p className="text-sm text-blue-600 font-medium">Total Comisiones</p>
+            <p className="text-sm text-blue-600 font-medium">Total General Comisiones</p>
             <p className="text-2xl font-bold text-blue-900">RD$ {stats.total_commissions?.toLocaleString()}</p>
           </div>
           <div className="bg-green-50 p-4 rounded-lg border-2 border-green-200">
-            <p className="text-sm text-green-600 font-medium">Cantidad</p>
+            <p className="text-sm text-green-600 font-medium">Total Reservaciones</p>
             <p className="text-2xl font-bold text-green-900">{stats.total_count}</p>
           </div>
           <div className="bg-purple-50 p-4 rounded-lg border-2 border-purple-200">
             <p className="text-sm text-purple-600 font-medium">Empleados con Comisiones</p>
             <p className="text-2xl font-bold text-purple-900">{stats.by_user?.length || 0}</p>
-          </div>
-        </div>
-      )}
-
-      {/* Por Usuario */}
-      {stats?.by_user && stats.by_user.length > 0 && (
-        <div className="bg-white rounded-lg shadow p-6 border">
-          <h3 className="text-xl font-bold mb-4">📊 Comisiones por Usuario</h3>
-          <div className="space-y-3">
-            {stats.by_user.map((userStat) => (
-              <div key={userStat.user_id} className="flex justify-between items-center p-3 bg-gray-50 rounded">
-                <div>
-                  <p className="font-semibold text-gray-900">{userStat.user_name}</p>
-                  <p className="text-sm text-gray-600">{userStat.commission_count} reservaciones</p>
-                </div>
-                <p className="text-lg font-bold text-blue-600">
-                  RD$ {userStat.total_commissions?.toLocaleString()}
-                </p>
-              </div>
-            ))}
           </div>
         </div>
       )}
