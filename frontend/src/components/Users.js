@@ -241,6 +241,43 @@ function Users() {
         </div>
       )}
 
+      {/* Pending Users Section */}
+      {pendingUsers.length > 0 && (
+        <div className="bg-yellow-50 border-2 border-yellow-300 rounded-lg p-6">
+          <h3 className="text-lg font-bold text-yellow-800 mb-4 flex items-center gap-2">
+            <span className="text-2xl">⏳</span>
+            Usuarios Pendientes de Aprobación ({pendingUsers.length})
+          </h3>
+          <div className="space-y-3">
+            {pendingUsers.map((pendingUser) => (
+              <div key={pendingUser.id} className="bg-white rounded-lg p-4 shadow flex items-center justify-between">
+                <div>
+                  <p className="font-semibold text-gray-800">{pendingUser.full_name}</p>
+                  <p className="text-sm text-gray-600">Usuario: {pendingUser.username} | Email: {pendingUser.email}</p>
+                  <p className="text-xs text-gray-500 mt-1">
+                    Rol: <span className="font-medium">{pendingUser.role === 'admin' ? 'Administrador' : 'Empleado'}</span>
+                  </p>
+                </div>
+                <div className="flex gap-2">
+                  <button
+                    onClick={() => handleApproveUser(pendingUser.id)}
+                    className="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700 font-medium"
+                  >
+                    ✅ Aprobar
+                  </button>
+                  <button
+                    onClick={() => handleRejectUser(pendingUser.id)}
+                    className="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700 font-medium"
+                  >
+                    ❌ Rechazar
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
       {/* Form */}
       {showForm && (
         <div className="bg-white rounded-lg shadow-md p-6">
