@@ -227,6 +227,130 @@ function Configuration() {
       {/* Logo Uploader */}
       <LogoUploader />
 
+      {/* Backup/Restore Section - COMPLETE DATABASE */}
+      <div className="bg-gradient-to-r from-red-50 to-orange-50 rounded-lg shadow-lg p-6 mb-6 border-2 border-red-300">
+        <h3 className="text-2xl font-bold mb-2 flex items-center text-red-900">
+          <span className="text-3xl mr-3">💾</span>
+          Backup y Restauración Completa
+        </h3>
+        <p className="text-sm text-red-700 mb-4">
+          ⚠️ <strong>Sistema de Respaldo Total:</strong> Descarga TODOS tus datos en un solo archivo JSON y restáuralos cuando necesites.
+        </p>
+        
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          {/* Download Backup */}
+          <div className="bg-white p-4 rounded-lg border-2 border-green-300">
+            <h4 className="font-bold text-green-800 mb-2 flex items-center">
+              <span className="text-xl mr-2">⬇️</span>
+              Descargar Backup Completo
+            </h4>
+            <p className="text-xs text-gray-600 mb-3">
+              Incluye: Usuarios, Clientes, Villas, Reservaciones, Gastos, Categorías, Configuraciones, etc.
+            </p>
+            <button
+              onClick={async () => {
+                try {
+                  const token = localStorage.getItem('token');
+                  const response = await fetch(`${API_URL}/api/backup/download`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                  });
+                  
+                  if (!response.ok) throw new Error('Error al descargar backup');
+                  
+                  const blob = await response.blob();
+                  const url = window.URL.createObjectURL(blob);
+                  const a = document.createElement('a');
+                  a.href = url;
+                  a.download = response.headers.get('Content-Disposition')?.split('filename=')[1] || 'backup.json';
+                  document.body.appendChild(a);
+                  a.click();
+                  a.remove();
+                  window.URL.revokeObjectURL(url);
+                  
+                  alert('✅ Backup descargado exitosamente! Guárdalo en un lugar seguro.');
+                } catch (err) {
+                  alert('❌ Error al descargar backup: ' + err.message);
+                }
+              }}
+              className="w-full px-4 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 font-semibold"
+            >
+              📥 Descargar Backup Ahora
+            </button>
+          </div>
+
+          {/* Restore Backup */}
+          <div className="bg-white p-4 rounded-lg border-2 border-orange-300">
+            <h4 className="font-bold text-orange-800 mb-2 flex items-center">
+              <span className="text-xl mr-2">⬆️</span>
+              Restaurar desde Backup
+            </h4>
+            <p className="text-xs text-red-600 mb-3">
+              ⚠️ <strong>CUIDADO:</strong> Esto ELIMINARÁ todos los datos actuales y los reemplazará con el backup.
+            </p>
+            <input
+              type="file"
+              accept=".json"
+              onChange={async (e) => {
+                const file = e.target.files[0];
+                if (!file) return;
+                
+                if (!window.confirm(`⚠️ ADVERTENCIA CRÍTICA ⚠️\n\n¿Estás SEGURO de restaurar "${file.name}"?\n\nEsto eliminará TODOS los datos actuales:\n- Usuarios\n- Clientes\n- Villas\n- Reservaciones\n- Gastos\n- Configuraciones\n\nY los reemplazará con los datos del backup.\n\n¿Continuar?`)) {
+                  e.target.value = '';
+                  return;
+                }
+                
+                try {
+                  const token = localStorage.getItem('token');
+                  const formData = new FormData();
+                  formData.append('file', file);
+                  
+                  const response = await fetch(`${API_URL}/api/backup/restore`, {
+                    method: 'POST',
+                    headers: { 'Authorization': `Bearer ${token}` },
+                    body: formData
+                  });
+                  
+                  if (!response.ok) {
+                    const error = await response.json();
+                    throw new Error(error.detail || 'Error al restaurar');
+                  }
+                  
+                  const result = await response.json();
+                  
+                  let message = `✅ Backup restaurado exitosamente!\n\n`;
+                  message += `Fecha del backup: ${result.backup_date}\n\n`;
+                  message += `Colecciones restauradas:\n`;
+                  result.restored.forEach(r => {
+                    message += `- ${r.collection}: ${r.documents} documentos\n`;
+                  });
+                  
+                  alert(message);
+                  
+                  // Recargar página
+                  window.location.reload();
+                } catch (err) {
+                  alert('❌ Error al restaurar backup: ' + err.message);
+                }
+                
+                e.target.value = '';
+              }}
+              className="w-full px-4 py-3 border-2 border-orange-400 rounded-lg text-sm file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-orange-600 file:text-white hover:file:bg-orange-700"
+            />
+          </div>
+        </div>
+        
+        {/* Info Section */}
+        <div className="mt-4 bg-blue-50 p-3 rounded border border-blue-200">
+          <h5 className="font-semibold text-blue-900 text-sm mb-1">💡 ¿Cuándo usar Backup/Restore?</h5>
+          <ul className="text-xs text-gray-700 space-y-1">
+            <li>✅ <strong>Antes de actualizaciones importantes</strong> - Descarga backup de seguridad</li>
+            <li>✅ <strong>Migrar a otro servidor</strong> - Descarga en servidor A, restaura en servidor B</li>
+            <li>✅ <strong>Recuperación de desastres</strong> - Si se borran datos por error</li>
+            <li>✅ <strong>Respaldo periódico</strong> - Descarga semanal/mensual para historial</li>
+          </ul>
+        </div>
+      </div>
+
       {/* Import/Export Section - Hierarchical */}
       <div className="bg-white rounded-lg shadow-md p-6 mb-6">
         <h3 className="text-xl font-semibold mb-4 flex items-center">
