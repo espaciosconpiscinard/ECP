@@ -374,6 +374,32 @@ class InvoiceCounter(BaseModel):
     current_number: int = 1600  # Comenzar desde 1600
 
 # ============ STATS MODELS ============
+# ============ COMMISSION MODELS ============
+class CommissionBase(BaseModel):
+    reservation_id: str
+    user_id: str  # Usuario que creó la reservación
+    user_name: str  # Nombre del usuario
+    villa_code: str
+    villa_name: str
+    customer_name: str
+    reservation_date: str
+    amount: float = 250.0  # Comisión default
+    notes: Optional[str] = None
+
+class CommissionCreate(CommissionBase):
+    pass
+
+class Commission(CommissionBase):
+    model_config = ConfigDict(extra="ignore")
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+    created_by: str = "system"
+
+class CommissionUpdate(BaseModel):
+    amount: Optional[float] = None
+    notes: Optional[str] = None
+
+# ============ DASHBOARD MODELS ============
 class DashboardStats(BaseModel):
     total_reservations: int
     pending_reservations: int
