@@ -1580,6 +1580,50 @@ async def get_backup_info(current_user: dict = Depends(require_admin)):
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error al obtener info: {str(e)}")
 
+@api_router.post("/system/reset-all")
+async def reset_all_data(admin_code: str, current_user: dict = Depends(require_admin)):
+    """BORRAR TODO - Elimina todos los datos de todas las colecciones (excepto admin)
+    Requiere código de administrador ECPROSA para ejecutar"""
+    
+    # Validar código secreto
+    if admin_code != "ECPROSA":
+        raise HTTPException(status_code=403, detail="Código de administrador inválido")
+    
+    try:
+        deleted_summary = []
+        
+        # Colecciones a borrar COMPLETAMENTE
+        collections_to_clear = [
+            "customers", "categories", "expense_categories",
+            "villas", "extra_services", "reservations", "villa_owners",
+            "expenses", "reservation_abonos", "expense_abonos",
+            "invoice_counter", "invoice_templates", "logo_config"
+        ]
+        
+        for collection_name in collections_to_clear:
+            collection = db[collection_name]
+            result = await collection.delete_many({})
+            deleted_summary.append({
+                "collection": collection_name,
+                "deleted": result.deleted_count
+            })
+        
+        # Usuarios: eliminar todos EXCEPTO administradores
+        users_result = await db.users.delete_many({"role": {"$ne": "admin"}})
+        deleted_summary.append({
+            "collection": "users (solo empleados)",
+            "deleted": users_result.deleted_count
+        })
+        
+        return {
+            "message": "⚠️ SISTEMA RESETEADO COMPLETAMENTE",
+            "warning": "Todos los datos han sido eliminados excepto usuarios administradores",
+            "deleted": deleted_summary,
+            "timestamp": datetime.now(timezone.utc).isoformat()
+        }
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error al resetear sistema: {str(e)}")
+
 # ============ EXPORT/IMPORT ENDPOINTS ============
 from export_service import create_excel_template, export_data_to_excel
 from import_service import import_customers, import_villas, import_reservations, import_expenses
