@@ -157,7 +157,7 @@ function Commissions() {
       {/* Cards por Usuario (Acumulado Individual) */}
       {stats?.by_user && stats.by_user.length > 0 && (
         <div>
-          <h3 className="text-xl font-bold mb-3">👥 Comisiones Acumuladas por Empleado</h3>
+          <h3 className="text-xl font-bold mb-3">👥 Comisiones por Empleado - Control de Pagos</h3>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {stats.by_user.map((userStat) => (
               <div key={userStat.user_id} className="bg-gradient-to-br from-blue-50 to-purple-50 p-5 rounded-lg border-2 border-blue-200 shadow-sm hover:shadow-md transition-shadow">
@@ -167,14 +167,34 @@ function Commissions() {
                   </div>
                   <div className="flex-1">
                     <p className="font-bold text-gray-900 text-lg">{userStat.user_name}</p>
-                    <p className="text-xs text-gray-600">{userStat.commission_count} reservaciones</p>
+                    <p className="text-xs text-gray-600">{userStat.commission_count} comisiones</p>
                   </div>
                 </div>
-                <div className="bg-white p-3 rounded border border-blue-300">
-                  <p className="text-xs text-gray-600 mb-1">Total Acumulado</p>
-                  <p className="text-2xl font-bold text-blue-700">
+                
+                {/* Total */}
+                <div className="bg-white p-3 rounded border border-blue-300 mb-2">
+                  <p className="text-xs text-gray-600 mb-1">💰 Total Comisiones</p>
+                  <p className="text-xl font-bold text-blue-700">
                     RD$ {userStat.total_commissions?.toLocaleString()}
                   </p>
+                </div>
+                
+                {/* Pagado y Pendiente */}
+                <div className="grid grid-cols-2 gap-2">
+                  <div className="bg-green-50 p-2 rounded border border-green-300">
+                    <p className="text-xs text-green-700 mb-1">✅ Pagado</p>
+                    <p className="text-sm font-bold text-green-800">
+                      RD$ {userStat.total_paid?.toLocaleString() || 0}
+                    </p>
+                    <p className="text-xs text-gray-600">{userStat.paid_count || 0}</p>
+                  </div>
+                  <div className="bg-orange-50 p-2 rounded border border-orange-300">
+                    <p className="text-xs text-orange-700 mb-1">⏳ Pendiente</p>
+                    <p className="text-sm font-bold text-orange-800">
+                      RD$ {userStat.total_pending?.toLocaleString() || 0}
+                    </p>
+                    <p className="text-xs text-gray-600">{userStat.pending_count || 0}</p>
+                  </div>
                 </div>
               </div>
             ))}
