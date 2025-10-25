@@ -56,7 +56,7 @@ const VillasManagementNew = () => {
     max_guests: 0,
     amenities: [],
     is_active: true,
-    use_flexible_pricing: false,
+    use_flexible_pricing: true,  // SIEMPRE true ahora
     flexible_prices: { pasadia: [], amanecida: [], evento: [] }
   });
 
