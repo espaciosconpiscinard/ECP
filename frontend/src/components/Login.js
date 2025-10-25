@@ -125,20 +125,40 @@ const Login = () => {
             </div>
 
             {!isLogin && (
-              <div className="space-y-2">
-                <Label htmlFor="role">Rol</Label>
-                <select
-                  id="role"
-                  name="role"
-                  value={formData.role}
-                  onChange={handleChange}
-                  className="w-full p-2 border rounded-md"
-                  data-testid="role-select"
-                >
-                  <option value="employee">Empleado</option>
-                  <option value="admin">Administrador</option>
-                </select>
-              </div>
+              <>
+                <div className="space-y-2">
+                  <Label htmlFor="role">Rol</Label>
+                  <select
+                    id="role"
+                    name="role"
+                    value={formData.role}
+                    onChange={handleChange}
+                    className="w-full p-2 border rounded-md"
+                    data-testid="role-select"
+                  >
+                    <option value="employee">Empleado</option>
+                    <option value="admin">Administrador</option>
+                  </select>
+                </div>
+                
+                {formData.role === 'admin' && (
+                  <div className="space-y-2">
+                    <Label htmlFor="admin_code">Código Secreto de Administrador</Label>
+                    <Input
+                      id="admin_code"
+                      name="admin_code"
+                      type="text"
+                      placeholder="Ingrese código de administrador"
+                      value={formData.admin_code}
+                      onChange={handleChange}
+                      required={formData.role === 'admin'}
+                      data-testid="admin-code-input"
+                      className="uppercase"
+                    />
+                    <p className="text-xs text-gray-500">Necesitas el código secreto para crear una cuenta de administrador</p>
+                  </div>
+                )}
+              </>
             )}
 
             {error && (
