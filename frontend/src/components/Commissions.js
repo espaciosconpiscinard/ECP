@@ -16,6 +16,7 @@ function Commissions() {
   const [selectedUser, setSelectedUser] = useState('all');
   const [selectedMonth, setSelectedMonth] = useState('all');
   const [selectedFortnight, setSelectedFortnight] = useState('all');
+  const [selectedStatus, setSelectedStatus] = useState('pending'); // pending, paid, all
 
   useEffect(() => {
     fetchCommissions();
