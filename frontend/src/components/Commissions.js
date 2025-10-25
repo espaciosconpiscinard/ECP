@@ -256,16 +256,17 @@ function Commissions() {
       {/* Tabla de comisiones */}
       <div className="bg-white rounded-lg shadow overflow-hidden border">
         <div className="px-6 py-4 border-b bg-gray-50">
-          <div className="flex justify-between items-center">
-            <h3 className="text-xl font-bold">📋 Historial de Comisiones</h3>
-            
+          <h3 className="text-xl font-bold mb-4">📋 Historial de Comisiones</h3>
+          
+          {/* Filtros */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             {/* Filtro por Usuario */}
-            <div className="flex items-center gap-3">
-              <label className="text-sm font-medium text-gray-700">Filtrar por empleado:</label>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">👤 Empleado:</label>
               <select
                 value={selectedUser}
                 onChange={(e) => setSelectedUser(e.target.value)}
-                className="px-4 py-2 border-2 border-gray-300 rounded-lg focus:border-blue-500 focus:outline-none"
+                className="w-full px-3 py-2 border-2 border-gray-300 rounded-lg focus:border-blue-500 focus:outline-none"
               >
                 <option value="all">Todos los empleados</option>
                 {stats?.by_user?.map((userStat) => (
@@ -275,6 +276,81 @@ function Commissions() {
                 ))}
               </select>
             </div>
+
+            {/* Filtro por Mes */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">📅 Mes (fecha reserva):</label>
+              <select
+                value={selectedMonth}
+                onChange={(e) => setSelectedMonth(e.target.value)}
+                className="w-full px-3 py-2 border-2 border-gray-300 rounded-lg focus:border-blue-500 focus:outline-none"
+              >
+                <option value="all">Todos los meses</option>
+                <option value="2025-01">Enero 2025</option>
+                <option value="2025-02">Febrero 2025</option>
+                <option value="2025-03">Marzo 2025</option>
+                <option value="2025-04">Abril 2025</option>
+                <option value="2025-05">Mayo 2025</option>
+                <option value="2025-06">Junio 2025</option>
+                <option value="2025-07">Julio 2025</option>
+                <option value="2025-08">Agosto 2025</option>
+                <option value="2025-09">Septiembre 2025</option>
+                <option value="2025-10">Octubre 2025</option>
+                <option value="2025-11">Noviembre 2025</option>
+                <option value="2025-12">Diciembre 2025</option>
+                <option value="2024-12">Diciembre 2024</option>
+                <option value="2024-11">Noviembre 2024</option>
+                <option value="2024-10">Octubre 2024</option>
+              </select>
+            </div>
+
+            {/* Filtro por Quincena */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">🗓️ Quincena (fecha reserva):</label>
+              <select
+                value={selectedFortnight}
+                onChange={(e) => setSelectedFortnight(e.target.value)}
+                className="w-full px-3 py-2 border-2 border-gray-300 rounded-lg focus:border-blue-500 focus:outline-none"
+              >
+                <option value="all">Todas</option>
+                <option value="1">1ra Quincena (1-14) - Pago día 15</option>
+                <option value="2">2da Quincena (15-31) - Pago día 30</option>
+              </select>
+            </div>
+          </div>
+
+          {/* Resumen de filtros activos */}
+          <div className="mt-3 flex flex-wrap gap-2">
+            {selectedUser !== 'all' && (
+              <span className="px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm">
+                👤 {stats?.by_user?.find(u => u.user_id === selectedUser)?.user_name}
+                <button onClick={() => setSelectedUser('all')} className="ml-2 text-blue-600 hover:text-blue-800">✕</button>
+              </span>
+            )}
+            {selectedMonth !== 'all' && (
+              <span className="px-3 py-1 bg-purple-100 text-purple-800 rounded-full text-sm">
+                📅 {selectedMonth}
+                <button onClick={() => setSelectedMonth('all')} className="ml-2 text-purple-600 hover:text-purple-800">✕</button>
+              </span>
+            )}
+            {selectedFortnight !== 'all' && (
+              <span className="px-3 py-1 bg-orange-100 text-orange-800 rounded-full text-sm">
+                🗓️ {selectedFortnight === '1' ? '1ra Quincena (1-14)' : '2da Quincena (15-31)'}
+                <button onClick={() => setSelectedFortnight('all')} className="ml-2 text-orange-600 hover:text-orange-800">✕</button>
+              </span>
+            )}
+            {(selectedUser !== 'all' || selectedMonth !== 'all' || selectedFortnight !== 'all') && (
+              <button
+                onClick={() => {
+                  setSelectedUser('all');
+                  setSelectedMonth('all');
+                  setSelectedFortnight('all');
+                }}
+                className="px-3 py-1 bg-red-100 text-red-800 rounded-full text-sm hover:bg-red-200"
+              >
+                🗑️ Limpiar filtros
+              </button>
+            )}
           </div>
         </div>
 
