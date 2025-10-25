@@ -592,17 +592,72 @@ const VillasManagementNew = () => {
                           Configura diferentes precios según el número de personas. Esto sobrescribirá los precios fijos de arriba.
                         </p>
                         
-                        <button
-                          type="button"
-                          onClick={() => setShowPricingTierModal(true)}
-                          className="px-4 py-2 bg-purple-600 text-white rounded hover:bg-purple-700 font-medium"
-                        >
-                          + Agregar Rango de Precio
-                        </button>
+                        {/* Formulario inline para agregar rangos */}
+                        <div className="bg-white p-4 rounded border-2 border-purple-300">
+                          <div className="flex items-center gap-3 mb-2">
+                            <h4 className="font-semibold text-purple-700">➕ Agregar Nuevo Rango</h4>
+                          </div>
+                          <div className="grid grid-cols-4 gap-3">
+                            <div>
+                              <label className="block text-xs font-medium mb-1">Personas Mín</label>
+                              <input
+                                type="number"
+                                min="1"
+                                value={newTier.min_people}
+                                onChange={(e) => setNewTier({ ...newTier, min_people: parseInt(e.target.value) || 1 })}
+                                className="w-full px-2 py-1 text-sm border rounded"
+                                placeholder="1"
+                              />
+                            </div>
+                            <div>
+                              <label className="block text-xs font-medium mb-1">Personas Máx</label>
+                              <input
+                                type="number"
+                                min="1"
+                                value={newTier.max_people}
+                                onChange={(e) => setNewTier({ ...newTier, max_people: parseInt(e.target.value) || 10 })}
+                                className="w-full px-2 py-1 text-sm border rounded"
+                                placeholder="10"
+                              />
+                            </div>
+                            <div>
+                              <label className="block text-xs font-medium mb-1">Precio Cliente</label>
+                              <input
+                                type="number"
+                                step="0.01"
+                                min="0"
+                                value={newTier.client_price}
+                                onChange={(e) => setNewTier({ ...newTier, client_price: parseFloat(e.target.value) || 0 })}
+                                className="w-full px-2 py-1 text-sm border rounded"
+                                placeholder="5000"
+                              />
+                            </div>
+                            <div>
+                              <label className="block text-xs font-medium mb-1">Pago Propietario</label>
+                              <input
+                                type="number"
+                                step="0.01"
+                                min="0"
+                                value={newTier.owner_price}
+                                onChange={(e) => setNewTier({ ...newTier, owner_price: parseFloat(e.target.value) || 0 })}
+                                className="w-full px-2 py-1 text-sm border rounded"
+                                placeholder="4000"
+                              />
+                            </div>
+                          </div>
+                          <button
+                            type="button"
+                            onClick={handleAddPricingTier}
+                            className="mt-3 w-full px-4 py-2 bg-purple-600 text-white rounded hover:bg-purple-700 font-medium text-sm"
+                          >
+                            ➕ Agregar Rango
+                          </button>
+                        </div>
 
-                        {/* Lista de rangos */}
+                        {/* Lista de rangos agregados */}
                         {formData.pricing_tiers && formData.pricing_tiers.length > 0 && (
-                          <div className="space-y-2 mt-3">
+                          <div className="space-y-2">
+                            <h4 className="font-semibold text-purple-700 text-sm">Rangos Configurados:</h4>
                             {formData.pricing_tiers.map((tier, index) => (
                               <div key={index} className="bg-white p-3 rounded border flex justify-between items-center">
                                 <div className="flex-1">
@@ -617,7 +672,7 @@ const VillasManagementNew = () => {
                                   onClick={() => handleRemovePricingTier(index)}
                                   className="text-red-600 hover:text-red-800 font-bold"
                                 >
-                                  🗑️ Eliminar
+                                  🗑️
                                 </button>
                               </div>
                             ))}
