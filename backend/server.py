@@ -730,6 +730,51 @@ async def delete_villa(villa_id: str, current_user: dict = Depends(require_admin
         raise HTTPException(status_code=404, detail="Villa not found")
     return {"message": "Villa deleted successfully"}
 
+@api_router.get("/villas/{villa_id}/calculate-price")
+async def calculate_villa_price(
+    villa_id: str, 
+    people: int,
+    rental_type: str = "pasadia",
+    current_user: dict = Depends(get_current_user)
+):
+    """Calculate suggested price based on number of people"""
+    villa = await db.villas.find_one({"id": villa_id}, {"_id": 0})
+    if not villa:
+        raise HTTPException(status_code=404, detail="Villa not found")
+    
+    # Si la villa usa pricing tiers
+    if villa.get("use_pricing_tiers") and villa.get("pricing_tiers"):
+        pricing_tiers = villa.get("pricing_tiers", [])
+        
+        # Buscar el tier que corresponda al número de personas
+        for tier in pricing_tiers:
+            if tier["min_people"] <= people <= tier["max_people"]:
+                return {
+                    "suggested_client_price": tier["client_price"],
+                    "suggested_owner_price": tier["owner_price"],
+                    "pricing_type": "tiered",
+                    "tier_range": f"{tier['min_people']}-{tier['max_people']} personas"
+                }
+        
+        # Si no hay tier que coincida, retornar mensaje
+        return {
+            "suggested_client_price": 0,
+            "suggested_owner_price": 0,
+            "pricing_type": "tiered",
+            "message": "No hay rango de precio configurado para este número de personas"
+        }
+    else:
+        # Sistema de precios fijos (compatibilidad)
+        price_field_client = f"default_price_{rental_type}"
+        price_field_owner = f"owner_price_{rental_type}"
+        
+        return {
+            "suggested_client_price": villa.get(price_field_client, 0),
+            "suggested_owner_price": villa.get(price_field_owner, 0),
+            "pricing_type": "fixed",
+            "rental_type": rental_type
+        }
+
 # ============ EXTRA SERVICE ENDPOINTS ============
 
 @api_router.post("/extra-services", response_model=ExtraService)
