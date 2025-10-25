@@ -3,16 +3,15 @@ The AI engineer successfully enhanced the Espacios Con Piscina application, prog
 </analysis>
 
 <product_requirements>
-The Espacios Con Piscina application manages villas, reservations, clients, and expenses with role-based access. Initially, it required robust reservation/client management, payment tracking, and customizable invoices (multi-currency, extra services). Villa management needed , , , , and an expense tracker. Evolving requirements led to professional invoice redesigns, separate villa/service management, partial payments (abonos), and advanced expense management (user-creatable categories, payment reminders, grouping, month-based filtering, overdue display, advanced sorting). Other features comprised cascade deletion, customer management with search/alphabetical listing, admin-controlled user management, dynamic logo handling, multi-selection for bulk operations, form persistence post-save, manual invoice numbering for admins, and a hierarchical data import/export system via Excel with auto-generated expenses. The application transitioned to a web-based solution.
+The Espacios Con Piscina application manages villas, reservations, clients, and expenses with role-based access. Initially, it required robust reservation/client management, payment tracking, and customizable invoices (multi-currency, extra services). Villa management needed , , , , and an expense tracker. Evolving requirements led to professional invoice redesigns, separate villa/service management, partial payments (abonos), and advanced expense management (user-creatable categories, payment reminders, grouping, month-based filtering, overdue display, advanced sorting). Other features comprised cascade deletion, customer management with search/alphabetical listing, admin-controlled user management, dynamic logo handling, multi-selection for bulk operations, form persistence post-save, manual invoice numbering for admins, and a hierarchical data import/export system via Excel with auto-generated expenses. The application transitioned to a web-based solution. Recent additions include an admin approval system for new users, flexible pricing tiers for villas based on rent type (with customizable Personas and Cliente/Propietario fields), an automatic commission system for reservations (editable amount, filtered by user, with payment tracking and bi-weekly filtering), and a full backup/restore system.
 </product_requirements>
 
 <key_technical_concepts>
-- **Full-stack Development**: React (Frontend), FastAPI (Backend), MongoDB Atlas (Cloud Database).
-- **Authentication**: JWT, Role-Based Access Control, Bcrypt.
-- **Styling**: Tailwind CSS.
-- **Data Modeling**: Pydantic for schema validation.
+- **Full-stack Development**: React (Frontend), FastAPI (Backend), MongoDB Atlas.
+- **Authentication**: JWT, Role-Based Access Control, Bcrypt hashing.
+- **Data Modeling**: Pydantic, UUIDs for IDs.
 - **API Design**: RESTful with  prefix, environment variables.
-- **Data Processing**: Pandas, Openpyxl for Excel manipulation.
+- **Data Processing**: Openpyxl for Excel (import/export).
 - **Deployment**: Render, Vercel, Docker.
 </key_technical_concepts>
 
@@ -22,73 +21,97 @@ The application uses a standard full-stack architecture with  and  directories.
 
 
 -   ****:
-    -   **Importance**: Stores environment variables, including .
-    -   **Changes**:  variable added and corrected to  to ensure the backend connects to the correct database.
+    -   **Importance**: Stores environment variables like , , .
+    -   **Changes**:  corrected to  for production.
 -   ****:
-    -   **Importance**: Defines Pydantic data models for the backend API.
-    -   **Changes**:  updated to include .  model fields were implicitly refined during import logic adjustments in  to correctly map various villa properties.
--   ****:
-    -   **Importance**: Main FastAPI application with all API routes.
+    -   **Importance**: Defines Pydantic data models.
     -   **Changes**:
-        -    was modified to also check  and  collections for existing invoice numbers.
-        -   A new helper function  was added for validating manual abono invoice numbers.
-        -   Endpoints  and  were updated to accept and process optional  for abonos.
-        -   New GET endpoints for hierarchical template downloads (, , ) and POST endpoints for hierarchical file imports (, , , etc.) were added. These import endpoints were repositioned in the file to be registered correctly by FastAPI. CORS configuration was also corrected. Debug logging was removed.
+        -    updated with  and .
+        -    model added with , , .
+        -    updated to replace , , , etc., with , ,  (lists of ).
+        -    model added (, , , Sat Oct 25 18:03:55 UTC 2025, , , ).
 -   ****:
-    -   **Importance**: *Newly created* module to handle the generation of structured Excel templates for various data entities (e.g., Customers, Villa Categories, Villas) as part of the hierarchical import system.
-    -   **Changes**: This file contains the logic for creating and formatting these Excel templates.
--   ****:
-    -   **Importance**: *Newly created* module to handle the processing of uploaded hierarchical Excel files.
-    -   **Changes**: Functions were implemented to parse Excel data, create/update database entries, and ensure mandatory fields like  (set to ) and correct villa field mappings are applied during the import process.
--   ****:
-    -   **Importance**: Lists Python dependencies for the frontend.
-    -   **Changes**:  was moved from  to  to fix desktop application build errors.
--   ****:
-    -   **Importance**: Manages client reservations, payment records (abonos), and invoice printing.
+    -   **Importance**: Main FastAPI application with API routes.
     -   **Changes**:
-        -   The abono creation form was updated with an  input field.
-        -   The reservation list view was modified to display the main  along with a list of  for associated abonos.
-        -   New summary cards (Total Reservations, Pending, Paid, Remaining) and their calculation logic were integrated into the reservation dashboard.
-        -   The  function was significantly refactored to asynchronously fetch all abonos and dynamically include the initial payment and all subsequent abono details (date, amount, invoice number) in the generated printable invoice, including new CSS styles. Multiple syntax errors in complex template literals were debugged and resolved.
+        -   Registration endpoint () modified to require  and set  to .
+        -   Login endpoint () modified to check .
+        -   New endpoints for user management:  and .
+        -   New endpoint  added.
+        -    endpoint modified to automatically create a  entry.
+        -   New endpoints for commissions: , , .
+        -   New endpoint  to mark commissions as paid.
+        -   New endpoints for full backup/restore:  and .
+        -   New endpoint  for a full data wipe, protected by secret code.
+        -    endpoint adjusted for robustness in handling missing reservation fields and for accurate calculation of .
 -   ****:
-    -   **Importance**: Manages business expenses and their associated payments (abonos).
-    -   **Changes**: The abono creation form was updated with an  input field, and the abono history list was modified to display the  for each abono.
+    -   **Importance**: Handles user authentication.
+    -   **Changes**: Added input for  on registration and displays messages regarding user approval status.
 -   ****:
-    -   **Importance**: Houses application-wide settings and tools, including data import/export.
-    -   **Changes**: The import/export section was entirely revamped to display a new hierarchical, step-by-step interface (Clientes, Categorías de Villas, Villas). This new UI includes record counters, download template buttons, and import file buttons. New state management and helper functions (, , ) were added, and JSX rendering issues with overlapping elements were resolved.
+    -   **Importance**: Manages user accounts.
+    -   **Changes**: Added a section to display and approve pending user registrations.
 -   ****:
-    -   **Importance**: *Newly created* configuration file for deploying the backend service on Render.com.
+    -   **Importance**: Manages villa details and pricing.
+    -   **Changes**:
+        -   Replaced fixed price fields with a dynamic interface for , , , allowing multiple , ,  entries per rent type with a '+' button.
+        -   Removed the modal for pricing tiers; now integrated inline.
+        -    is now always .
 -   ****:
-    -   **Importance**: *Newly created* configuration file for deploying the frontend service on Vercel.
+    -   **Importance**: Manages client reservations.
+    -   **Changes**:
+        -   Added a dropdown to select a flexible price tier (Pasadía, Amanecida, Evento) from available villa prices, which auto-fills the  field.
+        -   Added input fields for  and .
 -   ****:
-    -   **Importance**: *Newly created* comprehensive guide detailing the step-by-step process for deploying the full-stack application to MongoDB Atlas, Render.com, and Vercel.
+    -   **Importance**: *Newly created* component to display and manage commissions.
+    -   **Changes**:
+        -   Displays commissions with  of the user who created the reservation.
+        -   Includes cards for total, paid, and pending commissions per user.
+        -   Added a user filter dropdown.
+        -   Replaced the  checkbox with a Marcar como Pagada button.
+        -   Added filters for month and bi-weekly periods (quincenas) based on the reservation date.
+        -   Added Fecha Reserva column to the table.
+-   ****:
+    -   **Importance**: Houses application settings.
+    -   **Changes**: Added a Backup/Restore Completo section with buttons to download/upload full data backups and a RESET TOTAL button protected by the admin secret code.
+-   ****:
+    -   **Importance**: Main application routing.
+    -   **Changes**: Added routing for the new  component.
+-   ****:
+    -   **Importance**: Application sidebar menu.
+    -   **Changes**: Added Comisiones menu item, visible to admins.
+-   ****:
+    -   **Importance**: *Newly created* guide for deploying changes to production.
+-   ****:
+    -   **Importance**: *Newly created* summary of changes made.
+-   ****:
+    -   **Importance**: *Newly created* documentation for the flexible pricing system.
+-   ****:
+    -   **Importance**: *Newly created* documentation for the backup/restore system.
+-   ****:
+    -   **Importance**: *Newly created* documentation for the commissions system.
 </code_architecture>
 
 <pending_tasks>
--   **WhatsApp Integration**: Integrate WhatsApp for automated notifications.
--   **Calendar Sync**: Integrate external calendars (Google, Airbnb, iOS) for real-time availability updates.
--   **Import System (Full Backend Logic)**: Fully implement and validate backend processing for hierarchical imports beyond initial parsing, ensuring all data (e.g., reservations) is correctly linked and associated expenses are auto-generated.
--   **Frontend Refinements for Import**: Implement robust success/error messages for file imports.
+- **WhatsApp Integration**: Integrate WhatsApp for automated notifications.
+- **Calendar Sync**: Integrate external calendars (Google, Airbnb, iOS) for real-time availability updates.
+- **Import System (Full Backend Logic)**: Fully implement and validate backend processing for hierarchical imports beyond initial parsing, ensuring all data (e.g., reservations) is correctly linked and associated expenses are auto-generated.
+- **Frontend Refinements for Import**: Implement robust success/error messages for file imports.
 </pending_tasks>
 
 <current_work>
-Immediately before this summary request, the AI engineer was primarily focused on assisting the user with the deployment of the application to a production environment (MongoDB Atlas, Render.com, Vercel) and resolving critical post-deployment issues.
+Immediately before this summary request, the AI engineer was focused on implementing and refining the commissions management system based on extensive user feedback.
 
 **Current state of work:**
-1.  **Hierarchical Import/Export System**: The backend now includes  and  with corresponding GET endpoints for template downloads and POST endpoints for importing data (Customers, Villa Categories, Villas). The frontend  displays a hierarchical UI with steps, record counters, download, and import buttons.
-2.  **Deployment Guidance**: Detailed , , and  files were created, and the user was guided through setting up MongoDB Atlas, Render, and Vercel.
-3.  **Admin Login Debugging**: A major issue was the user's inability to log in to the deployed application. This involved:
-    *   Correcting the  in  (and ensuring it's correctly picked up by Render).
-    *   Guiding the user through setting the correct  and  in Render's environment variables.
-    *   Identifying a potential mismatch in the  for the  user, which was manually inserted into MongoDB Atlas.
-    The AI engineer confirmed the backend logic for login is sound and that / credentials should work if the database entry is correct.
-4.  **Import Data Display Issues**:
-    *   Initial client imports failed due to a missing  field, which was subsequently fixed in .
-    *   Imported villas were not displaying due to mismatches between the import template's simplified fields and the  model's expected fields, and the absence of associated  entries in the database. These schema and category dependency issues were addressed.
+1.  **Commissions System Enhancements**: The  frontend component has been significantly refined. It now displays commissions created automatically upon reservation, linked to the user who made the reservation.
+2.  **User-centric View**: The commissions dashboard includes cards displaying accumulated total, paid, and pending commissions for each employee (full names are displayed). A dropdown filter allows admins to view commissions for specific users.
+3.  **Payment Tracking**: Individual commissions can be marked as paid using a dedicated button (replacing a previous checkbox) to prevent accidental changes.
+4.  **Date-based Filtering**: A crucial enhancement is the ability to filter commissions by month and bi-weekly periods (quincenas), using the *reservation date* (not the creation date) as the basis, as per user's specific business logic.
+5.  **Visibility of Reservation Date**: The table now includes a Fecha Reserva column to clearly indicate the date used for filtering.
+6.  **Personas Extras field**: The  component has been updated to include input fields for Personas Extras and Costo Personas Extras to allow for additional charges beyond the flexible pricing tiers.
 
-The current immediate task is to rectify the  of the admin user in the *deployed* MongoDB Atlas instance to enable successful login for the user.
+The very last explicit request was to include the Fecha Reserva in the commissions table. This was implemented in the last tool call.
 </current_work>
 
 <optional_next_step>
-The next step is to guide the user to delete and re-insert the admin user in MongoDB Atlas with the provided JSON to fix the  mismatch.
+Add the Fecha Reserva column to the commissions table in the frontend to display the reservation date for each commission entry.
 </optional_next_step>
+
