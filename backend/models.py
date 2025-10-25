@@ -385,6 +385,8 @@ class CommissionBase(BaseModel):
     reservation_date: str
     amount: float = 250.0  # Comisión default
     notes: Optional[str] = None
+    paid: bool = False  # Si ya se pagó la comisión
+    paid_date: Optional[str] = None  # Fecha cuando se pagó
 
 class CommissionCreate(CommissionBase):
     pass
