@@ -259,7 +259,8 @@ function Commissions() {
           <table className="min-w-full divide-y divide-gray-200">
             <thead className="bg-gray-50">
               <tr>
-                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Fecha</th>
+                <th className="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase">Pagado</th>
+                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Fecha Reserva</th>
                 <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Usuario</th>
                 <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Villa</th>
                 <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Cliente</th>
