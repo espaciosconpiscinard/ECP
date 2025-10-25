@@ -24,6 +24,7 @@ const Expenses = () => {
   const [filterCategory, setFilterCategory] = useState('');
   const [groupByCategory, setGroupByCategory] = useState(false);
   const [activeTab, setActiveTab] = useState('variables'); // variables, fijos, unicos
+  const [paymentStatusFilter, setPaymentStatusFilter] = useState('pending'); // pending, paid, all
   
   // Filtro de mes/año
   const [selectedMonth, setSelectedMonth] = useState(new Date().getMonth());
