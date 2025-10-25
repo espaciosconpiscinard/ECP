@@ -526,96 +526,14 @@ const VillasManagementNew = () => {
                     </div>
                   </div>
 
-                  {/* PRECIOS AL CLIENTE */}
-                  <div className="col-span-2 bg-blue-50 p-4 rounded-md border-2 border-blue-200">
-                    <h3 className="font-bold text-lg mb-3 text-blue-800">💰 Precios al Cliente</h3>
-                    <div className="grid grid-cols-3 gap-3">
-                      <div>
-                        <Label className="text-sm">Pasadía *</Label>
-                        <Input
-                          type="number"
-                          step="0.01"
-                          value={formData.default_price_pasadia}
-                          onChange={(e) => setFormData({ ...formData, default_price_pasadia: parseFloat(e.target.value) || 0 })}
-                          required
-                        />
-                      </div>
-                      <div>
-                        <Label className="text-sm">Amanecida *</Label>
-                        <Input
-                          type="number"
-                          step="0.01"
-                          value={formData.default_price_amanecida}
-                          onChange={(e) => setFormData({ ...formData, default_price_amanecida: parseFloat(e.target.value) || 0 })}
-                          required
-                        />
-                      </div>
-                      <div>
-                        <Label className="text-sm">Evento *</Label>
-                        <Input
-                          type="number"
-                          step="0.01"
-                          value={formData.default_price_evento}
-                          onChange={(e) => setFormData({ ...formData, default_price_evento: parseFloat(e.target.value) || 0 })}
-                          required
-                        />
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* PRECIOS AL PROPIETARIO - Solo Admin */}
-                  <div className="col-span-2 bg-green-50 p-4 rounded-md border-2 border-green-200">
-                    <h3 className="font-bold text-lg mb-3 text-green-800">💵 Pago al Propietario</h3>
-                    <div className="grid grid-cols-3 gap-3">
-                      <div>
-                        <Label className="text-sm">Pasadía *</Label>
-                        <Input
-                          type="number"
-                          step="0.01"
-                          value={formData.owner_price_pasadia}
-                          onChange={(e) => setFormData({ ...formData, owner_price_pasadia: parseFloat(e.target.value) || 0 })}
-                          required
-                        />
-                      </div>
-                      <div>
-                        <Label className="text-sm">Amanecida *</Label>
-                        <Input
-                          type="number"
-                          step="0.01"
-                          value={formData.owner_price_amanecida}
-                          onChange={(e) => setFormData({ ...formData, owner_price_amanecida: parseFloat(e.target.value) || 0 })}
-                          required
-                        />
-                      </div>
-                      <div>
-                        <Label className="text-sm">Evento *</Label>
-                        <Input
-                          type="number"
-                          step="0.01"
-                          value={formData.owner_price_evento}
-                          onChange={(e) => setFormData({ ...formData, owner_price_evento: parseFloat(e.target.value) || 0 })}
-                          required
-                        />
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* SISTEMA DE PRECIOS FLEXIBLES */}
+                  {/* SISTEMA DE PRECIOS FLEXIBLES - SIEMPRE ACTIVO */}
                   <div className="col-span-2 bg-purple-50 p-4 rounded-md border-2 border-purple-200">
-                    <div className="flex justify-between items-center mb-3">
-                      <h3 className="font-bold text-lg text-purple-800">🔢 Precios Flexibles (Opcional)</h3>
-                      <label className="flex items-center gap-2 cursor-pointer">
-                        <input
-                          type="checkbox"
-                          checked={formData.use_flexible_pricing}
-                          onChange={(e) => setFormData({ ...formData, use_flexible_pricing: e.target.checked })}
-                          className="w-5 h-5"
-                        />
-                        <span className="text-sm font-medium">Activar</span>
-                      </label>
+                    <div className="mb-3">
+                      <h3 className="font-bold text-lg text-purple-800">💰 Precios por Tipo de Renta</h3>
+                      <p className="text-xs text-gray-600 mt-1">Agrega diferentes precios para cada tipo de renta. Cada fila puede representar cantidad de personas, temporada, etc.</p>
                     </div>
                     
-                    {formData.use_flexible_pricing && (
+                    {(
                       <div className="space-y-4">
                         <p className="text-sm text-gray-600 mb-2">
                           Agrega múltiples precios para cada tipo de renta. Ordénalos tú mismo según tus criterios.
