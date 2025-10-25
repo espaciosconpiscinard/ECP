@@ -56,8 +56,8 @@ const VillasManagementNew = () => {
     max_guests: 0,
     amenities: [],
     is_active: true,
-    use_pricing_tiers: false,
-    pricing_tiers: []
+    use_flexible_pricing: false,
+    flexible_prices: { pasadia: [], amanecida: [], evento: [] }
   });
 
   const [serviceFormData, setServiceFormData] = useState({
