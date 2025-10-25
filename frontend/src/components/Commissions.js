@@ -344,6 +344,12 @@ function Commissions() {
 
           {/* Resumen de filtros activos */}
           <div className="mt-3 flex flex-wrap gap-2">
+            {selectedStatus !== 'pending' && (
+              <span className="px-3 py-1 bg-teal-100 text-teal-800 rounded-full text-sm font-medium">
+                🔵 {selectedStatus === 'paid' ? '✅ Pagadas' : '📋 Todas'}
+                <button onClick={() => setSelectedStatus('pending')} className="ml-2 text-teal-600 hover:text-teal-800">✕</button>
+              </span>
+            )}
             {selectedUser !== 'all' && (
               <span className="px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm">
                 👤 {stats?.by_user?.find(u => u.user_id === selectedUser)?.user_name}
@@ -362,9 +368,10 @@ function Commissions() {
                 <button onClick={() => setSelectedFortnight('all')} className="ml-2 text-orange-600 hover:text-orange-800">✕</button>
               </span>
             )}
-            {(selectedUser !== 'all' || selectedMonth !== 'all' || selectedFortnight !== 'all') && (
+            {(selectedStatus !== 'pending' || selectedUser !== 'all' || selectedMonth !== 'all' || selectedFortnight !== 'all') && (
               <button
                 onClick={() => {
+                  setSelectedStatus('pending');
                   setSelectedUser('all');
                   setSelectedMonth('all');
                   setSelectedFortnight('all');
