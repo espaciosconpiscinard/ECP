@@ -12,6 +12,7 @@ class UserBase(BaseModel):
 
 class UserCreate(UserBase):
     password: str
+    admin_code: Optional[str] = None  # Código secreto para crear admin
 
 class UserLogin(BaseModel):
     username: str
