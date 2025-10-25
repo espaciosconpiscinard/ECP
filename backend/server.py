@@ -1140,26 +1140,50 @@ async def get_commission_stats(current_user: dict = Depends(require_admin)):
     """Get commission statistics (admin only)"""
     all_commissions = await db.commissions.find({}, {"_id": 0}).to_list(10000)
     
+    total_amount = 0
+    total_paid = 0
+    total_pending = 0
+    
     # Group by user
     user_totals = {}
     for comm in all_commissions:
         user_id = comm.get("user_id")
         user_name = comm.get("user_name", "Unknown")
         amount = comm.get("amount", 0)
+        is_paid = comm.get("paid", False)
+        
+        total_amount += amount
+        if is_paid:
+            total_paid += amount
+        else:
+            total_pending += amount
         
         if user_id not in user_totals:
             user_totals[user_id] = {
                 "user_id": user_id,
                 "user_name": user_name,
                 "total_commissions": 0,
-                "commission_count": 0
+                "total_paid": 0,
+                "total_pending": 0,
+                "commission_count": 0,
+                "paid_count": 0,
+                "pending_count": 0
             }
         
         user_totals[user_id]["total_commissions"] += amount
         user_totals[user_id]["commission_count"] += 1
+        
+        if is_paid:
+            user_totals[user_id]["total_paid"] += amount
+            user_totals[user_id]["paid_count"] += 1
+        else:
+            user_totals[user_id]["total_pending"] += amount
+            user_totals[user_id]["pending_count"] += 1
     
     return {
-        "total_commissions": sum(c.get("amount", 0) for c in all_commissions),
+        "total_commissions": total_amount,
+        "total_paid": total_paid,
+        "total_pending": total_pending,
         "total_count": len(all_commissions),
         "by_user": list(user_totals.values())
     }
