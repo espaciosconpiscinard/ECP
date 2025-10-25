@@ -1095,6 +1095,76 @@ async def delete_reservation_abono(reservation_id: str, abono_id: str, current_u
     
     return {"message": "Abono deleted successfully"}
 
+# ============ COMMISSION ENDPOINTS ============
+
+@api_router.get("/commissions", response_model=List[Commission])
+async def get_commissions(current_user: dict = Depends(require_admin)):
+    """Get all commissions (admin only)"""
+    commissions = await db.commissions.find({}, {"_id": 0}).sort("created_at", -1).to_list(1000)
+    return [restore_datetimes(c, ["created_at"]) for c in commissions]
+
+@api_router.get("/commissions/user/{user_id}", response_model=List[Commission])
+async def get_user_commissions(user_id: str, current_user: dict = Depends(require_admin)):
+    """Get commissions for a specific user (admin only)"""
+    commissions = await db.commissions.find({"user_id": user_id}, {"_id": 0}).sort("created_at", -1).to_list(1000)
+    return [restore_datetimes(c, ["created_at"]) for c in commissions]
+
+@api_router.get("/commissions/stats")
+async def get_commission_stats(current_user: dict = Depends(require_admin)):
+    """Get commission statistics (admin only)"""
+    all_commissions = await db.commissions.find({}, {"_id": 0}).to_list(10000)
+    
+    # Group by user
+    user_totals = {}
+    for comm in all_commissions:
+        user_id = comm.get("user_id")
+        user_name = comm.get("user_name", "Unknown")
+        amount = comm.get("amount", 0)
+        
+        if user_id not in user_totals:
+            user_totals[user_id] = {
+                "user_id": user_id,
+                "user_name": user_name,
+                "total_commissions": 0,
+                "commission_count": 0
+            }
+        
+        user_totals[user_id]["total_commissions"] += amount
+        user_totals[user_id]["commission_count"] += 1
+    
+    return {
+        "total_commissions": sum(c.get("amount", 0) for c in all_commissions),
+        "total_count": len(all_commissions),
+        "by_user": list(user_totals.values())
+    }
+
+@api_router.patch("/commissions/{commission_id}", response_model=Commission)
+async def update_commission(
+    commission_id: str, 
+    commission_update: CommissionUpdate,
+    current_user: dict = Depends(require_admin)
+):
+    """Update commission amount or notes (admin only)"""
+    existing = await db.commissions.find_one({"id": commission_id})
+    if not existing:
+        raise HTTPException(status_code=404, detail="Commission not found")
+    
+    update_data = {k: v for k, v in commission_update.model_dump().items() if v is not None}
+    
+    if update_data:
+        await db.commissions.update_one({"id": commission_id}, {"$set": update_data})
+    
+    updated = await db.commissions.find_one({"id": commission_id}, {"_id": 0})
+    return restore_datetimes(updated, ["created_at"])
+
+@api_router.delete("/commissions/{commission_id}")
+async def delete_commission(commission_id: str, current_user: dict = Depends(require_admin)):
+    """Delete a commission (admin only)"""
+    result = await db.commissions.delete_one({"id": commission_id})
+    if result.deleted_count == 0:
+        raise HTTPException(status_code=404, detail="Commission not found")
+    return {"message": "Commission deleted successfully"}
+
 # ============ VILLA OWNER ENDPOINTS ============
 
 @api_router.post("/owners", response_model=VillaOwner)
