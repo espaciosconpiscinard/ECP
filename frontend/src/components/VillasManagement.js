@@ -131,9 +131,10 @@ const VillasManagementNew = () => {
       max_guests: villa.max_guests || 0,
       amenities: villa.amenities || [],
       is_active: villa.is_active !== false,
-      use_pricing_tiers: villa.use_pricing_tiers || false,
-      pricing_tiers: villa.pricing_tiers || []
+      use_flexible_pricing: villa.use_flexible_pricing || false,
+      flexible_prices: villa.flexible_prices || { pasadia: [], amanecida: [], evento: [] }
     });
+    setFlexiblePrices(villa.flexible_prices || { pasadia: [], amanecida: [], evento: [] });
     setIsFormOpen(true);
   };
 
