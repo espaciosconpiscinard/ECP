@@ -6,6 +6,7 @@ const API_URL = process.env.REACT_APP_BACKEND_URL || '';
 function Users() {
   const { user } = useAuth();
   const [users, setUsers] = useState([]);
+  const [pendingUsers, setPendingUsers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [showForm, setShowForm] = useState(false);
@@ -21,6 +22,7 @@ function Users() {
 
   useEffect(() => {
     fetchUsers();
+    fetchPendingUsers();
   }, []);
 
   const fetchUsers = async () => {
