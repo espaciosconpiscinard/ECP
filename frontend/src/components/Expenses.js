@@ -1045,6 +1045,19 @@ const Expenses = () => {
         {/* Segunda fila: Ordenamiento y Filtros Avanzados */}
         <div className="flex items-center justify-between flex-wrap gap-4 border-t pt-4">
           <div className="flex items-center space-x-2">
+            <Label className="font-semibold">🔵 Estado:</Label>
+            <select
+              value={paymentStatusFilter}
+              onChange={(e) => setPaymentStatusFilter(e.target.value)}
+              className="p-2 border-2 rounded-md bg-blue-50 font-medium"
+            >
+              <option value="pending">⏳ Pendientes</option>
+              <option value="paid">✅ Pagados</option>
+              <option value="all">📋 Todos</option>
+            </select>
+          </div>
+
+          <div className="flex items-center space-x-2">
             <Label className="font-semibold">Ordenar por:</Label>
             <select
               value={sortBy}
@@ -1091,6 +1104,7 @@ const Expenses = () => {
 
           <button
             onClick={() => {
+              setPaymentStatusFilter('pending');
               setSortBy('date');
               setFilterVilla('');
               setFilterOwner('');
