@@ -189,6 +189,7 @@ const Login = () => {
               onClick={() => {
                 setIsLogin(!isLogin);
                 setError('');
+                setSuccess('');
               }}
               className="text-sm text-blue-600 hover:underline"
               data-testid="toggle-form-button"
