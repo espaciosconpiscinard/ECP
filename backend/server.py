@@ -22,6 +22,7 @@ from models import (
     PaymentCreate, Payment,
     AbonoCreate, Abono,
     ExpenseCreate, ExpenseUpdate, Expense,
+    CommissionCreate, Commission, CommissionUpdate,
     DashboardStats, InvoiceCounter,
     InvoiceTemplateCreate, InvoiceTemplateUpdate, InvoiceTemplate,
     LogoConfig
