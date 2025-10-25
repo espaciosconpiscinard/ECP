@@ -32,8 +32,12 @@ const VillasManagementNew = () => {
   const [selectedServices, setSelectedServices] = useState([]);
   const [selectAllServices, setSelectAllServices] = useState(false);
   
-  // Estados para pricing tiers
-  const [newTier, setNewTier] = useState({ min_people: 1, max_people: 10, client_price: 0, owner_price: 0 });
+  // Estados para precios flexibles - sin rangos de personas, solo listas ordenadas
+  const [flexiblePrices, setFlexiblePrices] = useState({
+    pasadia: [],
+    amanecida: [],
+    evento: []
+  });
   
   const [formData, setFormData] = useState({
     code: '',
