@@ -378,9 +378,9 @@ function Commissions() {
               {filteredCommissions.length === 0 ? (
                 <tr>
                   <td colSpan="8" className="px-4 py-8 text-center text-gray-500">
-                    {selectedUser === 'all' 
+                    {selectedUser === 'all' && selectedMonth === 'all' && selectedFortnight === 'all'
                       ? 'No hay comisiones registradas' 
-                      : 'Este empleado no tiene comisiones registradas'}
+                      : 'No hay comisiones con los filtros seleccionados'}
                   </td>
                 </tr>
               ) : (
