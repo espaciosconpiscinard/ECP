@@ -629,13 +629,21 @@ const VillasManagementNew = () => {
                             </button>
                           </div>
                           <div className="space-y-1">
-                            <div className="grid grid-cols-3 gap-2 text-xs font-semibold text-gray-600 mb-1">
+                            <div className="grid grid-cols-4 gap-2 text-xs font-semibold text-gray-600 mb-1">
+                              <span>Personas</span>
                               <span>Cliente</span>
                               <span>Propietario</span>
                               <span></span>
                             </div>
                             {flexiblePrices.pasadia.map((price, index) => (
-                              <div key={index} className="grid grid-cols-3 gap-2">
+                              <div key={index} className="grid grid-cols-4 gap-2">
+                                <input
+                                  type="text"
+                                  value={price.people_count || ''}
+                                  onChange={(e) => handleUpdateFlexiblePrice('pasadia', index, 'people_count', e.target.value)}
+                                  className="px-2 py-1 border rounded text-sm"
+                                  placeholder="1-10"
+                                />
                                 <input
                                   type="number"
                                   step="0.01"
