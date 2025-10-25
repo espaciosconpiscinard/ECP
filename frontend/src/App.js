@@ -13,6 +13,7 @@ import Expenses from './components/Expenses';
 import Users from './components/Users';
 import Configuration from './components/Configuration';
 import InvoiceEditor from './components/InvoiceEditor';
+import Commissions from './components/Commissions';
 import './App.css';
 
 const AppContent = () => {
