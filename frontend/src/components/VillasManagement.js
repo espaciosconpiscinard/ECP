@@ -595,113 +595,179 @@ const VillasManagementNew = () => {
                     </div>
                   </div>
 
-                  {/* SISTEMA DE PRECIOS VARIABLES */}
+                  {/* SISTEMA DE PRECIOS FLEXIBLES */}
                   <div className="col-span-2 bg-purple-50 p-4 rounded-md border-2 border-purple-200">
                     <div className="flex justify-between items-center mb-3">
-                      <h3 className="font-bold text-lg text-purple-800">🔢 Precios Variables por Personas (Opcional)</h3>
+                      <h3 className="font-bold text-lg text-purple-800">🔢 Precios Flexibles (Opcional)</h3>
                       <label className="flex items-center gap-2 cursor-pointer">
                         <input
                           type="checkbox"
-                          checked={formData.use_pricing_tiers}
-                          onChange={(e) => setFormData({ ...formData, use_pricing_tiers: e.target.checked })}
+                          checked={formData.use_flexible_pricing}
+                          onChange={(e) => setFormData({ ...formData, use_flexible_pricing: e.target.checked })}
                           className="w-5 h-5"
                         />
                         <span className="text-sm font-medium">Activar</span>
                       </label>
                     </div>
                     
-                    {formData.use_pricing_tiers && (
-                      <div className="space-y-3">
+                    {formData.use_flexible_pricing && (
+                      <div className="space-y-4">
                         <p className="text-sm text-gray-600 mb-2">
-                          Configura diferentes precios según el número de personas. Esto sobrescribirá los precios fijos de arriba.
+                          Agrega múltiples precios para cada tipo de renta. Ordénalos tú mismo según tus criterios.
                         </p>
                         
-                        {/* Formulario inline para agregar rangos */}
-                        <div className="bg-white p-4 rounded border-2 border-purple-300">
-                          <div className="flex items-center gap-3 mb-2">
-                            <h4 className="font-semibold text-purple-700">➕ Agregar Nuevo Rango</h4>
+                        {/* PASADÍA */}
+                        <div className="bg-blue-50 p-3 rounded border">
+                          <div className="flex justify-between items-center mb-2">
+                            <h4 className="font-bold text-blue-800">Precio de Pasadía</h4>
+                            <button
+                              type="button"
+                              onClick={() => handleAddFlexiblePrice('pasadia')}
+                              className="px-3 py-1 bg-blue-600 text-white rounded hover:bg-blue-700 text-sm"
+                            >
+                              ➕
+                            </button>
                           </div>
-                          <div className="grid grid-cols-4 gap-3">
-                            <div>
-                              <label className="block text-xs font-medium mb-1">Personas Mín</label>
-                              <input
-                                type="number"
-                                min="1"
-                                value={newTier.min_people}
-                                onChange={(e) => setNewTier({ ...newTier, min_people: parseInt(e.target.value) || 1 })}
-                                className="w-full px-2 py-1 text-sm border rounded"
-                                placeholder="1"
-                              />
+                          <div className="space-y-1">
+                            <div className="grid grid-cols-3 gap-2 text-xs font-semibold text-gray-600 mb-1">
+                              <span>Cliente</span>
+                              <span>Propietario</span>
+                              <span></span>
                             </div>
-                            <div>
-                              <label className="block text-xs font-medium mb-1">Personas Máx</label>
-                              <input
-                                type="number"
-                                min="1"
-                                value={newTier.max_people}
-                                onChange={(e) => setNewTier({ ...newTier, max_people: parseInt(e.target.value) || 10 })}
-                                className="w-full px-2 py-1 text-sm border rounded"
-                                placeholder="10"
-                              />
-                            </div>
-                            <div>
-                              <label className="block text-xs font-medium mb-1">Precio Cliente</label>
-                              <input
-                                type="number"
-                                step="0.01"
-                                min="0"
-                                value={newTier.client_price}
-                                onChange={(e) => setNewTier({ ...newTier, client_price: parseFloat(e.target.value) || 0 })}
-                                className="w-full px-2 py-1 text-sm border rounded"
-                                placeholder="5000"
-                              />
-                            </div>
-                            <div>
-                              <label className="block text-xs font-medium mb-1">Pago Propietario</label>
-                              <input
-                                type="number"
-                                step="0.01"
-                                min="0"
-                                value={newTier.owner_price}
-                                onChange={(e) => setNewTier({ ...newTier, owner_price: parseFloat(e.target.value) || 0 })}
-                                className="w-full px-2 py-1 text-sm border rounded"
-                                placeholder="4000"
-                              />
-                            </div>
-                          </div>
-                          <button
-                            type="button"
-                            onClick={handleAddPricingTier}
-                            className="mt-3 w-full px-4 py-2 bg-purple-600 text-white rounded hover:bg-purple-700 font-medium text-sm"
-                          >
-                            ➕ Agregar Rango
-                          </button>
-                        </div>
-
-                        {/* Lista de rangos agregados */}
-                        {formData.pricing_tiers && formData.pricing_tiers.length > 0 && (
-                          <div className="space-y-2">
-                            <h4 className="font-semibold text-purple-700 text-sm">Rangos Configurados:</h4>
-                            {formData.pricing_tiers.map((tier, index) => (
-                              <div key={index} className="bg-white p-3 rounded border flex justify-between items-center">
-                                <div className="flex-1">
-                                  <span className="font-semibold text-purple-800">
-                                    {tier.min_people}-{tier.max_people} personas:
-                                  </span>
-                                  <span className="ml-3 text-blue-600">Cliente: ${tier.client_price}</span>
-                                  <span className="ml-3 text-green-600">Propietario: ${tier.owner_price}</span>
-                                </div>
+                            {flexiblePrices.pasadia.map((price, index) => (
+                              <div key={index} className="grid grid-cols-3 gap-2">
+                                <input
+                                  type="number"
+                                  step="0.01"
+                                  value={price.client_price}
+                                  onChange={(e) => handleUpdateFlexiblePrice('pasadia', index, 'client_price', e.target.value)}
+                                  className="px-2 py-1 border rounded text-sm"
+                                  placeholder="5000"
+                                />
+                                <input
+                                  type="number"
+                                  step="0.01"
+                                  value={price.owner_price}
+                                  onChange={(e) => handleUpdateFlexiblePrice('pasadia', index, 'owner_price', e.target.value)}
+                                  className="px-2 py-1 border rounded text-sm"
+                                  placeholder="3000"
+                                />
                                 <button
                                   type="button"
-                                  onClick={() => handleRemovePricingTier(index)}
-                                  className="text-red-600 hover:text-red-800 font-bold"
+                                  onClick={() => handleRemoveFlexiblePrice('pasadia', index)}
+                                  className="text-red-600 hover:text-red-800 text-sm"
                                 >
                                   🗑️
                                 </button>
                               </div>
                             ))}
+                            {flexiblePrices.pasadia.length === 0 && (
+                              <p className="text-xs text-gray-500 italic">Presiona ➕ para agregar precios</p>
+                            )}
                           </div>
-                        )}
+                        </div>
+
+                        {/* AMANECIDA */}
+                        <div className="bg-indigo-50 p-3 rounded border">
+                          <div className="flex justify-between items-center mb-2">
+                            <h4 className="font-bold text-indigo-800">Precio de Amanecida</h4>
+                            <button
+                              type="button"
+                              onClick={() => handleAddFlexiblePrice('amanecida')}
+                              className="px-3 py-1 bg-indigo-600 text-white rounded hover:bg-indigo-700 text-sm"
+                            >
+                              ➕
+                            </button>
+                          </div>
+                          <div className="space-y-1">
+                            <div className="grid grid-cols-3 gap-2 text-xs font-semibold text-gray-600 mb-1">
+                              <span>Cliente</span>
+                              <span>Propietario</span>
+                              <span></span>
+                            </div>
+                            {flexiblePrices.amanecida.map((price, index) => (
+                              <div key={index} className="grid grid-cols-3 gap-2">
+                                <input
+                                  type="number"
+                                  step="0.01"
+                                  value={price.client_price}
+                                  onChange={(e) => handleUpdateFlexiblePrice('amanecida', index, 'client_price', e.target.value)}
+                                  className="px-2 py-1 border rounded text-sm"
+                                  placeholder="10000"
+                                />
+                                <input
+                                  type="number"
+                                  step="0.01"
+                                  value={price.owner_price}
+                                  onChange={(e) => handleUpdateFlexiblePrice('amanecida', index, 'owner_price', e.target.value)}
+                                  className="px-2 py-1 border rounded text-sm"
+                                  placeholder="8000"
+                                />
+                                <button
+                                  type="button"
+                                  onClick={() => handleRemoveFlexiblePrice('amanecida', index)}
+                                  className="text-red-600 hover:text-red-800 text-sm"
+                                >
+                                  🗑️
+                                </button>
+                              </div>
+                            ))}
+                            {flexiblePrices.amanecida.length === 0 && (
+                              <p className="text-xs text-gray-500 italic">Presiona ➕ para agregar precios</p>
+                            )}
+                          </div>
+                        </div>
+
+                        {/* EVENTO */}
+                        <div className="bg-purple-50 p-3 rounded border">
+                          <div className="flex justify-between items-center mb-2">
+                            <h4 className="font-bold text-purple-800">Precio de Evento</h4>
+                            <button
+                              type="button"
+                              onClick={() => handleAddFlexiblePrice('evento')}
+                              className="px-3 py-1 bg-purple-600 text-white rounded hover:bg-purple-700 text-sm"
+                            >
+                              ➕
+                            </button>
+                          </div>
+                          <div className="space-y-1">
+                            <div className="grid grid-cols-3 gap-2 text-xs font-semibold text-gray-600 mb-1">
+                              <span>Cliente</span>
+                              <span>Propietario</span>
+                              <span></span>
+                            </div>
+                            {flexiblePrices.evento.map((price, index) => (
+                              <div key={index} className="grid grid-cols-3 gap-2">
+                                <input
+                                  type="number"
+                                  step="0.01"
+                                  value={price.client_price}
+                                  onChange={(e) => handleUpdateFlexiblePrice('evento', index, 'client_price', e.target.value)}
+                                  className="px-2 py-1 border rounded text-sm"
+                                  placeholder="15000"
+                                />
+                                <input
+                                  type="number"
+                                  step="0.01"
+                                  value={price.owner_price}
+                                  onChange={(e) => handleUpdateFlexiblePrice('evento', index, 'owner_price', e.target.value)}
+                                  className="px-2 py-1 border rounded text-sm"
+                                  placeholder="12000"
+                                />
+                                <button
+                                  type="button"
+                                  onClick={() => handleRemoveFlexiblePrice('evento', index)}
+                                  className="text-red-600 hover:text-red-800 text-sm"
+                                >
+                                  🗑️
+                                </button>
+                              </div>
+                            ))}
+                            {flexiblePrices.evento.length === 0 && (
+                              <p className="text-xs text-gray-500 italic">Presiona ➕ para agregar precios</p>
+                            )}
+                          </div>
+                        </div>
                       </div>
                     )}
                   </div>
