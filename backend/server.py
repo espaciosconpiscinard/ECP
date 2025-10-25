@@ -209,6 +209,13 @@ async def get_me(current_user: dict = Depends(get_current_user)):
     user = await db.users.find_one({"id": current_user["id"]}, {"_id": 0})
     if not user:
         raise HTTPException(status_code=404, detail="User not found")
+    
+    # Asegurar que el usuario tenga los campos requeridos
+    if "is_active" not in user:
+        user["is_active"] = True
+    if "is_approved" not in user:
+        user["is_approved"] = True
+    
     return UserResponse(**user)
 
 # ============ USER MANAGEMENT ENDPOINTS (ADMIN ONLY) ============
