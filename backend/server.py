@@ -299,6 +299,37 @@ async def toggle_user_status(user_id: str, current_user: dict = Depends(require_
     
     return {"message": f"User {'activated' if new_status else 'deactivated'} successfully", "is_active": new_status}
 
+@api_router.get("/users/pending/list", response_model=List[UserResponse])
+async def get_pending_users(current_user: dict = Depends(require_admin)):
+    """Get all pending approval users (admin only)"""
+    users = await db.users.find({"is_approved": False}, {"_id": 0, "password_hash": 0}).to_list(1000)
+    return [restore_datetimes(u, ["created_at"]) for u in users]
+
+@api_router.patch("/users/{user_id}/approve")
+async def approve_user(user_id: str, current_user: dict = Depends(require_admin)):
+    """Approve a pending user (admin only)"""
+    user = await db.users.find_one({"id": user_id})
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+    
+    if user.get("is_approved", False):
+        return {"message": "User already approved", "is_approved": True}
+    
+    await db.users.update_one(
+        {"id": user_id},
+        {"$set": {"is_approved": True}}
+    )
+    
+    return {"message": "User approved successfully", "is_approved": True}
+
+@api_router.patch("/users/{user_id}/reject")
+async def reject_user(user_id: str, current_user: dict = Depends(require_admin)):
+    """Reject a pending user (delete account) (admin only)"""
+    result = await db.users.delete_one({"id": user_id})
+    if result.deleted_count == 0:
+        raise HTTPException(status_code=404, detail="User not found")
+    return {"message": "User rejected and deleted successfully"}
+
 # ============ CONFIGURATION ENDPOINTS (ADMIN ONLY) ============
 
 @api_router.get("/config/invoice-counter")
