@@ -92,6 +92,13 @@ class ExpenseCategory(ExpenseCategoryBase):
     created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
     created_by: str
 
+# ============ PRICING TIER MODEL ============
+class PricingTier(BaseModel):
+    min_people: int
+    max_people: int
+    client_price: float
+    owner_price: float
+
 # ============ VILLA MODELS ============
 class VillaBase(BaseModel):
     code: str  # ECPVSH, ECPVWLSL, etc.
@@ -104,15 +111,19 @@ class VillaBase(BaseModel):
     default_check_in_time: str = "9:00 AM"
     default_check_out_time: str = "8:00 PM"
     
-    # Precios al cliente
+    # Precios al cliente (compatibilidad con sistema antiguo)
     default_price_pasadia: float = 0.0
     default_price_amanecida: float = 0.0
     default_price_evento: float = 0.0
     
-    # Precios al propietario (lo que debemos pagar)
+    # Precios al propietario (lo que debemos pagar - compatibilidad)
     owner_price_pasadia: float = 0.0
     owner_price_amanecida: float = 0.0
     owner_price_evento: float = 0.0
+    
+    # Sistema de precios variables por rangos de personas (NUEVO)
+    use_pricing_tiers: bool = False  # Si es True, usar pricing_tiers en lugar de precios fijos
+    pricing_tiers: Optional[List[PricingTier]] = []  # Rangos de precios
     
     max_guests: int = 0
     amenities: List[str] = []  # Piscina, Jacuzzi, BBQ, etc.
