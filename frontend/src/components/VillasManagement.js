@@ -161,8 +161,23 @@ const VillasManagementNew = () => {
       owner_price_evento: 0,
       max_guests: 0,
       amenities: [],
-      is_active: true
+      is_active: true,
+      use_pricing_tiers: false,
+      pricing_tiers: []
     });
+  };
+
+  // ============ PRICING TIERS FUNCTIONS ============
+  const handleAddPricingTier = () => {
+    const updatedTiers = [...(formData.pricing_tiers || []), newTier];
+    setFormData({ ...formData, pricing_tiers: updatedTiers });
+    setNewTier({ min_people: 1, max_people: 10, client_price: 0, owner_price: 0 });
+    setShowPricingTierModal(false);
+  };
+
+  const handleRemovePricingTier = (index) => {
+    const updatedTiers = formData.pricing_tiers.filter((_, i) => i !== index);
+    setFormData({ ...formData, pricing_tiers: updatedTiers });
   };
 
   // ============ SERVICIOS FUNCTIONS ============
