@@ -23,13 +23,40 @@ function Commissions() {
   }, []);
 
   useEffect(() => {
-    // Filtrar comisiones por usuario seleccionado
-    if (selectedUser === 'all') {
-      setFilteredCommissions(commissions);
-    } else {
-      setFilteredCommissions(commissions.filter(c => c.user_id === selectedUser));
+    // Filtrar comisiones por usuario, mes y quincena
+    let filtered = commissions;
+    
+    // Filtro por usuario
+    if (selectedUser !== 'all') {
+      filtered = filtered.filter(c => c.user_id === selectedUser);
     }
-  }, [selectedUser, commissions]);
+    
+    // Filtro por mes
+    if (selectedMonth !== 'all') {
+      filtered = filtered.filter(c => {
+        if (!c.reservation_date) return false;
+        const reservationMonth = c.reservation_date.substring(0, 7); // YYYY-MM
+        return reservationMonth === selectedMonth;
+      });
+    }
+    
+    // Filtro por quincena (usa reservation_date, NO created_at)
+    if (selectedFortnight !== 'all') {
+      filtered = filtered.filter(c => {
+        if (!c.reservation_date) return false;
+        const day = parseInt(c.reservation_date.split('-')[2]);
+        
+        if (selectedFortnight === '1') {
+          return day >= 1 && day <= 14;
+        } else if (selectedFortnight === '2') {
+          return day >= 15 && day <= 31;
+        }
+        return true;
+      });
+    }
+    
+    setFilteredCommissions(filtered);
+  }, [selectedUser, selectedMonth, selectedFortnight, commissions]);
 
   const fetchCommissions = async () => {
     try {
