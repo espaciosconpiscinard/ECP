@@ -184,7 +184,26 @@ function Commissions() {
       {/* Tabla de comisiones */}
       <div className="bg-white rounded-lg shadow overflow-hidden border">
         <div className="px-6 py-4 border-b bg-gray-50">
-          <h3 className="text-xl font-bold">📋 Historial de Comisiones</h3>
+          <div className="flex justify-between items-center">
+            <h3 className="text-xl font-bold">📋 Historial de Comisiones</h3>
+            
+            {/* Filtro por Usuario */}
+            <div className="flex items-center gap-3">
+              <label className="text-sm font-medium text-gray-700">Filtrar por empleado:</label>
+              <select
+                value={selectedUser}
+                onChange={(e) => setSelectedUser(e.target.value)}
+                className="px-4 py-2 border-2 border-gray-300 rounded-lg focus:border-blue-500 focus:outline-none"
+              >
+                <option value="all">Todos los empleados</option>
+                {stats?.by_user?.map((userStat) => (
+                  <option key={userStat.user_id} value={userStat.user_id}>
+                    {userStat.user_name}
+                  </option>
+                ))}
+              </select>
+            </div>
+          </div>
         </div>
 
         {error && (
