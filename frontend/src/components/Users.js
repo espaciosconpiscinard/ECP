@@ -37,11 +37,73 @@ function Users() {
       if (!response.ok) throw new Error('Error al cargar usuarios');
       
       const data = await response.json();
-      setUsers(data);
+      // Filtrar solo usuarios aprobados
+      setUsers(data.filter(u => u.is_approved));
     } catch (err) {
       setError(err.message);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const fetchPendingUsers = async () => {
+    try {
+      const token = localStorage.getItem('token');
+      const response = await fetch(`${API_URL}/api/users/pending/list`, {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+      
+      if (!response.ok) return; // Si falla, simplemente no mostrar pendientes
+      
+      const data = await response.json();
+      setPendingUsers(data);
+    } catch (err) {
+      console.error('Error al cargar usuarios pendientes:', err);
+    }
+  };
+
+  const handleApproveUser = async (userId) => {
+    try {
+      const token = localStorage.getItem('token');
+      const response = await fetch(`${API_URL}/api/users/${userId}/approve`, {
+        method: 'PATCH',
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+
+      if (!response.ok) throw new Error('Error al aprobar usuario');
+
+      await fetchUsers();
+      await fetchPendingUsers();
+      alert('✅ Usuario aprobado exitosamente');
+    } catch (err) {
+      setError(err.message);
+    }
+  };
+
+  const handleRejectUser = async (userId) => {
+    if (!window.confirm('¿Estás seguro de rechazar esta solicitud? Esta acción eliminará la cuenta.')) {
+      return;
+    }
+
+    try {
+      const token = localStorage.getItem('token');
+      const response = await fetch(`${API_URL}/api/users/${userId}/reject`, {
+        method: 'PATCH',
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+
+      if (!response.ok) throw new Error('Error al rechazar usuario');
+
+      await fetchPendingUsers();
+      alert('❌ Usuario rechazado y eliminado');
+    } catch (err) {
+      setError(err.message);
     }
   };
 
