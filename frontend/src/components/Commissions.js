@@ -24,8 +24,16 @@ function Commissions() {
   }, []);
 
   useEffect(() => {
-    // Filtrar comisiones por usuario, mes y quincena
+    // Filtrar comisiones por usuario, mes, quincena y estado
     let filtered = commissions;
+    
+    // Filtro por estado (pendientes/pagadas/todas)
+    if (selectedStatus === 'pending') {
+      filtered = filtered.filter(c => !c.paid);
+    } else if (selectedStatus === 'paid') {
+      filtered = filtered.filter(c => c.paid);
+    }
+    // Si es 'all', no filtramos
     
     // Filtro por usuario
     if (selectedUser !== 'all') {
@@ -57,7 +65,7 @@ function Commissions() {
     }
     
     setFilteredCommissions(filtered);
-  }, [selectedUser, selectedMonth, selectedFortnight, commissions]);
+  }, [selectedUser, selectedMonth, selectedFortnight, selectedStatus, commissions]);
 
   const fetchCommissions = async () => {
     try {
