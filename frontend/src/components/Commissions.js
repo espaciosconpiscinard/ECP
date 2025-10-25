@@ -204,17 +204,21 @@ function Commissions() {
 
       {/* Estadísticas Generales */}
       {stats && (
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
           <div className="bg-blue-50 p-4 rounded-lg border-2 border-blue-200">
-            <p className="text-sm text-blue-600 font-medium">Total General Comisiones</p>
+            <p className="text-sm text-blue-600 font-medium">💰 Total Comisiones</p>
             <p className="text-2xl font-bold text-blue-900">RD$ {stats.total_commissions?.toLocaleString()}</p>
           </div>
           <div className="bg-green-50 p-4 rounded-lg border-2 border-green-200">
-            <p className="text-sm text-green-600 font-medium">Total Reservaciones</p>
-            <p className="text-2xl font-bold text-green-900">{stats.total_count}</p>
+            <p className="text-sm text-green-600 font-medium">✅ Total Pagado</p>
+            <p className="text-2xl font-bold text-green-900">RD$ {stats.total_paid?.toLocaleString() || 0}</p>
+          </div>
+          <div className="bg-orange-50 p-4 rounded-lg border-2 border-orange-200">
+            <p className="text-sm text-orange-600 font-medium">⏳ Total Pendiente</p>
+            <p className="text-2xl font-bold text-orange-900">RD$ {stats.total_pending?.toLocaleString() || 0}</p>
           </div>
           <div className="bg-purple-50 p-4 rounded-lg border-2 border-purple-200">
-            <p className="text-sm text-purple-600 font-medium">Empleados con Comisiones</p>
+            <p className="text-sm text-purple-600 font-medium">👥 Empleados</p>
             <p className="text-2xl font-bold text-purple-900">{stats.by_user?.length || 0}</p>
           </div>
         </div>
