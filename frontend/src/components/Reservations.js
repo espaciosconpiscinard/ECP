@@ -49,6 +49,10 @@ const Reservations = () => {
   // Estado para almacenar los abonos de cada reservación (para mostrar invoice_numbers)
   const [reservationAbonos, setReservationAbonos] = useState({});
   
+  // Estados para precios flexibles
+  const [selectedVillaFlexiblePrices, setSelectedVillaFlexiblePrices] = useState(null);
+  const [showPriceSelector, setShowPriceSelector] = useState(false);
+  
   const [formData, setFormData] = useState({
     customer_id: '',
     customer_name: '',
