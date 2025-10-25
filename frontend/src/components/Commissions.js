@@ -6,12 +6,14 @@ const API_URL = process.env.REACT_APP_BACKEND_URL || '';
 function Commissions() {
   const { user } = useAuth();
   const [commissions, setCommissions] = useState([]);
+  const [filteredCommissions, setFilteredCommissions] = useState([]);
   const [stats, setStats] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [editingCommission, setEditingCommission] = useState(null);
   const [editAmount, setEditAmount] = useState(0);
   const [editNotes, setEditNotes] = useState('');
+  const [selectedUser, setSelectedUser] = useState('all');
 
   useEffect(() => {
     fetchCommissions();
