@@ -127,7 +127,9 @@ const VillasManagementNew = () => {
       owner_price_evento: villa.owner_price_evento || 0,
       max_guests: villa.max_guests || 0,
       amenities: villa.amenities || [],
-      is_active: villa.is_active !== false
+      is_active: villa.is_active !== false,
+      use_pricing_tiers: villa.use_pricing_tiers || false,
+      pricing_tiers: villa.pricing_tiers || []
     });
     setIsFormOpen(true);
   };
