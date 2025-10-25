@@ -199,7 +199,12 @@ const VillasManagementNew = () => {
 
   const handleUpdateFlexiblePrice = (rentalType, index, field, value) => {
     const updated = [...flexiblePrices[rentalType]];
-    updated[index][field] = parseFloat(value) || 0;
+    // Para people_count es string, para precios es número
+    if (field === 'people_count') {
+      updated[index][field] = value;
+    } else {
+      updated[index][field] = parseFloat(value) || 0;
+    }
     setFlexiblePrices({
       ...flexiblePrices,
       [rentalType]: updated
