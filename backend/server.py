@@ -125,7 +125,7 @@ async def validate_invoice_number_available(invoice_num: str) -> bool:
 
 @api_router.post("/auth/register", response_model=UserResponse)
 async def register(user_data: UserCreate):
-    """Register a new user"""
+    """Register a new user - Admins need secret code, employees need approval"""
     existing_user = await db.users.find_one({"username": user_data.username})
     if existing_user:
         raise HTTPException(status_code=400, detail="Username already registered")
@@ -134,12 +134,24 @@ async def register(user_data: UserCreate):
     if existing_email:
         raise HTTPException(status_code=400, detail="Email already registered")
     
+    # Validar código secreto para administradores
+    if user_data.role == "admin":
+        if not user_data.admin_code or user_data.admin_code != "ECPROSA":
+            raise HTTPException(
+                status_code=403, 
+                detail="Código secreto de administrador inválido"
+            )
+        is_approved = True  # Admin aprobado automáticamente
+    else:
+        is_approved = False  # Empleado necesita aprobación
+    
     user = User(
         username=user_data.username,
         email=user_data.email,
         full_name=user_data.full_name,
         role=user_data.role,
-        password_hash=get_password_hash(user_data.password)
+        password_hash=get_password_hash(user_data.password),
+        is_approved=is_approved
     )
     
     doc = prepare_doc_for_insert(user.model_dump())
