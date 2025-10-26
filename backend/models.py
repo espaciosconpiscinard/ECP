@@ -340,6 +340,9 @@ class ExpenseBase(BaseModel):
     has_payment_reminder: bool = False
     payment_reminder_day: Optional[int] = None  # Día del mes (1-31) para recordatorio
     is_recurring: bool = False  # Si es un gasto recurrente mensual
+    
+    # Para gastos únicos: mostrar también en variables
+    show_in_variables: bool = False  # Si un gasto único debe aparecer también en el tab Variables
 
 class ExpenseCreate(ExpenseBase):
     pass
