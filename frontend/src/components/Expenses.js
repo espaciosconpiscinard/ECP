@@ -23,7 +23,7 @@ const Expenses = () => {
   const [editingExpense, setEditingExpense] = useState(null);
   const [filterCategory, setFilterCategory] = useState('');
   const [groupByCategory, setGroupByCategory] = useState(false);
-  const [activeTab, setActiveTab] = useState('variables'); // variables, fijos, unicos
+  const [activeTab, setActiveTab] = useState('propietarios'); // propietarios, fijos, unicos, variables
   const [paymentStatusFilter, setPaymentStatusFilter] = useState('pending'); // pending, paid, all
   
   // Filtro de mes/año
