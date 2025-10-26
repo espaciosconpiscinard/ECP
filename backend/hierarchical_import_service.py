@@ -256,6 +256,9 @@ async def import_services(file_content: bytes, db) -> Dict:
                 # Preparar datos
                 price_float = float(price)
                 
+                # Debug logging
+                print(f"Importando servicio: {name}, Precio del Excel: {price}, Precio convertido: {price_float}")
+                
                 service_data = {
                     'id': str(uuid.uuid4()),
                     'name': name,
