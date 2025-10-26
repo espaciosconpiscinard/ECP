@@ -651,20 +651,20 @@ const Reservations = () => {
             /* Villa Description Box */
             .villa-description {
               background: #e0f2fe;
-              padding: 12px 15px;
-              margin: 15px 0;
-              border-left: 3px solid #0ea5e9;
+              padding: 8px 10px;
+              margin: 10px 0;
+              border-left: 2px solid #0ea5e9;
             }
             .villa-description-title {
-              font-size: 10px;
+              font-size: 9px;
               font-weight: 700;
               color: #0369a1;
-              margin-bottom: 6px;
+              margin-bottom: 4px;
               text-transform: uppercase;
             }
             .villa-description-text {
-              font-size: 9px;
-              line-height: 1.5;
+              font-size: 8px;
+              line-height: 1.4;
               color: #555;
             }
             
