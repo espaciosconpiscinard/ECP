@@ -136,13 +136,13 @@ async def import_villas(file_content: bytes, db) -> Dict:
         created = 0
         updated = 0
         errors = []
+        skipped_example = 0
         
         for idx, row in df.iterrows():
             try:
                 # Validar campos obligatorios
                 code = str(row.get('Código Villa *', '')).strip().upper()
                 name = str(row.get('Nombre Villa *', '')).strip()
-                client_price = row.get('Precio Cliente *')
                 
                 if not code or code == 'NAN':
                     errors.append(f"Fila {idx+2}: Código Villa es obligatorio")
@@ -150,8 +150,10 @@ async def import_villas(file_content: bytes, db) -> Dict:
                 if not name or name.lower() == 'nan':
                     errors.append(f"Fila {idx+2}: Nombre Villa es obligatorio")
                     continue
-                if pd.isna(client_price):
-                    errors.append(f"Fila {idx+2}: Precio Cliente es obligatorio")
+                
+                # SKIP EJEMPLO: Si es la fila de ejemplo del template, saltarla
+                if code == 'ECPVSH' and name == 'Villa Shangrila':
+                    skipped_example += 1
                     continue
                 
                 # Buscar categoría si se especificó
@@ -162,9 +164,12 @@ async def import_villas(file_content: bytes, db) -> Dict:
                     if category:
                         category_id = category['id']
                 
-                # Convertir precio único a precios por tipo
-                client_price_val = float(client_price)
-                owner_price_val = float(row.get('Precio Propietario', 0)) if pd.notna(row.get('Precio Propietario')) else 0
+                # Precio Cliente ya NO es obligatorio (para villas con precios flexibles)
+                client_price = row.get('Precio Cliente *')
+                client_price_val = float(client_price) if pd.notna(client_price) else 0
+                
+                owner_price = row.get('Precio Propietario')
+                owner_price_val = float(owner_price) if pd.notna(owner_price) else 0
                 
                 # Preparar datos con el esquema correcto del modelo
                 villa_data = {
