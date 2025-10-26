@@ -233,6 +233,7 @@ async def import_services(file_content: bytes, db) -> Dict:
         created = 0
         updated = 0
         errors = []
+        skipped_examples = 0
         
         for idx, row in df.iterrows():
             try:
@@ -247,25 +248,35 @@ async def import_services(file_content: bytes, db) -> Dict:
                     errors.append(f"Fila {idx+2}: Precio es obligatorio")
                     continue
                 
+                # SKIP EJEMPLOS del template
+                if name in ['Chef privado', 'DJ', 'Decoración']:
+                    skipped_examples += 1
+                    continue
+                
                 # Preparar datos
+                price_float = float(price)
+                
                 service_data = {
                     'id': str(uuid.uuid4()),
                     'name': name,
-                    'price': float(price),
+                    'price': price_float,
                     'description': str(row.get('Descripción', '')).strip() if pd.notna(row.get('Descripción')) else '',
                     'created_at': datetime.now(timezone.utc).isoformat(),
                     'created_by': 'import_system'
                 }
                 
-                # Verificar si ya existe
+                # Verificar si ya existe (por nombre exacto)
                 existing = await db.extra_services.find_one({'name': service_data['name']})
                 
                 if existing:
-                    await db.extra_services.update_one(
-                        {'name': service_data['name']},
-                        {'$set': service_data}
-                    )
-                    updated += 1
+                    # Actualizar solo si hay cambios reales
+                    if existing.get('price') != price_float or existing.get('description') != service_data['description']:
+                        await db.extra_services.update_one(
+                            {'name': service_data['name']},
+                            {'$set': {'price': price_float, 'description': service_data['description']}}
+                        )
+                        updated += 1
+                    # Si ya existe y es idéntico, no contar como actualizado
                 else:
                     await db.extra_services.insert_one(service_data)
                     created += 1
@@ -277,7 +288,8 @@ async def import_services(file_content: bytes, db) -> Dict:
             'created': created,
             'updated': updated,
             'errors': errors,
-            'total': len(df)
+            'total': len(df),
+            'skipped_examples': skipped_examples
         }
         
     except Exception as e:
