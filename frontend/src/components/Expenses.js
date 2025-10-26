@@ -913,6 +913,53 @@ const Expenses = () => {
         </Dialog>
       </div>
 
+      {/* Tarjeta Especial: Gastos de Propietarios */}
+      <Card className="border-2 border-green-300 bg-gradient-to-r from-green-50 to-emerald-50 mb-4">
+        <CardHeader className="pb-3">
+          <CardTitle className="flex items-center text-green-800">
+            <span className="text-2xl mr-2">🏡</span>
+            Gastos a Propietarios - Mes Actual
+            <span className="ml-auto text-sm font-normal text-green-600">
+              {propietariosExpenses.length} pagos
+            </span>
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            {/* Total */}
+            <div className="bg-white p-4 rounded-lg border-2 border-green-200">
+              <p className="text-sm text-gray-600 font-medium mb-1">💰 Total del Mes</p>
+              <p className="text-3xl font-bold text-green-700">{formatCurrency(propietariosDOP, 'DOP')}</p>
+              {propietariosUSD > 0 && <p className="text-sm text-green-600 mt-1">{formatCurrency(propietariosUSD, 'USD')}</p>}
+            </div>
+            
+            {/* Pendiente */}
+            <div className="bg-orange-50 p-4 rounded-lg border-2 border-orange-200">
+              <p className="text-sm text-orange-800 font-medium mb-1">⏳ Pendiente de Pago</p>
+              <p className="text-3xl font-bold text-orange-600">{formatCurrency(propietariosPendientesDOP, 'DOP')}</p>
+              {propietariosPendientesUSD > 0 && <p className="text-sm text-orange-500 mt-1">{formatCurrency(propietariosPendientesUSD, 'USD')}</p>}
+              <p className="text-xs text-gray-600 mt-1">{propietariosPendientes} pagos pendientes</p>
+            </div>
+            
+            {/* Pagado */}
+            <div className="bg-blue-50 p-4 rounded-lg border-2 border-blue-200">
+              <p className="text-sm text-blue-800 font-medium mb-1">✅ Ya Pagado</p>
+              <p className="text-3xl font-bold text-blue-600">
+                {formatCurrency(propietariosDOP - propietariosPendientesDOP, 'DOP')}
+              </p>
+              <p className="text-xs text-gray-600 mt-1">{propietariosPagados} pagos realizados</p>
+            </div>
+          </div>
+          
+          <div className="mt-4 p-3 bg-green-100 rounded-lg border border-green-300">
+            <p className="text-sm text-green-800">
+              <strong>ℹ️ Nota:</strong> Estos gastos se generan automáticamente al crear reservaciones con "Pago Propietario" configurado.
+              Click en el tab "🏡 Propietarios" arriba para ver el detalle completo.
+            </p>
+          </div>
+        </CardContent>
+      </Card>
+
       {/* Summary Cards - Totales Desglosados */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         <Card className="border-red-200 bg-red-50" data-testid="total-compromisos-card">
