@@ -234,6 +234,7 @@ async def import_services(file_content: bytes, db) -> Dict:
         updated = 0
         errors = []
         skipped_examples = 0
+        skipped_empty = 0
         
         for idx, row in df.iterrows():
             try:
@@ -241,11 +242,13 @@ async def import_services(file_content: bytes, db) -> Dict:
                 name = str(row.get('Nombre Servicio *', '')).strip()
                 price = row.get('Precio *')
                 
-                if not name or name.lower() == 'nan':
-                    errors.append(f"Fila {idx+2}: Nombre Servicio es obligatorio")
+                # Saltar filas completamente vacías
+                if not name or name.lower() in ['nan', '']:
+                    skipped_empty += 1
                     continue
-                if pd.isna(price):
-                    errors.append(f"Fila {idx+2}: Precio es obligatorio")
+                    
+                if pd.isna(price) or price == '':
+                    skipped_empty += 1
                     continue
                 
                 # SKIP EJEMPLOS del template (pero NO DJ que puede ser servicio real)
@@ -262,7 +265,7 @@ async def import_services(file_content: bytes, db) -> Dict:
                 service_data = {
                     'id': str(uuid.uuid4()),
                     'name': name,
-                    'default_price': price_float,  # CORREGIDO: usar default_price no price
+                    'default_price': price_float,
                     'description': str(row.get('Descripción', '')).strip() if pd.notna(row.get('Descripción')) else '',
                     'is_active': True,
                     'created_at': datetime.now(timezone.utc).isoformat(),
@@ -287,10 +290,10 @@ async def import_services(file_content: bytes, db) -> Dict:
                     )
                     updated += 1
                     print(f"  → ACTUALIZADO: {name} de {existing_price} a {price_float}")
-                    # Si ya existe y es idéntico, no contar como actualizado
                 else:
                     await db.extra_services.insert_one(service_data)
                     created += 1
+                    print(f"  → CREADO: {name} con precio {price_float}")
                     
             except Exception as e:
                 errors.append(f"Fila {idx+2}: {str(e)}")
@@ -300,7 +303,8 @@ async def import_services(file_content: bytes, db) -> Dict:
             'updated': updated,
             'errors': errors,
             'total': len(df),
-            'skipped_examples': skipped_examples
+            'skipped_examples': skipped_examples,
+            'skipped_empty': skipped_empty
         }
         
     except Exception as e:
