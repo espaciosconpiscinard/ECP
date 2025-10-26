@@ -581,13 +581,13 @@ const Reservations = () => {
               flex-direction: column;
             }
             .brand-name { 
-              font-size: 22px; 
+              font-size: 16px; 
               font-weight: 700;
               color: #0369a1;
               line-height: 1.2;
             }
             .brand-tagline { 
-              font-size: 11px; 
+              font-size: 9px; 
               color: #0ea5e9;
               font-weight: 600;
               letter-spacing: 1px;
@@ -596,14 +596,14 @@ const Reservations = () => {
               text-align: right;
             }
             .invoice-title { 
-              font-size: 42px; 
+              font-size: 28px; 
               font-weight: 700;
               color: #0ea5e9;
-              margin-bottom: 10px;
+              margin-bottom: 8px;
               line-height: 1;
             }
             .invoice-meta {
-              font-size: 12px;
+              font-size: 10px;
               color: #0369a1;
               line-height: 1.8;
             }
