@@ -274,10 +274,10 @@ async def import_services(file_content: bytes, db) -> Dict:
                 
                 if existing:
                     # Actualizar solo si hay cambios reales
-                    if existing.get('price') != price_float or existing.get('description') != service_data['description']:
+                    if existing.get('default_price') != price_float or existing.get('description') != service_data['description']:
                         await db.extra_services.update_one(
                             {'name': service_data['name']},
-                            {'$set': {'price': price_float, 'description': service_data['description']}}
+                            {'$set': {'default_price': price_float, 'description': service_data['description'], 'is_active': True}}
                         )
                         updated += 1
                     # Si ya existe y es idéntico, no contar como actualizado
