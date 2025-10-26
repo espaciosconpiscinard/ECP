@@ -805,7 +805,15 @@ const Expenses = () => {
                 <Label>Tipo de Gasto *</Label>
                 <select
                   value={formData.expense_type}
-                  onChange={(e) => setFormData({ ...formData, expense_type: e.target.value })}
+                  onChange={(e) => {
+                    const newType = e.target.value;
+                    setFormData({ 
+                      ...formData, 
+                      expense_type: newType,
+                      // Resetear show_in_variables si NO es único
+                      show_in_variables: newType === 'unico' ? formData.show_in_variables : false
+                    });
+                  }}
                   className="w-full p-2 border rounded-md"
                 >
                   <option value="variable">Variable (Con fecha de pago)</option>
