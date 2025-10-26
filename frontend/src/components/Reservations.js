@@ -1597,7 +1597,15 @@ const Reservations = () => {
                     step="0.5"
                     min="0"
                     value={formData.extra_hours}
-                    onChange={(e) => setFormData({ ...formData, extra_hours: parseFloat(e.target.value) || 0 })}
+                    onChange={(e) => {
+                      const hours = parseFloat(e.target.value) || 0;
+                      const totalCost = hours * (formData.extra_hours_unit_price || 0);
+                      setFormData({ 
+                        ...formData, 
+                        extra_hours: hours,
+                        extra_hours_cost: totalCost 
+                      });
+                    }}
                     data-testid="extra-hours-input"
                   />
                 </div>
@@ -1634,7 +1642,15 @@ const Reservations = () => {
                     step="1"
                     min="0"
                     value={formData.extra_people}
-                    onChange={(e) => setFormData({ ...formData, extra_people: parseFloat(e.target.value) || 0 })}
+                    onChange={(e) => {
+                      const people = parseFloat(e.target.value) || 0;
+                      const totalCost = people * (formData.extra_people_unit_price || 0);
+                      setFormData({ 
+                        ...formData, 
+                        extra_people: people,
+                        extra_people_cost: totalCost 
+                      });
+                    }}
                     data-testid="extra-people-input"
                   />
                 </div>
