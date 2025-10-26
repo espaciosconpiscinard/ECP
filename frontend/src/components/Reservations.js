@@ -19,6 +19,7 @@ const Reservations = () => {
   const [villas, setVillas] = useState([]);
   const [extraServices, setExtraServices] = useState([]);
   const [logo, setLogo] = useState(null);
+  const [invoiceTemplate, setInvoiceTemplate] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [searchTerm, setSearchTerm] = useState('');
