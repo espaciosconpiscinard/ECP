@@ -1601,6 +1601,30 @@ const Reservations = () => {
                   />
                 </div>
                 
+                {/* Personas Extras */}
+                <div>
+                  <Label>Personas Extras</Label>
+                  <Input
+                    type="number"
+                    step="1"
+                    min="0"
+                    value={formData.extra_people}
+                    onChange={(e) => setFormData({ ...formData, extra_people: parseFloat(e.target.value) })}
+                    data-testid="extra-people-input"
+                  />
+                </div>
+                <div>
+                  <Label>Costo Personas Extras</Label>
+                  <Input
+                    type="number"
+                    step="0.01"
+                    min="0"
+                    value={formData.extra_people_cost}
+                    onChange={(e) => setFormData({ ...formData, extra_people_cost: parseFloat(e.target.value) })}
+                    data-testid="extra-people-cost-input"
+                  />
+                </div>
+                
                 {/* Checkbox para servicios adicionales */}
                 <div className="col-span-2">
                   <label className="flex items-center space-x-2 cursor-pointer">
