@@ -1213,9 +1213,10 @@ const Expenses = () => {
       <Card>
         <CardHeader>
           <CardTitle>
-            {activeTab === 'variables' && '📅 Gastos Variables (Con fecha de pago)'}
+            {activeTab === 'propietarios' && '🏡 Gastos a Propietarios (Auto-generados por reservaciones)'}
             {activeTab === 'fijos' && '🔁 Gastos Fijos (Recurrentes mensuales)'}
             {activeTab === 'unicos' && '💰 Gastos Únicos (Ya pagados)'}
+            {activeTab === 'variables' && '📅 Gastos Variables (Con fecha de pago)'}
             <span className="text-sm font-normal text-gray-500 ml-2">
               ({getFilteredAndSortedExpenses().length})
             </span>
