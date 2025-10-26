@@ -817,6 +817,22 @@ const Expenses = () => {
                 </p>
               </div>
               
+              {/* Checkbox para mostrar gasto único también en variables */}
+              {formData.expense_type === 'unico' && (
+                <div className="flex items-center space-x-2 p-3 bg-blue-50 border border-blue-200 rounded-md">
+                  <input
+                    type="checkbox"
+                    id="show_in_variables"
+                    checked={formData.show_in_variables || false}
+                    onChange={(e) => setFormData({ ...formData, show_in_variables: e.target.checked })}
+                    className="w-4 h-4 text-blue-600 rounded focus:ring-blue-500"
+                  />
+                  <label htmlFor="show_in_variables" className="text-sm text-gray-700 cursor-pointer">
+                    📊 <strong>Mostrar también en "Variables"</strong> (para incluir en análisis de gastos variables)
+                  </label>
+                </div>
+              )}
+              
               <div>
                 <Label>Descripción *</Label>
                 <Input
