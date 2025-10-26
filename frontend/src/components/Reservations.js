@@ -993,9 +993,18 @@ const Reservations = () => {
                       <td style="text-align: right;"><strong>${reservation.currency === 'DOP' ? 'RD$' : '$'}${(reservation.extra_hours_cost || 0).toLocaleString('es-DO', {minimumFractionDigits: 2})}</strong></td>
                     </tr>
                   ` : ''}
+                  ${reservation.extra_people && reservation.extra_people > 0 ? `
+                    <tr>
+                      <td>0${(reservation.extra_hours > 0 ? 3 : 2)}</td>
+                      <td>Personas Extras</td>
+                      <td style="text-align: right;">${reservation.currency === 'DOP' ? 'RD$' : '$'}${((reservation.extra_people_cost || 0) / reservation.extra_people).toLocaleString('es-DO', {minimumFractionDigits: 2})}</td>
+                      <td style="text-align: center;">${reservation.extra_people}</td>
+                      <td style="text-align: right;"><strong>${reservation.currency === 'DOP' ? 'RD$' : '$'}${(reservation.extra_people_cost || 0).toLocaleString('es-DO', {minimumFractionDigits: 2})}</strong></td>
+                    </tr>
+                  ` : ''}
                   ${reservation.extra_services && reservation.extra_services.length > 0 ? reservation.extra_services.map((service, idx) => `
                     <tr>
-                      <td>0${idx + (reservation.extra_hours > 0 ? 3 : 2)}</td>
+                      <td>0${idx + (reservation.extra_hours > 0 ? 1 : 0) + (reservation.extra_people > 0 ? 1 : 0) + 2}</td>
                       <td>${service.service_name}</td>
                       <td style="text-align: right;">${reservation.currency === 'DOP' ? 'RD$' : '$'}${service.unit_price.toLocaleString('es-DO', {minimumFractionDigits: 2})}</td>
                       <td style="text-align: center;">${service.quantity}</td>
