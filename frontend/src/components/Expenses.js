@@ -438,7 +438,18 @@ const Expenses = () => {
     
     // Filtrar por tipo de tab activo
     let filtered = expenses.filter(expense => {
+      // EXCLUIR gastos de propietarios del tab Variables
+      if (activeTab === 'variables' && (expense.category === 'pago_propietario' || expense.related_reservation_id)) {
+        return false;
+      }
+      
       const type = expense.expense_type || 'variable';
+      
+      // Si es tab Variables, incluir también gastos únicos marcados como "show_in_variables"
+      if (activeTab === 'variables') {
+        return type === 'variable' || (type === 'unico' && expense.show_in_variables === true);
+      }
+      
       return type === targetType;
     });
 
