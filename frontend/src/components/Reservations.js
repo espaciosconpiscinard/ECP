@@ -1589,50 +1589,76 @@ const Reservations = () => {
 
                 {/* Horas Extras */}
                 <div>
-                  <Label>Horas Extras</Label>
+                  <Label>Horas Extras (Cantidad)</Label>
                   <Input
                     type="number"
                     step="0.5"
                     min="0"
                     value={formData.extra_hours}
-                    onChange={(e) => setFormData({ ...formData, extra_hours: parseFloat(e.target.value) })}
+                    onChange={(e) => setFormData({ ...formData, extra_hours: parseFloat(e.target.value) || 0 })}
                     data-testid="extra-hours-input"
                   />
                 </div>
                 <div>
-                  <Label>Costo Horas Extras</Label>
+                  <Label>Precio por Hora Extra</Label>
                   <Input
                     type="number"
                     step="0.01"
                     min="0"
-                    value={formData.extra_hours_cost}
-                    onChange={(e) => setFormData({ ...formData, extra_hours_cost: parseFloat(e.target.value) })}
-                    data-testid="extra-hours-cost-input"
+                    value={formData.extra_hours_unit_price || 0}
+                    onChange={(e) => {
+                      const unitPrice = parseFloat(e.target.value) || 0;
+                      const totalCost = unitPrice * (formData.extra_hours || 0);
+                      setFormData({ 
+                        ...formData, 
+                        extra_hours_unit_price: unitPrice,
+                        extra_hours_cost: totalCost 
+                      });
+                    }}
+                    data-testid="extra-hours-unit-price-input"
                   />
+                  {formData.extra_hours > 0 && (
+                    <p className="text-xs text-gray-600 mt-1">
+                      Total: {((formData.extra_hours_unit_price || 0) * formData.extra_hours).toFixed(2)}
+                    </p>
+                  )}
                 </div>
                 
                 {/* Personas Extras */}
                 <div>
-                  <Label>Personas Extras</Label>
+                  <Label>Personas Extras (Cantidad)</Label>
                   <Input
                     type="number"
                     step="1"
                     min="0"
                     value={formData.extra_people}
-                    onChange={(e) => setFormData({ ...formData, extra_people: parseFloat(e.target.value) })}
+                    onChange={(e) => setFormData({ ...formData, extra_people: parseFloat(e.target.value) || 0 })}
                     data-testid="extra-people-input"
                   />
                 </div>
                 <div>
-                  <Label>Costo Personas Extras</Label>
+                  <Label>Precio por Persona Extra</Label>
                   <Input
                     type="number"
                     step="0.01"
                     min="0"
-                    value={formData.extra_people_cost}
-                    onChange={(e) => setFormData({ ...formData, extra_people_cost: parseFloat(e.target.value) })}
-                    data-testid="extra-people-cost-input"
+                    value={formData.extra_people_unit_price || 0}
+                    onChange={(e) => {
+                      const unitPrice = parseFloat(e.target.value) || 0;
+                      const totalCost = unitPrice * (formData.extra_people || 0);
+                      setFormData({ 
+                        ...formData, 
+                        extra_people_unit_price: unitPrice,
+                        extra_people_cost: totalCost 
+                      });
+                    }}
+                    data-testid="extra-people-unit-price-input"
                   />
+                  {formData.extra_people > 0 && (
+                    <p className="text-xs text-gray-600 mt-1">
+                      Total: {((formData.extra_people_unit_price || 0) * formData.extra_people).toFixed(2)}
+                    </p>
+                  )}
                 </div>
                 
                 {/* Checkbox para servicios adicionales */}
