@@ -214,7 +214,8 @@ const Expenses = () => {
       reservation_check_in: null,
       has_payment_reminder: false,
       payment_reminder_day: 1,
-      is_recurring: false
+      is_recurring: false,
+      show_in_variables: false
     });
   };
 
