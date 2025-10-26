@@ -1167,14 +1167,14 @@ const Expenses = () => {
       <div className="bg-white rounded-lg shadow-md mb-4">
         <div className="flex border-b">
           <button
-            onClick={() => setActiveTab('variables')}
+            onClick={() => setActiveTab('propietarios')}
             className={`flex-1 py-3 px-4 font-medium transition-colors ${
-              activeTab === 'variables'
-                ? 'border-b-2 border-blue-600 text-blue-600 bg-blue-50'
+              activeTab === 'propietarios'
+                ? 'border-b-2 border-green-600 text-green-600 bg-green-50'
                 : 'text-gray-600 hover:bg-gray-50'
             }`}
           >
-            📅 Variables ({expenses.filter(e => (e.expense_type || 'variable') === 'variable').length})
+            🏡 Propietarios ({expenses.filter(e => e.category === 'pago_propietario' || e.related_reservation_id).length})
           </button>
           <button
             onClick={() => setActiveTab('fijos')}
@@ -1195,6 +1195,16 @@ const Expenses = () => {
             }`}
           >
             💰 Únicos ({expenses.filter(e => e.expense_type === 'unico').length})
+          </button>
+          <button
+            onClick={() => setActiveTab('variables')}
+            className={`flex-1 py-3 px-4 font-medium transition-colors ${
+              activeTab === 'variables'
+                ? 'border-b-2 border-blue-600 text-blue-600 bg-blue-50'
+                : 'text-gray-600 hover:bg-gray-50'
+            }`}
+          >
+            📅 Variables ({expenses.filter(e => (e.expense_type || 'variable') === 'variable').length})
           </button>
         </div>
       </div>
