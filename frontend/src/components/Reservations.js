@@ -614,7 +614,7 @@ const Reservations = () => {
             
             /* Content Area */
             .content {
-              padding: 30px 50px;
+              padding: 20px 40px;
             }
             
             /* Payment Info & Bill To */
