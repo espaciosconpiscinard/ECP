@@ -655,15 +655,15 @@ const Reservations = () => {
               border-left: 4px solid #0ea5e9;
             }
             .villa-description-title {
-              font-size: 13px;
+              font-size: 11px;
               font-weight: 700;
               color: #0369a1;
-              margin-bottom: 10px;
+              margin-bottom: 8px;
               text-transform: uppercase;
             }
             .villa-description-text {
-              font-size: 12px;
-              line-height: 1.7;
+              font-size: 10px;
+              line-height: 1.6;
               color: #555;
             }
             
@@ -671,23 +671,23 @@ const Reservations = () => {
             .services-table {
               width: 100%;
               border-collapse: collapse;
-              margin: 25px 0;
+              margin: 20px 0;
             }
             .services-table thead {
               background: #0ea5e9;
               color: white;
             }
             .services-table th {
-              padding: 14px 12px;
+              padding: 10px 10px;
               text-align: left;
-              font-size: 12px;
+              font-size: 10px;
               font-weight: 600;
               text-transform: uppercase;
               letter-spacing: 0.5px;
             }
             .services-table td {
-              padding: 14px 12px;
-              font-size: 13px;
+              padding: 10px 10px;
+              font-size: 11px;
               border-bottom: 1px solid #e0e0e0;
             }
             .services-table tbody tr:nth-child(even) {
