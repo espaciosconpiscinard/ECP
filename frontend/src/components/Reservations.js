@@ -187,9 +187,10 @@ const Reservations = () => {
   useEffect(() => {
     const basePrice = parseFloat(formData.base_price) || 0;
     const extraHoursCost = parseFloat(formData.extra_hours_cost) || 0;
+    const extraPeopleCost = parseFloat(formData.extra_people_cost) || 0;
     const extraServicesTotal = selectedExtraServices.reduce((sum, s) => sum + (s.total || 0), 0);
     
-    const subtotal = basePrice + extraHoursCost + extraServicesTotal;
+    const subtotal = basePrice + extraHoursCost + extraPeopleCost + extraServicesTotal;
     const discount = parseFloat(formData.discount) || 0;
     const subtotalAfterDiscount = subtotal - discount;
     
@@ -208,7 +209,7 @@ const Reservations = () => {
       itbis_amount: itbisAmount,
       total_amount: total
     }));
-  }, [formData.base_price, formData.extra_hours_cost, formData.discount, formData.include_itbis, selectedExtraServices]);
+  }, [formData.base_price, formData.extra_hours_cost, formData.extra_people_cost, formData.discount, formData.include_itbis, selectedExtraServices]);
   
   const handleVillaChange = (villaId) => {
     const villa = villas.find(v => v.id === villaId);
