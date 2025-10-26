@@ -1320,7 +1320,12 @@ const Expenses = () => {
                 : 'text-gray-600 hover:bg-gray-50'
             }`}
           >
-            📅 Variables ({expenses.filter(e => (e.expense_type || 'variable') === 'variable').length})
+            📅 Variables ({expenses.filter(e => {
+              // Excluir gastos de propietarios
+              if (e.category === 'pago_propietario' || e.related_reservation_id) return false;
+              // Incluir variables + únicos marcados como show_in_variables
+              return (e.expense_type || 'variable') === 'variable' || (e.expense_type === 'unico' && e.show_in_variables);
+            }).length})
           </button>
         </div>
       </div>
