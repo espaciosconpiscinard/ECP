@@ -621,30 +621,30 @@ const Reservations = () => {
             .info-row {
               display: grid;
               grid-template-columns: 1fr 1fr;
-              gap: 20px;
-              margin-bottom: 20px;
+              gap: 15px;
+              margin-bottom: 12px;
             }
             .info-box {
               background: #f0f9ff;
-              padding: 12px 15px;
-              border-left: 3px solid #0ea5e9;
+              padding: 8px 10px;
+              border-left: 2px solid #0ea5e9;
             }
             .info-title {
-              font-size: 10px;
+              font-size: 9px;
               font-weight: 700;
               color: #0369a1;
-              margin-bottom: 6px;
+              margin-bottom: 4px;
               text-transform: uppercase;
             }
             .info-line {
-              font-size: 9px;
-              margin: 3px 0;
+              font-size: 8px;
+              margin: 2px 0;
               color: #555;
-              line-height: 1.4;
+              line-height: 1.3;
             }
             .info-line strong {
               color: #0369a1;
-              min-width: 75px;
+              min-width: 65px;
               display: inline-block;
             }
             
