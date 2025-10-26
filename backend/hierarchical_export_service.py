@@ -114,7 +114,7 @@ async def generate_villas_template(db) -> BytesIO:
     ws.title = "Villas"
     
     # Headers
-    headers = ["Código Villa *", "Nombre Villa *", "Categoría", "Precio Cliente *", "Precio Propietario", 
+    headers = ["Código Villa *", "Nombre Villa *", "Categoría", "Precio Cliente", "Precio Propietario", 
                "Descripción", "Horario Check-in", "Horario Check-out"]
     ws.append(headers)
     _apply_header_style(ws)
@@ -132,11 +132,11 @@ async def generate_villas_template(db) -> BytesIO:
         ws_categories[f'A{idx}'] = cat_name
     
     # Marcar columnas
-    _apply_required_fill(ws, "A")  # Código
-    _apply_required_fill(ws, "B")  # Nombre
-    _apply_optional_fill(ws, "C")  # Categoría
-    _apply_required_fill(ws, "D")  # Precio Cliente
-    _apply_optional_fill(ws, "E")  # Precio Propietario
+    _apply_required_fill(ws, "A")  # Código (obligatorio)
+    _apply_required_fill(ws, "B")  # Nombre (obligatorio)
+    _apply_optional_fill(ws, "C")  # Categoría (opcional)
+    _apply_optional_fill(ws, "D")  # Precio Cliente (opcional - para precios flexibles)
+    _apply_optional_fill(ws, "E")  # Precio Propietario (opcional)
     _apply_optional_fill(ws, "F")  # Descripción
     _apply_optional_fill(ws, "G")  # Check-in
     _apply_optional_fill(ws, "H")  # Check-out
