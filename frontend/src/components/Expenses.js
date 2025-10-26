@@ -403,18 +403,28 @@ const Expenses = () => {
         const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
         
         if (expense.payment_status === 'paid') {
-          return { ...expense, urgency: 'paid' };
+          return { ...expense, urgency: 'paid', daysUntil: 999 };
         } else if (diffDays < 0) {
-          return { ...expense, urgency: 'overdue', daysOverdue: Math.abs(diffDays) };
+          return { ...expense, urgency: 'overdue', daysOverdue: Math.abs(diffDays), daysUntil: diffDays };
         } else if (diffDays <= 3) {
           return { ...expense, urgency: 'upcoming', daysUntil: diffDays };
         } else {
-          return { ...expense, urgency: 'normal' };
+          return { ...expense, urgency: 'normal', daysUntil: diffDays };
         }
       });
       
-      // Ordenar por urgencia: vencidos primero, luego próximos, luego normales
-      return sortByReminder(filtered);
+      // Ordenar por urgencia: vencidos primero (menor daysUntil), luego próximos, luego normales, pagados al final
+      filtered.sort((a, b) => {
+        // Primero por urgencia
+        const urgencyOrder = { 'overdue': 1, 'upcoming': 2, 'normal': 3, 'paid': 4 };
+        const urgencyDiff = urgencyOrder[a.urgency] - urgencyOrder[b.urgency];
+        if (urgencyDiff !== 0) return urgencyDiff;
+        
+        // Dentro de la misma urgencia, ordenar por daysUntil (más cercano primero)
+        return a.daysUntil - b.daysUntil;
+      });
+      
+      return filtered;
     }
     
     // Mapear tabs a tipos del backend (para otros tabs)
