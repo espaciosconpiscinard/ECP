@@ -93,7 +93,26 @@ const Reservations = () => {
   useEffect(() => {
     fetchData();
     fetchLogo();
+    fetchInvoiceTemplate();
   }, []);
+
+  const fetchInvoiceTemplate = async () => {
+    try {
+      const token = localStorage.getItem('token');
+      const response = await fetch(`${API_URL}/api/config/invoice-template`, {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+      
+      if (response.ok) {
+        const data = await response.json();
+        setInvoiceTemplate(data);
+      }
+    } catch (err) {
+      console.error('Error loading invoice template:', err);
+    }
+  };
 
   const fetchLogo = async () => {
     try {
