@@ -361,7 +361,41 @@ const Expenses = () => {
 
   // Función para filtrar y ordenar gastos por tipo con prioridad de urgencia
   const getFilteredAndSortedExpenses = () => {
-    // Mapear tabs a tipos del backend
+    // Tab especial: Propietarios (gastos auto-generados)
+    if (activeTab === 'propietarios') {
+      let filtered = expenses.filter(expense => 
+        expense.category === 'pago_propietario' || expense.related_reservation_id
+      );
+      
+      // Filtrar por estado de pago
+      if (paymentStatusFilter === 'pending') {
+        filtered = filtered.filter(expense => expense.payment_status === 'pending');
+      } else if (paymentStatusFilter === 'paid') {
+        filtered = filtered.filter(expense => expense.payment_status === 'paid');
+      }
+      
+      // Filtrar por mes seleccionado
+      const monthFiltered = filterByMonth(filtered);
+      
+      // Agregar pendientes de meses anteriores
+      let pendingFiltered = [];
+      if (paymentStatusFilter !== 'paid') {
+        pendingFiltered = expenses.filter(expense => {
+          if (!(expense.category === 'pago_propietario' || expense.related_reservation_id)) return false;
+          if (expense.payment_status !== 'pending') return false;
+          const expenseDate = new Date(expense.expense_date);
+          const selectedDate = new Date(selectedYear, selectedMonth, 1);
+          return expenseDate < selectedDate;
+        });
+      }
+      
+      filtered = [...monthFiltered, ...pendingFiltered];
+      
+      // Aplicar ordenamiento simple por fecha
+      return filtered.sort((a, b) => new Date(b.expense_date) - new Date(a.expense_date));
+    }
+    
+    // Mapear tabs a tipos del backend (para otros tabs)
     const typeMap = {
       'variables': 'variable',
       'fijos': 'fijo',
