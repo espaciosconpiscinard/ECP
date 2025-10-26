@@ -269,17 +269,24 @@ async def import_services(file_content: bytes, db) -> Dict:
                     'created_by': 'import_system'
                 }
                 
-                # Verificar si ya existe (por nombre exacto)
-                existing = await db.extra_services.find_one({'name': service_data['name']})
+                # Verificar si ya existe (por nombre - case insensitive)
+                existing = await db.extra_services.find_one({'name': {'$regex': f'^{name}$', '$options': 'i'}})
                 
                 if existing:
-                    # Actualizar solo si hay cambios reales
-                    if existing.get('default_price') != price_float or existing.get('description') != service_data['description']:
-                        await db.extra_services.update_one(
-                            {'name': service_data['name']},
-                            {'$set': {'default_price': price_float, 'description': service_data['description'], 'is_active': True}}
-                        )
-                        updated += 1
+                    existing_price = existing.get('default_price', 0)
+                    print(f"  → Servicio existe: precio actual={existing_price}, nuevo precio={price_float}")
+                    
+                    # SIEMPRE actualizar el precio del Excel (no comparar)
+                    await db.extra_services.update_one(
+                        {'id': existing['id']},
+                        {'$set': {
+                            'default_price': price_float, 
+                            'description': service_data['description'], 
+                            'is_active': True
+                        }}
+                    )
+                    updated += 1
+                    print(f"  → ACTUALIZADO: {name} de {existing_price} a {price_float}")
                     # Si ya existe y es idéntico, no contar como actualizado
                 else:
                     await db.extra_services.insert_one(service_data)
