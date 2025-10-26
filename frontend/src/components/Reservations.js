@@ -908,8 +908,9 @@ const Reservations = () => {
                 </div>
                 
                 <div class="info-box">
-                  <div style="font-size: 11px; font-weight: 700; color: #000; margin-bottom: 4px;">
-                    Factura de: <span style="color: #000;">${reservation.customer_name}</span>
+                  <div style="font-size: 11px; margin-bottom: 4px;">
+                    <span style="font-weight: 700; color: #0369a1;">Factura de:</span> 
+                    <span style="font-weight: 700; color: #000;">${reservation.customer_name}</span>
                   </div>
                   ${reservation.customer_identification_document ? `
                     <div class="info-line"><strong>Cédula/RNC:</strong> ${reservation.customer_identification_document}</div>
