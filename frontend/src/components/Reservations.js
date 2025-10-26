@@ -778,10 +778,10 @@ const Reservations = () => {
             }
             .payment-box, .notes-box {
               background: #f0f9ff;
-              padding: 15px 20px;
-              margin: 15px 0;
+              padding: 12px 15px;
+              margin: 12px 0;
               border-left: 4px solid #0ea5e9;
-              font-size: 12px;
+              font-size: 10px;
             }
             .notes-box {
               border-left-color: #f59e0b;
@@ -790,53 +790,53 @@ const Reservations = () => {
             
             /* Terms & Signature */
             .terms-section {
-              margin: 30px 0;
-              padding: 20px;
+              margin: 20px 0;
+              padding: 15px;
               background: #f8f9fa;
               page-break-inside: avoid;
             }
             .terms-title {
-              font-size: 13px;
+              font-size: 11px;
               font-weight: 700;
               color: #0369a1;
-              margin-bottom: 10px;
+              margin-bottom: 8px;
               text-transform: uppercase;
             }
             .terms-content {
-              font-size: 10px;
-              line-height: 1.7;
+              font-size: 9px;
+              line-height: 1.6;
               color: #666;
             }
             .terms-content p {
-              margin: 5px 0;
+              margin: 4px 0;
             }
             
             /* Footer */
             .footer {
               background: #0369a1;
               color: white;
-              padding: 25px 50px;
+              padding: 20px 40px;
               text-align: center;
               position: relative;
             }
             .footer::before {
               content: '';
               position: absolute;
-              top: -20px;
+              top: -15px;
               left: 0;
               width: 0;
               height: 0;
-              border-left: 50px solid transparent;
-              border-bottom: 20px solid #0ea5e9;
+              border-left: 40px solid transparent;
+              border-bottom: 15px solid #0ea5e9;
             }
             .thank-you {
-              font-size: 18px;
+              font-size: 14px;
               font-weight: 700;
               letter-spacing: 1px;
-              margin-bottom: 10px;
+              margin-bottom: 8px;
             }
             .footer-contact {
-              font-size: 11px;
+              font-size: 9px;
               opacity: 0.9;
             }
             
