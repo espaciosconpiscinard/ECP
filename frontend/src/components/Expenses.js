@@ -391,8 +391,30 @@ const Expenses = () => {
       
       filtered = [...monthFiltered, ...pendingFiltered];
       
-      // Aplicar ordenamiento simple por fecha
-      return filtered.sort((a, b) => new Date(b.expense_date) - new Date(a.expense_date));
+      // ===== AGREGAR LÓGICA DE URGENCIA =====
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+      
+      filtered = filtered.map(expense => {
+        const expenseDate = new Date(expense.expense_date);
+        expenseDate.setHours(0, 0, 0, 0);
+        
+        const diffTime = expenseDate - today;
+        const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+        
+        if (expense.payment_status === 'paid') {
+          return { ...expense, urgency: 'paid' };
+        } else if (diffDays < 0) {
+          return { ...expense, urgency: 'overdue', daysOverdue: Math.abs(diffDays) };
+        } else if (diffDays <= 3) {
+          return { ...expense, urgency: 'upcoming', daysUntil: diffDays };
+        } else {
+          return { ...expense, urgency: 'normal' };
+        }
+      });
+      
+      // Ordenar por urgencia: vencidos primero, luego próximos, luego normales
+      return sortByReminder(filtered);
     }
     
     // Mapear tabs a tipos del backend (para otros tabs)
