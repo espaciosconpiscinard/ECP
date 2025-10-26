@@ -92,6 +92,7 @@ async def import_villa_categories(file_content: bytes, db) -> Dict:
                     'id': str(uuid.uuid4()),
                     'name': name,
                     'description': str(row.get('Descripción', '')).strip() if pd.notna(row.get('Descripción')) else '',
+                    'is_active': True,  # Siempre activo al importar
                     'created_at': datetime.now(timezone.utc).isoformat(),
                     'created_by': 'import_system'
                 }
