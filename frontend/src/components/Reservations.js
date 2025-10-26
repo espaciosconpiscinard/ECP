@@ -709,8 +709,8 @@ const Reservations = () => {
             .total-line {
               display: flex;
               justify-content: space-between;
-              padding: 10px 15px;
-              font-size: 14px;
+              padding: 8px 12px;
+              font-size: 11px;
               border-bottom: 1px solid #e0e0e0;
             }
             .total-line.subtotal {
@@ -723,31 +723,31 @@ const Reservations = () => {
             .total-line.grand-total {
               background: #0ea5e9;
               color: white;
-              font-size: 18px;
+              font-size: 14px;
               font-weight: 700;
               border: none;
-              padding: 15px;
+              padding: 12px;
             }
             
             /* Abonos Section */
             .abonos-section {
-              margin: 20px 0;
-              padding: 15px;
+              margin: 15px 0;
+              padding: 12px;
               background: #f0f9ff;
-              border-radius: 8px;
+              border-radius: 6px;
               border: 2px solid #0ea5e9;
             }
             .abonos-title {
-              font-size: 14px;
+              font-size: 11px;
               font-weight: 700;
               color: #0369a1;
-              margin-bottom: 10px;
+              margin-bottom: 8px;
               text-transform: uppercase;
             }
             .abonos-table {
               width: 100%;
               border-collapse: collapse;
-              font-size: 11px;
+              font-size: 9px;
             }
             .abonos-table thead {
               background: #0ea5e9;
