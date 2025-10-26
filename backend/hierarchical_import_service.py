@@ -248,8 +248,8 @@ async def import_services(file_content: bytes, db) -> Dict:
                     errors.append(f"Fila {idx+2}: Precio es obligatorio")
                     continue
                 
-                # SKIP EJEMPLOS del template
-                if name in ['Chef privado', 'DJ', 'Decoración']:
+                # SKIP EJEMPLOS del template (pero NO DJ que puede ser servicio real)
+                if name in ['Chef privado', 'Decoración']:
                     skipped_examples += 1
                     continue
                 
