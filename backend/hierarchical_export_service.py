@@ -120,8 +120,16 @@ async def generate_villas_template(db) -> BytesIO:
     _apply_header_style(ws)
     
     # Obtener categorías existentes para dropdown
-    categories = await db.categories.find({}, {"_id": 0, "name": 1}).to_list(100)
+    categories = await db.categories.find({'is_active': True}, {"_id": 0, "name": 1}).to_list(100)
     category_names = [cat["name"] for cat in categories] if categories else ["VIP", "Estándar", "Familiar"]
+    
+    # Crear hoja oculta para las categorías (solución para evitar límite de 255 caracteres)
+    ws_categories = wb.create_sheet("_Categorias")
+    ws_categories.sheet_state = 'hidden'
+    
+    # Escribir categorías en hoja oculta
+    for idx, cat_name in enumerate(category_names, start=1):
+        ws_categories[f'A{idx}'] = cat_name
     
     # Marcar columnas
     _apply_required_fill(ws, "A")  # Código
@@ -133,8 +141,17 @@ async def generate_villas_template(db) -> BytesIO:
     _apply_optional_fill(ws, "G")  # Check-in
     _apply_optional_fill(ws, "H")  # Check-out
     
-    # Dropdown para categorías
-    _add_dropdown(ws, "C", category_names)
+    # Dropdown para categorías usando referencia a hoja oculta
+    if category_names:
+        dv = DataValidation(
+            type="list", 
+            formula1=f'=_Categorias!$A$1:$A${len(category_names)}',
+            allow_blank=True
+        )
+        dv.error = 'Por favor selecciona una categoría de la lista'
+        dv.errorTitle = 'Categoría Inválida'
+        ws.add_data_validation(dv)
+        dv.add('C2:C100')
     
     # Ejemplo
     ws.append(["ECPVSH", "Villa Shangrila", category_names[0] if category_names else "VIP", 
