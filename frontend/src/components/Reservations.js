@@ -555,6 +555,21 @@ const Reservations = () => {
     const printWindow = window.open('', '', 'width=900,height=700');
     const balanceDue = reservation.balance_due || 0;
     
+    // Generar HTML de políticas
+    let policiesHtml = '';
+    if (invoiceTemplate && invoiceTemplate.policies && invoiceTemplate.policies.length > 0) {
+      policiesHtml = invoiceTemplate.policies.map(policy => `<p>• ${policy}</p>`).join('');
+    } else {
+      // Políticas por defecto
+      policiesHtml = `
+        <p>• El depósito de seguridad es reembolsable si no hay daños a la propiedad.</p>
+        <p>• Las reservaciones se garantizan con el pago del 50% del total.</p>
+        <p>• No hay reembolsos por cancelaciones, llegadas tardías o salidas anticipadas.</p>
+        <p>• El número máximo de huéspedes no debe ser excedido.</p>
+        <p>• Cualquier daño será cobrado al cliente. Prohibido fumar en áreas cerradas.</p>
+      `;
+    }
+    
     printWindow.document.write(`
       <html>
         <head>
