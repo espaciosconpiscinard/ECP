@@ -153,9 +153,7 @@ async def generate_villas_template(db) -> BytesIO:
         ws.add_data_validation(dv)
         dv.add('C2:C100')
     
-    # Ejemplo
-    ws.append(["ECPVSH", "Villa Shangrila", category_names[0] if category_names else "VIP", 
-               "15000", "7000", "Villa con piscina grande", "08:00", "18:00"])
+    # NO agregar fila de ejemplo - usuario agregará sus propias villas
     
     # Ajustar anchos
     for col, width in [("A", 15), ("B", 25), ("C", 15), ("D", 18), ("E", 20), ("F", 40), ("G", 15), ("H", 15)]:
