@@ -791,25 +791,28 @@ const Reservations = () => {
             
             /* Terms & Signature */
             .terms-section {
-              margin: 20px 0;
-              padding: 15px;
+              margin: 15px 0;
+              padding: 12px 15px;
               background: #f8f9fa;
               page-break-inside: avoid;
             }
             .terms-title {
-              font-size: 11px;
+              font-size: 10px;
               font-weight: 700;
               color: #0369a1;
               margin-bottom: 8px;
               text-transform: uppercase;
             }
             .terms-content {
-              font-size: 9px;
-              line-height: 1.6;
+              font-size: 8px;
+              line-height: 1.5;
               color: #666;
+              column-count: 2;
+              column-gap: 25px;
             }
             .terms-content p {
-              margin: 4px 0;
+              margin: 3px 0;
+              break-inside: avoid;
             }
             
             /* Footer */
