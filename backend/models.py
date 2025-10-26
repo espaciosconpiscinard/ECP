@@ -361,6 +361,7 @@ class ExpenseUpdate(BaseModel):
     has_payment_reminder: Optional[bool] = None
     payment_reminder_day: Optional[int] = None
     is_recurring: Optional[bool] = None
+    show_in_variables: Optional[bool] = None  # Para gastos únicos
 
 class Expense(ExpenseBase):
     model_config = ConfigDict(extra="ignore")
