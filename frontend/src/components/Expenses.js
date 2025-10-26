@@ -668,6 +668,15 @@ const Expenses = () => {
   const unicosDOP = allRelevantExpenses.filter(e => e.expense_type === 'unico' && e.currency === 'DOP').reduce((sum, e) => sum + e.amount, 0);
   const unicosUSD = allRelevantExpenses.filter(e => e.expense_type === 'unico' && e.currency === 'USD').reduce((sum, e) => sum + e.amount, 0);
   
+  // Gastos de Propietarios (auto-generados)
+  const propietariosExpenses = allRelevantExpenses.filter(e => e.category === 'pago_propietario' || e.related_reservation_id);
+  const propietariosDOP = propietariosExpenses.filter(e => e.currency === 'DOP').reduce((sum, e) => sum + e.amount, 0);
+  const propietariosUSD = propietariosExpenses.filter(e => e.currency === 'USD').reduce((sum, e) => sum + e.amount, 0);
+  const propietariosPendientes = propietariosExpenses.filter(e => e.payment_status === 'pending').length;
+  const propietariosPagados = propietariosExpenses.filter(e => e.payment_status === 'paid').length;
+  const propietariosPendientesDOP = propietariosExpenses.filter(e => e.payment_status === 'pending' && e.currency === 'DOP').reduce((sum, e) => sum + e.amount, 0);
+  const propietariosPendientesUSD = propietariosExpenses.filter(e => e.payment_status === 'pending' && e.currency === 'USD').reduce((sum, e) => sum + e.amount, 0);
+  
   // Totales de pendientes de meses anteriores
   const pendingPreviousDOP = pendingFromPrevious.filter(e => e.currency === 'DOP').reduce((sum, e) => sum + e.amount, 0);
   const pendingPreviousUSD = pendingFromPrevious.filter(e => e.currency === 'USD').reduce((sum, e) => sum + e.amount, 0);
