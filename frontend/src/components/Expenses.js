@@ -2230,6 +2230,51 @@ const Expenses = () => {
                 </div>
               )}
 
+              {/* Gastos de Suplidores Relacionados */}
+              {supplierExpenses.length > 0 && (
+                <div className="p-4 bg-orange-50 border border-orange-200 rounded-lg">
+                  <p className="text-sm text-orange-800 font-bold mb-3">📦 Pagos a Suplidores:</p>
+                  <div className="space-y-2">
+                    {supplierExpenses.map((supplierExpense, idx) => (
+                      <div key={idx} className="bg-white p-3 rounded border border-orange-200">
+                        <div className="flex justify-between items-start mb-2">
+                          <div className="flex-1">
+                            <p className="font-semibold text-gray-800">{supplierExpense.description}</p>
+                            <p className="text-xs text-gray-500 mt-1">
+                              Fecha: {new Date(supplierExpense.expense_date).toLocaleDateString('es-DO')}
+                            </p>
+                          </div>
+                          <div className="text-right">
+                            <p className="font-bold text-orange-600">{formatCurrency(supplierExpense.amount, supplierExpense.currency)}</p>
+                            <span className={`text-xs px-2 py-1 rounded ${
+                              supplierExpense.payment_status === 'paid' 
+                                ? 'bg-green-100 text-green-800' 
+                                : 'bg-yellow-100 text-yellow-800'
+                            }`}>
+                              {supplierExpense.payment_status === 'paid' ? '✓ Pagado' : '⏳ Pendiente'}
+                            </span>
+                          </div>
+                        </div>
+                        {supplierExpense.notes && (
+                          <p className="text-xs text-gray-600 mt-2 border-t pt-2">{supplierExpense.notes}</p>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                  <div className="mt-3 pt-3 border-t border-orange-200">
+                    <div className="flex justify-between font-bold">
+                      <span>Total Suplidores:</span>
+                      <span className="text-orange-600">
+                        {formatCurrency(
+                          supplierExpenses.reduce((sum, e) => sum + e.amount, 0),
+                          detailExpense.currency
+                        )}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              )}
+
               {/* Abonos si existen */}
               {expenseAbonos[detailExpense.id] && expenseAbonos[detailExpense.id].length > 0 && (
                 <div className="p-4 bg-purple-50 border border-purple-200 rounded-lg">
