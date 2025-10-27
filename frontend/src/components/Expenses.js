@@ -2083,7 +2083,7 @@ const Expenses = () => {
                             
                             alert('Pago registrado correctamente');
                             document.getElementById('propietario-monto').value = '';
-                            await fetchExpenses();
+                            await fetchData();
                             setIsAbonoDialogOpen(false);
                           } catch (err) {
                             console.error('Error al registrar pago:', err);
