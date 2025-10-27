@@ -1029,6 +1029,73 @@ const Expenses = () => {
         </CardContent>
       </Card>
 
+      {/* Tarjeta Especial: Gastos a Suplidores */}
+      <Card className="border-2 border-purple-300 bg-gradient-to-r from-purple-50 to-violet-50 mb-4">
+        <CardHeader className="pb-3">
+          <CardTitle className="flex items-center text-purple-800">
+            <span className="text-2xl mr-2">🚚</span>
+            Gastos a Suplidores - Mes Actual
+            <span className="ml-auto text-sm font-normal text-purple-600">
+              {expenses.filter(e => e.category === 'pago_suplidor' && new Date(e.expense_date).getMonth() === new Date().getMonth()).length} pagos
+            </span>
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            {/* Total */}
+            <div className="bg-white p-4 rounded-lg border-2 border-purple-200">
+              <p className="text-sm text-gray-600 font-medium mb-1">💰 Total del Mes</p>
+              <p className="text-3xl font-bold text-purple-700">
+                {formatCurrency(
+                  expenses
+                    .filter(e => e.category === 'pago_suplidor' && new Date(e.expense_date).getMonth() === new Date().getMonth() && e.currency === 'DOP')
+                    .reduce((sum, e) => sum + e.amount, 0),
+                  'DOP'
+                )}
+              </p>
+            </div>
+            
+            {/* Pendiente */}
+            <div className="bg-orange-50 p-4 rounded-lg border-2 border-orange-200">
+              <p className="text-sm text-orange-800 font-medium mb-1">⏳ Pendiente de Pago</p>
+              <p className="text-3xl font-bold text-orange-600">
+                {formatCurrency(
+                  expenses
+                    .filter(e => e.category === 'pago_suplidor' && e.payment_status === 'pending' && new Date(e.expense_date).getMonth() === new Date().getMonth())
+                    .reduce((sum, e) => sum + e.amount, 0),
+                  'DOP'
+                )}
+              </p>
+              <p className="text-xs text-gray-600 mt-1">
+                {expenses.filter(e => e.category === 'pago_suplidor' && e.payment_status === 'pending' && new Date(e.expense_date).getMonth() === new Date().getMonth()).length} pagos pendientes
+              </p>
+            </div>
+            
+            {/* Pagado */}
+            <div className="bg-blue-50 p-4 rounded-lg border-2 border-blue-200">
+              <p className="text-sm text-blue-800 font-medium mb-1">✅ Ya Pagado</p>
+              <p className="text-3xl font-bold text-blue-600">
+                {formatCurrency(
+                  expenses
+                    .filter(e => e.category === 'pago_suplidor' && e.payment_status === 'paid' && new Date(e.expense_date).getMonth() === new Date().getMonth())
+                    .reduce((sum, e) => sum + e.amount, 0),
+                  'DOP'
+                )}
+              </p>
+              <p className="text-xs text-gray-600 mt-1">
+                {expenses.filter(e => e.category === 'pago_suplidor' && e.payment_status === 'paid' && new Date(e.expense_date).getMonth() === new Date().getMonth()).length} pagos realizados
+              </p>
+            </div>
+          </div>
+          
+          <div className="mt-4 p-3 bg-purple-100 rounded-lg border border-purple-300">
+            <p className="text-sm text-purple-800">
+              <strong>ℹ️ Nota:</strong> Estos gastos se generan automáticamente al crear reservaciones con servicios adicionales que tienen suplidores.
+            </p>
+          </div>
+        </CardContent>
+      </Card>
+
       {/* Summary Cards - Totales Desglosados */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         <Card className="border-red-200 bg-red-50" data-testid="total-compromisos-card">
