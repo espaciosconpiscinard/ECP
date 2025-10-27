@@ -2240,11 +2240,15 @@ const Expenses = () => {
                                   deposit_returned: e.target.checked
                                 }));
                                 alert(e.target.checked ? 'Depósito marcado como devuelto' : 'Depósito marcado como pendiente');
-                                await fetchExpenses();
+                                await fetchData();
+                              } else {
+                                const errorText = await response.text();
+                                console.error('Error en respuesta:', response.status, errorText);
+                                alert('Error al actualizar el depósito');
                               }
                             } catch (err) {
                               console.error('Error al actualizar depósito:', err);
-                              alert('Error al actualizar el depósito');
+                              alert('Error al actualizar el depósito: ' + err.message);
                             }
                           }}
                           className="h-6 w-6 cursor-pointer"
