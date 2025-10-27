@@ -2037,7 +2037,7 @@ const Reservations = () => {
       <Card>
         <CardHeader>
           <div className="flex justify-between items-center">
-            <CardTitle>Lista de Reservaciones ({filteredReservations.length})</CardTitle>
+            <CardTitle>Lista de Facturas ({filteredReservations.length})</CardTitle>
             {selectedReservations.length > 0 && user?.role === 'admin' && (
               <div className="flex items-center space-x-2">
                 <Button
