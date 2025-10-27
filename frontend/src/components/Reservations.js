@@ -291,7 +291,15 @@ const Reservations = () => {
   const addExtraService = () => {
     setSelectedExtraServices([
       ...selectedExtraServices,
-      { service_id: '', service_name: '', quantity: 1, unit_price: 0, total: 0 }
+      { 
+        service_id: '', 
+        service_name: '', 
+        supplier_name: '', 
+        supplier_cost: 0, 
+        quantity: 1, 
+        unit_price: 0, 
+        total: 0 
+      }
     ]);
   };
   
