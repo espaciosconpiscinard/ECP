@@ -1714,7 +1714,7 @@ const Reservations = () => {
                       </Button>
                     </div>
                     {selectedExtraServices.map((service, index) => (
-                      <div key={index} className="grid grid-cols-4 gap-2 mb-2 items-end">
+                      <div key={index} className="grid grid-cols-6 gap-2 mb-2 items-end">
                         <div className="col-span-2">
                           <Label className="text-xs">Servicio</Label>
                           <select
@@ -1726,6 +1726,31 @@ const Reservations = () => {
                             {extraServices.map(s => (
                               <option key={s.id} value={s.id}>{s.name}</option>
                             ))}
+                          </select>
+                        </div>
+                        <div className="col-span-2">
+                          <Label className="text-xs">Suplidor</Label>
+                          <select
+                            value={service.supplier_name || ''}
+                            onChange={(e) => {
+                              const selectedService = extraServices.find(s => s.id === service.service_id);
+                              const selectedSupplier = selectedService?.suppliers?.find(sup => sup.name === e.target.value);
+                              if (selectedSupplier) {
+                                updateExtraService(index, 'supplier_name', selectedSupplier.name);
+                                updateExtraService(index, 'supplier_cost', selectedSupplier.supplier_cost);
+                                updateExtraService(index, 'unit_price', selectedSupplier.client_price);
+                              }
+                            }}
+                            className="w-full p-2 border rounded-md text-sm"
+                            disabled={!service.service_id}
+                          >
+                            <option value="">Seleccionar suplidor</option>
+                            {extraServices
+                              .find(s => s.id === service.service_id)?.suppliers?.map((supplier, idx) => (
+                                <option key={idx} value={supplier.name}>
+                                  {supplier.name} - RD$ {supplier.client_price.toLocaleString('es-DO')}
+                                </option>
+                              ))}
                           </select>
                         </div>
                         <div>
