@@ -1440,35 +1440,74 @@ const Reservations = () => {
                     />
                     <Search className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={18} />
                     
-                    {/* Dropdown de villas filtradas */}
-                    {showVillaDropdown && filteredVillas.length > 0 && (
+                    {/* Dropdown de villas y servicios filtrados */}
+                    {showVillaDropdown && (filteredVillas.length > 0 || filteredServices.length > 0) && (
                       <div className="absolute z-50 w-full mt-1 bg-white border border-gray-300 rounded-md shadow-lg max-h-60 overflow-y-auto">
-                        {filteredVillas.map(villa => (
-                          <div
-                            key={villa.id}
-                            onClick={() => handleSelectVilla(villa.id)}
-                            className="p-3 hover:bg-blue-50 cursor-pointer border-b last:border-b-0"
-                          >
-                            <div className="flex justify-between items-center">
-                              <div>
-                                <p className="font-semibold text-blue-600">{villa.code}</p>
-                                <p className="text-sm text-gray-600">{villa.name}</p>
-                              </div>
-                              <div className="text-right text-sm">
-                                <p className="text-gray-700">
-                                  {formData.rental_type === 'pasadia' && `RD$ ${villa.default_price_pasadia?.toLocaleString()}`}
-                                  {formData.rental_type === 'amanecida' && `RD$ ${villa.default_price_amanecida?.toLocaleString()}`}
-                                  {formData.rental_type === 'evento' && `RD$ ${villa.default_price_evento?.toLocaleString()}`}
-                                </p>
-                              </div>
+                        {/* Sección de Villas */}
+                        {filteredVillas.length > 0 && (
+                          <>
+                            <div className="px-3 py-2 bg-blue-50 border-b font-semibold text-sm text-blue-900">
+                              🏡 Villas
                             </div>
-                          </div>
-                        ))}
+                            {filteredVillas.map(villa => (
+                              <div
+                                key={`villa-${villa.id}`}
+                                onClick={() => handleSelectVilla(villa.id)}
+                                className="p-3 hover:bg-blue-50 cursor-pointer border-b last:border-b-0"
+                              >
+                                <div className="flex justify-between items-center">
+                                  <div>
+                                    <p className="font-semibold text-blue-600">{villa.code}</p>
+                                    <p className="text-sm text-gray-600">{villa.name}</p>
+                                  </div>
+                                  <div className="text-right text-sm">
+                                    <p className="text-gray-700">
+                                      {formData.rental_type === 'pasadia' && `RD$ ${villa.default_price_pasadia?.toLocaleString()}`}
+                                      {formData.rental_type === 'amanecida' && `RD$ ${villa.default_price_amanecida?.toLocaleString()}`}
+                                      {formData.rental_type === 'evento' && `RD$ ${villa.default_price_evento?.toLocaleString()}`}
+                                    </p>
+                                  </div>
+                                </div>
+                              </div>
+                            ))}
+                          </>
+                        )}
+                        
+                        {/* Sección de Servicios */}
+                        {filteredServices.length > 0 && (
+                          <>
+                            <div className="px-3 py-2 bg-green-50 border-b font-semibold text-sm text-green-900">
+                              🛎️ Servicios
+                            </div>
+                            {filteredServices.map(service => (
+                              <div
+                                key={`service-${service.id}`}
+                                onClick={() => handleSelectService(service.id)}
+                                className="p-3 hover:bg-green-50 cursor-pointer border-b last:border-b-0"
+                              >
+                                <div className="flex justify-between items-start">
+                                  <div className="flex-1">
+                                    <p className="font-semibold text-green-700">{service.name}</p>
+                                    {service.suppliers && service.suppliers.length > 0 && (
+                                      <div className="mt-1 space-y-1">
+                                        {service.suppliers.map((supplier, idx) => (
+                                          <p key={idx} className="text-xs text-gray-600">
+                                            📦 {supplier.name}: RD$ {supplier.price?.toLocaleString()}
+                                          </p>
+                                        ))}
+                                      </div>
+                                    )}
+                                  </div>
+                                </div>
+                              </div>
+                            ))}
+                          </>
+                        )}
                       </div>
                     )}
                     
                     {/* Mensaje si no hay resultados */}
-                    {showVillaDropdown && villaSearchTerm && filteredVillas.length === 0 && (
+                    {showVillaDropdown && villaSearchTerm && filteredVillas.length === 0 && filteredServices.length === 0 && (
                       <div className="absolute z-50 w-full mt-1 bg-white border border-gray-300 rounded-md shadow-lg p-3 text-center text-gray-500">
                         No se encontraron villas o servicios
                       </div>
