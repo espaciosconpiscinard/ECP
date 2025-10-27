@@ -191,6 +191,7 @@ class ReservationBase(BaseModel):
     villa_id: str
     villa_code: str  # ECPVSH
     villa_description: Optional[str] = None
+    villa_location: Optional[str] = None  # Ubicación de la villa
     
     # Tipo de renta
     rental_type: Literal["pasadia", "amanecida", "evento"] = "pasadia"
