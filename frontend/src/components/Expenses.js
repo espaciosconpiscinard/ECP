@@ -1028,7 +1028,7 @@ const Expenses = () => {
           <div className="mt-4 p-3 bg-green-100 rounded-lg border border-green-300">
             <p className="text-sm text-green-800">
               <strong>ℹ️ Nota:</strong> Estos gastos se generan automáticamente al crear reservaciones con "Pago Propietario" configurado.
-              Click en el tab "🏡 Propietarios" arriba para ver el detalle completo.
+              Click en el tab "🏡 Propietarios y Servicios" arriba para ver el detalle completo.
             </p>
           </div>
         </CardContent>
