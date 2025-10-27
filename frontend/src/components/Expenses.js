@@ -245,6 +245,33 @@ const Expenses = () => {
       setAbonos([]);
     }
     
+    // Si el gasto está relacionado con una reservación, cargar los detalles
+    if (expense.related_reservation_id) {
+      try {
+        const reservationResponse = await fetch(
+          `${import.meta.env.VITE_BACKEND_URL || process.env.REACT_APP_BACKEND_URL}/api/reservations/${expense.related_reservation_id}`,
+          {
+            headers: {
+              'Authorization': `Bearer ${localStorage.getItem('token')}`
+            }
+          }
+        );
+        
+        if (reservationResponse.ok) {
+          const reservationData = await reservationResponse.json();
+          setRelatedReservation(reservationData);
+          console.log('Reservación relacionada cargada:', reservationData);
+        } else {
+          setRelatedReservation(null);
+        }
+      } catch (err) {
+        console.error('Error al cargar reservación relacionada:', err);
+        setRelatedReservation(null);
+      }
+    } else {
+      setRelatedReservation(null);
+    }
+    
     setIsAbonoDialogOpen(true);
   };
 
