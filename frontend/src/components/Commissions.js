@@ -176,6 +176,109 @@ function Commissions() {
     }
   };
 
+  // Funciones de selección múltiple
+  const handleSelectAll = () => {
+    if (selectAll) {
+      setSelectedCommissions([]);
+      setSelectAll(false);
+    } else {
+      setSelectedCommissions(filteredCommissions.map(c => c.id));
+      setSelectAll(true);
+    }
+  };
+
+  const handleSelectCommission = (commissionId) => {
+    if (selectedCommissions.includes(commissionId)) {
+      setSelectedCommissions(selectedCommissions.filter(id => id !== commissionId));
+      setSelectAll(false);
+    } else {
+      const newSelected = [...selectedCommissions, commissionId];
+      setSelectedCommissions(newSelected);
+      if (newSelected.length === filteredCommissions.length) {
+        setSelectAll(true);
+      }
+    }
+  };
+
+  const handleBulkDelete = async () => {
+    if (selectedCommissions.length === 0) {
+      alert('Por favor selecciona al menos una comisión');
+      return;
+    }
+
+    if (!window.confirm(`¿Eliminar ${selectedCommissions.length} comisión(es) seleccionada(s)?`)) {
+      return;
+    }
+
+    try {
+      const token = localStorage.getItem('token');
+      for (const commissionId of selectedCommissions) {
+        await fetch(`${API_URL}/api/commissions/${commissionId}`, {
+          method: 'DELETE',
+          headers: { 'Authorization': `Bearer ${token}` }
+        });
+      }
+
+      await fetchCommissions();
+      await fetchStats();
+      setSelectedCommissions([]);
+      setSelectAll(false);
+      alert(`✅ ${selectedCommissions.length} comisión(es) eliminada(s)`);
+    } catch (err) {
+      alert('❌ Error: ' + err.message);
+    }
+  };
+
+  const handleBulkMarkPaid = async () => {
+    if (selectedCommissions.length === 0) {
+      alert('Por favor selecciona al menos una comisión');
+      return;
+    }
+
+    try {
+      const token = localStorage.getItem('token');
+      for (const commissionId of selectedCommissions) {
+        await fetch(`${API_URL}/api/commissions/${commissionId}/mark-paid`, {
+          method: 'POST',
+          headers: { 'Authorization': `Bearer ${token}` }
+        });
+      }
+
+      await fetchCommissions();
+      await fetchStats();
+      setSelectedCommissions([]);
+      setSelectAll(false);
+      alert(`✅ ${selectedCommissions.length} comisión(es) marcada(s) como pagada(s)`);
+    } catch (err) {
+      alert('❌ Error: ' + err.message);
+    }
+  };
+
+  const handleBulkMarkUnpaid = async () => {
+    if (selectedCommissions.length === 0) {
+      alert('Por favor selecciona al menos una comisión');
+      return;
+    }
+
+    try {
+      const token = localStorage.getItem('token');
+      for (const commissionId of selectedCommissions) {
+        await fetch(`${API_URL}/api/commissions/${commissionId}/mark-unpaid`, {
+          method: 'POST',
+          headers: { 'Authorization': `Bearer ${token}` }
+        });
+      }
+
+      await fetchCommissions();
+      await fetchStats();
+      setSelectedCommissions([]);
+      setSelectAll(false);
+      alert(`✅ ${selectedCommissions.length} comisión(es) marcada(s) como no pagada(s)`);
+    } catch (err) {
+      alert('❌ Error: ' + err.message);
+    }
+  };
+
   if (user?.role !== 'admin') {
     return (
       <div className="text-center py-8">
