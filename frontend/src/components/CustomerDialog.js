@@ -51,12 +51,12 @@ const CustomerDialog = ({ onCustomerCreated }) => {
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger asChild>
         <Button variant="outline" size="sm" data-testid="quick-add-customer-button">
-          <Plus className="mr-2 h-4 w-4" /> Cliente R\u00e1pido
+          <Plus className="mr-2 h-4 w-4" /> Cliente Rápido
         </Button>
       </DialogTrigger>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Agregar Cliente R\u00e1pido</DialogTitle>
+          <DialogTitle>Agregar Cliente Rápido</DialogTitle>
         </DialogHeader>
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
