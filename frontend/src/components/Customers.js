@@ -1,12 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import { getCustomers, createCustomer, deleteCustomer } from '../api/api';
+import { getCustomers, createCustomer, updateCustomer, deleteCustomer } from '../api/api';
 import { Button } from './ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from './ui/card';
 import { Input } from './ui/input';
 import { Label } from './ui/label';
 import { Alert, AlertDescription } from './ui/alert';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from './ui/dialog';
-import { Plus, Trash2, Users, Phone, Mail } from 'lucide-react';
+import { Plus, Trash2, Users, Phone, Mail, Edit2 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 
 const Customers = () => {
@@ -17,6 +17,7 @@ const Customers = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [isFormOpen, setIsFormOpen] = useState(false);
+  const [editingCustomer, setEditingCustomer] = useState(null);
   
   // Estados para selección múltiple
   const [selectedCustomers, setSelectedCustomers] = useState([]);
