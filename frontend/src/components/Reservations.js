@@ -1376,9 +1376,9 @@ const Reservations = () => {
                   </div>
                 </div>
 
-                {/* Villa con Buscador */}
+                {/* Villas Y Servicios con Buscador */}
                 <div className="col-span-2">
-                  <Label>Villa *</Label>
+                  <Label>Villas Y Servicios</Label>
                   <div className="relative">
                     <Input
                       type="text"
@@ -1388,7 +1388,7 @@ const Reservations = () => {
                         setShowVillaDropdown(true);
                       }}
                       onFocus={() => setShowVillaDropdown(true)}
-                      placeholder="Buscar por código o nombre de villa..."
+                      placeholder="Buscar villa o servicio..."
                       className="w-full"
                       data-testid="villa-search-input"
                     />
@@ -1424,12 +1424,12 @@ const Reservations = () => {
                     {/* Mensaje si no hay resultados */}
                     {showVillaDropdown && villaSearchTerm && filteredVillas.length === 0 && (
                       <div className="absolute z-50 w-full mt-1 bg-white border border-gray-300 rounded-md shadow-lg p-3 text-center text-gray-500">
-                        No se encontraron villas
+                        No se encontraron villas o servicios
                       </div>
                     )}
                   </div>
                   {!formData.villa_id && (
-                    <p className="text-xs text-red-500 mt-1">* Debes seleccionar una villa</p>
+                    <p className="text-xs text-gray-500 mt-1">Selecciona una villa o servicio (opcional)</p>
                   )}
                 </div>
 
