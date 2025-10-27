@@ -360,10 +360,15 @@ const Reservations = () => {
     try {
       const customer = customers.find(c => c.id === formData.customer_id);
       
+      // Arreglar fecha para evitar problema de zona horaria
+      const reservationDate = formData.reservation_date.includes('T') 
+        ? formData.reservation_date 
+        : `${formData.reservation_date}T12:00:00.000Z`; // Usar mediodía UTC para evitar cambio de día
+      
       const dataToSend = {
         ...formData,
         customer_name: customer?.name || '',
-        reservation_date: new Date(formData.reservation_date).toISOString(),
+        reservation_date: reservationDate,
         extra_services: selectedExtraServices.filter(s => s.service_id)
       };
       
