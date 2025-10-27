@@ -150,6 +150,9 @@ const Reservations = () => {
       setVillas(villasResponse.data);
       setExtraServices(servicesResponse.data);
       
+      console.log('📋 Servicios cargados:', servicesResponse.data);
+      console.log('📋 Total servicios:', servicesResponse.data.length);
+      
       // Cargar abonos de cada reservación para mostrar sus invoice_numbers
       const abonosMap = {};
       for (const reservation of resResponse.data) {
