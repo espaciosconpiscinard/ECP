@@ -469,6 +469,7 @@ metadata:
 
 test_plan:
   current_focus:
+    - "VillasManagement - Checkbox 'Por Defecto' para precios flexibles"
     - "Sistema de importación Excel - Backend"
     - "Reservations - Campo invoice_number en formulario de abono"
     - "Expenses - Campo invoice_number en formulario de abono"
@@ -476,7 +477,7 @@ test_plan:
   stuck_tasks: []
   test_all: false
   test_priority: "high_first"
-  latest_test: "Completado - Sistema de invoice_number para abonos completamente funcional. Pendiente: Sistema de importación Excel (complejo, se hará manualmente)"
+  latest_test: "Completado - Checkbox 'Por Defecto' implementado en las 3 secciones de precios flexibles (Pasadía, Amanecida, Evento). Pendiente: Testing de funcionalidad end-to-end"
 
 agent_communication:
   - agent: "main"
