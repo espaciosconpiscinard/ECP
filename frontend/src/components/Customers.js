@@ -250,7 +250,7 @@ const Customers = () => {
                   Cancelar
                 </Button>
                 <Button type="submit">
-                  Guardar Cliente
+                  {editingCustomer ? 'Actualizar Cliente' : 'Guardar Cliente'}
                 </Button>
               </div>
             </form>
