@@ -1415,7 +1415,7 @@ const Expenses = () => {
       <Card>
         <CardHeader>
           <CardTitle>
-            {activeTab === 'propietarios' && '🏡 Gastos a Propietarios (Auto-generados por reservaciones)'}
+            {activeTab === 'propietarios' && '🏡 Gastos a Propietarios y Servicios (Auto-generados por reservaciones)'}
             {activeTab === 'fijos' && '🔁 Gastos Fijos (Recurrentes mensuales)'}
             {activeTab === 'unicos' && '💰 Gastos Únicos (Ya pagados)'}
             {activeTab === 'variables' && '📅 Gastos Variables (Con fecha de pago)'}
