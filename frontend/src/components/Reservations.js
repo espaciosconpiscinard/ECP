@@ -1215,13 +1215,20 @@ const Reservations = () => {
   const totals = calculateReservationTotals();
 
 
-  // Filtrar y ordenar villas alfabéticamente
+  // Filtrar y ordenar villas y servicios alfabéticamente
   const filteredVillas = villas
     .filter(v => 
       v.code?.toLowerCase().includes(villaSearchTerm.toLowerCase()) ||
       v.name?.toLowerCase().includes(villaSearchTerm.toLowerCase())
     )
     .sort((a, b) => a.code.localeCompare(b.code));
+
+  // Filtrar servicios para mostrar en el dropdown
+  const filteredServices = extraServices
+    .filter(s => 
+      s.name?.toLowerCase().includes(villaSearchTerm.toLowerCase())
+    )
+    .sort((a, b) => a.name.localeCompare(b.name));
 
   // Filtrar y ordenar clientes alfabéticamente
   const filteredCustomers = customers
@@ -1237,6 +1244,45 @@ const Reservations = () => {
       setVillaSearchTerm(`${villa.code} - ${villa.name}`);
       setShowVillaDropdown(false);
       handleVillaChange(villaId);
+    }
+  };
+
+  const handleSelectService = (serviceId) => {
+    const service = extraServices.find(s => s.id === serviceId);
+    if (service) {
+      setVillaSearchTerm(`Servicio: ${service.name}`);
+      setShowVillaDropdown(false);
+      
+      // Agregar el servicio a la lista de servicios seleccionados
+      const newService = {
+        id: service.id,
+        name: service.name,
+        quantity: 1,
+        price_unit: service.suppliers && service.suppliers.length > 0 ? service.suppliers[0].price : 0,
+        price_total: service.suppliers && service.suppliers.length > 0 ? service.suppliers[0].price : 0,
+        supplier_id: service.suppliers && service.suppliers.length > 0 ? service.suppliers[0].id : '',
+        supplier_name: service.suppliers && service.suppliers.length > 0 ? service.suppliers[0].name : '',
+        supplier_price_unit: service.suppliers && service.suppliers.length > 0 ? service.suppliers[0].price : 0,
+        supplier_price_total: service.suppliers && service.suppliers.length > 0 ? service.suppliers[0].price : 0
+      };
+      
+      setSelectedExtraServices([newService]);
+      setShowExtraServices(true);
+      
+      // Recalcular totales
+      const servicesTotal = newService.price_total;
+      const newSubtotal = (formData.base_price || 0) + (formData.extra_hours_cost || 0) + (formData.extra_people_cost || 0) + servicesTotal;
+      const newITBIS = formData.include_itbis ? newSubtotal * 0.18 : 0;
+      const newTotal = newSubtotal + newITBIS - (formData.discount || 0);
+      
+      setFormData(prev => ({
+        ...prev,
+        extra_services: [newService],
+        extra_services_total: servicesTotal,
+        subtotal: newSubtotal,
+        itbis_amount: newITBIS,
+        total_amount: newTotal
+      }));
     }
   };
 
