@@ -2351,9 +2351,9 @@ const Reservations = () => {
 
       {/* Diálogo de Agregar Abono */}
       <Dialog open={isAbonoDialogOpen} onOpenChange={setIsAbonoDialogOpen}>
-        <DialogContent className="max-w-md">
+        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
-            <DialogTitle>Agregar Abono a Reservación</DialogTitle>
+            <DialogTitle>Agregar Abono a Factura</DialogTitle>
           </DialogHeader>
           {selectedReservation && (
             <>
