@@ -408,6 +408,7 @@ const VillasManagementNew = () => {
       suppliers: [],
       is_active: true
     });
+  };
 
   // Funciones para manejar suplidores de servicios
   const handleAddSupplier = () => {
