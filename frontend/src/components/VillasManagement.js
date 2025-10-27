@@ -205,6 +205,7 @@ const VillasManagementNew = () => {
       code: '',
       name: '',
       description: '',
+      location: '',
       phone: '',
       category_id: '',
       default_check_in_time: '9:00 AM',
