@@ -189,6 +189,8 @@ class ReservationBase(BaseModel):
     
     # Personas
     guests: int = 1
+    extra_people: int = 0  # Cantidad de personas extras
+    extra_people_cost: float = 0.0  # Costo de personas extras
     
     # Precios
     base_price: float  # Precio base de la villa al cliente
