@@ -980,6 +980,90 @@ const VillasManagementNew = () => {
                       </p>
                     </div>
 
+                    {/* Sección de Suplidores */}
+                    <div className="col-span-2">
+                      <div className="flex justify-between items-center mb-3">
+                        <h4 className="font-semibold text-gray-700">Suplidores</h4>
+                        <Button
+                          type="button"
+                          onClick={handleAddSupplier}
+                          size="sm"
+                          variant="outline"
+                          className="text-xs"
+                        >
+                          ➕ Agregar Suplidor
+                        </Button>
+                      </div>
+                      
+                      {serviceFormData.suppliers.length > 0 && (
+                        <div className="space-y-3 border border-gray-200 rounded-lg p-3 bg-gray-50">
+                          {serviceFormData.suppliers.map((supplier, index) => (
+                            <div key={index} className="bg-white p-3 rounded border border-gray-200">
+                              <div className="grid grid-cols-4 gap-2 mb-2">
+                                <div className="col-span-4">
+                                  <Label className="text-xs">Nombre del Suplidor</Label>
+                                  <Input
+                                    value={supplier.name}
+                                    onChange={(e) => handleUpdateSupplier(index, 'name', e.target.value)}
+                                    placeholder="Ej: Decoraciones ABC"
+                                    className="text-sm"
+                                  />
+                                </div>
+                                <div className="col-span-2">
+                                  <Label className="text-xs">Precio Cliente (RD$)</Label>
+                                  <Input
+                                    type="number"
+                                    step="0.01"
+                                    value={supplier.client_price}
+                                    onChange={(e) => handleUpdateSupplier(index, 'client_price', parseFloat(e.target.value) || 0)}
+                                    placeholder="5000"
+                                    className="text-sm"
+                                  />
+                                </div>
+                                <div className="col-span-2">
+                                  <Label className="text-xs">Costo Suplidor (RD$)</Label>
+                                  <Input
+                                    type="number"
+                                    step="0.01"
+                                    value={supplier.supplier_cost}
+                                    onChange={(e) => handleUpdateSupplier(index, 'supplier_cost', parseFloat(e.target.value) || 0)}
+                                    placeholder="4000"
+                                    className="text-sm"
+                                  />
+                                </div>
+                              </div>
+                              <div className="flex justify-between items-center">
+                                <div className="flex items-center space-x-2">
+                                  <input
+                                    type="checkbox"
+                                    checked={supplier.is_default}
+                                    onChange={(e) => handleUpdateSupplier(index, 'is_default', e.target.checked)}
+                                    className="w-4 h-4"
+                                  />
+                                  <Label className="text-xs">Por Defecto</Label>
+                                </div>
+                                <Button
+                                  type="button"
+                                  onClick={() => handleRemoveSupplier(index)}
+                                  size="sm"
+                                  variant="ghost"
+                                  className="text-red-600 hover:text-red-800 text-xs"
+                                >
+                                  🗑️ Eliminar
+                                </Button>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                      
+                      {serviceFormData.suppliers.length === 0 && (
+                        <p className="text-xs text-gray-500 italic text-center py-3 bg-gray-50 rounded border border-dashed">
+                          No hay suplidores agregados. Presiona "➕ Agregar Suplidor" para comenzar.
+                        </p>
+                      )}
+                    </div>
+
                     <div className="col-span-2 flex items-center space-x-2">
                       <input
                         type="checkbox"
