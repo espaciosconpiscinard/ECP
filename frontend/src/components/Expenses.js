@@ -1903,27 +1903,27 @@ const Expenses = () => {
           <DialogHeader>
             <DialogTitle>Detalles del Gasto</DialogTitle>
           </DialogHeader>
-          {selectedExpense && (
+          {detailExpense && (
             <div className="space-y-4">
               {/* Información Básica */}
               <div className="grid grid-cols-2 gap-4 p-4 bg-gray-50 rounded-lg">
                 <div>
                   <p className="text-sm text-gray-600 font-medium">Fecha</p>
-                  <p className="text-lg font-bold">{new Date(selectedExpense.expense_date).toLocaleDateString('es-DO', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}</p>
+                  <p className="text-lg font-bold">{new Date(detailExpense.expense_date).toLocaleDateString('es-DO', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}</p>
                 </div>
                 <div>
                   <p className="text-sm text-gray-600 font-medium">Categoría</p>
-                  <span className={`px-3 py-1 rounded text-sm font-bold ${getCategoryColor(selectedExpense.category)}`}>
-                    {getCategoryLabel(selectedExpense.category)}
+                  <span className={`px-3 py-1 rounded text-sm font-bold ${getCategoryColor(detailExpense.category)}`}>
+                    {getCategoryLabel(detailExpense.category)}
                   </span>
                 </div>
                 <div>
                   <p className="text-sm text-gray-600 font-medium">Monto Total</p>
-                  <p className="text-2xl font-bold text-blue-600">{formatCurrency(selectedExpense.amount, selectedExpense.currency)}</p>
+                  <p className="text-2xl font-bold text-blue-600">{formatCurrency(detailExpense.amount, detailExpense.currency)}</p>
                 </div>
                 <div>
                   <p className="text-sm text-gray-600 font-medium">Restante</p>
-                  <p className="text-2xl font-bold text-orange-600">{formatCurrency((selectedExpense.amount - (selectedExpense.total_paid || 0)), selectedExpense.currency)}</p>
+                  <p className="text-2xl font-bold text-orange-600">{formatCurrency((detailExpense.amount - (detailExpense.total_paid || 0)), detailExpense.currency)}</p>
                 </div>
               </div>
 
@@ -1931,13 +1931,13 @@ const Expenses = () => {
               <div className="p-4 bg-white border rounded-lg">
                 <p className="text-sm text-gray-600 font-medium mb-2">Descripción</p>
                 <div className="whitespace-pre-line text-gray-800">
-                  {selectedExpense.description}
+                  {detailExpense.description}
                 </div>
               </div>
 
               {/* Detectar y mostrar detalles específicos */}
               {(() => {
-                const desc = selectedExpense.description || '';
+                const desc = detailExpense.description || '';
                 const hasExtras = desc.includes('Horas extras') || desc.includes('Personas extras');
                 const hasServices = desc.includes('servicio(s) adicional(es)');
                 const hasITBIS = desc.includes('Con ITBIS');
@@ -1970,32 +1970,32 @@ const Expenses = () => {
               })()}
 
               {/* Notas */}
-              {selectedExpense.notes && (
+              {detailExpense.notes && (
                 <div className="p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
                   <p className="text-sm text-yellow-800 font-bold mb-2">📝 Notas:</p>
-                  <p className="text-gray-700 whitespace-pre-line">{selectedExpense.notes}</p>
+                  <p className="text-gray-700 whitespace-pre-line">{detailExpense.notes}</p>
                 </div>
               )}
 
               {/* Abonos si existen */}
-              {expenseAbonos[selectedExpense.id] && expenseAbonos[selectedExpense.id].length > 0 && (
+              {expenseAbonos[detailExpense.id] && expenseAbonos[detailExpense.id].length > 0 && (
                 <div className="p-4 bg-purple-50 border border-purple-200 rounded-lg">
                   <p className="text-sm text-purple-800 font-bold mb-3">💰 Abonos Realizados:</p>
                   <div className="space-y-2">
-                    {expenseAbonos[selectedExpense.id].map((abono, idx) => (
+                    {expenseAbonos[detailExpense.id].map((abono, idx) => (
                       <div key={idx} className="flex justify-between items-center bg-white p-2 rounded">
                         <div>
                           <span className="font-medium">Factura #{abono.invoice_number}</span>
                           <span className="text-xs text-gray-600 ml-2">{new Date(abono.payment_date).toLocaleDateString('es-DO')}</span>
                         </div>
-                        <span className="font-bold text-purple-600">{formatCurrency(abono.amount, selectedExpense.currency)}</span>
+                        <span className="font-bold text-purple-600">{formatCurrency(abono.amount, detailExpense.currency)}</span>
                       </div>
                     ))}
                   </div>
                   <div className="mt-3 pt-3 border-t border-purple-200">
                     <div className="flex justify-between font-bold">
                       <span>Total Pagado:</span>
-                      <span className="text-purple-600">{formatCurrency(selectedExpense.total_paid || 0, selectedExpense.currency)}</span>
+                      <span className="text-purple-600">{formatCurrency(detailExpense.total_paid || 0, detailExpense.currency)}</span>
                     </div>
                   </div>
                 </div>
@@ -2009,10 +2009,10 @@ const Expenses = () => {
                 >
                   Cerrar
                 </Button>
-                {selectedExpense.payment_status === 'pending' && (
+                {detailExpense.payment_status === 'pending' && (
                   <Button
                     onClick={() => {
-                      handleAddAbono(selectedExpense);
+                      handleAddAbono(detailExpense);
                       setShowDetailsModal(false);
                     }}
                     className="bg-green-600 hover:bg-green-700 text-white"
