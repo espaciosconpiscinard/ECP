@@ -89,6 +89,39 @@ const VillasManagementNew = () => {
     }
   };
 
+
+  // Helper function para obtener el precio predeterminado de los flexible_prices
+  const getDefaultPrice = (villa, rentalType, priceType) => {
+    // rentalType: 'pasadia', 'amanecida', 'evento'
+    // priceType: 'client_price' o 'owner_price'
+    
+    if (!villa.flexible_prices || !villa.flexible_prices[rentalType]) {
+      // Si no hay flexible_prices, usar los precios estáticos antiguos
+      if (priceType === 'client_price') {
+        return villa[`default_price_${rentalType}`] || 0;
+      } else {
+        return villa[`owner_price_${rentalType}`] || 0;
+      }
+    }
+    
+    const prices = villa.flexible_prices[rentalType];
+    
+    // Buscar el precio marcado como default
+    const defaultPrice = prices.find(p => p.is_default === true);
+    
+    if (defaultPrice) {
+      return defaultPrice[priceType] || 0;
+    }
+    
+    // Si no hay default, retornar el primer precio o 0
+    if (prices.length > 0) {
+      return prices[0][priceType] || 0;
+    }
+    
+    return 0;
+  };
+
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
