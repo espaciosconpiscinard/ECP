@@ -100,6 +100,18 @@ const Customers = () => {
       }
     }
   };
+  
+  const handleEdit = (customer) => {
+    setEditingCustomer(customer);
+    setFormData({
+      name: customer.name,
+      phone: customer.phone || '',
+      email: customer.email || '',
+      identification_document: customer.identification_document || '',
+      address: customer.address || ''
+    });
+    setIsFormOpen(true);
+  };
 
   // Manejar selección individual
   const handleSelectCustomer = (customerId) => {
