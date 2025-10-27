@@ -851,3 +851,47 @@ agent_communication:
       SIGUIENTE PASO:
       - Testing backend para validar que el campo is_default se guarda correctamente
       - Verificar que al crear/editar villa, el checkbox funciona end-to-end
+
+  - agent: "testing"
+    message: |
+      🎯 CHECKBOX 'POR DEFECTO' TESTING COMPLETADO - TODOS LOS TESTS PASARON ✅
+      
+      ✅ FUNCIONALIDADES VERIFICADAS:
+      
+      🏠 BACKEND - MODELO FLEXIBLEPRICE:
+      - Campo is_default: Optional[bool] = False ✅ funcional
+      - Guardado correcto en base de datos ✅ verificado
+      - Recuperación correcta en GET /api/villas/{id} ✅ verificado
+      - Serialización/deserialización sin errores ✅ verificado
+      
+      📋 CASOS DE PRUEBA COMPLETADOS:
+      - Villa creada con precios predeterminados por tipo ✅
+        * Pasadía: Segundo precio (11-20 personas) marcado como default
+        * Amanecida: Primer precio (1-15 personas) marcado como default  
+        * Evento: Segundo precio (51-100 personas) marcado como default
+      - Actualización de villa cambiando precio predeterminado ✅
+        * Cambio exitoso de segundo a primer precio en Pasadía
+      - Cada tipo de renta tiene su propio precio predeterminado ✅
+        * Pasadía: 1 precio default ✅
+        * Amanecida: 1 precio default ✅
+        * Evento: 1 precio default ✅
+      
+      🔍 ESTRUCTURA DE DATOS VERIFICADA:
+      - Campo is_default presente en todos los precios ✅
+      - Valores boolean correctos (true/false) ✅
+      - No hay errores de validación o serialización ✅
+      - API endpoints POST/PUT/GET funcionan correctamente ✅
+      
+      📊 RESULTADO FINAL: 5/5 pruebas de checkbox 'Por Defecto' pasaron exitosamente
+      - Sistema de precios flexibles con is_default completamente funcional
+      - Backend guarda y recupera correctamente el campo is_default
+      - Cada tipo de renta puede tener su propio precio predeterminado
+      - Frontend puede actualizar qué precio es el predeterminado
+      - No hay errores de validación o serialización con el campo is_default
+      
+      ✅ CRITERIOS DE ÉXITO CUMPLIDOS:
+      ✅ El campo is_default se guarda correctamente en la base de datos
+      ✅ El campo is_default se recupera correctamente en GET
+      ✅ Cada tipo de renta puede tener su propio precio predeterminado
+      ✅ El frontend puede actualizar qué precio es el predeterminado
+      ✅ No hay errores de validación o serialización con el campo is_default
