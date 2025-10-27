@@ -2044,23 +2044,43 @@ const Expenses = () => {
                       </select>
                       <Button
                         type="button"
-                        onClick={() => {
+                        onClick={async () => {
                           const monto = document.getElementById('propietario-monto').value;
                           const metodo = document.getElementById('propietario-metodo').value;
                           if (!monto || monto <= 0) {
                             alert('Por favor ingresa un monto válido');
                             return;
                           }
-                          handleAbonoSubmit({
-                            preventDefault: () => {},
-                            target: {
-                              amount: { value: monto },
-                              currency: { value: selectedExpense?.currency },
-                              payment_method: { value: metodo },
-                              payment_date: { value: new Date().toISOString().split('T')[0] },
-                              notes: { value: `Pago propietario - ${relatedReservation.villa_code}` }
-                            }
-                          });
+                          
+                          try {
+                            const abonoData = {
+                              amount: parseFloat(monto),
+                              currency: selectedExpense?.currency,
+                              payment_method: metodo,
+                              payment_date: new Date().toISOString().split('T')[0],
+                              notes: `Pago propietario - ${relatedReservation.villa_code}`
+                            };
+                            
+                            await fetch(
+                              `${import.meta.env.VITE_BACKEND_URL || process.env.REACT_APP_BACKEND_URL}/api/expenses/${selectedExpense.id}/abonos`,
+                              {
+                                method: 'POST',
+                                headers: {
+                                  'Content-Type': 'application/json',
+                                  'Authorization': `Bearer ${localStorage.getItem('token')}`
+                                },
+                                body: JSON.stringify(abonoData)
+                              }
+                            );
+                            
+                            alert('Pago registrado correctamente');
+                            document.getElementById('propietario-monto').value = '';
+                            await fetchExpenses();
+                            setIsAbonoDialogOpen(false);
+                          } catch (err) {
+                            console.error('Error al registrar pago:', err);
+                            alert('Error al registrar el pago');
+                          }
                         }}
                         className="bg-purple-600 hover:bg-purple-700"
                       >
@@ -2111,9 +2131,7 @@ const Expenses = () => {
                                     return;
                                   }
                                   
-                                  // Crear gasto de suplidor y hacer el abono
                                   try {
-                                    // Buscar el gasto del suplidor en la base de datos
                                     const allExpensesResponse = await fetch(
                                       `${import.meta.env.VITE_BACKEND_URL || process.env.REACT_APP_BACKEND_URL}/api/expenses`,
                                       {
@@ -2131,7 +2149,6 @@ const Expenses = () => {
                                     );
                                     
                                     if (supplierExpense) {
-                                      // Hacer abono al gasto del suplidor
                                       const abonoData = {
                                         amount: parseFloat(monto),
                                         currency: selectedExpense?.currency,
@@ -2232,7 +2249,18 @@ const Expenses = () => {
                   )}
                 </div>
               ) : (
-                <p className="text-gray-500">No hay detalles de reservación disponibles</p>
+                <div className="p-4 bg-yellow-50 border border-yellow-300 rounded-md">
+                  <p className="text-yellow-800 mb-3">
+                    <strong>⚠️ Este gasto no tiene reservación asociada.</strong>
+                  </p>
+                  <p className="text-sm text-gray-700 mb-3">
+                    Gasto ID: {selectedExpense?.id}<br/>
+                    Related Reservation ID: {selectedExpense?.related_reservation_id || 'No tiene'}
+                  </p>
+                  <p className="text-sm text-gray-600">
+                    Para ver los pagos específicos, crea una factura NUEVA con servicios extras y depósito.
+                  </p>
+                </div>
               )}
             </div>
 
