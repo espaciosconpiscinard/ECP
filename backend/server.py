@@ -586,12 +586,15 @@ async def update_customer(customer_id: str, customer_data: CustomerCreate, curre
     if not existing:
         raise HTTPException(status_code=404, detail="Customer not found")
     
-    # Actualizar solo los campos que vienen en el request
-    update_dict = customer_data.model_dump(exclude_unset=True)
+    # Actualizar solo los campos del request
+    update_dict = customer_data.model_dump()
     
-    if update_dict:
-        update_dict = prepare_doc_for_insert(update_dict, for_update=True)
-        await db.customers.update_one({"id": customer_id}, {"$set": update_dict})
+    # Convertir datetimes a ISO strings si existen
+    for key, value in update_dict.items():
+        if isinstance(value, datetime):
+            update_dict[key] = value.isoformat()
+    
+    await db.customers.update_one({"id": customer_id}, {"$set": update_dict})
     
     # Devolver el cliente actualizado
     updated_customer = await db.customers.find_one({"id": customer_id}, {"_id": 0})
