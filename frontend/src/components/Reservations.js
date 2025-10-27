@@ -1841,9 +1841,35 @@ const Reservations = () => {
                               const selectedService = extraServices.find(s => s.id === service.service_id);
                               const selectedSupplier = selectedService?.suppliers?.find(sup => sup.name === e.target.value);
                               if (selectedSupplier) {
+                                // Actualizar todos los campos del suplidor
                                 updateExtraService(index, 'supplier_name', selectedSupplier.name);
-                                updateExtraService(index, 'supplier_cost', selectedSupplier.supplier_cost);
-                                updateExtraService(index, 'unit_price', selectedSupplier.client_price);
+                                updateExtraService(index, 'supplier_id', selectedSupplier.name); // Usar name como id por ahora
+                                updateExtraService(index, 'supplier_price_unit', selectedSupplier.supplier_cost);
+                                updateExtraService(index, 'supplier_price_total', selectedSupplier.supplier_cost * service.quantity);
+                                
+                                // Actualizar precios al cliente
+                                updateExtraService(index, 'price_unit', selectedSupplier.client_price);
+                                updateExtraService(index, 'price_total', selectedSupplier.client_price * service.quantity);
+                                
+                                // Recalcular totales de la factura
+                                const servicesTotal = selectedExtraServices.reduce((sum, s, idx) => {
+                                  if (idx === index) {
+                                    return sum + (selectedSupplier.client_price * service.quantity);
+                                  }
+                                  return sum + (s.price_total || 0);
+                                }, 0);
+                                
+                                const newSubtotal = (formData.base_price || 0) + (formData.extra_hours_cost || 0) + (formData.extra_people_cost || 0) + servicesTotal;
+                                const newITBIS = formData.include_itbis ? newSubtotal * 0.18 : 0;
+                                const newTotal = newSubtotal + newITBIS - (formData.discount || 0);
+                                
+                                setFormData(prev => ({
+                                  ...prev,
+                                  extra_services_total: servicesTotal,
+                                  subtotal: newSubtotal,
+                                  itbis_amount: newITBIS,
+                                  total_amount: newTotal
+                                }));
                               }
                             }}
                             className="w-full p-2 border rounded-md text-sm"
@@ -1859,7 +1885,7 @@ const Reservations = () => {
                             {extraServices
                               .find(s => s.id === service.service_id)?.suppliers?.map((supplier, idx) => (
                                 <option key={idx} value={supplier.name}>
-                                  {supplier.name} - RD$ {supplier.client_price.toLocaleString('es-DO')}
+                                  {supplier.name} - Cliente: RD$ {supplier.client_price?.toLocaleString('es-DO')} | Suplidor: RD$ {supplier.supplier_cost?.toLocaleString('es-DO')}
                                 </option>
                               ))}
                           </select>
