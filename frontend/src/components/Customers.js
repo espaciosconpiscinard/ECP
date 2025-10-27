@@ -68,12 +68,22 @@ const Customers = () => {
     setError('');
     
     try {
-      await createCustomer(formData);
-      await fetchCustomers();
-      // NO cerrar el formulario - mantenerlo abierto
-      // setIsFormOpen(false);
-      resetForm();
-      alert('✅ Cliente agregado exitosamente. Puedes agregar otro cliente.');
+      if (editingCustomer) {
+        // Modo edición
+        await updateCustomer(editingCustomer.id, formData);
+        await fetchCustomers();
+        setIsFormOpen(false);
+        setEditingCustomer(null);
+        resetForm();
+        alert('✅ Cliente actualizado exitosamente');
+      } else {
+        // Modo creación
+        await createCustomer(formData);
+        await fetchCustomers();
+        // NO cerrar el formulario - mantenerlo abierto
+        resetForm();
+        alert('✅ Cliente agregado exitosamente. Puedes agregar otro cliente.');
+      }
     } catch (err) {
       setError(err.response?.data?.detail || 'Error al guardar cliente');
     }
