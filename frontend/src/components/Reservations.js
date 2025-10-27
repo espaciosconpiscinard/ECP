@@ -1728,6 +1728,16 @@ const Reservations = () => {
                         <Plus size={16} className="mr-1" /> Agregar
                       </Button>
                     </div>
+                    
+                    {/* Mensaje si no hay servicios disponibles */}
+                    {extraServices.length === 0 && (
+                      <div className="bg-yellow-50 border border-yellow-300 rounded p-3 mb-3">
+                        <p className="text-sm text-yellow-800">
+                          ⚠️ No hay servicios adicionales configurados. Por favor, ve a <strong>Villas → Servicios</strong> para crear servicios y agregar suplidores.
+                        </p>
+                      </div>
+                    )}
+                    
                     {selectedExtraServices.map((service, index) => (
                       <div key={index} className="grid grid-cols-6 gap-2 mb-2 items-end">
                         <div className="col-span-2">
