@@ -563,6 +563,14 @@ function Commissions() {
                 filteredCommissions.map((commission) => (
                   <tr key={commission.id} className={`hover:bg-gray-50 ${commission.paid ? 'bg-green-50' : 'bg-white'}`}>
                     <td className="px-4 py-3 text-center">
+                      <input
+                        type="checkbox"
+                        checked={selectedCommissions.includes(commission.id)}
+                        onChange={() => handleSelectCommission(commission.id)}
+                        className="h-4 w-4 cursor-pointer"
+                      />
+                    </td>
+                    <td className="px-4 py-3 text-center">
                       {commission.paid ? (
                         <div>
                           <span className="inline-block px-2 py-1 bg-green-600 text-white rounded text-xs font-bold mb-1">
