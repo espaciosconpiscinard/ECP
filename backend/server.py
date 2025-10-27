@@ -917,14 +917,36 @@ async def create_reservation(reservation_data: ReservationCreate, current_user: 
             itbis_note = "Con ITBIS" if reservation_data.include_itbis else "Sin ITBIS"
             details.append(itbis_note)
             
-            # Indicar si tiene servicios adicionales
+            # Indicar si tiene servicios adicionales y guardar detalles
+            services_details = []
             if reservation_data.extra_services and len(reservation_data.extra_services) > 0:
                 details.append(f"Incluye {len(reservation_data.extra_services)} servicio(s) adicional(es)")
+                # Guardar detalles de cada servicio para mostrarlos en el modal
+                for svc in reservation_data.extra_services:
+                    services_details.append({
+                        "service_name": svc.get('service_name', 'N/A'),
+                        "supplier_name": svc.get('supplier_name', 'N/A'),
+                        "quantity": svc.get('quantity', 1),
+                        "unit_price": svc.get('unit_price', 0),
+                        "supplier_cost": svc.get('supplier_cost', 0),
+                        "total": svc.get('total', 0)
+                    })
             
             # Crear descripción detallada
             description = f"Pago propietario villa {villa['code']} - Factura #{invoice_number}"
             if details:
                 description += f"\nDetalles: {', '.join(details)}"
+            
+            # Crear notes con información completa
+            notes_parts = [
+                f"Auto-generado. Cliente: {reservation_data.customer_name}.",
+                f"Base: RD$ {reservation_data.owner_price:.2f}, Total: RD$ {total_owner_payment:.2f}"
+            ]
+            
+            if services_details:
+                notes_parts.append("\n\nServicios Adicionales:")
+                for svc in services_details:
+                    notes_parts.append(f"\n- {svc['service_name']} (Suplidor: {svc['supplier_name']}) x{svc['quantity']} = RD$ {svc['total']:.2f}")
             
             # Crear gasto automático para el pago al propietario
             from models import Expense
@@ -939,8 +961,9 @@ async def create_reservation(reservation_data: ReservationCreate, current_user: 
                 "currency": reservation_data.currency,
                 "expense_date": reservation_data.reservation_date.isoformat() if isinstance(reservation_data.reservation_date, datetime) else reservation_data.reservation_date,
                 "payment_status": "pending",
-                "notes": f"Auto-generado. Cliente: {reservation_data.customer_name}. Base: RD$ {reservation_data.owner_price:.2f}, Total: RD$ {total_owner_payment:.2f}",
+                "notes": ''.join(notes_parts),
                 "related_reservation_id": reservation.id,
+                "services_details": services_details if services_details else None,  # Nuevo campo
                 "created_at": datetime.now(timezone.utc).isoformat(),
                 "created_by": current_user["id"]
             }
