@@ -97,6 +97,7 @@ class FlexiblePrice(BaseModel):
     people_count: str = ""  # Ej: "1-10", "11-20", "21+", etc. - usuario decide
     client_price: float
     owner_price: float
+    is_default: bool = False  # Marca si este precio debe mostrarse por defecto en la lista
 
 class FlexiblePrices(BaseModel):
     pasadia: List[FlexiblePrice] = []
