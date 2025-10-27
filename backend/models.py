@@ -226,6 +226,7 @@ class ReservationBase(BaseModel):
     
     # Pagos
     deposit: float = 0.0
+    deposit_returned: bool = False  # Si el depósito fue devuelto al cliente
     payment_method: Literal["efectivo", "deposito", "transferencia", "mixto"] = "efectivo"
     payment_details: Optional[str] = None  # Detalles del pago
     amount_paid: float = 0.0
