@@ -447,8 +447,6 @@ const VillasManagementNew = () => {
   };
 
 
-  };
-
   const handleOpenForm = () => {
     if (itemType === 'villa') {
       resetForm();
