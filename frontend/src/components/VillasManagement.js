@@ -815,28 +815,60 @@ const VillasManagementNew = () => {
                     />
                   </div>
 
-                  <div>
-                    <Label>Precio Hora Extra (RD$)</Label>
-                    <Input
-                      type="number"
-                      step="0.01"
-                      min="0"
-                      value={formData.extra_hours_price}
-                      onChange={(e) => setFormData({ ...formData, extra_hours_price: parseFloat(e.target.value) || 0 })}
-                      placeholder="500"
-                    />
+                  <div className="col-span-2">
+                    <h4 className="font-semibold text-gray-700 mb-2">Precios de Horas Extras</h4>
+                    <div className="grid grid-cols-2 gap-4">
+                      <div>
+                        <Label>Precio Cliente (RD$/hora)</Label>
+                        <Input
+                          type="number"
+                          step="0.01"
+                          min="0"
+                          value={formData.extra_hours_price_client}
+                          onChange={(e) => setFormData({ ...formData, extra_hours_price_client: parseFloat(e.target.value) || 0 })}
+                          placeholder="500"
+                        />
+                      </div>
+                      <div>
+                        <Label>Pago Propietario (RD$/hora)</Label>
+                        <Input
+                          type="number"
+                          step="0.01"
+                          min="0"
+                          value={formData.extra_hours_price_owner}
+                          onChange={(e) => setFormData({ ...formData, extra_hours_price_owner: parseFloat(e.target.value) || 0 })}
+                          placeholder="400"
+                        />
+                      </div>
+                    </div>
                   </div>
 
-                  <div>
-                    <Label>Precio Persona Extra (RD$)</Label>
-                    <Input
-                      type="number"
-                      step="0.01"
-                      min="0"
-                      value={formData.extra_people_price}
-                      onChange={(e) => setFormData({ ...formData, extra_people_price: parseFloat(e.target.value) || 0 })}
-                      placeholder="300"
-                    />
+                  <div className="col-span-2">
+                    <h4 className="font-semibold text-gray-700 mb-2">Precios de Personas Extras</h4>
+                    <div className="grid grid-cols-2 gap-4">
+                      <div>
+                        <Label>Precio Cliente (RD$/persona)</Label>
+                        <Input
+                          type="number"
+                          step="0.01"
+                          min="0"
+                          value={formData.extra_people_price_client}
+                          onChange={(e) => setFormData({ ...formData, extra_people_price_client: parseFloat(e.target.value) || 0 })}
+                          placeholder="300"
+                        />
+                      </div>
+                      <div>
+                        <Label>Pago Propietario (RD$/persona)</Label>
+                        <Input
+                          type="number"
+                          step="0.01"
+                          min="0"
+                          value={formData.extra_people_price_owner}
+                          onChange={(e) => setFormData({ ...formData, extra_people_price_owner: parseFloat(e.target.value) || 0 })}
+                          placeholder="200"
+                        />
+                      </div>
+                    </div>
                   </div>
 
                   <div>
