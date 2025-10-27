@@ -1132,6 +1132,18 @@ async def update_reservation(
             {"id": reservation_id},
             {"$set": prepared_update}
         )
+        
+        # Si se actualizó la fecha de reservación, actualizar también los gastos relacionados
+        if "reservation_date" in update_dict:
+            new_date = update_dict["reservation_date"]
+            if isinstance(new_date, datetime):
+                new_date = new_date.isoformat()
+            
+            # Actualizar todos los gastos relacionados con esta reservación
+            await db.expenses.update_many(
+                {"related_reservation_id": reservation_id},
+                {"$set": {"expense_date": new_date}}
+            )
     
     updated = await db.reservations.find_one({"id": reservation_id}, {"_id": 0})
     return restore_datetimes(updated, ["reservation_date", "created_at", "updated_at"])
