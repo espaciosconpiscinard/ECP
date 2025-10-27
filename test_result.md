@@ -462,6 +462,10 @@ frontend:
       - working: true
         agent: "testing"
         comment: "✅ TESTED: Checkbox 'Por Defecto' para precios flexibles completamente funcional. Backend: Campo is_default (bool) en modelo FlexiblePrice funciona correctamente. Villa creada con precios predeterminados: Pasadía (11-20 personas), Amanecida (1-15 personas), Evento (51-100 personas). Actualización de precios predeterminados funcional (cambio de segundo a primer precio en Pasadía). Cada tipo de renta puede tener su propio precio predeterminado independiente. Estructura de campo is_default correcta (boolean) en todas las respuestas API. Serialización y deserialización sin errores. 5/5 tests pasaron exitosamente."
+      - working: true
+        agent: "main"
+        comment: "✅ BUG CORREGIDO: Vista de lista no mostraba precios predeterminados. Implementada función helper getDefaultPrice() que busca el precio con is_default: true en flexible_prices y lo muestra en la vista de lista y vista expandida. Vista compacta ahora muestra: PREM001 - Cliente RD$ 18,000, Propietario RD$ 12,000. Vista expandida muestra correctamente los precios predeterminados por tipo de renta. Si no hay precio predeterminado, muestra el primer precio de la lista o RD$ 0. Screenshot verificado: precios mostrándose correctamente."
+
 
 
 metadata:
