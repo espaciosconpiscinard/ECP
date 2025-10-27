@@ -2254,18 +2254,24 @@ const Reservations = () => {
                           </div>
                         </div>
 
-                        {/* Servicios extras */}
-                        {res.extra_services && res.extra_services.length > 0 && (
-                          <div className="mt-3 bg-blue-50 p-3 rounded-md">
-                            <p className="text-xs font-bold text-blue-800 mb-2">SERVICIOS EXTRAS:</p>
-                            <div className="space-y-1 text-sm">
-                              {res.extra_services.map((service, idx) => (
-                                <div key={idx} className="flex justify-between">
-                                  <span>{service.service_name} (x{service.quantity})</span>
-                                  <span className="font-semibold">{formatCurrency(service.total, res.currency)}</span>
-                                </div>
-                              ))}
-                            </div>
+                        {/* Indicador de extras - Solo mostrar badges */}
+                        {((res.extra_services && res.extra_services.length > 0) || res.extra_hours > 0 || res.extra_people > 0) && (
+                          <div className="mt-3 flex flex-wrap gap-2">
+                            {res.extra_services && res.extra_services.length > 0 && (
+                              <span className="text-xs px-2 py-1 bg-blue-100 text-blue-800 rounded-full font-medium">
+                                🛎️ {res.extra_services.length} Servicio(s) Extra
+                              </span>
+                            )}
+                            {res.extra_hours > 0 && (
+                              <span className="text-xs px-2 py-1 bg-purple-100 text-purple-800 rounded-full font-medium">
+                                ⏰ {res.extra_hours} Hora(s) Extra
+                              </span>
+                            )}
+                            {res.extra_people > 0 && (
+                              <span className="text-xs px-2 py-1 bg-green-100 text-green-800 rounded-full font-medium">
+                                👥 {res.extra_people} Persona(s) Extra
+                              </span>
+                            )}
                           </div>
                         )}
 
