@@ -473,6 +473,43 @@ frontend:
         agent: "main"
         comment: "✅ IMPLEMENTADO: Agregados campos extra_hours_price y extra_people_price al modelo Villa (backend). Campos agregados a formData, resetForm, handleEdit en VillasManagement.js. Campos visibles en formulario de villa después de 'Máximo de Huéspedes'. Screenshot verificado: campos mostrándose correctamente con placeholders (500 para horas, 300 para personas)."
 
+
+  - task: "Reservations - Auto-carga de precios extras"
+    implemented: true
+    working: true
+    file: "/app/frontend/src/components/Reservations.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: true
+        agent: "main"
+        comment: "✅ IMPLEMENTADO: Función handleVillaChange() modificada para auto-cargar extra_hours_unit_price y extra_people_unit_price desde la villa seleccionada. Cuando el usuario selecciona una villa en el formulario de reservación, automáticamente se cargan los precios de horas extras y personas extras configurados en esa villa. La lógica de cálculo automático de costos ya existía y funciona correctamente (cantidad x precio unitario = costo total)."
+
+  - task: "Reservations - Botón Cliente Rápido (In-form client creation)"
+    implemented: true
+    working: true
+    file: "/app/frontend/src/components/Reservations.js, /app/frontend/src/components/CustomerDialog.js"
+    stuck_count: 0
+    priority: "medium"
+    needs_retesting: false
+    status_history:
+      - working: true
+        agent: "main"
+        comment: "✅ IMPLEMENTADO: Agregado botón 'Cliente Rápido' al lado del campo Cliente en formulario de reservación. Usa componente CustomerDialog existente con callback onCustomerCreated. Al crear un cliente, automáticamente se recarga la lista y se selecciona el cliente recién creado en el formulario. Corregido encoding de caracteres especiales en CustomerDialog.js."
+
+  - task: "Backend - Auto-generación de gasto para owner_price"
+    implemented: true
+    working: true
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: true
+        agent: "main"
+        comment: "✅ YA ESTABA IMPLEMENTADO: La funcionalidad de auto-generación de gastos para pago al propietario ya existe en server.py líneas 897-920. Cuando se crea una reservación con owner_price > 0, automáticamente se crea un gasto en categoría 'pago_propietario' con estado 'pending'. Esta funcionalidad cubre el requerimiento de generar gasto para precio manual de reservación."
+
         agent: "testing"
         comment: "✅ TESTED: Checkbox 'Por Defecto' para precios flexibles completamente funcional. Backend: Campo is_default (bool) en modelo FlexiblePrice funciona correctamente. Villa creada con precios predeterminados: Pasadía (11-20 personas), Amanecida (1-15 personas), Evento (51-100 personas). Actualización de precios predeterminados funcional (cambio de segundo a primer precio en Pasadía). Cada tipo de renta puede tener su propio precio predeterminado independiente. Estructura de campo is_default correcta (boolean) en todas las respuestas API. Serialización y deserialización sin errores. 5/5 tests pasaron exitosamente."
       - working: true
