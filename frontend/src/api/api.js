@@ -13,6 +13,7 @@ if (token) {
 export const getCustomers = () => axios.get(`${API}/customers`);
 export const getCustomer = (id) => axios.get(`${API}/customers/${id}`);
 export const createCustomer = (data) => axios.post(`${API}/customers`, data);
+export const updateCustomer = (id, data) => axios.put(`${API}/customers/${id}`, data);
 export const deleteCustomer = (id) => axios.delete(`${API}/customers/${id}`);
 
 // ============ CATEGORIES (FOR VILLAS) ============
