@@ -405,6 +405,7 @@ const VillasManagementNew = () => {
       name: '',
       description: '',
       default_price: 0,
+      suppliers: [],
       is_active: true
     });
   };
