@@ -2030,11 +2030,17 @@ const Expenses = () => {
                       <div>
                         <h4 className="font-bold text-purple-900">🏡 PAGO PROPIETARIO</h4>
                         <p className="text-sm text-gray-600">Villa {relatedReservation.villa_code}</p>
+                        <p className="text-xs text-gray-500 mt-1">
+                          Total original: {formatCurrency(relatedReservation.owner_price || 0, selectedExpense?.currency)}
+                        </p>
+                        <p className="text-xs text-gray-500">
+                          Pagado: {formatCurrency(selectedExpense?.total_paid || 0, selectedExpense?.currency)}
+                        </p>
                       </div>
                       <div className="text-right">
-                        <p className="text-sm text-gray-600">Total a pagar:</p>
+                        <p className="text-sm text-gray-600">RESTANTE a pagar:</p>
                         <p className="text-xl font-bold text-purple-900">
-                          {formatCurrency(relatedReservation.owner_price || 0, selectedExpense?.currency)}
+                          {formatCurrency(selectedExpense?.balance_due || 0, selectedExpense?.currency)}
                         </p>
                       </div>
                     </div>
@@ -2083,8 +2089,8 @@ const Expenses = () => {
                             
                             alert('Pago registrado correctamente');
                             document.getElementById('propietario-monto').value = '';
-                            await fetchData();
                             setIsAbonoDialogOpen(false);
+                            await fetchData();
                           } catch (err) {
                             console.error('Error al registrar pago:', err);
                             alert('Error al registrar el pago');
