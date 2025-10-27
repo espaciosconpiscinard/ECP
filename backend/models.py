@@ -130,9 +130,11 @@ class VillaBase(BaseModel):
     use_flexible_pricing: bool = False  # Si es True, usar flexible_prices
     flexible_prices: Optional[FlexiblePrices] = None  # Precios flexibles por tipo
     
-    # Precios por extras (aplican a cualquier tipo de renta)
-    extra_hours_price: float = 0.0  # Precio por hora extra
-    extra_people_price: float = 0.0  # Precio por persona extra
+    # Precios por extras (aplican a cualquier tipo de renta) - separados cliente/propietario
+    extra_hours_price_client: float = 0.0  # Precio al cliente por hora extra
+    extra_hours_price_owner: float = 0.0   # Precio al propietario por hora extra
+    extra_people_price_client: float = 0.0  # Precio al cliente por persona extra
+    extra_people_price_owner: float = 0.0   # Precio al propietario por persona extra
     
     max_guests: int = 0
     amenities: List[str] = []  # Piscina, Jacuzzi, BBQ, etc.
