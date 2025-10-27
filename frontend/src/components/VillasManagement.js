@@ -262,6 +262,12 @@ const VillasManagementNew = () => {
     e.preventDefault();
     setError('');
     
+    // Validar que haya al menos un suplidor
+    if (serviceFormData.suppliers.length === 0) {
+      setError('Debes agregar al menos un suplidor para este servicio');
+      return;
+    }
+    
     try {
       if (editingService) {
         await updateExtraService(editingService.id, serviceFormData);
