@@ -1811,6 +1811,117 @@ const Expenses = () => {
               </div>
             </div>
 
+            {/* Detalles de la Reservación (si existe) */}
+            {relatedReservation && (
+              <div className="bg-blue-50 border border-blue-200 p-4 rounded-md">
+                <h3 className="font-semibold text-blue-900 mb-3">📋 Detalles de la Reservación</h3>
+                
+                {/* Información básica */}
+                <div className="mb-4 pb-3 border-b border-blue-200">
+                  <div className="grid grid-cols-2 gap-3 text-sm">
+                    <div>
+                      <span className="text-blue-700 font-medium">Villa:</span>{' '}
+                      <span className="text-gray-800">{relatedReservation.villa_code}</span>
+                    </div>
+                    <div>
+                      <span className="text-blue-700 font-medium">Cliente:</span>{' '}
+                      <span className="text-gray-800">{relatedReservation.customer_name}</span>
+                    </div>
+                    <div>
+                      <span className="text-blue-700 font-medium">Check-in:</span>{' '}
+                      <span className="text-gray-800">{new Date(relatedReservation.check_in_date).toLocaleDateString('es-DO')}</span>
+                    </div>
+                    <div>
+                      <span className="text-blue-700 font-medium">Pago Propietario:</span>{' '}
+                      <span className="text-gray-800 font-bold">{formatCurrency(relatedReservation.owner_price || 0, selectedExpense?.currency)}</span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Personas Extras */}
+                {relatedReservation.extra_people > 0 && (
+                  <div className="mb-3 p-3 bg-white rounded border border-blue-200">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <span className="text-sm font-semibold text-blue-900">👥 Personas Extras:</span>
+                        <span className="ml-2 text-sm text-gray-700">{relatedReservation.extra_people} persona(s)</span>
+                      </div>
+                      <div className="text-right">
+                        <p className="text-xs text-gray-500">Costo Cliente</p>
+                        <p className="font-bold text-blue-900">{formatCurrency(relatedReservation.extra_people_cost || 0, selectedExpense?.currency)}</p>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {/* Horas Extras */}
+                {relatedReservation.extra_hours > 0 && (
+                  <div className="mb-3 p-3 bg-white rounded border border-blue-200">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <span className="text-sm font-semibold text-blue-900">⏰ Horas Extras:</span>
+                        <span className="ml-2 text-sm text-gray-700">{relatedReservation.extra_hours} hora(s)</span>
+                      </div>
+                      <div className="text-right">
+                        <p className="text-xs text-gray-500">Costo Cliente</p>
+                        <p className="font-bold text-blue-900">{formatCurrency(relatedReservation.extra_hours_cost || 0, selectedExpense?.currency)}</p>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {/* Servicios Extras con Suplidores */}
+                {relatedReservation.extra_services && relatedReservation.extra_services.length > 0 && (
+                  <div className="mb-3">
+                    <h4 className="text-sm font-semibold text-blue-900 mb-2">🛎️ Servicios Extras</h4>
+                    <div className="space-y-2">
+                      {relatedReservation.extra_services.map((service, index) => (
+                        <div key={index} className="p-3 bg-white rounded border border-blue-200">
+                          <div className="flex justify-between items-start mb-2">
+                            <div className="flex-1">
+                              <p className="font-semibold text-gray-800">{service.name}</p>
+                              <p className="text-xs text-gray-500">
+                                Cantidad: {service.quantity} × {formatCurrency(service.price_unit, selectedExpense?.currency)}
+                              </p>
+                            </div>
+                            <div className="text-right">
+                              <p className="text-xs text-gray-500">Costo Cliente</p>
+                              <p className="font-bold text-blue-900">{formatCurrency(service.price_total, selectedExpense?.currency)}</p>
+                            </div>
+                          </div>
+                          
+                          {/* Información del Suplidor */}
+                          {service.supplier_name && (
+                            <div className="mt-2 pt-2 border-t border-gray-200">
+                              <div className="flex justify-between items-center bg-yellow-50 p-2 rounded">
+                                <div>
+                                  <p className="text-xs font-medium text-gray-600">Suplidor:</p>
+                                  <p className="text-sm font-semibold text-gray-800">{service.supplier_name}</p>
+                                </div>
+                                <div className="text-right">
+                                  <p className="text-xs text-gray-500">Costo Suplidor</p>
+                                  <p className="font-bold text-orange-600">
+                                    {service.quantity} × {formatCurrency(service.supplier_price_unit || 0, selectedExpense?.currency)} = {formatCurrency(service.supplier_price_total || 0, selectedExpense?.currency)}
+                                  </p>
+                                </div>
+                              </div>
+                            </div>
+                          )}
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* Nota Informativa */}
+                <div className="mt-3 p-2 bg-green-50 border border-green-200 rounded">
+                  <p className="text-xs text-green-800">
+                    <strong>ℹ️ Nota:</strong> Los abonos que agregues aquí se aplicarán al pago del propietario. Para pagos a suplidores, deberás crear gastos independientes en la sección de Gastos.
+                  </p>
+                </div>
+              </div>
+            )}
+
             {/* Add Abono Form */}
             <form onSubmit={handleAbonoSubmit} className="border-t pt-4">
               <h3 className="font-semibold mb-3">Agregar Nuevo Abono</h3>
