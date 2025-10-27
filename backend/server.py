@@ -924,12 +924,12 @@ async def create_reservation(reservation_data: ReservationCreate, current_user: 
                 # Guardar detalles de cada servicio para mostrarlos en el modal
                 for svc in reservation_data.extra_services:
                     services_details.append({
-                        "service_name": svc.get('service_name', 'N/A'),
-                        "supplier_name": svc.get('supplier_name', 'N/A'),
-                        "quantity": svc.get('quantity', 1),
-                        "unit_price": svc.get('unit_price', 0),
-                        "supplier_cost": svc.get('supplier_cost', 0),
-                        "total": svc.get('total', 0)
+                        "service_name": svc.service_name if hasattr(svc, 'service_name') else 'N/A',
+                        "supplier_name": svc.supplier_name if hasattr(svc, 'supplier_name') else 'N/A',
+                        "quantity": svc.quantity if hasattr(svc, 'quantity') else 1,
+                        "unit_price": svc.unit_price if hasattr(svc, 'unit_price') else 0,
+                        "supplier_cost": svc.supplier_cost if hasattr(svc, 'supplier_cost') else 0,
+                        "total": svc.total if hasattr(svc, 'total') else 0
                     })
             
             # Crear descripción detallada
@@ -947,6 +947,7 @@ async def create_reservation(reservation_data: ReservationCreate, current_user: 
                 notes_parts.append("\n\nServicios Adicionales:")
                 for svc in services_details:
                     notes_parts.append(f"\n- {svc['service_name']} (Suplidor: {svc['supplier_name']}) x{svc['quantity']} = RD$ {svc['total']:.2f}")
+            
             
             # Crear gasto automático para el pago al propietario
             from models import Expense
