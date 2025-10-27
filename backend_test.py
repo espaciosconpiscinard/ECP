@@ -1815,6 +1815,10 @@ class BackendTester:
         print("\n🧾 Invoice Number System Tests for Abonos")
         self.test_invoice_number_system_for_abonos()
         
+        # FLEXIBLE PRICING IS_DEFAULT CHECKBOX TESTS
+        print("\n✅ Flexible Pricing 'Por Defecto' Checkbox Tests")
+        self.test_flexible_pricing_is_default_checkbox()
+        
         # Summary
         print("\n" + "=" * 60)
         print("📊 TEST SUMMARY")
