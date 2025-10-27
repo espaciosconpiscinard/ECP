@@ -2010,82 +2010,231 @@ const Expenses = () => {
               </div>
             )}
 
-            {/* Add Abono Form */}
-            <form onSubmit={handleAbonoSubmit} className="border-t pt-4">
-              <h3 className="font-semibold mb-3">Agregar Nuevo Abono</h3>
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <Label>Monto *</Label>
-                  <Input
-                    type="number"
-                    step="0.01"
-                    value={abonoFormData.amount}
-                    onChange={(e) => setAbonoFormData({ ...abonoFormData, amount: parseFloat(e.target.value) })}
-                    required
-                  />
-                </div>
-                <div>
-                  <Label>Moneda *</Label>
-                  <select
-                    value={abonoFormData.currency}
-                    onChange={(e) => setAbonoFormData({ ...abonoFormData, currency: e.target.value })}
-                    className="w-full p-2 border rounded-md"
-                  >
-                    <option value="DOP">Pesos Dominicanos (DOP)</option>
-                    <option value="USD">Dólares (USD)</option>
-                  </select>
-                </div>
-                <div>
-                  <Label>Método de Pago *</Label>
-                  <select
-                    value={abonoFormData.payment_method}
-                    onChange={(e) => setAbonoFormData({ ...abonoFormData, payment_method: e.target.value })}
-                    className="w-full p-2 border rounded-md"
-                  >
-                    <option value="efectivo">Efectivo</option>
-                    <option value="deposito">Depósito</option>
-                    <option value="transferencia">Transferencia</option>
-                    <option value="mixto">Mixto</option>
-                  </select>
-                </div>
-                <div>
-                  <Label>Fecha de Pago *</Label>
-                  <Input
-                    type="date"
-                    value={abonoFormData.payment_date}
-                    onChange={(e) => setAbonoFormData({ ...abonoFormData, payment_date: e.target.value })}
-                    required
-                  />
-                </div>
-                {/* Campo de número de factura - solo visible para admin */}
-                {user?.role === 'admin' && (
-                  <div className="col-span-2">
-                    <Label>Número de Factura (Opcional)</Label>
-                    <Input
-                      type="text"
-                      value={abonoFormData.invoice_number}
-                      onChange={(e) => setAbonoFormData({ ...abonoFormData, invoice_number: e.target.value })}
-                      placeholder="Dejar vacío para auto-generar"
-                    />
-                    <p className="text-xs text-gray-500 mt-1">
-                      Si no se especifica, se generará automáticamente
-                    </p>
+            {/* Add Abono Form - REEMPLAZADO CON LISTA DE PAGOS ESPECÍFICOS */}
+            <div className="border-t pt-4">
+              <h3 className="font-semibold mb-3 text-lg">💳 Realizar Pagos</h3>
+              
+              {relatedReservation ? (
+                <div className="space-y-3">
+                  {/* PAGO AL PROPIETARIO */}
+                  <div className="p-4 bg-purple-50 border border-purple-200 rounded-md">
+                    <div className="flex justify-between items-center mb-3">
+                      <div>
+                        <h4 className="font-bold text-purple-900">🏡 PAGO PROPIETARIO</h4>
+                        <p className="text-sm text-gray-600">Villa {relatedReservation.villa_code}</p>
+                      </div>
+                      <div className="text-right">
+                        <p className="text-sm text-gray-600">Total a pagar:</p>
+                        <p className="text-xl font-bold text-purple-900">
+                          {formatCurrency(relatedReservation.owner_price || 0, selectedExpense?.currency)}
+                        </p>
+                      </div>
+                    </div>
+                    <div className="grid grid-cols-3 gap-2">
+                      <Input
+                        type="number"
+                        step="0.01"
+                        placeholder="Monto"
+                        id="propietario-monto"
+                      />
+                      <select className="p-2 border rounded-md" id="propietario-metodo">
+                        <option value="efectivo">Efectivo</option>
+                        <option value="deposito">Depósito</option>
+                        <option value="transferencia">Transferencia</option>
+                      </select>
+                      <Button
+                        type="button"
+                        onClick={() => {
+                          const monto = document.getElementById('propietario-monto').value;
+                          const metodo = document.getElementById('propietario-metodo').value;
+                          if (!monto || monto <= 0) {
+                            alert('Por favor ingresa un monto válido');
+                            return;
+                          }
+                          handleAbonoSubmit({
+                            preventDefault: () => {},
+                            target: {
+                              amount: { value: monto },
+                              currency: { value: selectedExpense?.currency },
+                              payment_method: { value: metodo },
+                              payment_date: { value: new Date().toISOString().split('T')[0] },
+                              notes: { value: `Pago propietario - ${relatedReservation.villa_code}` }
+                            }
+                          });
+                        }}
+                        className="bg-purple-600 hover:bg-purple-700"
+                      >
+                        Pagar
+                      </Button>
+                    </div>
                   </div>
-                )}
-                <div className="col-span-2">
-                  <Label>Notas</Label>
-                  <textarea
-                    value={abonoFormData.notes}
-                    onChange={(e) => setAbonoFormData({ ...abonoFormData, notes: e.target.value })}
-                    className="w-full p-2 border rounded-md"
-                    rows="2"
-                  />
+
+                  {/* SERVICIOS EXTRAS CON SUPLIDORES */}
+                  {relatedReservation.extra_services && relatedReservation.extra_services.length > 0 && (
+                    <>
+                      <h4 className="font-bold text-orange-900 mt-4">🛎️ SERVICIOS EXTRAS - PAGO A SUPLIDORES</h4>
+                      {relatedReservation.extra_services.map((service, index) => (
+                        service.supplier_name && (
+                          <div key={index} className="p-4 bg-orange-50 border border-orange-200 rounded-md">
+                            <div className="flex justify-between items-center mb-3">
+                              <div>
+                                <h4 className="font-bold text-orange-900">{service.service_name || service.name}</h4>
+                                <p className="text-sm text-gray-600">Suplidor: {service.supplier_name}</p>
+                                <p className="text-xs text-gray-500">Cantidad: {service.quantity}</p>
+                              </div>
+                              <div className="text-right">
+                                <p className="text-sm text-gray-600">Total a pagar:</p>
+                                <p className="text-xl font-bold text-orange-900">
+                                  {formatCurrency((service.supplier_cost || 0) * service.quantity, selectedExpense?.currency)}
+                                </p>
+                              </div>
+                            </div>
+                            <div className="grid grid-cols-3 gap-2">
+                              <Input
+                                type="number"
+                                step="0.01"
+                                placeholder="Monto"
+                                id={`servicio-${index}-monto`}
+                              />
+                              <select className="p-2 border rounded-md" id={`servicio-${index}-metodo`}>
+                                <option value="efectivo">Efectivo</option>
+                                <option value="deposito">Depósito</option>
+                                <option value="transferencia">Transferencia</option>
+                              </select>
+                              <Button
+                                type="button"
+                                onClick={async () => {
+                                  const monto = document.getElementById(`servicio-${index}-monto`).value;
+                                  const metodo = document.getElementById(`servicio-${index}-metodo`).value;
+                                  if (!monto || monto <= 0) {
+                                    alert('Por favor ingresa un monto válido');
+                                    return;
+                                  }
+                                  
+                                  // Crear gasto de suplidor y hacer el abono
+                                  try {
+                                    // Buscar el gasto del suplidor en la base de datos
+                                    const allExpensesResponse = await fetch(
+                                      `${import.meta.env.VITE_BACKEND_URL || process.env.REACT_APP_BACKEND_URL}/api/expenses`,
+                                      {
+                                        headers: {
+                                          'Authorization': `Bearer ${localStorage.getItem('token')}`
+                                        }
+                                      }
+                                    );
+                                    const allExpenses = await allExpensesResponse.json();
+                                    
+                                    const supplierExpense = allExpenses.find(e => 
+                                      e.category === 'pago_suplidor' && 
+                                      e.related_reservation_id === relatedReservation.id &&
+                                      e.description.includes(service.supplier_name)
+                                    );
+                                    
+                                    if (supplierExpense) {
+                                      // Hacer abono al gasto del suplidor
+                                      const abonoData = {
+                                        amount: parseFloat(monto),
+                                        currency: selectedExpense?.currency,
+                                        payment_method: metodo,
+                                        payment_date: new Date().toISOString().split('T')[0],
+                                        notes: `Pago a suplidor ${service.supplier_name} - ${service.service_name || service.name}`
+                                      };
+                                      
+                                      await fetch(
+                                        `${import.meta.env.VITE_BACKEND_URL || process.env.REACT_APP_BACKEND_URL}/api/expenses/${supplierExpense.id}/abonos`,
+                                        {
+                                          method: 'POST',
+                                          headers: {
+                                            'Content-Type': 'application/json',
+                                            'Authorization': `Bearer ${localStorage.getItem('token')}`
+                                          },
+                                          body: JSON.stringify(abonoData)
+                                        }
+                                      );
+                                      
+                                      alert(`Pago registrado a ${service.supplier_name}`);
+                                      document.getElementById(`servicio-${index}-monto`).value = '';
+                                      await fetchExpenses();
+                                      setIsAbonoDialogOpen(false);
+                                    } else {
+                                      alert('No se encontró el gasto del suplidor');
+                                    }
+                                  } catch (err) {
+                                    console.error('Error al registrar pago:', err);
+                                    alert('Error al registrar el pago');
+                                  }
+                                }}
+                                className="bg-orange-600 hover:bg-orange-700"
+                              >
+                                Pagar
+                              </Button>
+                            </div>
+                          </div>
+                        )
+                      ))}
+                    </>
+                  )}
+
+                  {/* DEPÓSITO DE SEGURIDAD */}
+                  {relatedReservation.deposit > 0 && (
+                    <div className="p-4 bg-green-50 border border-green-200 rounded-md">
+                      <div className="flex justify-between items-center mb-3">
+                        <div>
+                          <h4 className="font-bold text-green-900">💰 DEPÓSITO DE SEGURIDAD</h4>
+                          <p className="text-sm text-gray-600">Devolver al cliente</p>
+                        </div>
+                        <div className="text-right">
+                          <p className="text-sm text-gray-600">Monto:</p>
+                          <p className="text-xl font-bold text-green-900">
+                            {formatCurrency(relatedReservation.deposit || 0, selectedExpense?.currency)}
+                          </p>
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-3">
+                        <input
+                          type="checkbox"
+                          id="depositReturned"
+                          checked={relatedReservation.deposit_returned || false}
+                          onChange={async (e) => {
+                            try {
+                              const response = await fetch(
+                                `${import.meta.env.VITE_BACKEND_URL || process.env.REACT_APP_BACKEND_URL}/api/reservations/${relatedReservation.id}`,
+                                {
+                                  method: 'PATCH',
+                                  headers: {
+                                    'Content-Type': 'application/json',
+                                    'Authorization': `Bearer ${localStorage.getItem('token')}`
+                                  },
+                                  body: JSON.stringify({ deposit_returned: e.target.checked })
+                                }
+                              );
+                              
+                              if (response.ok) {
+                                setRelatedReservation(prev => ({
+                                  ...prev,
+                                  deposit_returned: e.target.checked
+                                }));
+                                alert(e.target.checked ? 'Depósito marcado como devuelto' : 'Depósito marcado como pendiente');
+                                await fetchExpenses();
+                              }
+                            } catch (err) {
+                              console.error('Error al actualizar depósito:', err);
+                              alert('Error al actualizar el depósito');
+                            }
+                          }}
+                          className="h-6 w-6 cursor-pointer"
+                        />
+                        <label htmlFor="depositReturned" className="font-medium cursor-pointer">
+                          {relatedReservation.deposit_returned ? '✓ DEVUELTO AL CLIENTE' : '⏳ MARCAR COMO DEVUELTO'}
+                        </label>
+                      </div>
+                    </div>
+                  )}
                 </div>
-              </div>
-              <div className="flex justify-end mt-4">
-                <Button type="submit">Agregar Abono</Button>
-              </div>
-            </form>
+              ) : (
+                <p className="text-gray-500">No hay detalles de reservación disponibles</p>
+              )}
+            </div>
 
             {/* Abonos List */}
             <div className="border-t pt-4">
