@@ -69,7 +69,7 @@ const CustomerDialog = ({ onCustomerCreated }) => {
             />
           </div>
           <div>
-            <Label>Tel\u00e9fono *</Label>
+            <Label>Teléfono *</Label>
             <Input
               value={formData.phone}
               onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
@@ -87,7 +87,7 @@ const CustomerDialog = ({ onCustomerCreated }) => {
             />
           </div>
           <div>
-            <Label>Identificaci\u00f3n (C\u00e9dula/Pasaporte)</Label>
+            <Label>Identificación (Cédula/Pasaporte)</Label>
             <Input
               value={formData.identification}
               onChange={(e) => setFormData({ ...formData, identification: e.target.value })}
