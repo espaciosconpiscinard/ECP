@@ -1601,12 +1601,15 @@ const Expenses = () => {
                             {expense.payment_status === 'paid' ? 'Pagado' : 'Pendiente'}
                           </span>
                         </td>
-                        <td className="p-2 text-sm">
+                        <td className="p-2 text-sm" onClick={(e) => e.stopPropagation()}>
                           <div className="flex justify-center space-x-1">
                             <Button
                               size="sm"
                               variant="ghost"
-                              onClick={() => handleOpenAbonoDialog(expense)}
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handleOpenAbonoDialog(expense);
+                              }}
                               className="text-green-600 hover:text-green-700 hover:bg-green-50"
                               title="Agregar Abono"
                             >
@@ -1615,7 +1618,10 @@ const Expenses = () => {
                             <Button
                               size="sm"
                               variant="ghost"
-                              onClick={() => handleEdit(expense)}
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handleEdit(expense);
+                              }}
                               className="hover:bg-gray-100"
                               data-testid="edit-expense-button"
                             >
@@ -1625,7 +1631,10 @@ const Expenses = () => {
                               <Button
                                 size="sm"
                                 variant="ghost"
-                                onClick={() => handleDelete(expense.id)}
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  handleDelete(expense.id);
+                                }}
                                 className="text-red-600 hover:text-red-700 hover:bg-red-50"
                                 data-testid="delete-expense-button"
                               >
