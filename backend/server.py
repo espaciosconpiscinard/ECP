@@ -898,6 +898,34 @@ async def create_reservation(reservation_data: ReservationCreate, current_user: 
     if reservation_data.villa_id:
         villa = await db.villas.find_one({"id": reservation_data.villa_id}, {"_id": 0})
         if villa:
+            # Calcular detalles del gasto
+            details = []
+            total_owner_payment = reservation_data.owner_price
+            
+            # Agregar detalles de extras
+            if reservation_data.extra_hours > 0:
+                extra_hours_owner_cost = reservation_data.extra_hours * villa.get('extra_hours_price_owner', 0)
+                total_owner_payment += extra_hours_owner_cost
+                details.append(f"Horas extras: {reservation_data.extra_hours} hrs × RD$ {villa.get('extra_hours_price_owner', 0):.2f} = RD$ {extra_hours_owner_cost:.2f}")
+            
+            if reservation_data.extra_people > 0:
+                extra_people_owner_cost = reservation_data.extra_people * villa.get('extra_people_price_owner', 0)
+                total_owner_payment += extra_people_owner_cost
+                details.append(f"Personas extras: {reservation_data.extra_people} × RD$ {villa.get('extra_people_price_owner', 0):.2f} = RD$ {extra_people_owner_cost:.2f}")
+            
+            # Indicar si incluye ITBIS
+            itbis_note = "Con ITBIS" if reservation_data.include_itbis else "Sin ITBIS"
+            details.append(itbis_note)
+            
+            # Indicar si tiene servicios adicionales
+            if reservation_data.extra_services and len(reservation_data.extra_services) > 0:
+                details.append(f"Incluye {len(reservation_data.extra_services)} servicio(s) adicional(es)")
+            
+            # Crear descripción detallada
+            description = f"Pago propietario villa {villa['code']} - Factura #{invoice_number}"
+            if details:
+                description += f"\nDetalles: {', '.join(details)}"
+            
             # Crear gasto automático para el pago al propietario
             from models import Expense
             import uuid
@@ -906,18 +934,41 @@ async def create_reservation(reservation_data: ReservationCreate, current_user: 
                 "id": str(uuid.uuid4()),
                 "category": "pago_propietario",
                 "category_id": None,
-                "description": f"Pago propietario villa {villa['code']} - Factura #{invoice_number}",
-                "amount": reservation_data.owner_price,
+                "description": description,
+                "amount": total_owner_payment,
                 "currency": reservation_data.currency,
                 "expense_date": reservation_data.reservation_date.isoformat() if isinstance(reservation_data.reservation_date, datetime) else reservation_data.reservation_date,
                 "payment_status": "pending",
-                "notes": f"Auto-generado por reservación. Cliente: {reservation_data.customer_name}. Puede actualizar monto manualmente.",
+                "notes": f"Auto-generado. Cliente: {reservation_data.customer_name}. Base: RD$ {reservation_data.owner_price:.2f}, Total: RD$ {total_owner_payment:.2f}",
                 "related_reservation_id": reservation.id,
                 "created_at": datetime.now(timezone.utc).isoformat(),
                 "created_by": current_user["id"]
             }
             
             await db.expenses.insert_one(expense)
+    
+    # AUTO-CREAR GASTOS PARA SUPLIDORES DE SERVICIOS ADICIONALES
+    if reservation_data.extra_services:
+        for service in reservation_data.extra_services:
+            if service.get('supplier_name') and service.get('supplier_cost', 0) > 0:
+                supplier_total = service['supplier_cost'] * service.get('quantity', 1)
+                
+                supplier_expense = {
+                    "id": str(uuid.uuid4()),
+                    "category": "pago_suplidor",
+                    "category_id": None,
+                    "description": f"Pago suplidor: {service['supplier_name']} - {service['service_name']} - Factura #{invoice_number}",
+                    "amount": supplier_total,
+                    "currency": reservation_data.currency,
+                    "expense_date": reservation_data.reservation_date.isoformat() if isinstance(reservation_data.reservation_date, datetime) else reservation_data.reservation_date,
+                    "payment_status": "pending",
+                    "notes": f"Auto-generado. Cliente: {reservation_data.customer_name}. Cantidad: {service.get('quantity', 1)}",
+                    "related_reservation_id": reservation.id,
+                    "created_at": datetime.now(timezone.utc).isoformat(),
+                    "created_by": current_user["id"]
+                }
+                
+                await db.expenses.insert_one(supplier_expense)
     
     # Si hay owner_price > 0, crear/actualizar deuda al propietario de la villa
     if reservation_data.owner_price > 0 and reservation_data.villa_id:
