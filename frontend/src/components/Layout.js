@@ -73,7 +73,11 @@ const Layout = ({ children, currentView, setCurrentView }) => {
             >
               {sidebarOpen ? <X size={24} /> : <Menu size={24} />}
             </button>
-            <div className="flex items-center space-x-3">
+            <div 
+              className="flex items-center space-x-3 cursor-pointer hover:opacity-80 transition-opacity"
+              onClick={() => setCurrentView('reservations')}
+              title="Ir al inicio"
+            >
               {logo ? (
                 <img 
                   src={logo} 
