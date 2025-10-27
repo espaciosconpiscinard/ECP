@@ -206,6 +206,8 @@ const VillasManagementNew = () => {
       owner_price_pasadia: 0,
       owner_price_amanecida: 0,
       owner_price_evento: 0,
+      extra_hours_price: 0,
+      extra_people_price: 0,
       max_guests: 0,
       amenities: [],
       is_active: true,
