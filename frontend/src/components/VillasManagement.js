@@ -1357,12 +1357,29 @@ const VillasManagementNew = () => {
                   <p className="text-sm text-gray-600 mb-3">{service.description}</p>
                 )}
                 <div className="space-y-2 mb-4">
-                  <div className="flex justify-between text-sm">
-                    <span className="text-gray-600">Precio por Defecto:</span>
-                    <span className="font-bold text-lg text-blue-600">
-                      RD$ {(service.default_price || 0).toLocaleString('es-DO', {minimumFractionDigits: 2})}
-                    </span>
-                  </div>
+                  {/* Mostrar suplidores en lugar de precio predeterminado */}
+                  {service.suppliers && service.suppliers.length > 0 ? (
+                    <div className="space-y-1">
+                      <p className="text-xs text-gray-600 font-semibold mb-1">Suplidores:</p>
+                      {service.suppliers.map((supplier, idx) => (
+                        <div key={idx} className="text-xs bg-gray-50 p-2 rounded">
+                          <div className="flex justify-between items-center">
+                            <span className="font-medium text-gray-700">
+                              {supplier.name || `Suplidor ${idx + 1}`}
+                              {supplier.is_default && <span className="ml-1 text-green-600">⭐</span>}
+                            </span>
+                            <span className="text-blue-600 font-bold">
+                              RD$ {(supplier.client_price || 0).toLocaleString('es-DO', {minimumFractionDigits: 2})}
+                            </span>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  ) : (
+                    <div className="text-xs text-gray-500 italic">
+                      Sin suplidores configurados
+                    </div>
+                  )}
                 </div>
                 {isAdmin && (
                   <div className="flex justify-end space-x-2 pt-3 border-t">
