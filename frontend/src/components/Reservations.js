@@ -1866,22 +1866,23 @@ const Reservations = () => {
                               const selectedService = extraServices.find(s => s.id === service.service_id);
                               const selectedSupplier = selectedService?.suppliers?.find(sup => sup.name === e.target.value);
                               if (selectedSupplier) {
-                                // Actualizar todos los campos del suplidor
+                                // Actualizar todos los campos del suplidor (usar supplier_cost como en el backend)
                                 updateExtraService(index, 'supplier_name', selectedSupplier.name);
-                                updateExtraService(index, 'supplier_id', selectedSupplier.name); // Usar name como id por ahora
-                                updateExtraService(index, 'supplier_price_unit', selectedSupplier.supplier_cost);
-                                updateExtraService(index, 'supplier_price_total', selectedSupplier.supplier_cost * service.quantity);
+                                updateExtraService(index, 'supplier_id', selectedSupplier.name);
+                                updateExtraService(index, 'supplier_cost', selectedSupplier.supplier_cost);
                                 
                                 // Actualizar precios al cliente
                                 updateExtraService(index, 'price_unit', selectedSupplier.client_price);
+                                updateExtraService(index, 'unit_price', selectedSupplier.client_price);
                                 updateExtraService(index, 'price_total', selectedSupplier.client_price * service.quantity);
+                                updateExtraService(index, 'total', selectedSupplier.client_price * service.quantity);
                                 
                                 // Recalcular totales de la factura
                                 const servicesTotal = selectedExtraServices.reduce((sum, s, idx) => {
                                   if (idx === index) {
                                     return sum + (selectedSupplier.client_price * service.quantity);
                                   }
-                                  return sum + (s.price_total || 0);
+                                  return sum + (s.price_total || s.total || 0);
                                 }, 0);
                                 
                                 const newSubtotal = (formData.base_price || 0) + (formData.extra_hours_cost || 0) + (formData.extra_people_cost || 0) + servicesTotal;
