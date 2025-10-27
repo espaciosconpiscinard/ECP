@@ -1960,21 +1960,21 @@ const Reservations = () => {
 
       {/* Tarjetas de Totales */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
-        {/* Total de Reservaciones */}
+        {/* Total de Facturas */}
         <Card>
           <CardHeader className="pb-3">
-            <CardTitle className="text-sm font-medium text-gray-600">📋 Total Reservaciones</CardTitle>
+            <CardTitle className="text-sm font-medium text-gray-600">📋 Total Facturas</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold text-blue-600">{totals.totalReservations}</div>
-            <p className="text-xs text-gray-500 mt-1">Todas las reservaciones</p>
+            <p className="text-xs text-gray-500 mt-1">Todas las facturas</p>
           </CardContent>
         </Card>
 
-        {/* Reservaciones Pendientes/Futuras */}
+        {/* Facturas Pendientes/Futuras */}
         <Card>
           <CardHeader className="pb-3">
-            <CardTitle className="text-sm font-medium text-gray-600">📅 Reservaciones Pendientes</CardTitle>
+            <CardTitle className="text-sm font-medium text-gray-600">📅 Facturas Pendientes</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold text-orange-600">{totals.upcomingReservations}</div>
