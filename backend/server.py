@@ -974,19 +974,24 @@ async def create_reservation(reservation_data: ReservationCreate, current_user: 
     # AUTO-CREAR GASTOS PARA SUPLIDORES DE SERVICIOS ADICIONALES
     if reservation_data.extra_services:
         for service in reservation_data.extra_services:
-            if service.get('supplier_name') and service.get('supplier_cost', 0) > 0:
-                supplier_total = service['supplier_cost'] * service.get('quantity', 1)
+            supplier_name = service.supplier_name if hasattr(service, 'supplier_name') else None
+            supplier_cost = service.supplier_cost if hasattr(service, 'supplier_cost') else 0
+            service_name = service.service_name if hasattr(service, 'service_name') else 'N/A'
+            quantity = service.quantity if hasattr(service, 'quantity') else 1
+            
+            if supplier_name and supplier_cost > 0:
+                supplier_total = supplier_cost * quantity
                 
                 supplier_expense = {
                     "id": str(uuid.uuid4()),
                     "category": "pago_suplidor",
                     "category_id": None,
-                    "description": f"Pago suplidor: {service['supplier_name']} - {service['service_name']} - Factura #{invoice_number}",
+                    "description": f"Pago suplidor: {supplier_name} - {service_name} - Factura #{invoice_number}",
                     "amount": supplier_total,
                     "currency": reservation_data.currency,
                     "expense_date": reservation_data.reservation_date.isoformat() if isinstance(reservation_data.reservation_date, datetime) else reservation_data.reservation_date,
                     "payment_status": "pending",
-                    "notes": f"Auto-generado. Cliente: {reservation_data.customer_name}. Cantidad: {service.get('quantity', 1)}",
+                    "notes": f"Auto-generado. Cliente: {reservation_data.customer_name}. Cantidad: {quantity}",
                     "related_reservation_id": reservation.id,
                     "created_at": datetime.now(timezone.utc).isoformat(),
                     "created_by": current_user["id"]
