@@ -1261,7 +1261,15 @@ const Reservations = () => {
               <div className="grid grid-cols-2 gap-4">
                 {/* Cliente con Buscador */}
                 <div className="col-span-2">
-                  <Label>Cliente *</Label>
+                  <div className="flex justify-between items-center mb-2">
+                    <Label>Cliente *</Label>
+                    <CustomerDialog onCustomerCreated={async (newCustomer) => {
+                      await fetchData();
+                      // Auto-seleccionar el cliente recién creado
+                      setCustomerSearchTerm(newCustomer.name);
+                      setFormData({ ...formData, customer_id: newCustomer.id, customer_name: newCustomer.name });
+                    }} />
+                  </div>
                   <div className="relative">
                     <Input
                       type="text"
