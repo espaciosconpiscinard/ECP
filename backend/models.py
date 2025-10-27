@@ -178,9 +178,11 @@ class ExtraService(ExtraServiceBase):
 class ReservationExtraService(BaseModel):
     service_id: str
     service_name: str
+    supplier_name: Optional[str] = None  # Nombre del suplidor seleccionado
+    supplier_cost: float = 0.0  # Costo del servicio (pago al suplidor)
     quantity: int = 1
-    unit_price: float
-    total: float
+    unit_price: float  # Precio al cliente
+    total: float  # Total cobrado al cliente
 
 class ReservationBase(BaseModel):
     customer_id: str
