@@ -450,15 +450,18 @@ frontend:
 
   - task: "VillasManagement - Checkbox 'Por Defecto' para precios flexibles"
     implemented: true
-    working: "NA"
-    file: "/app/frontend/src/components/VillasManagement.js"
+    working: true
+    file: "/app/frontend/src/components/VillasManagement.js, /app/backend/models.py"
     stuck_count: 0
     priority: "high"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
       - working: "NA"
         agent: "main"
         comment: "Implementado checkbox 'Por Defecto' para las 3 secciones de precios flexibles (Pasadía, Amanecida, Evento). Cambió grid-cols-4 a grid-cols-5 en sección Evento. Agregada columna 'Por Defecto' en header. Implementado checkbox con lógica para permitir solo 1 precio predeterminado por tipo. Campo is_default ya existía en modelo backend (FlexiblePrice)."
+      - working: true
+        agent: "testing"
+        comment: "✅ TESTED: Checkbox 'Por Defecto' para precios flexibles completamente funcional. Backend: Campo is_default (bool) en modelo FlexiblePrice funciona correctamente. Villa creada con precios predeterminados: Pasadía (11-20 personas), Amanecida (1-15 personas), Evento (51-100 personas). Actualización de precios predeterminados funcional (cambio de segundo a primer precio en Pasadía). Cada tipo de renta puede tener su propio precio predeterminado independiente. Estructura de campo is_default correcta (boolean) en todas las respuestas API. Serialización y deserialización sin errores. 5/5 tests pasaron exitosamente."
 
 
 metadata:
