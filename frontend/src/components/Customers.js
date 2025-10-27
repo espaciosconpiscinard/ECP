@@ -164,6 +164,7 @@ const Customers = () => {
       identification_document: '',
       address: ''
     });
+    setEditingCustomer(null);
   };
 
   if (loading) {
