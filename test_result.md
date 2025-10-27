@@ -448,6 +448,19 @@ frontend:
         agent: "testing"
         comment: "✅ TESTED: Vista expandible funcional. Página carga correctamente con estructura de lista expandible. No hay reservaciones para probar expansión, pero interfaz está lista. Formulario de nueva reservación disponible."
 
+  - task: "VillasManagement - Checkbox 'Por Defecto' para precios flexibles"
+    implemented: true
+    working: "NA"
+    file: "/app/frontend/src/components/VillasManagement.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Implementado checkbox 'Por Defecto' para las 3 secciones de precios flexibles (Pasadía, Amanecida, Evento). Cambió grid-cols-4 a grid-cols-5 en sección Evento. Agregada columna 'Por Defecto' en header. Implementado checkbox con lógica para permitir solo 1 precio predeterminado por tipo. Campo is_default ya existía en modelo backend (FlexiblePrice)."
+
+
 metadata:
   created_by: "main_agent"
   version: "1.0"
