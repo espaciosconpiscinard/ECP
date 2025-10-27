@@ -1769,7 +1769,13 @@ const Reservations = () => {
                             className="w-full p-2 border rounded-md text-sm"
                             disabled={!service.service_id}
                           >
-                            <option value="">Seleccionar suplidor</option>
+                            <option value="">
+                              {!service.service_id 
+                                ? 'Primero selecciona un servicio' 
+                                : extraServices.find(s => s.id === service.service_id)?.suppliers?.length === 0
+                                  ? 'Este servicio no tiene suplidores'
+                                  : 'Seleccionar suplidor'}
+                            </option>
                             {extraServices
                               .find(s => s.id === service.service_id)?.suppliers?.map((supplier, idx) => (
                                 <option key={idx} value={supplier.name}>
