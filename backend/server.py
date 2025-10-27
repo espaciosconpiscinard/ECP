@@ -989,7 +989,7 @@ async def create_reservation(reservation_data: ReservationCreate, current_user: 
                     "description": f"Pago suplidor: {supplier_name} - {service_name} - Factura #{invoice_number}",
                     "amount": supplier_total,
                     "currency": reservation_data.currency,
-                    "expense_date": reservation_data.reservation_date.isoformat() if isinstance(reservation_data.reservation_date, datetime) else reservation_data.reservation_date,
+                    "expense_date": reservation_data.reservation_date if isinstance(reservation_data.reservation_date, str) else reservation_data.reservation_date.isoformat(),
                     "payment_status": "pending",
                     "notes": f"Auto-generado. Cliente: {reservation_data.customer_name}. Cantidad: {quantity}",
                     "related_reservation_id": reservation.id,
