@@ -228,6 +228,9 @@ const Expenses = () => {
 
   // Abono functions
   const handleOpenAbonoDialog = async (expense) => {
+    console.log('🔍 Abriendo modal para gasto:', expense.id);
+    console.log('🔍 Related Reservation ID:', expense.related_reservation_id);
+    
     setSelectedExpense(expense);
     setAbonoFormData({
       amount: 0,
@@ -249,6 +252,7 @@ const Expenses = () => {
     // Si el gasto está relacionado con una reservación, cargar los detalles
     if (expense.related_reservation_id) {
       try {
+        console.log('📞 Cargando reservación...');
         const reservationResponse = await fetch(
           `${import.meta.env.VITE_BACKEND_URL || process.env.REACT_APP_BACKEND_URL}/api/reservations/${expense.related_reservation_id}`,
           {
@@ -258,18 +262,22 @@ const Expenses = () => {
           }
         );
         
+        console.log('📞 Response status:', reservationResponse.status);
+        
         if (reservationResponse.ok) {
           const reservationData = await reservationResponse.json();
+          console.log('✅ Reservación cargada:', reservationData);
           setRelatedReservation(reservationData);
-          console.log('Reservación relacionada cargada:', reservationData);
         } else {
+          console.error('❌ Error en respuesta:', await reservationResponse.text());
           setRelatedReservation(null);
         }
       } catch (err) {
-        console.error('Error al cargar reservación relacionada:', err);
+        console.error('❌ Error al cargar reservación:', err);
         setRelatedReservation(null);
       }
     } else {
+      console.log('⚠️ Gasto sin related_reservation_id');
       setRelatedReservation(null);
     }
     
