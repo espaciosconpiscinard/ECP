@@ -810,6 +810,30 @@ const VillasManagementNew = () => {
                   </div>
 
                   <div>
+                    <Label>Precio Hora Extra (RD$)</Label>
+                    <Input
+                      type="number"
+                      step="0.01"
+                      min="0"
+                      value={formData.extra_hours_price}
+                      onChange={(e) => setFormData({ ...formData, extra_hours_price: parseFloat(e.target.value) || 0 })}
+                      placeholder="500"
+                    />
+                  </div>
+
+                  <div>
+                    <Label>Precio Persona Extra (RD$)</Label>
+                    <Input
+                      type="number"
+                      step="0.01"
+                      min="0"
+                      value={formData.extra_people_price}
+                      onChange={(e) => setFormData({ ...formData, extra_people_price: parseFloat(e.target.value) || 0 })}
+                      placeholder="300"
+                    />
+                  </div>
+
+                  <div>
                     <Label>Estado</Label>
                     <select
                       value={formData.is_active ? 'active' : 'inactive'}
