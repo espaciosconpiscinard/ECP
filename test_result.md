@@ -504,6 +504,31 @@ frontend:
     file: "/app/backend/server.py"
     stuck_count: 0
     priority: "high"
+
+  - agent: "main"
+    message: |
+      ✅ CORRECCIONES COMPLETADAS - Problemas 1, 2 y 3
+      
+      PROBLEMA 1: Precios de extras separados Cliente/Propietario
+      ✅ Backend models.py actualizado con 4 campos:
+         - extra_hours_price_client / extra_hours_price_owner
+         - extra_people_price_client / extra_people_price_owner
+      ✅ Frontend VillasManagement.js actualizado:
+         - formData con 4 campos
+         - resetForm y handleEdit actualizados
+         - Formulario HTML con secciones separadas en grid 2x2
+      ✅ Reservations.js actualizado para cargar precio_client automáticamente
+      ✅ Screenshot verificado: 4 campos visibles correctamente
+      
+      PROBLEMA 2 y 3: Gasto no se registraba + Crear siempre aunque precio sea 0
+      ✅ server.py línea 897 modificada:
+         - Condición cambiada de "if owner_price > 0" a "if villa_id"
+         - Ahora SIEMPRE crea gasto cuando hay villa_id
+         - Incluso con owner_price = 0, para actualizar manualmente después
+         - Nota en gasto: "Puede actualizar monto manualmente"
+      
+      SIGUIENTE PASO: Probar creación de reservación para verificar que el gasto se crea correctamente
+
     needs_retesting: false
     status_history:
       - working: true
