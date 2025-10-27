@@ -9,7 +9,7 @@ import sys
 from typing import Dict, Any, Optional
 
 # Backend URL from environment
-BACKEND_URL = "https://villa-manager-7.preview.emergentagent.com/api"
+BACKEND_URL = "https://espacios-pool-mgmt.preview.emergentagent.com/api"
 
 class AutoExpenseTest:
     def __init__(self):

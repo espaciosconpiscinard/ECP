@@ -1,121 +1,70 @@
 <analysis>
-The AI engineer's work largely focused on extending and stabilizing the Espacios Con Piscina application, moving from core feature enhancements to critical deployment and data integrity fixes. Initial tasks involved fixing admin password hash issues and implementing dynamic filtering for commissions and expenses. A significant portion of the trajectory was dedicated to troubleshooting deployment and API validation errors, particularly  validation failures due to missing fields in older database entries and CORS misconfigurations. The engineer introduced data migration scripts and manual database update instructions to resolve these. Subsequent efforts concentrated on refining Excel import/export logic for categories and services, addressing issues like missing  fields, Excel formula character limits, and incorrect price field mappings. The final segment of the trajectory began implementing a comprehensive set of new features, including a client editor, enhanced flexible pricing defaults, and advanced reservation/expense logic, facing an update error while implementing the client editor due to a backend issue.
+The AI engineer's work in this trajectory was a continuous cycle of feature implementation, bug fixing, and refinement based on user feedback. It started with completing the is_default checkbox for flexible prices in . A critical bug regarding default prices not displaying in the villa list led to the creation of a  helper. The agent then added extra hours/people fields to Villa and Reservation models and forms, and implemented automatic loading of these values. Backend logic was updated to always create owner expenses for reservations. The client editor was integrated into the reservation form for quick client creation. A significant effort was dedicated to implementing multiple suppliers for extra services, necessitating extensive model and UI changes. Detailed expense tracking, including supplier expenses and a summary, was also added. UI improvements like making the logo a home button and adding villa location to invoices were also completed.
+
+Numerous bugs were encountered and resolved, including Pydantic  for  objects, a  due to missing expense categories, and various frontend syntax errors related to misplaced braces and function scoping in  and . The latest user feedback highlighted issues with expense visibility (badges for extras not showing for all invoices) and the absence of supplier payment options within the expense detail modal. The AI acknowledged these and was about to implement renaming the Propietarios tab to Propietarios y Servicios.
 </analysis>
 
 <product_requirements>
-The Espacios Con Piscina application manages villas, reservations, clients, and expenses with role-based access. Initially, it required robust reservation/client management, payment tracking, customizable invoices, and an expense tracker. Evolving requirements led to professional invoice redesigns, partial payments, and advanced expense management (user-creatable categories, payment reminders, grouping, filtering). Other features included cascade deletion, customer management, admin user management, dynamic logo handling, bulk operations, manual invoice numbering, and hierarchical Excel import/export. Recent additions include user approval, flexible pricing tiers (Pasadía, Amanecida, Evento with configurable people/prices), an automatic commission system (editable, filtered by user, payment tracking, bi-weekly filtering), and a full backup/restore system. Latest requests include a customer editor, dynamic expense updates based on villa price changes, extra people/hours fields in villa forms/Excel, dynamic expense generation for manual reservation prices, in-form client creation for reservations, multiple suppliers for additional services, advanced expense tracking (extras, ITBIS), a supplier expense summary, and a dynamic logo upload for invoices/home.
+The Espacios Con Piscina application manages villas, reservations, clients, and expenses. Initial requirements included robust reservation/client management, payment tracking, customizable invoices, and an expense tracker. The application evolved to feature professional invoice redesigns, partial payments, advanced expense management (user-creatable categories, reminders, grouping, filtering), cascade deletion, customer/admin management, dynamic logo handling, bulk operations, manual invoice numbering, and hierarchical Excel import/export. Recent additions included user approval, flexible pricing tiers (Pasadía, Amanecida, Evento), an automatic commission system, and a full backup/restore system. Latest requests include a customer editor, dynamic expense updates, extra people/hours fields in villa forms/Excel, dynamic expense generation for manual reservation prices, in-form client creation for reservations, multiple suppliers for additional services, advanced expense tracking (extras, ITBIS), a supplier expense summary, and a dynamic logo upload for invoices/home. Crucially, the system needs to visually identify expenses with extra services/people/hours and facilitate payments to suppliers directly from expense details. Also, the reservation form should allow booking services independently, and the Propietarios expense tab should reflect services.
 </product_requirements>
 
 <key_technical_concepts>
-- **Full-stack Development**: React (Frontend), FastAPI (Backend), MongoDB Atlas.
-- **Authentication**: JWT, Bcrypt, Role-Based Access Control, Admin approval.
-- **Data Modeling**: Pydantic for validation, UUIDs for IDs.
-- **API Design**: RESTful with  prefix, environment variables for URLs.
-- **Data Processing**:  for hierarchical Excel import/export.
-- **Deployment**: Render (Backend), Vercel (Frontend), Kubernetes for container environment.
-- **Database Management**: MongoDB operations (find, insert, update).
+-   **Full-stack Development**: React (Frontend), FastAPI (Backend), MongoDB Atlas.
+-   **Authentication**: JWT, Bcrypt, Role-Based Access Control, Admin approval.
+-   **Data Modeling**: Pydantic for validation, UUIDs for IDs.
+-   **API Design**: RESTful with  prefix, environment variables for URLs.
+-   **Data Processing**:  for hierarchical Excel import/export.
+-   **Deployment**: Render (Backend), Vercel (Frontend), Kubernetes for container environment.
+-   **Database Management**: MongoDB operations (find, insert, update).
+-   **Frontend State Management**: ,  in React.
 </key_technical_concepts>
 
 <code_architecture>
-The application uses a standard full-stack architecture with  and  directories.
 
-
-
--   ****:
-    -   **Importance**: Stores environment variables like , , , .
-    -   **Changes**:  was updated to include Vercel frontend URL.
--   ****:
-    -   **Importance**: Defines Pydantic data models for the application entities.
-    -   **Changes**:
-        -    was adjusted to handle  and  as optional to prevent validation errors for older users.
-        -    and  models updated with .
-        -    model updated with .
-        -    model changed  to .
--   ****:
-    -   **Importance**: Main FastAPI application with API routes.
-    -   **Changes**:
-        -   Admin password hash was fixed programmatically.
-        -    and  endpoints were modified to be more robust against missing fields (, ) in old user documents.
-        -    endpoint () was added.
-        -   Logic for creating owner expenses during  was refined.
--   ****:
-    -   **Importance**: Handles importing data from Excel for various entities.
-    -   **Changes**:
-        -    updated to include  for imported categories.
-        -    removed mandatory  validation and skipped example rows.
-        -    logic refined to handle existing services, compare names case-insensitively, and correctly map  from Excel to  in the model, with improved error handling and logging.
--   ****:
-    -   **Importance**: Handles exporting data to Excel, including template generation.
-    -   **Changes**:  modified to use a hidden sheet for dropdown options to bypass the 255-character limit for  in Excel data validation, preventing Excel corruption. Also removed  from Precio Cliente header.
--   ** (New File)**:
-    -   **Importance**: Script to add  and  fields to existing user documents in MongoDB.
--   ** (New File)**:
-    -   **Importance**: Script to add  to existing villa category documents in MongoDB.
--   ****:
-    -   **Importance**: Frontend API client.
-    -   **Changes**: Added  function.
--   ****:
-    -   **Importance**: Displays and manages commissions.
-    -   **Changes**: Added status filter (Pendientes/Pagadas/Todas) with Pendientes as default. Confirmed  column and date-based filtering were already implemented.
--   ****:
-    -   **Importance**: Manages and displays expenses.
-    -   **Changes**:
-        -   Implemented 4 expense tabs: Propietarios, Fijos, Únicos, Variables with Propietarios as default.
-        -   Added a top section with statistics specifically for Gastos de Propietarios.
-        -   Added status filter (Pendientes/Pagadas/Todas) with Pendientes as default.
-        -   Corrected  scope.
-        -   Modified Variables tab to exclude owner expenses.
-        -   Added  checkbox for Único expense type, allowing them to appear in the Variables tab. Reset  on form clear/type change.
-        -   Logic for Propietarios tab to display pending for current year.
--   ****:
-    -   **Importance**: Manages client reservations and invoice generation.
-    -   **Changes**:
-        -   Invoice styling was made more compact (reduced font sizes, padding, margins).
-        -   Payment/Bill To sections further condensed.
-        -   Policies section in the invoice was changed to a 2-column layout.
-        -   Facturar a: changed to FACTURA DE: (uppercase, normal color) with client name next to it (black, bold).
-        -   Invoice policies are now loaded dynamically from a template instead of being hardcoded.
-        -    and  inputs added to the reservation form and invoice display.
-        -   Logic for  and  changed to unit price and quantity multiplication for total cost calculation.
--   ****:
-    -   **Importance**: Manages villa details and pricing.
-    -   **Changes**:  checkbox added to flexible pricing entries for Pasadia and Amanecida types to select a default price.
--   ****:
-    -   **Importance**: Manages customer accounts.
-    -   **Changes**: Implemented customer editing functionality (form population, update API call, UI buttons, dialog title, submit button text).
+-   ****: Stores environment variables like , , .  was updated.
+-   ****: Defines Pydantic data models.
+    -    was adjusted for optional /. / gained .  gained . 's  became .
+    -   **Changes**:  now includes , , , , and . A new  model was created.  was modified to contain a list of  objects.  now includes , , , .  includes . The   was expanded to include .
+-   ****: Main FastAPI application.
+    -   Admin password hash fixed. Robust user endpoints.  endpoint added.  owner expense logic refined.
+    -   **Changes**:  now *always* generates an owner expense and creates separate expenses for each supplier. Fixed  by correctly accessing Pydantic model attributes ( instead of ).  are now stored in owner expenses.
+-   ****: Handles Excel imports. Updated for  and less strict  validation.
+-   ****: Handles Excel exports. Uses hidden sheets for dropdowns and removed  from Precio Cliente header.
+-   ****: Frontend API client.  function added.
+-   ****: Manages expenses.
+    -   Implemented 4 tabs, statistics for owners, status filter, and  checkbox.
+    -   **Changes**: Added a Supplier Summary card. Modified expense description to display visual badges for extras/services. Implemented a modal for detailed expense viewing, fetching associated reservation data for services and supplier info. Renamed  to  to resolve conflicts.
+-   ****: Manages reservations and invoice generation.
+    -   Invoice styling condensed, policies dynamic. / inputs added.
+    -   **Changes**:  updated to auto-load  and . Added a Cliente Rápido button to integrate . Updated state and invoice display to include . Modified the extra services table to include a 'Suplidor' column, initializing related // fields when adding a service. Added console logs and UI messages for debugging service/supplier loading.
+-   ****: Manages villa details and pricing.
+    -    checkbox added to flexible pricing entries.
+    -   **Changes**:  implementation completed for Evento. Added  helper for dynamic price display in list view. Added  and  inputs, updated ,  and HTML for these fields. Integrated multi-supplier management for services by updating , , , and adding helper functions (, , ) and corresponding HTML in the service form. Removed  from service forms and enforced at least one supplier.
+-   ****: Reused for in-form client creation. Encoding issues in button text fixed.
+-   ****: Manages overall application layout.
+    -   **Changes**: The application logo in the navbar was made a clickable home button.
 </code_architecture>
 
 <pending_tasks>
-- **WhatsApp Integration**: Integrate WhatsApp for automated notifications.
-- **Calendar Sync**: Integrate external calendars (Google, Airbnb, iOS) for real-time availability updates.
-- **Import System (Full Backend Logic)**: Fully implement and validate backend processing for hierarchical imports beyond initial parsing, ensuring all data (e.g., reservations) is correctly linked and associated expenses are auto-generated. (Partially addressed for categories/villas/services, but general problem statement remains).
-- **Frontend Refinements for Import**: Implement robust success/error messages for file imports.
-- **Dynamic Expense Updates**: When villa prices (e.g., owner price) change, associated expenses should automatically update.
-- **Extra fields in Villa form/Excel**: Add Horas Extras and Personas Extras input fields to the Villa form and ensure they are handled in Excel import/export.
-- **Expense for Manual Reservation Price**: If a reservation is made for a villa without flexible prices but a manual  is entered, it should generate an expense and mark it as pending.
-- **In-form client creation for reservations**: Add a button to add clients directly from the reservation form without closing it.
-- **Multiple suppliers for additional services**: Allow multiple suppliers for extra services, and select supplier in reservation to load their price into the expense.
-- **Auto-load extra hours/people**: When a villa is chosen, auto-load its default extra hours/people into the reservation form (and allow editing).
-- **Detailed Expense Tracking**: Expenses should indicate if a reservation includes services, extra hours, or extra people, and calculate total payment to owner (villa + extras) and separate expenses for supplier payments.
-- **ITBIS indication in expenses**: Expense should indicate if reservation includes ITBIS (fiscal comprobante).
-- **Supplier Expense Summary**: A summary in Gastos similar to Gasto a propietario - mes actual for suppliers, including pago a suplidores category.
-- **Invoice Logo Upload Fix**: Resolve image already in use and weird errors when uploading logo in invoice editor.
-- **Logo as Home button**: Implement the application logo as a home button in the navigation.
-- **Villa Location in Invoice**: Include villa location in the invoice, based on data from villas/services.
-- **Excel mandatory fields**: Ensure no mandatory fields in Excel import/export templates.
+-   **Integrations**: WhatsApp & Calendar Sync.
+-   **Import System**: Full backend logic & frontend error messages.
+-   **Dynamic Expense Updates**: Auto-update expenses on villa price changes.
+-   **Excel mandatory fields**: Ensure no mandatory fields in templates.
+-   **Expense Payments**: Implement abonos for suppliers from expense details.
+-   **Reservations UI**: Nueva Factura button, Villas Y Servicios input for flexible booking.
+-   **Expenses UI**: Rename Propietarios tab to Propietarios y Servicios.
 </pending_tasks>
 
 <current_work>
-Immediately before this summary request, the AI engineer was working on a large set of new features, prioritized by the user. Specifically, the high-priority task being addressed was the implementation of a default flexible price selection for villas.
+Immediately before this summary request, the AI engineer was addressing user feedback concerning the display and payment functionality for expenses. The user reported that expense items in the list view (e.g., invoice #1604) did not clearly indicate if they included extra services, hours, or people, and crucially, clicking on an expense did not consistently display the detailed list of these services with their suppliers, nor provide an option to make payments (abonos) to those suppliers.
 
-The following changes were in progress and partially completed:
-1.  **Client Editor**: The frontend component  has been updated to include functionality for editing client information. This involved adding a  API call to  and modifying the  logic, ,  function, and UI elements (edit button, dialog title, submit button) in the  component.
-2.  **Backend Client Update Endpoint**: A  endpoint was added to  to support the client editor. An initial bug related to  was fixed by simplifying the update logic.
-3.  **Flexible Price Default**: The  model in  was updated to include . The  component was being updated to add a Por Defecto checkbox next to each flexible price entry. This has been implemented for Pasadia and Amanecida prices, and the AI was in the process of implementing it for Evento prices when the trajectory ended.
+The AI had implemented several fixes: enhancing the backend to store  within the owner expense, updating  to show a service badge in the list, and creating a modal in  to display detailed expense information by fetching the associated reservation. During this process, a critical backend  (using  on Pydantic objects) and a  (missing  category) were identified and fixed.
 
-The user had reported a persistent Failed to fetch error when trying to update a client, which was diagnosed as a backend issue and subsequently fixed by refining the  endpoint in . The last instruction from the user was to continua con todas, si hay errores lo vemos despues, indicating a preference for broad implementation before detailed testing.
+However, the user's latest feedback (Chat Message 515, 518) indicated that the visual indicators for extras were still inconsistent across invoices (only new ones worked as expected), and the core issue of being unable to make payments to suppliers from the expense modal persisted. The user also explicitly requested two new UI changes: renaming the Propietarios tab in the Expenses section to Propietarios y Servicios and changing the Nueva Reservacion button to Nueva Factura in the Reservations section, while also enabling the selection of services independently.
+
+The AI acknowledged these points, specifically vamos hacerlo mas en orde, and was preparing to implement the first of these new UI changes, starting with renaming the Propietarios tab.
 </current_work>
 
 <optional_next_step>
-Complete the implementation of the  checkbox for Evento flexible prices in .
+Rename the Propietarios tab in the Expenses section to Propietarios y Servicios.
 </optional_next_step>
