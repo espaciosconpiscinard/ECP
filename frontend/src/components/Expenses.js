@@ -1974,7 +1974,7 @@ const Expenses = () => {
                                 const response = await fetch(
                                   `${process.env.REACT_APP_BACKEND_URL}/api/reservations/${relatedReservation.id}`,
                                   {
-                                    method: 'PATCH',
+                                    method: 'PUT',
                                     headers: {
                                       'Content-Type': 'application/json',
                                       'Authorization': `Bearer ${localStorage.getItem('token')}`
@@ -2232,7 +2232,7 @@ const Expenses = () => {
                               const response = await fetch(
                                 `${process.env.REACT_APP_BACKEND_URL}/api/reservations/${relatedReservation.id}`,
                                 {
-                                  method: 'PATCH',
+                                  method: 'PUT',
                                   headers: {
                                     'Content-Type': 'application/json',
                                     'Authorization': `Bearer ${localStorage.getItem('token')}`
