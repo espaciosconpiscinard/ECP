@@ -67,7 +67,8 @@ const VillasManagementNew = () => {
   const [serviceFormData, setServiceFormData] = useState({
     name: '',
     description: '',
-    default_price: 0,
+    default_price: 0,  // Mantener para compatibilidad
+    suppliers: [],  // Lista de suplidores
     is_active: true
   });
 
