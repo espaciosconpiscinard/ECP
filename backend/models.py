@@ -261,6 +261,7 @@ class ReservationUpdate(BaseModel):
     itbis_amount: Optional[float] = None
     total_amount: Optional[float] = None
     deposit: Optional[float] = None
+    deposit_returned: Optional[bool] = None  # Si el depósito fue devuelto
     payment_method: Optional[Literal["efectivo", "deposito", "transferencia", "mixto"]] = None
     payment_details: Optional[str] = None
     amount_paid: Optional[float] = None
