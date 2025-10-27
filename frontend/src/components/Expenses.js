@@ -1879,14 +1879,14 @@ const Expenses = () => {
                         <div key={index} className="p-3 bg-white rounded border border-blue-200">
                           <div className="flex justify-between items-start mb-2">
                             <div className="flex-1">
-                              <p className="font-semibold text-gray-800">{service.name}</p>
+                              <p className="font-semibold text-gray-800">{service.service_name || service.name}</p>
                               <p className="text-xs text-gray-500">
-                                Cantidad: {service.quantity} × {formatCurrency(service.price_unit, selectedExpense?.currency)}
+                                Cantidad: {service.quantity} × {formatCurrency(service.unit_price || service.price_unit || 0, selectedExpense?.currency)}
                               </p>
                             </div>
                             <div className="text-right">
                               <p className="text-xs text-gray-500">Costo Cliente</p>
-                              <p className="font-bold text-blue-900">{formatCurrency(service.price_total, selectedExpense?.currency)}</p>
+                              <p className="font-bold text-blue-900">{formatCurrency(service.total || service.price_total || 0, selectedExpense?.currency)}</p>
                             </div>
                           </div>
                           
