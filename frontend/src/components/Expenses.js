@@ -40,7 +40,7 @@ const Expenses = () => {
   const [villas, setVillas] = useState([]);
 
   // Estado para modal de detalles
-  const [selectedExpense, setSelectedExpense] = useState(null);
+  const [detailExpense, setDetailExpense] = useState(null);
   const [showDetailsModal, setShowDetailsModal] = useState(false);
 
   
