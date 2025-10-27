@@ -232,8 +232,8 @@ const Reservations = () => {
           check_out_time: villa.default_check_out_time || '8:00 PM',
           base_price: 0,
           owner_price: 0,
-          extra_hours_unit_price: villa.extra_hours_price || 0,
-          extra_people_unit_price: villa.extra_people_price || 0
+          extra_hours_unit_price: villa.extra_hours_price_client || 0,
+          extra_people_unit_price: villa.extra_people_price_client || 0
         }));
       } else {
         // Si no tiene precios flexibles, usar precios fijos (compatibilidad)
@@ -261,8 +261,8 @@ const Reservations = () => {
           check_out_time: villa.default_check_out_time || '8:00 PM',
           base_price: clientPrice,
           owner_price: ownerPrice,
-          extra_hours_unit_price: villa.extra_hours_price || 0,
-          extra_people_unit_price: villa.extra_people_price || 0
+          extra_hours_unit_price: villa.extra_hours_price_client || 0,
+          extra_people_unit_price: villa.extra_people_price_client || 0
         }));
       }
     }
