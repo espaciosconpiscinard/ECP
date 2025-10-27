@@ -349,6 +349,14 @@ const Customers = () => {
                       </td>
                       <td className="p-2 text-sm">
                         <div className="flex justify-center space-x-2">
+                          <Button
+                            size="sm"
+                            variant="ghost"
+                            onClick={() => handleEdit(customer)}
+                            className="text-blue-600 hover:text-blue-700"
+                          >
+                            <Edit2 size={16} />
+                          </Button>
                           {user?.role === 'admin' && (
                             <Button
                               size="sm"
