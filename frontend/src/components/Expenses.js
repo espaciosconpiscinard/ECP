@@ -1945,6 +1945,62 @@ const Expenses = () => {
                   </div>
                 )}
 
+                {/* Depósito de Seguridad */}
+                {relatedReservation.deposit > 0 && (
+                  <div className="mb-3 p-3 bg-green-50 rounded border border-green-300">
+                    <div className="flex items-center justify-between">
+                      <div className="flex-1">
+                        <span className="text-sm font-semibold text-green-900">💰 Depósito de Seguridad:</span>
+                        <p className="text-xs text-gray-600 mt-1">Debe ser devuelto al cliente al finalizar</p>
+                      </div>
+                      <div className="text-right">
+                        <p className="font-bold text-green-900">{formatCurrency(relatedReservation.deposit || 0, selectedExpense?.currency)}</p>
+                        <div className="mt-2 flex items-center justify-end">
+                          <input
+                            type="checkbox"
+                            id="depositReturned"
+                            checked={relatedReservation.deposit_returned || false}
+                            onChange={async (e) => {
+                              try {
+                                // Actualizar el estado de depósito devuelto
+                                const response = await fetch(
+                                  `${import.meta.env.VITE_BACKEND_URL || process.env.REACT_APP_BACKEND_URL}/api/reservations/${relatedReservation.id}`,
+                                  {
+                                    method: 'PATCH',
+                                    headers: {
+                                      'Content-Type': 'application/json',
+                                      'Authorization': `Bearer ${localStorage.getItem('token')}`
+                                    },
+                                    body: JSON.stringify({ deposit_returned: e.target.checked })
+                                  }
+                                );
+                                
+                                if (response.ok) {
+                                  // Actualizar estado local
+                                  setRelatedReservation(prev => ({
+                                    ...prev,
+                                    deposit_returned: e.target.checked
+                                  }));
+                                  
+                                  // Mostrar mensaje
+                                  alert(e.target.checked ? 'Depósito marcado como devuelto' : 'Depósito marcado como pendiente');
+                                }
+                              } catch (err) {
+                                console.error('Error al actualizar depósito:', err);
+                                alert('Error al actualizar el depósito');
+                              }
+                            }}
+                            className="mr-2 h-5 w-5 cursor-pointer"
+                          />
+                          <label htmlFor="depositReturned" className="text-xs font-medium cursor-pointer">
+                            {relatedReservation.deposit_returned ? '✓ Devuelto' : '⏳ Pendiente de Devolución'}
+                          </label>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
                 {/* Nota Informativa */}
                 <div className="mt-3 p-2 bg-green-50 border border-green-200 rounded">
                   <p className="text-xs text-green-800">
