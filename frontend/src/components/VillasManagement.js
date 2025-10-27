@@ -588,6 +588,15 @@ const VillasManagementNew = () => {
                   </div>
 
                   <div className="col-span-2">
+                    <Label>Ubicación/Dirección</Label>
+                    <Input
+                      value={formData.location}
+                      onChange={(e) => setFormData({ ...formData, location: e.target.value })}
+                      placeholder="Ej: Santo Domingo, Zona Colonial"
+                    />
+                  </div>
+
+                  <div className="col-span-2">
                     <Label>Teléfono del Propietario (Opcional)</Label>
                     <Input
                       value={formData.phone}
