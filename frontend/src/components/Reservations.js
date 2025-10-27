@@ -60,6 +60,7 @@ const Reservations = () => {
     villa_id: '',
     villa_code: '',
     villa_description: '',
+    villa_location: '',
     rental_type: 'pasadia',
     event_type: '',
     reservation_date: new Date().toISOString().split('T')[0],
