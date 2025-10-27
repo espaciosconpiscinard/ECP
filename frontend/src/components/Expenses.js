@@ -1901,7 +1901,7 @@ const Expenses = () => {
                                 <div className="text-right">
                                   <p className="text-xs text-gray-500">Costo Suplidor</p>
                                   <p className="font-bold text-orange-600">
-                                    {service.quantity} × {formatCurrency(service.supplier_price_unit || 0, selectedExpense?.currency)} = {formatCurrency(service.supplier_price_total || 0, selectedExpense?.currency)}
+                                    {service.quantity} × {formatCurrency(service.supplier_cost || 0, selectedExpense?.currency)} = {formatCurrency((service.supplier_cost || 0) * service.quantity, selectedExpense?.currency)}
                                   </p>
                                 </div>
                               </div>
