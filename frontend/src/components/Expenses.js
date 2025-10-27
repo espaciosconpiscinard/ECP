@@ -1450,7 +1450,7 @@ const Expenses = () => {
                         key={expense.id} 
                         className={`border-b hover:bg-gray-50 cursor-pointer transition-colors ${getUrgencyColor(expense)}`}
                         onClick={() => {
-                          setSelectedExpense(expense);
+                          setDetailExpense(expense);
                           setShowDetailsModal(true);
                         }}
                         title="Click para ver detalles completos"
