@@ -1525,6 +1525,237 @@ class BackendTester:
         print("      - Unique and consecutive auto-generated numbers")
         print("      - Invoice_number presence in all abonos")
     
+    def test_flexible_pricing_is_default_checkbox(self):
+        """Test the 'Por Defecto' checkbox functionality for flexible prices"""
+        print("\n✅ Testing Flexible Pricing 'Por Defecto' Checkbox")
+        
+        # Test data as specified in the review request
+        villa_data = {
+            "code": "TESTDEFAULT",
+            "name": "Villa Test Default Price",
+            "description": "Testing is_default checkbox",
+            "phone": "809-555-1234",
+            "category_id": None,
+            "default_check_in_time": "9:00 AM",
+            "default_check_out_time": "8:00 PM",
+            "max_guests": 20,
+            "is_active": True,
+            "use_flexible_pricing": True,
+            "flexible_prices": {
+                "pasadia": [
+                    {"people_count": "1-10", "client_price": 5000, "owner_price": 4000, "is_default": False},
+                    {"people_count": "11-20", "client_price": 7000, "owner_price": 6000, "is_default": True},
+                    {"people_count": "21-30", "client_price": 9000, "owner_price": 8000, "is_default": False}
+                ],
+                "amanecida": [
+                    {"people_count": "1-15", "client_price": 10000, "owner_price": 8500, "is_default": True},
+                    {"people_count": "16-30", "client_price": 15000, "owner_price": 13000, "is_default": False}
+                ],
+                "evento": [
+                    {"people_count": "1-50", "client_price": 20000, "owner_price": 17000, "is_default": False},
+                    {"people_count": "51-100", "client_price": 30000, "owner_price": 27000, "is_default": True}
+                ]
+            }
+        }
+        
+        # TEST 1: Create villa with default prices marked
+        print("\n   📋 Test 1: Create villa with default prices marked")
+        
+        create_result = self.make_request("POST", "/villas", villa_data, self.admin_token)
+        
+        if not create_result.get("success"):
+            self.log_test("Create Villa with Default Prices", False, "Failed to create villa", create_result)
+            return
+        
+        created_villa = create_result["data"]
+        villa_id = created_villa["id"]
+        self.log_test("Create Villa with Default Prices", True, f"Villa created with ID: {villa_id}")
+        
+        # TEST 2: Verify is_default field is saved correctly
+        print("\n   📋 Test 2: Verify is_default field is saved correctly")
+        
+        get_result = self.make_request("GET", f"/villas/{villa_id}", token=self.admin_token)
+        
+        if not get_result.get("success"):
+            self.log_test("Get Villa with Default Prices", False, "Failed to get villa", get_result)
+            return
+        
+        retrieved_villa = get_result["data"]
+        flexible_prices = retrieved_villa.get("flexible_prices", {})
+        
+        # Verify each rental type has correct default settings
+        checks = []
+        
+        # Check Pasadía defaults
+        pasadia_prices = flexible_prices.get("pasadia", [])
+        if len(pasadia_prices) == 3:
+            pasadia_defaults = [p.get("is_default", False) for p in pasadia_prices]
+            expected_pasadia = [False, True, False]  # Second price should be default
+            if pasadia_defaults == expected_pasadia:
+                checks.append("✓ Pasadía: Second price (11-20) marked as default")
+            else:
+                checks.append(f"✗ Pasadía: Expected {expected_pasadia}, got {pasadia_defaults}")
+        else:
+            checks.append(f"✗ Pasadía: Expected 3 prices, got {len(pasadia_prices)}")
+        
+        # Check Amanecida defaults
+        amanecida_prices = flexible_prices.get("amanecida", [])
+        if len(amanecida_prices) == 2:
+            amanecida_defaults = [p.get("is_default", False) for p in amanecida_prices]
+            expected_amanecida = [True, False]  # First price should be default
+            if amanecida_defaults == expected_amanecida:
+                checks.append("✓ Amanecida: First price (1-15) marked as default")
+            else:
+                checks.append(f"✗ Amanecida: Expected {expected_amanecida}, got {amanecida_defaults}")
+        else:
+            checks.append(f"✗ Amanecida: Expected 2 prices, got {len(amanecida_prices)}")
+        
+        # Check Evento defaults
+        evento_prices = flexible_prices.get("evento", [])
+        if len(evento_prices) == 2:
+            evento_defaults = [p.get("is_default", False) for p in evento_prices]
+            expected_evento = [False, True]  # Second price should be default
+            if evento_defaults == expected_evento:
+                checks.append("✓ Evento: Second price (51-100) marked as default")
+            else:
+                checks.append(f"✗ Evento: Expected {expected_evento}, got {evento_defaults}")
+        else:
+            checks.append(f"✗ Evento: Expected 2 prices, got {len(evento_prices)}")
+        
+        all_checks_passed = all("✓" in check for check in checks)
+        
+        if all_checks_passed:
+            self.log_test("Verify Default Price Settings", True, f"All default price settings correct:\n   " + "\n   ".join(checks))
+        else:
+            self.log_test("Verify Default Price Settings", False, f"Some default price settings incorrect:\n   " + "\n   ".join(checks))
+        
+        # TEST 3: Update villa changing which price is default
+        print("\n   📋 Test 3: Update villa changing default price")
+        
+        # Change Pasadía default from second to first price
+        updated_villa_data = villa_data.copy()
+        updated_villa_data["flexible_prices"]["pasadia"] = [
+            {"people_count": "1-10", "client_price": 5000, "owner_price": 4000, "is_default": True},   # Now default
+            {"people_count": "11-20", "client_price": 7000, "owner_price": 6000, "is_default": False}, # No longer default
+            {"people_count": "21-30", "client_price": 9000, "owner_price": 8000, "is_default": False}
+        ]
+        
+        update_result = self.make_request("PUT", f"/villas/{villa_id}", updated_villa_data, self.admin_token)
+        
+        if not update_result.get("success"):
+            self.log_test("Update Villa Default Price", False, "Failed to update villa", update_result)
+            return
+        
+        # Verify the update
+        verify_result = self.make_request("GET", f"/villas/{villa_id}", token=self.admin_token)
+        
+        if verify_result.get("success"):
+            updated_villa = verify_result["data"]
+            updated_pasadia = updated_villa.get("flexible_prices", {}).get("pasadia", [])
+            
+            if len(updated_pasadia) >= 2:
+                new_defaults = [p.get("is_default", False) for p in updated_pasadia[:2]]
+                if new_defaults == [True, False]:  # First should now be default, second should not
+                    self.log_test("Update Villa Default Price", True, "Default price successfully changed from second to first")
+                else:
+                    self.log_test("Update Villa Default Price", False, f"Default price not updated correctly: {new_defaults}")
+            else:
+                self.log_test("Update Villa Default Price", False, "Updated villa missing pasadia prices")
+        else:
+            self.log_test("Update Villa Default Price", False, "Failed to verify villa update", verify_result)
+        
+        # TEST 4: Verify each rental type can have its own default
+        print("\n   📋 Test 4: Verify each rental type can have independent defaults")
+        
+        # Get the current villa state
+        current_result = self.make_request("GET", f"/villas/{villa_id}", token=self.admin_token)
+        
+        if current_result.get("success"):
+            current_villa = current_result["data"]
+            current_flexible_prices = current_villa.get("flexible_prices", {})
+            
+            # Count defaults per type
+            pasadia_default_count = sum(1 for p in current_flexible_prices.get("pasadia", []) if p.get("is_default", False))
+            amanecida_default_count = sum(1 for p in current_flexible_prices.get("amanecida", []) if p.get("is_default", False))
+            evento_default_count = sum(1 for p in current_flexible_prices.get("evento", []) if p.get("is_default", False))
+            
+            # Each type should have exactly one default
+            type_checks = []
+            
+            if pasadia_default_count == 1:
+                type_checks.append("✓ Pasadía: Exactly 1 default price")
+            else:
+                type_checks.append(f"✗ Pasadía: {pasadia_default_count} default prices (expected: 1)")
+            
+            if amanecida_default_count == 1:
+                type_checks.append("✓ Amanecida: Exactly 1 default price")
+            else:
+                type_checks.append(f"✗ Amanecida: {amanecida_default_count} default prices (expected: 1)")
+            
+            if evento_default_count == 1:
+                type_checks.append("✓ Evento: Exactly 1 default price")
+            else:
+                type_checks.append(f"✗ Evento: {evento_default_count} default prices (expected: 1)")
+            
+            all_type_checks_passed = all("✓" in check for check in type_checks)
+            
+            if all_type_checks_passed:
+                self.log_test("Independent Default Prices by Type", True, f"Each rental type has its own default:\n   " + "\n   ".join(type_checks))
+            else:
+                self.log_test("Independent Default Prices by Type", False, f"Default price issues by type:\n   " + "\n   ".join(type_checks))
+        else:
+            self.log_test("Independent Default Prices by Type", False, "Failed to get villa for type verification")
+        
+        # TEST 5: Verify field structure and serialization
+        print("\n   📋 Test 5: Verify is_default field structure")
+        
+        if current_result.get("success"):
+            current_villa = current_result["data"]
+            structure_checks = []
+            
+            # Check that is_default field is present in all prices
+            for rental_type in ["pasadia", "amanecida", "evento"]:
+                prices = current_villa.get("flexible_prices", {}).get(rental_type, [])
+                for i, price in enumerate(prices):
+                    if "is_default" in price:
+                        structure_checks.append(f"✓ {rental_type}[{i}]: is_default field present")
+                    else:
+                        structure_checks.append(f"✗ {rental_type}[{i}]: is_default field missing")
+            
+            # Check that is_default values are boolean
+            boolean_checks = []
+            for rental_type in ["pasadia", "amanecida", "evento"]:
+                prices = current_villa.get("flexible_prices", {}).get(rental_type, [])
+                for i, price in enumerate(prices):
+                    is_default_value = price.get("is_default")
+                    if isinstance(is_default_value, bool):
+                        boolean_checks.append(f"✓ {rental_type}[{i}]: is_default is boolean ({is_default_value})")
+                    else:
+                        boolean_checks.append(f"✗ {rental_type}[{i}]: is_default is not boolean ({type(is_default_value).__name__}: {is_default_value})")
+            
+            all_structure_checks = structure_checks + boolean_checks
+            all_structure_passed = all("✓" in check for check in all_structure_checks)
+            
+            if all_structure_passed:
+                self.log_test("Field Structure Verification", True, f"All is_default fields properly structured:\n   " + "\n   ".join(all_structure_checks))
+            else:
+                self.log_test("Field Structure Verification", False, f"Field structure issues:\n   " + "\n   ".join(all_structure_checks))
+        
+        # Log detailed villa structure for debugging
+        print(f"\n   📋 Villa flexible_prices structure:")
+        if current_result.get("success"):
+            current_villa = current_result["data"]
+            flexible_prices = current_villa.get("flexible_prices", {})
+            for rental_type, prices in flexible_prices.items():
+                print(f"      {rental_type.upper()}:")
+                for i, price in enumerate(prices):
+                    default_marker = " (DEFAULT)" if price.get("is_default", False) else ""
+                    print(f"        {i+1}. {price.get('people_count')}: Client ${price.get('client_price')}, Owner ${price.get('owner_price')}, is_default: {price.get('is_default')}{default_marker}")
+        
+        print(f"   🎯 TEST SUMMARY: Flexible pricing 'Por Defecto' checkbox {'✅ PASSED' if all_checks_passed and all_type_checks_passed else '❌ FAILED'}")
+        
+        return villa_id if 'villa_id' in locals() else None
+    
     def run_all_tests(self):
         """Run all backend tests"""
         print("🚀 Starting Backend Testing Suite for Category System")
