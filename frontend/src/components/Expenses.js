@@ -1902,7 +1902,7 @@ const Expenses = () => {
 
       {/* Modal de Detalles del Gasto */}
       <Dialog open={showDetailsModal} onOpenChange={setShowDetailsModal}>
-        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+        <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>Detalles del Gasto</DialogTitle>
           </DialogHeader>
@@ -1973,54 +1973,71 @@ const Expenses = () => {
                 );
               })()}
 
-              {/* Tabla de Servicios Adicionales */}
-              {detailExpense.notes && detailExpense.notes.includes('Servicios Adicionales:') && (
-                <div className="p-4 bg-purple-50 border border-purple-300 rounded-lg">
-                  <p className="text-sm text-purple-900 font-bold mb-3">🛎️ Servicios Adicionales:</p>
-                  <div className="bg-white rounded border overflow-hidden">
-                    <table className="w-full text-sm">
-                      <thead className="bg-purple-100">
-                        <tr>
-                          <th className="p-2 text-left font-bold">Servicio</th>
-                          <th className="p-2 text-left font-bold">Suplidor</th>
-                          <th className="p-2 text-center font-bold">Cant.</th>
-                          <th className="p-2 text-right font-bold">Total</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {(() => {
-                          // Parsear servicios de las notas
-                          const notesText = detailExpense.notes || '';
-                          const servicesSection = notesText.split('Servicios Adicionales:')[1];
-                          if (!servicesSection) return null;
-                          
-                          const serviceLines = servicesSection.split('\n').filter(line => line.trim().startsWith('-'));
-                          
-                          return serviceLines.map((line, idx) => {
-                            // Parsear: "- Decoración (Suplidor: ABC) x2 = RD$ 5000.00"
-                            const match = line.match(/- (.+?) \(Suplidor: (.+?)\) x(\d+) = RD\$ ([\d,.]+)/);
-                            if (!match) return null;
-                            
-                            const [_, serviceName, supplierName, quantity, total] = match;
-                            
-                            return (
-                              <tr key={idx} className="border-t hover:bg-purple-50">
-                                <td className="p-2">{serviceName}</td>
-                                <td className="p-2 text-purple-700 font-medium">{supplierName}</td>
-                                <td className="p-2 text-center">{quantity}</td>
-                                <td className="p-2 text-right font-bold">RD$ {total}</td>
-                              </tr>
-                            );
-                          });
-                        })()}
-                      </tbody>
-                    </table>
+              {/* Tabla de Servicios Adicionales - Obtener de la reservación */}
+              {(() => {
+                // Buscar la reservación asociada
+                if (!detailExpense.related_reservation_id) return null;
+                
+                const reservation = reservations.find(r => r.id === detailExpense.related_reservation_id);
+                if (!reservation || !reservation.extra_services || reservation.extra_services.length === 0) return null;
+                
+                return (
+                  <div className="p-4 bg-purple-50 border-2 border-purple-300 rounded-lg">
+                    <p className="text-lg text-purple-900 font-bold mb-3">🛎️ Servicios Adicionales Incluidos:</p>
+                    <div className="bg-white rounded-lg border-2 border-purple-200 overflow-hidden shadow-sm">
+                      <table className="w-full text-sm">
+                        <thead className="bg-purple-100">
+                          <tr>
+                            <th className="p-3 text-left font-bold text-purple-900">Servicio</th>
+                            <th className="p-3 text-left font-bold text-purple-900">Suplidor</th>
+                            <th className="p-3 text-center font-bold text-purple-900">Cant.</th>
+                            <th className="p-3 text-right font-bold text-purple-900">Precio Unit.</th>
+                            <th className="p-3 text-right font-bold text-purple-900">Total</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {reservation.extra_services.map((service, idx) => (
+                            <tr key={idx} className="border-t border-purple-100 hover:bg-purple-50 transition-colors">
+                              <td className="p-3 font-medium">{service.service_name}</td>
+                              <td className="p-3">
+                                <span className="px-2 py-1 bg-purple-100 text-purple-800 rounded-full text-xs font-semibold">
+                                  {service.supplier_name || 'N/A'}
+                                </span>
+                              </td>
+                              <td className="p-3 text-center font-bold">{service.quantity}</td>
+                              <td className="p-3 text-right text-gray-600">
+                                {formatCurrency(service.unit_price || 0, detailExpense.currency)}
+                              </td>
+                              <td className="p-3 text-right font-bold text-purple-700">
+                                {formatCurrency(service.total || 0, detailExpense.currency)}
+                              </td>
+                            </tr>
+                          ))}
+                        </tbody>
+                        <tfoot className="bg-purple-100 border-t-2 border-purple-300">
+                          <tr>
+                            <td colSpan="4" className="p-3 text-right font-bold text-purple-900">
+                              Total Servicios:
+                            </td>
+                            <td className="p-3 text-right font-bold text-purple-900 text-lg">
+                              {formatCurrency(
+                                reservation.extra_services.reduce((sum, s) => sum + (s.total || 0), 0),
+                                detailExpense.currency
+                              )}
+                            </td>
+                          </tr>
+                        </tfoot>
+                      </table>
+                    </div>
+                    <div className="mt-3 p-3 bg-purple-100 rounded-lg border border-purple-300">
+                      <p className="text-xs text-purple-900">
+                        <strong>💡 Nota:</strong> Los pagos a suplidores se generan automáticamente como gastos separados en la categoría "Pago Suplidor".
+                        Puedes buscarlos en la lista de gastos filtrando por la factura #{reservation.invoice_number}.
+                      </p>
+                    </div>
                   </div>
-                  <div className="mt-3 p-2 bg-purple-100 rounded text-xs text-purple-900">
-                    <strong>💡 Nota:</strong> Los pagos a suplidores se registran como gastos separados en la categoría "Pago Suplidor"
-                  </div>
-                </div>
-              )}
+                );
+              })()}
 
               {/* Notas */}
               {detailExpense.notes && (
