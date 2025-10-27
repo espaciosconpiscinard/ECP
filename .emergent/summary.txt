@@ -1,18 +1,19 @@
 <analysis>
-The AI engineer successfully enhanced the Espacios Con Piscina application, progressing from initial bug fixes and core feature additions to addressing complex user requirements. Key accomplishments include fixing an expense display bug, implementing dynamic sorting and filtering for expenses, and adding bulk deletion capabilities across various entities. Significant work was done on invoice management, introducing unique invoice numbers for individual payments (abonos), and displaying these prominently. A comprehensive hierarchical Excel import/export system was developed, with frontend UI and backend endpoints established for importing data like customers and villas. Recent efforts heavily focused on debugging deployment issues, resolving admin login failures caused by  misconfigurations, database name discrepancies, and  mismatches in MongoDB Atlas. The current immediate task is to rectify the  for the admin user in the deployed MongoDB Atlas instance.
+The AI engineer's work largely focused on extending and stabilizing the Espacios Con Piscina application, moving from core feature enhancements to critical deployment and data integrity fixes. Initial tasks involved fixing admin password hash issues and implementing dynamic filtering for commissions and expenses. A significant portion of the trajectory was dedicated to troubleshooting deployment and API validation errors, particularly  validation failures due to missing fields in older database entries and CORS misconfigurations. The engineer introduced data migration scripts and manual database update instructions to resolve these. Subsequent efforts concentrated on refining Excel import/export logic for categories and services, addressing issues like missing  fields, Excel formula character limits, and incorrect price field mappings. The final segment of the trajectory began implementing a comprehensive set of new features, including a client editor, enhanced flexible pricing defaults, and advanced reservation/expense logic, facing an update error while implementing the client editor due to a backend issue.
 </analysis>
 
 <product_requirements>
-The Espacios Con Piscina application manages villas, reservations, clients, and expenses with role-based access. Initially, it required robust reservation/client management, payment tracking, and customizable invoices (multi-currency, extra services). Villa management needed , , , , and an expense tracker. Evolving requirements led to professional invoice redesigns, separate villa/service management, partial payments (abonos), and advanced expense management (user-creatable categories, payment reminders, grouping, month-based filtering, overdue display, advanced sorting). Other features comprised cascade deletion, customer management with search/alphabetical listing, admin-controlled user management, dynamic logo handling, multi-selection for bulk operations, form persistence post-save, manual invoice numbering for admins, and a hierarchical data import/export system via Excel with auto-generated expenses. The application transitioned to a web-based solution. Recent additions include an admin approval system for new users, flexible pricing tiers for villas based on rent type (with customizable Personas and Cliente/Propietario fields), an automatic commission system for reservations (editable amount, filtered by user, with payment tracking and bi-weekly filtering), and a full backup/restore system.
+The Espacios Con Piscina application manages villas, reservations, clients, and expenses with role-based access. Initially, it required robust reservation/client management, payment tracking, customizable invoices, and an expense tracker. Evolving requirements led to professional invoice redesigns, partial payments, and advanced expense management (user-creatable categories, payment reminders, grouping, filtering). Other features included cascade deletion, customer management, admin user management, dynamic logo handling, bulk operations, manual invoice numbering, and hierarchical Excel import/export. Recent additions include user approval, flexible pricing tiers (Pasadía, Amanecida, Evento with configurable people/prices), an automatic commission system (editable, filtered by user, payment tracking, bi-weekly filtering), and a full backup/restore system. Latest requests include a customer editor, dynamic expense updates based on villa price changes, extra people/hours fields in villa forms/Excel, dynamic expense generation for manual reservation prices, in-form client creation for reservations, multiple suppliers for additional services, advanced expense tracking (extras, ITBIS), a supplier expense summary, and a dynamic logo upload for invoices/home.
 </product_requirements>
 
 <key_technical_concepts>
 - **Full-stack Development**: React (Frontend), FastAPI (Backend), MongoDB Atlas.
-- **Authentication**: JWT, Role-Based Access Control, Bcrypt hashing.
-- **Data Modeling**: Pydantic, UUIDs for IDs.
-- **API Design**: RESTful with  prefix, environment variables.
-- **Data Processing**: Openpyxl for Excel (import/export).
-- **Deployment**: Render, Vercel, Docker.
+- **Authentication**: JWT, Bcrypt, Role-Based Access Control, Admin approval.
+- **Data Modeling**: Pydantic for validation, UUIDs for IDs.
+- **API Design**: RESTful with  prefix, environment variables for URLs.
+- **Data Processing**:  for hierarchical Excel import/export.
+- **Deployment**: Render (Backend), Vercel (Frontend), Kubernetes for container environment.
+- **Database Management**: MongoDB operations (find, insert, update).
 </key_technical_concepts>
 
 <code_architecture>
@@ -21,97 +22,100 @@ The application uses a standard full-stack architecture with  and  directories.
 
 
 -   ****:
-    -   **Importance**: Stores environment variables like , , .
-    -   **Changes**:  corrected to  for production.
+    -   **Importance**: Stores environment variables like , , , .
+    -   **Changes**:  was updated to include Vercel frontend URL.
 -   ****:
-    -   **Importance**: Defines Pydantic data models.
+    -   **Importance**: Defines Pydantic data models for the application entities.
     -   **Changes**:
-        -    updated with  and .
-        -    model added with , , .
-        -    updated to replace , , , etc., with , ,  (lists of ).
-        -    model added (, , , Sat Oct 25 18:03:55 UTC 2025, , , ).
+        -    was adjusted to handle  and  as optional to prevent validation errors for older users.
+        -    and  models updated with .
+        -    model updated with .
+        -    model changed  to .
 -   ****:
     -   **Importance**: Main FastAPI application with API routes.
     -   **Changes**:
-        -   Registration endpoint () modified to require  and set  to .
-        -   Login endpoint () modified to check .
-        -   New endpoints for user management:  and .
-        -   New endpoint  added.
-        -    endpoint modified to automatically create a  entry.
-        -   New endpoints for commissions: , , .
-        -   New endpoint  to mark commissions as paid.
-        -   New endpoints for full backup/restore:  and .
-        -   New endpoint  for a full data wipe, protected by secret code.
-        -    endpoint adjusted for robustness in handling missing reservation fields and for accurate calculation of .
+        -   Admin password hash was fixed programmatically.
+        -    and  endpoints were modified to be more robust against missing fields (, ) in old user documents.
+        -    endpoint () was added.
+        -   Logic for creating owner expenses during  was refined.
 -   ****:
-    -   **Importance**: Handles user authentication.
-    -   **Changes**: Added input for  on registration and displays messages regarding user approval status.
+    -   **Importance**: Handles importing data from Excel for various entities.
+    -   **Changes**:
+        -    updated to include  for imported categories.
+        -    removed mandatory  validation and skipped example rows.
+        -    logic refined to handle existing services, compare names case-insensitively, and correctly map  from Excel to  in the model, with improved error handling and logging.
 -   ****:
-    -   **Importance**: Manages user accounts.
-    -   **Changes**: Added a section to display and approve pending user registrations.
+    -   **Importance**: Handles exporting data to Excel, including template generation.
+    -   **Changes**:  modified to use a hidden sheet for dropdown options to bypass the 255-character limit for  in Excel data validation, preventing Excel corruption. Also removed  from Precio Cliente header.
+-   ** (New File)**:
+    -   **Importance**: Script to add  and  fields to existing user documents in MongoDB.
+-   ** (New File)**:
+    -   **Importance**: Script to add  to existing villa category documents in MongoDB.
+-   ****:
+    -   **Importance**: Frontend API client.
+    -   **Changes**: Added  function.
+-   ****:
+    -   **Importance**: Displays and manages commissions.
+    -   **Changes**: Added status filter (Pendientes/Pagadas/Todas) with Pendientes as default. Confirmed  column and date-based filtering were already implemented.
+-   ****:
+    -   **Importance**: Manages and displays expenses.
+    -   **Changes**:
+        -   Implemented 4 expense tabs: Propietarios, Fijos, Únicos, Variables with Propietarios as default.
+        -   Added a top section with statistics specifically for Gastos de Propietarios.
+        -   Added status filter (Pendientes/Pagadas/Todas) with Pendientes as default.
+        -   Corrected  scope.
+        -   Modified Variables tab to exclude owner expenses.
+        -   Added  checkbox for Único expense type, allowing them to appear in the Variables tab. Reset  on form clear/type change.
+        -   Logic for Propietarios tab to display pending for current year.
+-   ****:
+    -   **Importance**: Manages client reservations and invoice generation.
+    -   **Changes**:
+        -   Invoice styling was made more compact (reduced font sizes, padding, margins).
+        -   Payment/Bill To sections further condensed.
+        -   Policies section in the invoice was changed to a 2-column layout.
+        -   Facturar a: changed to FACTURA DE: (uppercase, normal color) with client name next to it (black, bold).
+        -   Invoice policies are now loaded dynamically from a template instead of being hardcoded.
+        -    and  inputs added to the reservation form and invoice display.
+        -   Logic for  and  changed to unit price and quantity multiplication for total cost calculation.
 -   ****:
     -   **Importance**: Manages villa details and pricing.
-    -   **Changes**:
-        -   Replaced fixed price fields with a dynamic interface for , , , allowing multiple , ,  entries per rent type with a '+' button.
-        -   Removed the modal for pricing tiers; now integrated inline.
-        -    is now always .
+    -   **Changes**:  checkbox added to flexible pricing entries for Pasadia and Amanecida types to select a default price.
 -   ****:
-    -   **Importance**: Manages client reservations.
-    -   **Changes**:
-        -   Added a dropdown to select a flexible price tier (Pasadía, Amanecida, Evento) from available villa prices, which auto-fills the  field.
-        -   Added input fields for  and .
--   ****:
-    -   **Importance**: *Newly created* component to display and manage commissions.
-    -   **Changes**:
-        -   Displays commissions with  of the user who created the reservation.
-        -   Includes cards for total, paid, and pending commissions per user.
-        -   Added a user filter dropdown.
-        -   Replaced the  checkbox with a Marcar como Pagada button.
-        -   Added filters for month and bi-weekly periods (quincenas) based on the reservation date.
-        -   Added Fecha Reserva column to the table.
--   ****:
-    -   **Importance**: Houses application settings.
-    -   **Changes**: Added a Backup/Restore Completo section with buttons to download/upload full data backups and a RESET TOTAL button protected by the admin secret code.
--   ****:
-    -   **Importance**: Main application routing.
-    -   **Changes**: Added routing for the new  component.
--   ****:
-    -   **Importance**: Application sidebar menu.
-    -   **Changes**: Added Comisiones menu item, visible to admins.
--   ****:
-    -   **Importance**: *Newly created* guide for deploying changes to production.
--   ****:
-    -   **Importance**: *Newly created* summary of changes made.
--   ****:
-    -   **Importance**: *Newly created* documentation for the flexible pricing system.
--   ****:
-    -   **Importance**: *Newly created* documentation for the backup/restore system.
--   ****:
-    -   **Importance**: *Newly created* documentation for the commissions system.
+    -   **Importance**: Manages customer accounts.
+    -   **Changes**: Implemented customer editing functionality (form population, update API call, UI buttons, dialog title, submit button text).
 </code_architecture>
 
 <pending_tasks>
 - **WhatsApp Integration**: Integrate WhatsApp for automated notifications.
 - **Calendar Sync**: Integrate external calendars (Google, Airbnb, iOS) for real-time availability updates.
-- **Import System (Full Backend Logic)**: Fully implement and validate backend processing for hierarchical imports beyond initial parsing, ensuring all data (e.g., reservations) is correctly linked and associated expenses are auto-generated.
+- **Import System (Full Backend Logic)**: Fully implement and validate backend processing for hierarchical imports beyond initial parsing, ensuring all data (e.g., reservations) is correctly linked and associated expenses are auto-generated. (Partially addressed for categories/villas/services, but general problem statement remains).
 - **Frontend Refinements for Import**: Implement robust success/error messages for file imports.
+- **Dynamic Expense Updates**: When villa prices (e.g., owner price) change, associated expenses should automatically update.
+- **Extra fields in Villa form/Excel**: Add Horas Extras and Personas Extras input fields to the Villa form and ensure they are handled in Excel import/export.
+- **Expense for Manual Reservation Price**: If a reservation is made for a villa without flexible prices but a manual  is entered, it should generate an expense and mark it as pending.
+- **In-form client creation for reservations**: Add a button to add clients directly from the reservation form without closing it.
+- **Multiple suppliers for additional services**: Allow multiple suppliers for extra services, and select supplier in reservation to load their price into the expense.
+- **Auto-load extra hours/people**: When a villa is chosen, auto-load its default extra hours/people into the reservation form (and allow editing).
+- **Detailed Expense Tracking**: Expenses should indicate if a reservation includes services, extra hours, or extra people, and calculate total payment to owner (villa + extras) and separate expenses for supplier payments.
+- **ITBIS indication in expenses**: Expense should indicate if reservation includes ITBIS (fiscal comprobante).
+- **Supplier Expense Summary**: A summary in Gastos similar to Gasto a propietario - mes actual for suppliers, including pago a suplidores category.
+- **Invoice Logo Upload Fix**: Resolve image already in use and weird errors when uploading logo in invoice editor.
+- **Logo as Home button**: Implement the application logo as a home button in the navigation.
+- **Villa Location in Invoice**: Include villa location in the invoice, based on data from villas/services.
+- **Excel mandatory fields**: Ensure no mandatory fields in Excel import/export templates.
 </pending_tasks>
 
 <current_work>
-Immediately before this summary request, the AI engineer was focused on implementing and refining the commissions management system based on extensive user feedback.
+Immediately before this summary request, the AI engineer was working on a large set of new features, prioritized by the user. Specifically, the high-priority task being addressed was the implementation of a default flexible price selection for villas.
 
-**Current state of work:**
-1.  **Commissions System Enhancements**: The  frontend component has been significantly refined. It now displays commissions created automatically upon reservation, linked to the user who made the reservation.
-2.  **User-centric View**: The commissions dashboard includes cards displaying accumulated total, paid, and pending commissions for each employee (full names are displayed). A dropdown filter allows admins to view commissions for specific users.
-3.  **Payment Tracking**: Individual commissions can be marked as paid using a dedicated button (replacing a previous checkbox) to prevent accidental changes.
-4.  **Date-based Filtering**: A crucial enhancement is the ability to filter commissions by month and bi-weekly periods (quincenas), using the *reservation date* (not the creation date) as the basis, as per user's specific business logic.
-5.  **Visibility of Reservation Date**: The table now includes a Fecha Reserva column to clearly indicate the date used for filtering.
-6.  **Personas Extras field**: The  component has been updated to include input fields for Personas Extras and Costo Personas Extras to allow for additional charges beyond the flexible pricing tiers.
+The following changes were in progress and partially completed:
+1.  **Client Editor**: The frontend component  has been updated to include functionality for editing client information. This involved adding a  API call to  and modifying the  logic, ,  function, and UI elements (edit button, dialog title, submit button) in the  component.
+2.  **Backend Client Update Endpoint**: A  endpoint was added to  to support the client editor. An initial bug related to  was fixed by simplifying the update logic.
+3.  **Flexible Price Default**: The  model in  was updated to include . The  component was being updated to add a Por Defecto checkbox next to each flexible price entry. This has been implemented for Pasadia and Amanecida prices, and the AI was in the process of implementing it for Evento prices when the trajectory ended.
 
-The very last explicit request was to include the Fecha Reserva in the commissions table. This was implemented in the last tool call.
+The user had reported a persistent Failed to fetch error when trying to update a client, which was diagnosed as a backend issue and subsequently fixed by refining the  endpoint in . The last instruction from the user was to continua con todas, si hay errores lo vemos despues, indicating a preference for broad implementation before detailed testing.
 </current_work>
 
 <optional_next_step>
-Add the Fecha Reserva column to the commissions table in the frontend to display the reservation date for each commission entry.
+Complete the implementation of the  checkbox for Evento flexible prices in .
 </optional_next_step>
-
