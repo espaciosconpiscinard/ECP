@@ -965,24 +965,10 @@ const VillasManagementNew = () => {
                       />
                     </div>
 
-                    <div className="col-span-2">
-                      <Label>Precio por Defecto *</Label>
-                      <Input
-                        type="number"
-                        step="0.01"
-                        value={serviceFormData.default_price}
-                        onChange={(e) => setServiceFormData({ ...serviceFormData, default_price: parseFloat(e.target.value) })}
-                        required
-                      />
-                      <p className="text-xs text-gray-500 mt-1">
-                        Este precio se usará como base al agregar el servicio a una reservación
-                      </p>
-                    </div>
-
-                    {/* Sección de Suplidores */}
+                    {/* Sección de Suplidores - REQUERIDO */}
                     <div className="col-span-2">
                       <div className="flex justify-between items-center mb-3">
-                        <h4 className="font-semibold text-gray-700">Suplidores</h4>
+                        <h4 className="font-semibold text-gray-700">Suplidores *</h4>
                         <Button
                           type="button"
                           onClick={handleAddSupplier}
