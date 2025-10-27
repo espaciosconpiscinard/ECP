@@ -1257,19 +1257,19 @@ const Reservations = () => {
     <div className="space-y-6" data-testid="reservations-page">
       <div className="flex justify-between items-center">
         <div>
-          <h2 className="text-3xl font-bold text-gray-900">Reservaciones</h2>
-          <p className="text-gray-500 mt-1">Gestiona las reservaciones de villas</p>
+          <h2 className="text-3xl font-bold text-gray-900">Facturas</h2>
+          <p className="text-gray-500 mt-1">Gestiona las facturas de villas y servicios</p>
         </div>
         <Dialog open={isFormOpen} onOpenChange={setIsFormOpen}>
           <DialogTrigger asChild>
             <Button onClick={() => resetForm()} data-testid="add-reservation-button">
-              <Plus className="mr-2 h-4 w-4" /> Nueva Reservación
+              <Plus className="mr-2 h-4 w-4" /> Nueva Factura
             </Button>
           </DialogTrigger>
           <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
             <DialogHeader>
               <DialogTitle>
-                {editingReservation ? 'Editar Reservación' : 'Nueva Reservación'}
+                {editingReservation ? 'Editar Factura' : 'Nueva Factura'}
               </DialogTitle>
             </DialogHeader>
             <form onSubmit={handleSubmit} className="space-y-4">
