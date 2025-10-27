@@ -2090,7 +2090,7 @@ const Expenses = () => {
                             alert('Pago registrado correctamente');
                             document.getElementById('propietario-monto').value = '';
                             setIsAbonoDialogOpen(false);
-                            await fetchData();
+                            await fetchExpenses();
                           } catch (err) {
                             console.error('Error al registrar pago:', err);
                             alert('Error al registrar el pago');
@@ -2248,7 +2248,7 @@ const Expenses = () => {
                                 }));
                                 alert(isChecked ? 'Depósito marcado como devuelto' : 'Depósito marcado como pendiente');
                                 setIsAbonoDialogOpen(false);
-                                await fetchData();
+                                await fetchExpenses();
                               } else {
                                 const errorData = await response.json().catch(() => null);
                                 console.error('Error en respuesta:', response.status, errorData);
