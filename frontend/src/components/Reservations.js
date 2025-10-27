@@ -2377,20 +2377,117 @@ const Reservations = () => {
 
       {/* Diálogo de Agregar Abono */}
       <Dialog open={isAbonoDialogOpen} onOpenChange={setIsAbonoDialogOpen}>
-        <DialogContent className="max-w-md">
+        <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
-            <DialogTitle>Agregar Abono a Factura</DialogTitle>
+            <DialogTitle>Pagos - Factura #{selectedReservation?.invoice_number}</DialogTitle>
           </DialogHeader>
           {selectedReservation && (
-            <div className="mb-4 p-3 bg-gray-50 rounded">
-              <p className="text-sm font-medium">Factura #{selectedReservation.invoice_number}</p>
-              <p className="text-xs text-gray-600">Cliente: {selectedReservation.customer_name}</p>
-              <p className="text-xs text-gray-600 mt-1">
-                Total: {formatCurrency(selectedReservation.total_amount, selectedReservation.currency)} | 
-                Pagado: {formatCurrency(selectedReservation.amount_paid, selectedReservation.currency)} | 
-                Restante: <span className="font-semibold text-orange-600">{formatCurrency(selectedReservation.balance_due, selectedReservation.currency)}</span>
-              </p>
-            </div>
+            <>
+              {/* Resumen de la factura */}
+              <div className="mb-4 p-3 bg-gray-50 rounded">
+                <p className="text-sm font-medium">Cliente: {selectedReservation.customer_name}</p>
+                <p className="text-xs text-gray-600 mt-1">
+                  Total: {formatCurrency(selectedReservation.total_amount, selectedReservation.currency)} | 
+                  Pagado: {formatCurrency(selectedReservation.amount_paid, selectedReservation.currency)} | 
+                  Restante: <span className="font-semibold text-orange-600">{formatCurrency(selectedReservation.balance_due, selectedReservation.currency)}</span>
+                </p>
+              </div>
+
+              {/* Detalles de pagos a realizar */}
+              <div className="mb-4 p-4 bg-blue-50 border border-blue-200 rounded-md">
+                <h4 className="text-sm font-bold text-blue-900 mb-3">💰 Pagos Pendientes</h4>
+                
+                {/* Pago al Propietario */}
+                <div className="mb-3 p-3 bg-white rounded border border-blue-200">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <span className="text-sm font-semibold text-purple-900">🏡 Pago Propietario:</span>
+                      <p className="text-xs text-gray-600 mt-1">Villa: {selectedReservation.villa_code}</p>
+                    </div>
+                    <div className="text-right">
+                      <p className="text-xs text-gray-500">Monto</p>
+                      <p className="font-bold text-purple-900">{formatCurrency(selectedReservation.owner_price || 0, selectedReservation.currency)}</p>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Personas Extras */}
+                {selectedReservation.extra_people > 0 && (
+                  <div className="mb-3 p-3 bg-white rounded border border-blue-200">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <span className="text-sm font-semibold text-blue-900">👥 Personas Extras:</span>
+                        <span className="ml-2 text-sm text-gray-700">{selectedReservation.extra_people} persona(s)</span>
+                      </div>
+                      <div className="text-right">
+                        <p className="text-xs text-gray-500">Pago Propietario</p>
+                        <p className="font-bold text-blue-900">{formatCurrency(selectedReservation.extra_people * (selectedReservation.extra_people_price_owner || 0), selectedReservation.currency)}</p>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {/* Horas Extras */}
+                {selectedReservation.extra_hours > 0 && (
+                  <div className="mb-3 p-3 bg-white rounded border border-blue-200">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <span className="text-sm font-semibold text-blue-900">⏰ Horas Extras:</span>
+                        <span className="ml-2 text-sm text-gray-700">{selectedReservation.extra_hours} hora(s)</span>
+                      </div>
+                      <div className="text-right">
+                        <p className="text-xs text-gray-500">Pago Propietario</p>
+                        <p className="font-bold text-blue-900">{formatCurrency(selectedReservation.extra_hours * (selectedReservation.extra_hours_price_owner || 0), selectedReservation.currency)}</p>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {/* Servicios Extras con Suplidores */}
+                {selectedReservation.extra_services && selectedReservation.extra_services.length > 0 && (
+                  <div>
+                    <h5 className="text-sm font-semibold text-blue-900 mb-2">🛎️ Servicios Extras - Pago a Suplidores</h5>
+                    <div className="space-y-2">
+                      {selectedReservation.extra_services.map((service, index) => (
+                        <div key={index} className="p-3 bg-white rounded border border-blue-200">
+                          <div className="flex justify-between items-start mb-2">
+                            <div className="flex-1">
+                              <p className="font-semibold text-gray-800">{service.service_name || service.name}</p>
+                              <p className="text-xs text-gray-500">Cantidad: {service.quantity}</p>
+                            </div>
+                          </div>
+                          
+                          {/* Información del Suplidor */}
+                          {service.supplier_name && (
+                            <div className="mt-2 pt-2 border-t border-gray-200">
+                              <div className="flex justify-between items-center bg-yellow-50 p-2 rounded">
+                                <div>
+                                  <p className="text-xs font-medium text-gray-600">Pagar a Suplidor:</p>
+                                  <p className="text-sm font-semibold text-gray-800">{service.supplier_name}</p>
+                                </div>
+                                <div className="text-right">
+                                  <p className="text-xs text-gray-500">Monto</p>
+                                  <p className="font-bold text-orange-600">
+                                    {service.quantity} × {formatCurrency(service.supplier_cost || 0, selectedReservation.currency)} = {formatCurrency((service.supplier_cost || 0) * service.quantity, selectedReservation.currency)}
+                                  </p>
+                                </div>
+                              </div>
+                            </div>
+                          )}
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* Nota informativa */}
+                <div className="mt-3 p-2 bg-green-50 border border-green-200 rounded">
+                  <p className="text-xs text-green-800">
+                    <strong>ℹ️ Nota:</strong> Utiliza el formulario abajo para registrar los abonos realizados a propietario y/o suplidores.
+                  </p>
+                </div>
+              </div>
+            </>
           )}
           <form onSubmit={submitAbono} className="space-y-4">
             <div className="grid grid-cols-2 gap-4">
