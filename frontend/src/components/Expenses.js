@@ -38,6 +38,11 @@ const Expenses = () => {
   // Estados para almacenar reservaciones y villas
   const [reservations, setReservations] = useState([]);
   const [villas, setVillas] = useState([]);
+
+  // Estado para modal de detalles
+  const [selectedExpense, setSelectedExpense] = useState(null);
+  const [showDetailsModal, setShowDetailsModal] = useState(false);
+
   
   // Abono states
   const [isAbonoDialogOpen, setIsAbonoDialogOpen] = useState(false);
