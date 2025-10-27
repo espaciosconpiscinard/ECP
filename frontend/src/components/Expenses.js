@@ -1446,7 +1446,15 @@ const Expenses = () => {
                 <tbody>
                   {getFilteredAndSortedExpenses().length > 0 ? (
                     getFilteredAndSortedExpenses().map((expense) => (
-                      <tr key={expense.id} className={`border-b hover:bg-gray-100 ${getUrgencyColor(expense)}`}>
+                      <tr 
+                        key={expense.id} 
+                        className={`border-b hover:bg-gray-50 cursor-pointer transition-colors ${getUrgencyColor(expense)}`}
+                        onClick={() => {
+                          setSelectedExpense(expense);
+                          setShowDetailsModal(true);
+                        }}
+                        title="Click para ver detalles completos"
+                      >
                         <td className="p-2 text-sm">
                           {new Date(expense.expense_date).toLocaleDateString('es-DO')}
                         </td>
