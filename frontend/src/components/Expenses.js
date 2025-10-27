@@ -97,7 +97,7 @@ const Expenses = () => {
 
   const fetchReservations = async () => {
     try {
-      const response = await fetch(`${import.meta.env.VITE_BACKEND_URL || process.env.REACT_APP_BACKEND_URL}/api/reservations`, {
+      const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/reservations`, {
         headers: {
           'Authorization': `Bearer ${localStorage.getItem('token')}`
         }
@@ -112,7 +112,7 @@ const Expenses = () => {
 
   const fetchVillas = async () => {
     try {
-      const response = await fetch(`${import.meta.env.VITE_BACKEND_URL || process.env.REACT_APP_BACKEND_URL}/api/villas`, {
+      const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/villas`, {
         headers: {
           'Authorization': `Bearer ${localStorage.getItem('token')}`
         }
@@ -254,7 +254,7 @@ const Expenses = () => {
       try {
         console.log('📞 Cargando reservación...');
         const reservationResponse = await fetch(
-          `${import.meta.env.VITE_BACKEND_URL || process.env.REACT_APP_BACKEND_URL}/api/reservations/${expense.related_reservation_id}`,
+          `${process.env.REACT_APP_BACKEND_URL}/api/reservations/${expense.related_reservation_id}`,
           {
             headers: {
               'Authorization': `Bearer ${localStorage.getItem('token')}`
@@ -1498,7 +1498,7 @@ const Expenses = () => {
                           if (expense.category === 'pago_propietario' && expense.related_reservation_id) {
                             try {
                               const allExpenses = await (await fetch(
-                                `${import.meta.env.VITE_BACKEND_URL || process.env.REACT_APP_BACKEND_URL}/api/expenses`,
+                                `${process.env.REACT_APP_BACKEND_URL}/api/expenses`,
                                 {
                                   headers: {
                                     'Authorization': `Bearer ${localStorage.getItem('token')}`
@@ -1972,7 +1972,7 @@ const Expenses = () => {
                               try {
                                 // Actualizar el estado de depósito devuelto
                                 const response = await fetch(
-                                  `${import.meta.env.VITE_BACKEND_URL || process.env.REACT_APP_BACKEND_URL}/api/reservations/${relatedReservation.id}`,
+                                  `${process.env.REACT_APP_BACKEND_URL}/api/reservations/${relatedReservation.id}`,
                                   {
                                     method: 'PATCH',
                                     headers: {
@@ -2070,7 +2070,7 @@ const Expenses = () => {
                             };
                             
                             await fetch(
-                              `${import.meta.env.VITE_BACKEND_URL || process.env.REACT_APP_BACKEND_URL}/api/expenses/${selectedExpense.id}/abonos`,
+                              `${process.env.REACT_APP_BACKEND_URL}/api/expenses/${selectedExpense.id}/abonos`,
                               {
                                 method: 'POST',
                                 headers: {
@@ -2141,7 +2141,7 @@ const Expenses = () => {
                                   
                                   try {
                                     const allExpensesResponse = await fetch(
-                                      `${import.meta.env.VITE_BACKEND_URL || process.env.REACT_APP_BACKEND_URL}/api/expenses`,
+                                      `${process.env.REACT_APP_BACKEND_URL}/api/expenses`,
                                       {
                                         headers: {
                                           'Authorization': `Bearer ${localStorage.getItem('token')}`
@@ -2166,7 +2166,7 @@ const Expenses = () => {
                                       };
                                       
                                       await fetch(
-                                        `${import.meta.env.VITE_BACKEND_URL || process.env.REACT_APP_BACKEND_URL}/api/expenses/${supplierExpense.id}/abonos`,
+                                        `${process.env.REACT_APP_BACKEND_URL}/api/expenses/${supplierExpense.id}/abonos`,
                                         {
                                           method: 'POST',
                                           headers: {
@@ -2223,7 +2223,7 @@ const Expenses = () => {
                           onChange={async (e) => {
                             try {
                               const response = await fetch(
-                                `${import.meta.env.VITE_BACKEND_URL || process.env.REACT_APP_BACKEND_URL}/api/reservations/${relatedReservation.id}`,
+                                `${process.env.REACT_APP_BACKEND_URL}/api/reservations/${relatedReservation.id}`,
                                 {
                                   method: 'PATCH',
                                   headers: {
