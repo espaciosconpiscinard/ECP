@@ -150,10 +150,19 @@ class Villa(VillaBase):
     created_by: str
 
 # ============ EXTRA SERVICE MODELS ============
+# ============ EXTRA SERVICES MODELS ============
+class ServiceSupplier(BaseModel):
+    """Suplidor de un servicio adicional con sus precios"""
+    name: str  # Nombre del suplidor
+    client_price: float = 0.0  # Precio al cliente
+    supplier_cost: float = 0.0  # Costo del servicio (pago al suplidor)
+    is_default: bool = False  # Si es el suplidor predeterminado
+
 class ExtraServiceBase(BaseModel):
     name: str  # Buffet, Decoración, DJ, etc.
     description: Optional[str] = None
-    default_price: float = 0.0
+    default_price: float = 0.0  # DEPRECADO: mantener para compatibilidad
+    suppliers: List[ServiceSupplier] = []  # Lista de suplidores
     is_active: bool = True
 
 class ExtraServiceCreate(ExtraServiceBase):
