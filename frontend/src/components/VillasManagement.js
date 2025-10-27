@@ -625,14 +625,15 @@ const VillasManagementNew = () => {
                             </button>
                           </div>
                           <div className="space-y-1">
-                            <div className="grid grid-cols-4 gap-2 text-xs font-semibold text-gray-600 mb-1">
+                            <div className="grid grid-cols-5 gap-2 text-xs font-semibold text-gray-600 mb-1">
                               <span>Personas</span>
                               <span>Cliente</span>
                               <span>Propietario</span>
+                              <span>Por Defecto</span>
                               <span></span>
                             </div>
                             {flexiblePrices.amanecida.map((price, index) => (
-                              <div key={index} className="grid grid-cols-4 gap-2">
+                              <div key={index} className="grid grid-cols-5 gap-2 items-center">
                                 <input
                                   type="text"
                                   value={price.people_count || ''}
@@ -656,6 +657,18 @@ const VillasManagementNew = () => {
                                   className="px-2 py-1 border rounded text-sm"
                                   placeholder="8000"
                                 />
+                                <div className="flex justify-center">
+                                  <input
+                                    type="checkbox"
+                                    checked={price.is_default || false}
+                                    onChange={(e) => {
+                                      const newPrices = [...flexiblePrices.amanecida];
+                                      newPrices.forEach((p, i) => p.is_default = i === index && e.target.checked);
+                                      setFlexiblePrices({...flexiblePrices, amanecida: newPrices});
+                                    }}
+                                    className="w-4 h-4"
+                                  />
+                                </div>
                                 <button
                                   type="button"
                                   onClick={() => handleRemoveFlexiblePrice('amanecida', index)}
