@@ -960,7 +960,7 @@ async def create_reservation(reservation_data: ReservationCreate, current_user: 
                 "description": description,
                 "amount": total_owner_payment,
                 "currency": reservation_data.currency,
-                "expense_date": reservation_data.reservation_date.isoformat() if isinstance(reservation_data.reservation_date, datetime) else reservation_data.reservation_date,
+                "expense_date": reservation_data.reservation_date if isinstance(reservation_data.reservation_date, str) else reservation_data.reservation_date.isoformat(),
                 "payment_status": "pending",
                 "notes": ''.join(notes_parts),
                 "related_reservation_id": reservation.id,
