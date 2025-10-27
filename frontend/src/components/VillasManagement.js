@@ -293,6 +293,7 @@ const VillasManagementNew = () => {
       name: service.name,
       description: service.description || '',
       default_price: service.default_price || 0,
+      suppliers: service.suppliers || [],
       is_active: service.is_active !== undefined ? service.is_active : true
     });
     setIsFormOpen(true);
