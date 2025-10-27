@@ -109,6 +109,7 @@ class VillaBase(BaseModel):
     code: str  # ECPVSH, ECPVWLSL, etc.
     name: str  # Villa Sabrina (interno)
     description: Optional[str] = None  # Descripción de lo que contiene
+    location: Optional[str] = None  # Ubicación/dirección de la villa
     phone: Optional[str] = None  # Teléfono del propietario (opcional)
     category_id: Optional[str] = None  # ID de la categoría asignada
     
