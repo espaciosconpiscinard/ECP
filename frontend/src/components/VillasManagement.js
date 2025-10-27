@@ -163,6 +163,7 @@ const VillasManagementNew = () => {
       code: villa.code,
       name: villa.name,
       description: villa.description || '',
+      location: villa.location || '',
       phone: villa.phone || '',
       category_id: villa.category_id || '',
       default_check_in_time: villa.default_check_in_time || '9:00 AM',
