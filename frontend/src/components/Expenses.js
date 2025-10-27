@@ -396,9 +396,13 @@ const Expenses = () => {
 
   // Función para filtrar y ordenar gastos por tipo con prioridad de urgencia
   const getFilteredAndSortedExpenses = () => {
+    // FILTRAR: Excluir gastos de suplidores de la vista principal
+    // Solo se mostrarán dentro del modal del gasto del propietario
+    const visibleExpenses = expenses.filter(e => e.category !== 'pago_suplidor');
+    
     // Tab especial: Propietarios (gastos auto-generados)
     if (activeTab === 'propietarios') {
-      let filtered = expenses.filter(expense => 
+      let filtered = visibleExpenses.filter(expense => 
         expense.category === 'pago_propietario' || expense.related_reservation_id
       );
       
@@ -415,7 +419,7 @@ const Expenses = () => {
       // Agregar pendientes de meses anteriores
       let pendingFiltered = [];
       if (paymentStatusFilter !== 'paid') {
-        pendingFiltered = expenses.filter(expense => {
+        pendingFiltered = visibleExpenses.filter(expense => {
           if (!(expense.category === 'pago_propietario' || expense.related_reservation_id)) return false;
           if (expense.payment_status !== 'pending') return false;
           const expenseDate = new Date(expense.expense_date);
