@@ -1942,7 +1942,8 @@ const Expenses = () => {
               {(() => {
                 const desc = detailExpense.description || '';
                 const hasExtras = desc.includes('Horas extras') || desc.includes('Personas extras');
-                const hasServices = desc.includes('servicio(s) adicional(es)');
+                const servicesMatch = desc.match(/Incluye (\d+) servicio\(s\) adicional\(es\)/);
+                const hasServices = servicesMatch && parseInt(servicesMatch[1]) > 0;
                 const hasITBIS = desc.includes('Con ITBIS');
                 
                 return (hasExtras || hasServices || hasITBIS) && (
@@ -1958,7 +1959,7 @@ const Expenses = () => {
                       {hasServices && (
                         <div className="flex items-center space-x-2">
                           <span className="text-xl">🛎️</span>
-                          <span className="font-medium">Servicios adicionales</span>
+                          <span className="font-medium">{servicesMatch[1]} Servicio(s) adicional(es)</span>
                         </div>
                       )}
                       {hasITBIS && (
@@ -1971,6 +1972,55 @@ const Expenses = () => {
                   </div>
                 );
               })()}
+
+              {/* Tabla de Servicios Adicionales */}
+              {detailExpense.notes && detailExpense.notes.includes('Servicios Adicionales:') && (
+                <div className="p-4 bg-purple-50 border border-purple-300 rounded-lg">
+                  <p className="text-sm text-purple-900 font-bold mb-3">🛎️ Servicios Adicionales:</p>
+                  <div className="bg-white rounded border overflow-hidden">
+                    <table className="w-full text-sm">
+                      <thead className="bg-purple-100">
+                        <tr>
+                          <th className="p-2 text-left font-bold">Servicio</th>
+                          <th className="p-2 text-left font-bold">Suplidor</th>
+                          <th className="p-2 text-center font-bold">Cant.</th>
+                          <th className="p-2 text-right font-bold">Total</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {(() => {
+                          // Parsear servicios de las notas
+                          const notesText = detailExpense.notes || '';
+                          const servicesSection = notesText.split('Servicios Adicionales:')[1];
+                          if (!servicesSection) return null;
+                          
+                          const serviceLines = servicesSection.split('\n').filter(line => line.trim().startsWith('-'));
+                          
+                          return serviceLines.map((line, idx) => {
+                            // Parsear: "- Decoración (Suplidor: ABC) x2 = RD$ 5000.00"
+                            const match = line.match(/- (.+?) \(Suplidor: (.+?)\) x(\d+) = RD\$ ([\d,.]+)/);
+                            if (!match) return null;
+                            
+                            const [_, serviceName, supplierName, quantity, total] = match;
+                            
+                            return (
+                              <tr key={idx} className="border-t hover:bg-purple-50">
+                                <td className="p-2">{serviceName}</td>
+                                <td className="p-2 text-purple-700 font-medium">{supplierName}</td>
+                                <td className="p-2 text-center">{quantity}</td>
+                                <td className="p-2 text-right font-bold">RD$ {total}</td>
+                              </tr>
+                            );
+                          });
+                        })()}
+                      </tbody>
+                    </table>
+                  </div>
+                  <div className="mt-3 p-2 bg-purple-100 rounded text-xs text-purple-900">
+                    <strong>💡 Nota:</strong> Los pagos a suplidores se registran como gastos separados en la categoría "Pago Suplidor"
+                  </div>
+                </div>
+              )}
 
               {/* Notas */}
               {detailExpense.notes && (
