@@ -321,16 +321,36 @@ const Reservations = () => {
       const service = extraServices.find(s => s.id === value);
       if (service) {
         updated[index].service_name = service.name;
+        updated[index].name = service.name;
         updated[index].unit_price = service.default_price;
+        updated[index].price_unit = service.default_price;
         updated[index].total = service.default_price * updated[index].quantity;
+        updated[index].price_total = service.default_price * updated[index].quantity;
       }
     }
     
-    if (field === 'quantity' || field === 'unit_price') {
-      updated[index].total = updated[index].quantity * updated[index].unit_price;
+    if (field === 'quantity' || field === 'unit_price' || field === 'price_unit') {
+      const unitPrice = updated[index].price_unit || updated[index].unit_price || 0;
+      updated[index].total = updated[index].quantity * unitPrice;
+      updated[index].price_total = updated[index].quantity * unitPrice;
     }
     
     setSelectedExtraServices(updated);
+    
+    // Recalcular totales generales
+    const servicesTotal = updated.reduce((sum, s) => sum + (s.price_total || s.total || 0), 0);
+    const newSubtotal = (formData.base_price || 0) + (formData.extra_hours_cost || 0) + (formData.extra_people_cost || 0) + servicesTotal;
+    const newITBIS = formData.include_itbis ? newSubtotal * 0.18 : 0;
+    const newTotal = newSubtotal + newITBIS - (formData.discount || 0);
+    
+    setFormData(prev => ({
+      ...prev,
+      extra_services: updated,
+      extra_services_total: servicesTotal,
+      subtotal: newSubtotal,
+      itbis_amount: newITBIS,
+      total_amount: newTotal
+    }));
   };
 
   const handleSubmit = async (e) => {
