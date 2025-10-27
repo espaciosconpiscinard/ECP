@@ -460,6 +460,19 @@ frontend:
         agent: "main"
         comment: "Implementado checkbox 'Por Defecto' para las 3 secciones de precios flexibles (Pasadía, Amanecida, Evento). Cambió grid-cols-4 a grid-cols-5 en sección Evento. Agregada columna 'Por Defecto' en header. Implementado checkbox con lógica para permitir solo 1 precio predeterminado por tipo. Campo is_default ya existía en modelo backend (FlexiblePrice)."
       - working: true
+
+  - task: "Villa - Campos Precio Hora Extra y Precio Persona Extra"
+    implemented: true
+    working: true
+    file: "/app/backend/models.py, /app/frontend/src/components/VillasManagement.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: true
+        agent: "main"
+        comment: "✅ IMPLEMENTADO: Agregados campos extra_hours_price y extra_people_price al modelo Villa (backend). Campos agregados a formData, resetForm, handleEdit en VillasManagement.js. Campos visibles en formulario de villa después de 'Máximo de Huéspedes'. Screenshot verificado: campos mostrándose correctamente con placeholders (500 para horas, 300 para personas)."
+
         agent: "testing"
         comment: "✅ TESTED: Checkbox 'Por Defecto' para precios flexibles completamente funcional. Backend: Campo is_default (bool) en modelo FlexiblePrice funciona correctamente. Villa creada con precios predeterminados: Pasadía (11-20 personas), Amanecida (1-15 personas), Evento (51-100 personas). Actualización de precios predeterminados funcional (cambio de segundo a primer precio en Pasadía). Cada tipo de renta puede tener su propio precio predeterminado independiente. Estructura de campo is_default correcta (boolean) en todas las respuestas API. Serialización y deserialización sin errores. 5/5 tests pasaron exitosamente."
       - working: true
