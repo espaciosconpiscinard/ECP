@@ -2227,6 +2227,7 @@ const Expenses = () => {
                           id="depositReturned"
                           checked={relatedReservation.deposit_returned || false}
                           onChange={async (e) => {
+                            const isChecked = e.target.checked;
                             try {
                               const response = await fetch(
                                 `${process.env.REACT_APP_BACKEND_URL}/api/reservations/${relatedReservation.id}`,
@@ -2236,20 +2237,21 @@ const Expenses = () => {
                                     'Content-Type': 'application/json',
                                     'Authorization': `Bearer ${localStorage.getItem('token')}`
                                   },
-                                  body: JSON.stringify({ deposit_returned: e.target.checked })
+                                  body: JSON.stringify({ deposit_returned: isChecked })
                                 }
                               );
                               
                               if (response.ok) {
                                 setRelatedReservation(prev => ({
                                   ...prev,
-                                  deposit_returned: e.target.checked
+                                  deposit_returned: isChecked
                                 }));
-                                alert(e.target.checked ? 'Depósito marcado como devuelto' : 'Depósito marcado como pendiente');
+                                alert(isChecked ? 'Depósito marcado como devuelto' : 'Depósito marcado como pendiente');
+                                setIsAbonoDialogOpen(false);
                                 await fetchData();
                               } else {
-                                const errorText = await response.text();
-                                console.error('Error en respuesta:', response.status, errorText);
+                                const errorData = await response.json().catch(() => null);
+                                console.error('Error en respuesta:', response.status, errorData);
                                 alert('Error al actualizar el depósito');
                               }
                             } catch (err) {
