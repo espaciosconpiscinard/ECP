@@ -578,6 +578,25 @@ async def get_customer(customer_id: str, current_user: dict = Depends(get_curren
         raise HTTPException(status_code=404, detail="Customer not found")
     return restore_datetimes(customer, ["created_at"])
 
+@api_router.put("/customers/{customer_id}", response_model=Customer)
+async def update_customer(customer_id: str, customer_data: CustomerCreate, current_user: dict = Depends(get_current_user)):
+    """Update a customer"""
+    # Verificar que el cliente existe
+    existing = await db.customers.find_one({"id": customer_id})
+    if not existing:
+        raise HTTPException(status_code=404, detail="Customer not found")
+    
+    # Actualizar solo los campos que vienen en el request
+    update_dict = customer_data.model_dump(exclude_unset=True)
+    
+    if update_dict:
+        update_dict = prepare_doc_for_insert(update_dict, for_update=True)
+        await db.customers.update_one({"id": customer_id}, {"$set": update_dict})
+    
+    # Devolver el cliente actualizado
+    updated_customer = await db.customers.find_one({"id": customer_id}, {"_id": 0})
+    return restore_datetimes(updated_customer, ["created_at"])
+
 @api_router.delete("/customers/{customer_id}")
 async def delete_customer(customer_id: str, current_user: dict = Depends(require_admin)):
     """Delete a customer (admin only)"""
