@@ -491,6 +491,37 @@ function Commissions() {
           </div>
         </div>
 
+        {/* Botones de acción masiva */}
+        {selectedCommissions.length > 0 && (
+          <div className="bg-blue-50 border border-blue-200 p-4 rounded-md">
+            <div className="flex items-center justify-between">
+              <p className="text-sm font-medium text-blue-900">
+                {selectedCommissions.length} comisión(es) seleccionada(s)
+              </p>
+              <div className="flex gap-2">
+                <button
+                  onClick={handleBulkMarkPaid}
+                  className="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700 text-sm"
+                >
+                  ✓ Marcar como Pagadas
+                </button>
+                <button
+                  onClick={handleBulkMarkUnpaid}
+                  className="px-4 py-2 bg-yellow-600 text-white rounded hover:bg-yellow-700 text-sm"
+                >
+                  ⏳ Marcar como No Pagadas
+                </button>
+                <button
+                  onClick={handleBulkDelete}
+                  className="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700 text-sm"
+                >
+                  🗑️ Eliminar
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+
         {error && (
           <div className="p-4 bg-red-50 border-b border-red-200 text-red-700">
             {error}
@@ -501,6 +532,14 @@ function Commissions() {
           <table className="min-w-full divide-y divide-gray-200">
             <thead className="bg-gray-50">
               <tr>
+                <th className="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase">
+                  <input
+                    type="checkbox"
+                    checked={selectAll}
+                    onChange={handleSelectAll}
+                    className="h-4 w-4 cursor-pointer"
+                  />
+                </th>
                 <th className="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase">Pagado</th>
                 <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Fecha Reserva</th>
                 <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Usuario</th>
@@ -514,7 +553,7 @@ function Commissions() {
             <tbody className="bg-white divide-y divide-gray-200">
               {filteredCommissions.length === 0 ? (
                 <tr>
-                  <td colSpan="8" className="px-4 py-8 text-center text-gray-500">
+                  <td colSpan="9" className="px-4 py-8 text-center text-gray-500">
                     {selectedUser === 'all' && selectedMonth === 'all' && selectedFortnight === 'all'
                       ? 'No hay comisiones registradas' 
                       : 'No hay comisiones con los filtros seleccionados'}
