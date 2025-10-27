@@ -408,6 +408,45 @@ const VillasManagementNew = () => {
       suppliers: [],
       is_active: true
     });
+
+  // Funciones para manejar suplidores de servicios
+  const handleAddSupplier = () => {
+    const newSupplier = {
+      name: '',
+      client_price: 0,
+      supplier_cost: 0,
+      is_default: serviceFormData.suppliers.length === 0  // El primero es default
+    };
+    setServiceFormData({
+      ...serviceFormData,
+      suppliers: [...serviceFormData.suppliers, newSupplier]
+    });
+  };
+
+  const handleUpdateSupplier = (index, field, value) => {
+    const updated = [...serviceFormData.suppliers];
+    updated[index][field] = value;
+    
+    // Si se marca como default, desmarcar los demás
+    if (field === 'is_default' && value === true) {
+      updated.forEach((s, i) => {
+        if (i !== index) s.is_default = false;
+      });
+    }
+    
+    setServiceFormData({ ...serviceFormData, suppliers: updated });
+  };
+
+  const handleRemoveSupplier = (index) => {
+    const updated = serviceFormData.suppliers.filter((_, i) => i !== index);
+    // Si el que se eliminó era default y quedan suplidores, marcar el primero como default
+    if (serviceFormData.suppliers[index].is_default && updated.length > 0) {
+      updated[0].is_default = true;
+    }
+    setServiceFormData({ ...serviceFormData, suppliers: updated });
+  };
+
+
   };
 
   const handleOpenForm = () => {
