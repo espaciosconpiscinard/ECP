@@ -1253,35 +1253,30 @@ const Reservations = () => {
       setVillaSearchTerm(`Servicio: ${service.name}`);
       setShowVillaDropdown(false);
       
-      // Agregar el servicio a la lista de servicios seleccionados
+      // Agregar el servicio a la lista de servicios seleccionados SIN auto-seleccionar suplidor
       const newService = {
-        id: service.id,
+        service_id: service.id,
         name: service.name,
         quantity: 1,
-        price_unit: service.suppliers && service.suppliers.length > 0 ? service.suppliers[0].price : 0,
-        price_total: service.suppliers && service.suppliers.length > 0 ? service.suppliers[0].price : 0,
-        supplier_id: service.suppliers && service.suppliers.length > 0 ? service.suppliers[0].id : '',
-        supplier_name: service.suppliers && service.suppliers.length > 0 ? service.suppliers[0].name : '',
-        supplier_price_unit: service.suppliers && service.suppliers.length > 0 ? service.suppliers[0].price : 0,
-        supplier_price_total: service.suppliers && service.suppliers.length > 0 ? service.suppliers[0].price : 0
+        price_unit: 0,  // No establecer precio hasta que el usuario seleccione un suplidor
+        price_total: 0,
+        supplier_id: '',  // Vacío hasta que el usuario seleccione
+        supplier_name: '',  // Vacío hasta que el usuario seleccione
+        supplier_price_unit: 0,
+        supplier_price_total: 0
       };
       
       setSelectedExtraServices([newService]);
       setShowExtraServices(true);
       
-      // Recalcular totales
-      const servicesTotal = newService.price_total;
-      const newSubtotal = (formData.base_price || 0) + (formData.extra_hours_cost || 0) + (formData.extra_people_cost || 0) + servicesTotal;
-      const newITBIS = formData.include_itbis ? newSubtotal * 0.18 : 0;
-      const newTotal = newSubtotal + newITBIS - (formData.discount || 0);
-      
+      // NO recalcular totales hasta que el usuario seleccione un suplidor
       setFormData(prev => ({
         ...prev,
         extra_services: [newService],
-        extra_services_total: servicesTotal,
-        subtotal: newSubtotal,
-        itbis_amount: newITBIS,
-        total_amount: newTotal
+        extra_services_total: 0,
+        subtotal: (prev.base_price || 0) + (prev.extra_hours_cost || 0) + (prev.extra_people_cost || 0),
+        itbis_amount: prev.include_itbis ? ((prev.base_price || 0) + (prev.extra_hours_cost || 0) + (prev.extra_people_cost || 0)) * 0.18 : 0,
+        total_amount: ((prev.base_price || 0) + (prev.extra_hours_cost || 0) + (prev.extra_people_cost || 0)) + (prev.include_itbis ? ((prev.base_price || 0) + (prev.extra_hours_cost || 0) + (prev.extra_people_cost || 0)) * 0.18 : 0) - (prev.discount || 0)
       }));
     }
   };
