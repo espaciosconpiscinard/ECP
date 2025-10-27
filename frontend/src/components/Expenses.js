@@ -1482,9 +1482,36 @@ const Expenses = () => {
                       <tr 
                         key={expense.id} 
                         className={`border-b hover:bg-gray-50 cursor-pointer transition-colors ${getUrgencyColor(expense)}`}
-                        onClick={() => {
+                        onClick={async () => {
                           setDetailExpense(expense);
                           setShowDetailsModal(true);
+                          
+                          // Si es un gasto de propietario, cargar gastos de suplidores relacionados
+                          if (expense.category === 'pago_propietario' && expense.related_reservation_id) {
+                            try {
+                              const allExpenses = await (await fetch(
+                                `${import.meta.env.VITE_BACKEND_URL || process.env.REACT_APP_BACKEND_URL}/api/expenses`,
+                                {
+                                  headers: {
+                                    'Authorization': `Bearer ${localStorage.getItem('token')}`
+                                  }
+                                }
+                              )).json();
+                              
+                              // Filtrar gastos de suplidores de esta misma reservación
+                              const relatedSupplierExpenses = allExpenses.filter(e => 
+                                e.category === 'pago_suplidor' && 
+                                e.related_reservation_id === expense.related_reservation_id
+                              );
+                              
+                              setSupplierExpenses(relatedSupplierExpenses);
+                            } catch (err) {
+                              console.error('Error cargando gastos de suplidores:', err);
+                              setSupplierExpenses([]);
+                            }
+                          } else {
+                            setSupplierExpenses([]);
+                          }
                         }}
                         title="Click para ver detalles completos"
                       >
