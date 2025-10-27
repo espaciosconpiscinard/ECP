@@ -894,8 +894,8 @@ async def create_reservation(reservation_data: ReservationCreate, current_user: 
     doc = prepare_doc_for_insert(reservation.model_dump())
     await db.reservations.insert_one(doc)
     
-    # AUTO-CREAR GASTO PARA PAGO AL PROPIETARIO
-    if reservation_data.owner_price > 0 and reservation_data.villa_id:
+    # AUTO-CREAR GASTO PARA PAGO AL PROPIETARIO (SIEMPRE, incluso si owner_price es 0)
+    if reservation_data.villa_id:
         villa = await db.villas.find_one({"id": reservation_data.villa_id}, {"_id": 0})
         if villa:
             # Crear gasto automático para el pago al propietario
@@ -911,7 +911,7 @@ async def create_reservation(reservation_data: ReservationCreate, current_user: 
                 "currency": reservation_data.currency,
                 "expense_date": reservation_data.reservation_date.isoformat() if isinstance(reservation_data.reservation_date, datetime) else reservation_data.reservation_date,
                 "payment_status": "pending",
-                "notes": f"Auto-generado por reservación. Cliente: {reservation_data.customer_name}",
+                "notes": f"Auto-generado por reservación. Cliente: {reservation_data.customer_name}. Puede actualizar monto manualmente.",
                 "related_reservation_id": reservation.id,
                 "created_at": datetime.now(timezone.utc).isoformat(),
                 "created_by": current_user["id"]
@@ -919,7 +919,7 @@ async def create_reservation(reservation_data: ReservationCreate, current_user: 
             
             await db.expenses.insert_one(expense)
     
-    # Si hay owner_price, crear/actualizar deuda al propietario de la villa
+    # Si hay owner_price > 0, crear/actualizar deuda al propietario de la villa
     if reservation_data.owner_price > 0 and reservation_data.villa_id:
         villa = await db.villas.find_one({"id": reservation_data.villa_id}, {"_id": 0})
         if villa:
