@@ -48,6 +48,7 @@ const Expenses = () => {
   const [isAbonoDialogOpen, setIsAbonoDialogOpen] = useState(false);
   const [selectedExpense, setSelectedExpense] = useState(null);
   const [abonos, setAbonos] = useState([]);
+  const [relatedReservation, setRelatedReservation] = useState(null);
   
   // Estado para almacenar los abonos de cada gasto (para mostrar invoice_numbers)
   const [expenseAbonos, setExpenseAbonos] = useState({});
