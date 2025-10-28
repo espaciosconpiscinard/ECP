@@ -557,6 +557,7 @@ const Reservations = () => {
       amount_paid: 0,
       currency: 'DOP',
       notes: '',
+      internal_notes: '',  // Nota interna
       status: 'confirmed'
     });
   };
