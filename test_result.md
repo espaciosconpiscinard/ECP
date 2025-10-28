@@ -412,10 +412,10 @@ frontend:
   - task: "Reservations - Dos variantes de factura (Villa vs Solo Servicios)"
     implemented: true
     working: true
-    file: "/app/frontend/src/components/Reservations.js"
+    file: "/app/frontend/src/components/Reservations.js, /app/backend/models.py, /app/backend/server.py"
     stuck_count: 0
     priority: "high"
-    needs_retesting: false
+    needs_retesting: true
     status_history:
       - working: "NA"
         agent: "main"
@@ -423,6 +423,12 @@ frontend:
       - working: true
         agent: "main"
         comment: "✅ VERIFICADO: Error de sintaxis corregido (faltaba cierre de condicional). Formulario se renderiza sin errores. Dos variantes funcionando: 'Factura con Villa' muestra campos de villa/huéspedes/tipo renta. 'Solo Servicios' oculta campos irrelevantes y muestra sección de servicios. Screenshots verifican renderizado correcto."
+      - working: false
+        agent: "user"
+        comment: "Usuario reportó error 500 (Internal Server Error) al intentar guardar factura de Solo Servicios. La factura solo se guarda si se incluye junto con una villa, pero deberían ser independientes."
+      - working: true
+        agent: "main"
+        comment: "✅ BUG CORREGIDO: Error 500 causado por 3 problemas: 1) Faltaba import uuid al inicio de server.py, 2) Import duplicado de uuid dentro de función create_reservation causaba UnboundLocalError, 3) Campos obligatorios en modelo ReservationBase impedían facturas sin villa. CORRECCIONES: Agregado 'import uuid' en línea 9 de server.py. Eliminado import duplicado dentro de función (línea 955). Modificado ReservationBase en models.py: villa_id, villa_code, rental_type ahora Optional, base_price con default 0.0, guests con default 0. Ahora soporta facturas de Solo Servicios sin villa."
 
   - task: "Reservations - Campo invoice_number en formulario de abono"
     implemented: true
