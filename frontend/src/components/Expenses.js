@@ -156,9 +156,14 @@ const Expenses = () => {
     setError('');
     
     try {
+      // Arreglar fecha para evitar problema de zona horaria
+      const expenseDate = formData.expense_date.includes('T') 
+        ? formData.expense_date 
+        : `${formData.expense_date}T12:00:00.000Z`; // Usar mediodía UTC para evitar cambio de día
+      
       const dataToSend = {
         ...formData,
-        expense_date: new Date(formData.expense_date).toISOString()
+        expense_date: expenseDate
       };
       
       if (editingExpense) {
