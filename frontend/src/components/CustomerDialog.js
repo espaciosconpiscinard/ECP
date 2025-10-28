@@ -50,7 +50,7 @@ const CustomerDialog = ({ onCustomerCreated }) => {
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger asChild>
-        <Button variant="outline" size="sm" data-testid="quick-add-customer-button">
+        <Button type="button" variant="outline" size="sm" data-testid="quick-add-customer-button">
           <Plus className="mr-2 h-4 w-4" /> Cliente Rápido
         </Button>
       </DialogTrigger>
