@@ -21,16 +21,23 @@ const CustomerDialog = ({ onCustomerCreated }) => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    e.stopPropagation(); // Prevenir propagación al formulario padre
     setError('');
     
     try {
       const response = await createCustomer(formData);
-      setIsOpen(false);
-      resetForm();
+      
+      // Llamar callback ANTES de cerrar el dialog y mostrar alert
       if (onCustomerCreated) {
         onCustomerCreated(response.data);
       }
-      alert('Cliente creado exitosamente');
+      
+      // Cerrar dialog después de un breve delay
+      setTimeout(() => {
+        setIsOpen(false);
+        resetForm();
+        alert('Cliente creado exitosamente');
+      }, 100);
     } catch (err) {
       setError(err.response?.data?.detail || 'Error al crear cliente');
     }
