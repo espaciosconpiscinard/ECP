@@ -2017,9 +2017,12 @@ const Reservations = () => {
                     </p>
                   )}
                 </div>
+                </>
+                )}
                 
-                {/* Checkbox para servicios adicionales */}
-                <div className="col-span-2">
+                {/* Checkbox para servicios adicionales - Solo para villas */}
+                {invoiceType === 'villa' && (
+                  <div className="col-span-2">
                   <label className="flex items-center space-x-2 cursor-pointer">
                     <input
                       type="checkbox"
