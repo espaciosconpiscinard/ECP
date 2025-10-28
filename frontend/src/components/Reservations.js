@@ -1344,11 +1344,13 @@ const Reservations = () => {
                 <div className="col-span-2">
                   <div className="flex justify-between items-center mb-2">
                     <Label>Cliente *</Label>
-                    <CustomerDialog onCustomerCreated={async (newCustomer) => {
-                      await fetchData();
-                      // Auto-seleccionar el cliente recién creado
+                    <CustomerDialog onCustomerCreated={(newCustomer) => {
+                      // Solo actualizar el cliente seleccionado, NO cerrar el formulario
                       setCustomerSearchTerm(newCustomer.name);
                       setFormData({ ...formData, customer_id: newCustomer.id, customer_name: newCustomer.name });
+                      setShowCustomerDropdown(false);
+                      // Recargar lista de clientes en background
+                      fetchData();
                     }} />
                   </div>
                   <div className="relative">
