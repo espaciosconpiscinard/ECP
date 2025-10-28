@@ -2162,7 +2162,6 @@ const Reservations = () => {
                     ))}
                   </div>
                 )}
-                )}
 
                 {/* Descuento */}
                 <div className="col-span-2">
