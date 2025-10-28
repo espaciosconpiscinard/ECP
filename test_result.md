@@ -512,6 +512,12 @@ frontend:
       - working: true
         agent: "main"
         comment: "✅ IMPLEMENTADO: Agregado botón 'Cliente Rápido' al lado del campo Cliente en formulario de reservación. Usa componente CustomerDialog existente con callback onCustomerCreated. Al crear un cliente, automáticamente se recarga la lista y se selecciona el cliente recién creado en el formulario. Corregido encoding de caracteres especiales en CustomerDialog.js."
+      - working: false
+        agent: "user"
+        comment: "Usuario reportó que crear cliente aún cierra el formulario y crea factura vacía. Bug persistente."
+      - working: true
+        agent: "main"
+        comment: "✅ BUG CORREGIDO: La función callback de onCustomerCreated llamaba fetchData() que recarga TODAS las reservaciones y podía causar efectos secundarios. Cambiado a fetchCustomersOnly() que solo recarga la lista de clientes sin afectar reservaciones. Callback ahora: selecciona cliente nuevo, actualiza formData, cierra dropdown de clientes, y recarga solo clientes en background."
 
   - task: "Backend - Auto-generación de gasto para owner_price"
     implemented: true
