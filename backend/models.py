@@ -188,13 +188,13 @@ class ReservationExtraService(BaseModel):
 class ReservationBase(BaseModel):
     customer_id: str
     customer_name: str
-    villa_id: str
-    villa_code: str  # ECPVSH
+    villa_id: Optional[str] = None  # Opcional para facturas de solo servicios
+    villa_code: Optional[str] = None  # Opcional para facturas de solo servicios
     villa_description: Optional[str] = None
     villa_location: Optional[str] = None  # Ubicación de la villa
     
-    # Tipo de renta
-    rental_type: Literal["pasadia", "amanecida", "evento"] = "pasadia"
+    # Tipo de renta (opcional para facturas de solo servicios)
+    rental_type: Optional[Literal["pasadia", "amanecida", "evento"]] = None
     event_type: Optional[str] = None  # Si es evento, qué tipo
     
     # Fechas y horarios
@@ -202,13 +202,13 @@ class ReservationBase(BaseModel):
     check_in_time: str  # "9:00 AM"
     check_out_time: str  # "8:00 PM"
     
-    # Personas
-    guests: int = 1
+    # Personas (opcional para facturas de solo servicios)
+    guests: int = 0
     extra_people: int = 0  # Cantidad de personas extras
     extra_people_cost: float = 0.0  # Costo de personas extras
     
-    # Precios
-    base_price: float  # Precio base de la villa al cliente
+    # Precios (base_price opcional para facturas de solo servicios)
+    base_price: float = 0.0  # Precio base de la villa al cliente
     owner_price: float = 0.0  # Precio a pagar al propietario
     extra_hours: float = 0.0
     extra_hours_cost: float = 0.0
