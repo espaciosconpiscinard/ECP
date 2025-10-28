@@ -1321,7 +1321,6 @@ async def delete_reservation_abono(reservation_id: str, abono_id: str, current_u
 @api_router.post("/quotations", response_model=Quotation)
 async def create_quotation(quotation_data: QuotationCreate, current_user: dict = Depends(get_current_user)):
     """Create a new quotation"""
-    from models import Quotation
     
     # Generate quotation number
     if quotation_data.quotation_number and current_user.get("role") == "admin":
