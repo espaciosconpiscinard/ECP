@@ -1490,9 +1490,10 @@ const Reservations = () => {
                   />
                 )}
                 
-                {/* Tipo de Renta */}
-                <div className="col-span-2">
-                  <Label>Tipo de Renta *</Label>
+                {/* Tipo de Renta - Solo para facturas con villa */}
+                {invoiceType === 'villa' && (
+                  <div className="col-span-2">
+                    <Label>Tipo de Renta *</Label>
                   <div className="grid grid-cols-3 gap-2 mt-2">
                     <button
                       type="button"
