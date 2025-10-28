@@ -2148,6 +2148,11 @@ class BackendTester:
         self.test_register_admin()
         self.test_register_employee()
         self.test_admin_login()
+        
+        # Approve employee if admin token is available
+        if self.admin_token:
+            self.approve_employee()
+        
         self.test_employee_login()
         
         # Category tests (admin)
