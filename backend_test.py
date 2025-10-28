@@ -1910,13 +1910,57 @@ class BackendTester:
         
         self.log_test("Get Customer for Solo Servicios", True, f"Using customer: {test_customer['name']}")
         
-        # Step 3: Create a "Solo Servicios" invoice (NO villa, only services)
+        # Step 3: Get existing extra services to use proper service_id
+        services_result = self.make_request("GET", "/extra-services", token=self.admin_token)
+        if not services_result.get("success") or not services_result["data"]:
+            # Create test services if none exist
+            service1_data = {
+                "name": "Decoración con Globos",
+                "description": "Servicio de decoración con globos",
+                "default_price": 3500.0,
+                "currency": "DOP"
+            }
+            service1_result = self.make_request("POST", "/extra-services", service1_data, self.admin_token)
+            
+            service2_data = {
+                "name": "Servicio de DJ",
+                "description": "Servicio de DJ profesional",
+                "default_price": 5000.0,
+                "currency": "DOP"
+            }
+            service2_result = self.make_request("POST", "/extra-services", service2_data, self.admin_token)
+            
+            if service1_result.get("success") and service2_result.get("success"):
+                service1_id = service1_result["data"]["id"]
+                service2_id = service2_result["data"]["id"]
+            else:
+                self.log_test("Create Test Services", False, "Failed to create test services")
+                return
+        else:
+            # Use existing services or create if needed
+            services = services_result["data"]
+            if len(services) >= 2:
+                service1_id = services[0]["id"]
+                service2_id = services[1]["id"]
+            else:
+                # Create additional services if needed
+                service1_data = {
+                    "name": "Decoración con Globos",
+                    "description": "Servicio de decoración con globos",
+                    "default_price": 3500.0,
+                    "currency": "DOP"
+                }
+                service1_result = self.make_request("POST", "/extra-services", service1_data, self.admin_token)
+                service1_id = service1_result["data"]["id"] if service1_result.get("success") else services[0]["id"]
+                service2_id = services[0]["id"] if len(services) > 0 else service1_id
+        
+        # Step 4: Create a "Solo Servicios" invoice (NO villa, only services)
         # This simulates selecting "Solo Servicios" option in the frontend
         solo_servicios_data = {
             "customer_id": test_customer["id"],
             "customer_name": test_customer["name"],
             # NO villa_id - this is key for "Solo Servicios"
-            "rental_type": "servicio",
+            "rental_type": "pasadia",  # Use valid rental_type
             "reservation_date": "2025-01-21T00:00:00Z",
             "check_in_time": "",
             "check_out_time": "",
@@ -1931,6 +1975,7 @@ class BackendTester:
             "notes": "Factura Solo Servicios - Testing",
             "extra_services": [
                 {
+                    "service_id": service1_id,
                     "service_name": "Decoración con Globos",
                     "supplier_name": "Decoraciones Bella",
                     "quantity": 1,
@@ -1939,6 +1984,7 @@ class BackendTester:
                     "total": 3500.0
                 },
                 {
+                    "service_id": service2_id,
                     "service_name": "Servicio de DJ",
                     "supplier_name": "DJ Professional",
                     "quantity": 1,
