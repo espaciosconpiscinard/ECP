@@ -2261,8 +2261,9 @@ const Reservations = () => {
             </form>
           </DialogContent>
         </Dialog>
-        
-        {/* Segundo botón y Dialog para Factura Solo Servicios */}
+      </div>
+
+      {/* Tarjetas de Totales */}
         <Dialog open={isFormOpen && invoiceType === 'service'} onOpenChange={(open) => {
           if (!open) {
             setIsFormOpen(false);
@@ -2607,8 +2608,9 @@ const Reservations = () => {
             </form>
           </DialogContent>
         </Dialog>
-        
-        {/* Segundo botón y Dialog para Factura Solo Servicios */}
+      </div>
+
+      {/* Tarjetas de Totales */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
         {/* Total de Facturas */}
         <Card>
