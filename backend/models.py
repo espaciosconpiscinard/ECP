@@ -558,6 +558,8 @@ class CommissionUpdate(BaseModel):
     notes: Optional[str] = None
     paid: Optional[bool] = None
     paid_date: Optional[str] = None
+    invoice_deleted: Optional[bool] = None
+    invoice_deleted_date: Optional[str] = None
 
 # ============ DASHBOARD MODELS ============
 class DashboardStats(BaseModel):
