@@ -1495,7 +1495,6 @@ async def convert_quotation_to_invoice(quotation_id: str, current_user: dict = D
 @api_router.post("/conduces", response_model=Conduce)
 async def create_conduce(conduce_data: ConduceCreate, current_user: dict = Depends(get_current_user)):
     """Create a new conduce (delivery note)"""
-    from models import Conduce
     
     # Generate conduce number
     if conduce_data.conduce_number and current_user.get("role") == "admin":
