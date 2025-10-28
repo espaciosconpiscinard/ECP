@@ -436,7 +436,7 @@ const Expenses = () => {
       let pendingFiltered = [];
       if (paymentStatusFilter !== 'paid') {
         pendingFiltered = visibleExpenses.filter(expense => {
-          if (!(expense.category === 'pago_propietario' || expense.related_reservation_id)) return false;
+          if (!(expense.category === 'pago_propietario' || expense.category === 'pago_servicios' || expense.related_reservation_id)) return false;
           if (expense.payment_status !== 'pending') return false;
           const expenseDate = new Date(expense.expense_date);
           const selectedDate = new Date(selectedYear, selectedMonth, 1);
