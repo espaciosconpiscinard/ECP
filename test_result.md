@@ -409,6 +409,21 @@ frontend:
         comment: "Actualizada tabla a vista lista expandible. Vista compacta: cliente, código villa, fecha, pagado, restante. Vista expandida: todos los detalles + acciones"
       - working: true
 
+  - task: "Reservations - Dos variantes de factura (Villa vs Solo Servicios)"
+    implemented: true
+    working: true
+    file: "/app/frontend/src/components/Reservations.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Implementado state invoiceType ('villa' | 'service') con dos botones de selección al inicio del formulario. Renderizado condicional para mostrar/ocultar campos según tipo. Tipo 'villa': muestra todos los campos (tipo renta, villa, precio base, pago propietario, huéspedes, extras). Tipo 'service': oculta campos de villa y muestra solo sección 'Servicios a Facturar'. Función handleSelectService actualizada para poblar service_name correctamente."
+      - working: true
+        agent: "main"
+        comment: "✅ VERIFICADO: Error de sintaxis corregido (faltaba cierre de condicional). Formulario se renderiza sin errores. Dos variantes funcionando: 'Factura con Villa' muestra campos de villa/huéspedes/tipo renta. 'Solo Servicios' oculta campos irrelevantes y muestra sección de servicios. Screenshots verifican renderizado correcto."
+
   - task: "Reservations - Campo invoice_number en formulario de abono"
     implemented: true
     working: "NA"
