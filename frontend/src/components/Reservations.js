@@ -2033,9 +2033,10 @@ const Reservations = () => {
                     <span className="font-medium">¿Lleva servicios adicionales?</span>
                   </label>
                 </div>
+                )}
 
                 {/* Servicios Extras */}
-                {showExtraServices && (
+                {invoiceType === 'villa' && showExtraServices && (
                   <div className="col-span-2 border-2 border-blue-200 p-4 rounded-md bg-blue-50">
                     <div className="flex justify-between items-center mb-3">
                       <Label className="text-lg font-bold">Servicios Adicionales</Label>
