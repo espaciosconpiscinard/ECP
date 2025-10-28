@@ -92,6 +92,7 @@ const Reservations = () => {
     amount_paid: 0,
     currency: 'DOP',
     notes: '',
+    internal_notes: '',  // Nota interna (no se imprime)
     status: 'confirmed',
     invoice_number: null  // Solo admin puede establecer manualmente
   });
