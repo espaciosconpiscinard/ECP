@@ -19,6 +19,8 @@ from models import (
     VillaCreate, Villa,
     ExtraServiceCreate, ExtraService,
     ReservationCreate, ReservationUpdate, Reservation,
+    QuotationCreate, QuotationUpdate, Quotation,
+    ConduceCreate, ConduceUpdate, Conduce,
     VillaOwnerCreate, VillaOwnerUpdate, VillaOwner,
     PaymentCreate, Payment,
     AbonoCreate, Abono,
