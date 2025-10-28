@@ -1432,8 +1432,8 @@ const Reservations = () => {
                       setCustomerSearchTerm(newCustomer.name);
                       setFormData({ ...formData, customer_id: newCustomer.id, customer_name: newCustomer.name });
                       setShowCustomerDropdown(false);
-                      // Recargar lista de clientes en background
-                      fetchData();
+                      // Recargar solo lista de clientes en background (NO reservations)
+                      fetchCustomersOnly();
                     }} />
                   </div>
                   <div className="relative">
