@@ -1793,6 +1793,11 @@ class BackendTester:
         print("\n👤 Employee Permission Tests")
         self.test_employee_permissions()
         
+        # CRITICAL BUG FIXES TESTING (Priority)
+        print("\n🐛 Critical Bug Fixes Testing")
+        self.test_ghost_invoice_bug_cliente_rapido()
+        self.test_solo_servicios_expense_display()
+        
         # Auto-expense creation flow
         print("\n💰 Auto-Expense Creation Tests")
         self.test_auto_expense_creation_flow()
