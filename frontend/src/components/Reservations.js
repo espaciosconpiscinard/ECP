@@ -9,6 +9,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { Plus, Edit, Trash2, Printer, Search, X, ChevronDown, ChevronUp, Download } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import CustomerDialog from './CustomerDialog';
+import html2pdf from 'html2pdf.js';
 
 const API_URL = process.env.REACT_APP_BACKEND_URL || '';
 
