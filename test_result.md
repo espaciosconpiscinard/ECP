@@ -931,6 +931,33 @@ agent_communication:
       - Testing backend para validar que el campo is_default se guarda correctamente
       - Verificar que al crear/editar villa, el checkbox funciona end-to-end
 
+  - agent: "main"
+    message: |
+      ✅ CORRECCIÓN COMPLETADA - ERROR DE SINTAXIS EN RESERVATIONS.JS
+      
+      PROBLEMA IDENTIFICADO:
+      - Error de sintaxis en línea 2037: "Unexpected token, expected ',''"
+      - Causa: Falta de cierre de condicional `{invoiceType === 'villa' && (`
+      
+      CORRECCIÓN APLICADA:
+      - ✅ Agregado cierre correcto `)}` en línea 2036
+      - ✅ Comentario JSX `{/* Servicios Extras */}` correctamente formateado
+      - ✅ Condicional para mostrar extras solo en tipo 'villa' funcionando
+      
+      VERIFICACIÓN VISUAL COMPLETADA:
+      1. ✅ Formulario "Nueva Factura" se abre sin errores
+      2. ✅ Dos variantes visibles: "Factura con Villa" y "Solo Servicios"
+      3. ✅ Tipo "Factura con Villa" muestra todos los campos (villa, tipo renta, huéspedes, extras)
+      4. ✅ Tipo "Solo Servicios" oculta campos correctamente:
+         - ❌ No muestra: Tipo de Renta, Villas Y Servicios, Precio Base, Pago Propietario, Huéspedes
+         - ✅ Muestra: Sección "Servicios a Facturar" con botón "+ Agregar Servicio"
+      5. ✅ Sin errores en consola de navegador (solo warnings de WebSocket que son normales)
+      
+      ESTADO ACTUAL: 
+      - Sintaxis corregida ✅
+      - Dos variantes de factura funcionando correctamente ✅
+      - Renderizado condicional operativo ✅
+
   - agent: "testing"
     message: |
       🎯 CHECKBOX 'POR DEFECTO' TESTING COMPLETADO - TODOS LOS TESTS PASARON ✅
