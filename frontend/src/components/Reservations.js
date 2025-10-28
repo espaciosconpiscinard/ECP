@@ -1369,63 +1369,6 @@ const Reservations = () => {
                   {editingReservation ? 'Editar Factura' : 'Nueva Factura - Villa y Servicios'}
                 </DialogTitle>
               </DialogHeader>
-              <div className="mb-4 p-4 bg-gray-50 rounded-lg border border-gray-300">
-                <label className="block text-sm font-medium text-gray-700 mb-2">Tipo de Factura</label>
-                <div className="grid grid-cols-2 gap-3">
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setInvoiceType('villa');
-                      setFormData({
-                        ...formData,
-                        villa_id: '',
-                        base_price: 0,
-                        owner_price: 0
-                      });
-                      setVillaSearchTerm('');
-                    }}
-                    className={`p-4 rounded-lg border-2 transition-all ${
-                      invoiceType === 'villa' 
-                        ? 'border-blue-600 bg-blue-50 text-blue-900' 
-                        : 'border-gray-300 bg-white text-gray-700 hover:border-gray-400'
-                    }`}
-                  >
-                    <div className="text-center">
-                      <div className="text-3xl mb-2">🏡</div>
-                      <div className="font-semibold">Factura con Villa</div>
-                      <div className="text-xs mt-1">Incluye villa + servicios</div>
-                    </div>
-                  </button>
-                  
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setInvoiceType('service');
-                      setFormData({
-                        ...formData,
-                        villa_id: '',
-                        base_price: 0,
-                        owner_price: 0,
-                        rental_type: 'pasadia'
-                      });
-                      setVillaSearchTerm('');
-                      setShowExtraServices(true);
-                    }}
-                    className={`p-4 rounded-lg border-2 transition-all ${
-                      invoiceType === 'service' 
-                        ? 'border-green-600 bg-green-50 text-green-900' 
-                        : 'border-gray-300 bg-white text-gray-700 hover:border-gray-400'
-                    }`}
-                  >
-                    <div className="text-center">
-                      <div className="text-3xl mb-2">🛎️</div>
-                      <div className="font-semibold">Solo Servicios</div>
-                      <div className="text-xs mt-1">DJ, buffet, decoración, etc.</div>
-                    </div>
-                  </button>
-                </div>
-              </div>
-            )}
 
             <form onSubmit={handleSubmit} className="space-y-4">
               <div className="grid grid-cols-2 gap-4">
