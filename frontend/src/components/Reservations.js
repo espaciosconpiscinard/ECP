@@ -1203,6 +1203,446 @@ const Reservations = () => {
     printWindow.document.close();
   };
 
+  const handleDownloadPDF = async (reservation) => {
+    // Cargar los abonos de esta reservación
+    let abonos = [];
+    try {
+      const response = await fetch(`${API_URL}/api/reservations/${reservation.id}/abonos`, {
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem('token')}`
+        }
+      });
+      if (response.ok) {
+        abonos = await response.json();
+      }
+    } catch (err) {
+      console.error('Error loading abonos for PDF:', err);
+    }
+    
+    const balanceDue = reservation.balance_due || 0;
+    
+    // Generar HTML de políticas
+    let policiesHtml = '';
+    if (invoiceTemplate && invoiceTemplate.policies && invoiceTemplate.policies.length > 0) {
+      policiesHtml = invoiceTemplate.policies.map(policy => `<p>• ${policy}</p>`).join('');
+    } else {
+      // Políticas por defecto
+      policiesHtml = `
+        <p>• El depósito de seguridad es reembolsable si no hay daños a la propiedad.</p>
+        <p>• Las reservaciones se garantizan con el pago del 50% del total.</p>
+        <p>• No hay reembolsos por cancelaciones, llegadas tardías o salidas anticipadas.</p>
+        <p>• El número máximo de huéspedes no debe ser excedido.</p>
+        <p>• Cualquier daño será cobrado al cliente. Prohibido fumar en áreas cerradas.</p>
+      `;
+    }
+    
+    // Crear elemento temporal para el PDF
+    const tempDiv = document.createElement('div');
+    tempDiv.style.position = 'absolute';
+    tempDiv.style.left = '-9999px';
+    tempDiv.innerHTML = `
+      <html>
+        <head>
+          <style>
+            * { margin: 0; padding: 0; box-sizing: border-box; }
+            body { 
+              font-family: 'Arial', sans-serif; 
+              color: #333;
+              background: white;
+            }
+            .invoice-wrapper {
+              width: 900px;
+              margin: 0 auto;
+              background: white;
+            }
+            
+            .top-bar {
+              height: 15px;
+              background: #0ea5e9;
+            }
+            
+            .header {
+              display: flex;
+              justify-content: space-between;
+              padding: 40px 50px 30px;
+              border-bottom: 3px solid #0369a1;
+            }
+            .header-left {
+              display: flex;
+              align-items: center;
+              gap: 15px;
+            }
+            .logo { 
+              height: 60px; 
+              width: auto;
+            }
+            .brand-info {
+              display: flex;
+              flex-direction: column;
+            }
+            .brand-name { 
+              font-size: 16px; 
+              font-weight: 700;
+              color: #0369a1;
+              line-height: 1.2;
+            }
+            .brand-tagline { 
+              font-size: 11px; 
+              color: #64748b;
+              font-style: italic;
+            }
+            .invoice-title {
+              text-align: right;
+            }
+            .invoice-title h1 { 
+              font-size: 32px; 
+              color: #0ea5e9; 
+              font-weight: 900; 
+            }
+            .invoice-title .invoice-number { 
+              font-size: 14px; 
+              color: #64748b; 
+            }
+            
+            .info-section {
+              display: flex;
+              justify-content: space-between;
+              padding: 30px 50px;
+              gap: 30px;
+            }
+            .info-box {
+              flex: 1;
+              background: #f8fafc;
+              padding: 20px;
+              border-radius: 8px;
+              border-left: 4px solid #0ea5e9;
+            }
+            .info-box h3 {
+              font-size: 12px;
+              color: #0369a1;
+              text-transform: uppercase;
+              letter-spacing: 1px;
+              margin-bottom: 10px;
+              font-weight: 700;
+            }
+            .info-box p {
+              font-size: 13px;
+              line-height: 1.6;
+              color: #334155;
+            }
+            
+            .items-section {
+              padding: 20px 50px;
+            }
+            table {
+              width: 100%;
+              border-collapse: collapse;
+              font-size: 13px;
+            }
+            thead th {
+              background: #0369a1;
+              color: white;
+              padding: 12px;
+              text-align: left;
+              font-weight: 600;
+              text-transform: uppercase;
+              font-size: 11px;
+              letter-spacing: 0.5px;
+            }
+            tbody td {
+              padding: 12px;
+              border-bottom: 1px solid #e2e8f0;
+            }
+            tbody tr:hover {
+              background: #f8fafc;
+            }
+            .item-name {
+              font-weight: 600;
+              color: #0f172a;
+            }
+            .text-right {
+              text-align: right;
+            }
+            
+            .totals-section {
+              padding: 20px 50px;
+              background: #f8fafc;
+            }
+            .totals-grid {
+              max-width: 400px;
+              margin-left: auto;
+            }
+            .total-row {
+              display: flex;
+              justify-content: space-between;
+              padding: 8px 0;
+              font-size: 13px;
+            }
+            .total-row.subtotal {
+              border-top: 1px solid #cbd5e1;
+              padding-top: 12px;
+              margin-top: 8px;
+            }
+            .total-row.grand-total {
+              border-top: 2px solid #0369a1;
+              padding-top: 12px;
+              margin-top: 8px;
+              font-size: 16px;
+              font-weight: 700;
+              color: #0369a1;
+            }
+            .total-row .label {
+              color: #64748b;
+            }
+            .total-row.grand-total .label {
+              color: #0369a1;
+            }
+            
+            .notes-section {
+              padding: 20px 50px;
+            }
+            .notes-section h3 {
+              font-size: 12px;
+              color: #0369a1;
+              text-transform: uppercase;
+              margin-bottom: 10px;
+              font-weight: 700;
+            }
+            .notes-section p {
+              font-size: 12px;
+              color: #64748b;
+              line-height: 1.6;
+            }
+            
+            .policies-section {
+              padding: 25px 50px;
+              background: #f1f5f9;
+              border-top: 2px solid #cbd5e1;
+            }
+            .policies-section h3 {
+              font-size: 13px;
+              color: #0369a1;
+              text-transform: uppercase;
+              margin-bottom: 12px;
+              font-weight: 700;
+            }
+            .policies-section p {
+              font-size: 11px;
+              color: #475569;
+              line-height: 1.7;
+              margin-bottom: 5px;
+            }
+            
+            .footer {
+              padding: 25px 50px;
+              text-align: center;
+              background: #0369a1;
+              color: white;
+            }
+            .thank-you {
+              font-size: 16px;
+              font-weight: 700;
+              margin-bottom: 8px;
+            }
+            .footer-contact {
+              font-size: 11px;
+              opacity: 0.9;
+            }
+            
+            .status-badge {
+              display: inline-block;
+              padding: 4px 12px;
+              border-radius: 12px;
+              font-size: 11px;
+              font-weight: 600;
+              text-transform: uppercase;
+            }
+            .status-pending {
+              background: #fef3c7;
+              color: #92400e;
+            }
+            .status-paid {
+              background: #d1fae5;
+              color: #065f46;
+            }
+            .status-partial {
+              background: #dbeafe;
+              color: #1e40af;
+            }
+          </style>
+        </head>
+        <body>
+          <div class="invoice-wrapper">
+            <div class="top-bar"></div>
+            
+            <div class="header">
+              <div class="header-left">
+                ${logoData ? `<img src="${logoData}" class="logo" alt="Logo" />` : ''}
+                <div class="brand-info">
+                  <div class="brand-name">Espacios Con Piscina</div>
+                  <div class="brand-tagline">Alquiler de villas premium</div>
+                </div>
+              </div>
+              <div class="invoice-title">
+                <h1>FACTURA</h1>
+                <div class="invoice-number">#${reservation.invoice_number}</div>
+              </div>
+            </div>
+            
+            <div class="info-section">
+              <div class="info-box">
+                <h3>Cliente</h3>
+                <p><strong>${reservation.customer_name}</strong></p>
+              </div>
+              <div class="info-box">
+                <h3>Fecha</h3>
+                <p>${new Date(reservation.reservation_date).toLocaleDateString('es-ES', { year: 'numeric', month: 'long', day: 'numeric' })}</p>
+              </div>
+              <div class="info-box">
+                <h3>Estado de Pago</h3>
+                <p>
+                  ${balanceDue <= 0 
+                    ? '<span class="status-badge status-paid">PAGADO</span>' 
+                    : reservation.amount_paid > 0 
+                      ? '<span class="status-badge status-partial">PAGO PARCIAL</span>'
+                      : '<span class="status-badge status-pending">PENDIENTE</span>'
+                  }
+                </p>
+              </div>
+            </div>
+            
+            <div class="items-section">
+              <table>
+                <thead>
+                  <tr>
+                    <th>CONCEPTO</th>
+                    <th class="text-right">CANTIDAD</th>
+                    <th class="text-right">PRECIO</th>
+                    <th class="text-right">TOTAL</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  ${reservation.villa_code ? `
+                    <tr>
+                      <td class="item-name">${reservation.villa_code}${reservation.villa_location ? ` - ${reservation.villa_location}` : ''}</td>
+                      <td class="text-right">1</td>
+                      <td class="text-right">${reservation.currency} ${reservation.base_price.toFixed(2)}</td>
+                      <td class="text-right">${reservation.currency} ${reservation.base_price.toFixed(2)}</td>
+                    </tr>
+                  ` : ''}
+                  ${reservation.extra_people > 0 ? `
+                    <tr>
+                      <td>Personas extra</td>
+                      <td class="text-right">${reservation.extra_people}</td>
+                      <td class="text-right">${reservation.currency} ${(reservation.extra_people_cost / reservation.extra_people).toFixed(2)}</td>
+                      <td class="text-right">${reservation.currency} ${reservation.extra_people_cost.toFixed(2)}</td>
+                    </tr>
+                  ` : ''}
+                  ${reservation.extra_hours > 0 ? `
+                    <tr>
+                      <td>Horas extra</td>
+                      <td class="text-right">${reservation.extra_hours}</td>
+                      <td class="text-right">${reservation.currency} ${(reservation.extra_hours_cost / reservation.extra_hours).toFixed(2)}</td>
+                      <td class="text-right">${reservation.currency} ${reservation.extra_hours_cost.toFixed(2)}</td>
+                    </tr>
+                  ` : ''}
+                  ${reservation.extra_services && reservation.extra_services.length > 0 
+                    ? reservation.extra_services.map(service => `
+                      <tr>
+                        <td>${service.service_name || 'Servicio adicional'}${service.supplier_name ? ` (${service.supplier_name})` : ''}</td>
+                        <td class="text-right">${service.quantity || 1}</td>
+                        <td class="text-right">${reservation.currency} ${service.unit_price?.toFixed(2) || '0.00'}</td>
+                        <td class="text-right">${reservation.currency} ${service.total?.toFixed(2) || '0.00'}</td>
+                      </tr>
+                    `).join('')
+                    : ''
+                  }
+                </tbody>
+              </table>
+            </div>
+            
+            <div class="totals-section">
+              <div class="totals-grid">
+                <div class="total-row subtotal">
+                  <span class="label">Subtotal:</span>
+                  <span>${reservation.currency} ${reservation.subtotal.toFixed(2)}</span>
+                </div>
+                ${reservation.discount > 0 ? `
+                  <div class="total-row">
+                    <span class="label">Descuento:</span>
+                    <span>-${reservation.currency} ${reservation.discount.toFixed(2)}</span>
+                  </div>
+                ` : ''}
+                ${reservation.include_itbis ? `
+                  <div class="total-row">
+                    <span class="label">ITBIS (18%):</span>
+                    <span>${reservation.currency} ${reservation.itbis_amount.toFixed(2)}</span>
+                  </div>
+                ` : ''}
+                <div class="total-row grand-total">
+                  <span class="label">TOTAL:</span>
+                  <span>${reservation.currency} ${reservation.total_amount.toFixed(2)}</span>
+                </div>
+                ${reservation.amount_paid > 0 ? `
+                  <div class="total-row">
+                    <span class="label">Pagado:</span>
+                    <span>${reservation.currency} ${reservation.amount_paid.toFixed(2)}</span>
+                  </div>
+                  <div class="total-row" style="color: ${balanceDue > 0 ? '#dc2626' : '#16a34a'}">
+                    <span class="label">Balance:</span>
+                    <span>${reservation.currency} ${balanceDue.toFixed(2)}</span>
+                  </div>
+                ` : ''}
+              </div>
+            </div>
+            
+            ${reservation.notes ? `
+              <div class="notes-section">
+                <h3>Notas</h3>
+                <p>${reservation.notes}</p>
+              </div>
+            ` : ''}
+            
+            <div class="policies-section">
+              <h3>Políticas y Condiciones</h3>
+              ${policiesHtml}
+            </div>
+            
+            <div class="footer">
+              <div class="thank-you">GRACIAS POR SU PREFERENCIA</div>
+              <div class="footer-contact">
+                Calle Mencia #5, Ensanche Los Tainos, San Isidro, SDE | 
+                Contacto: 829-904-4245 (WhatsApp)
+              </div>
+            </div>
+          </div>
+        </body>
+      </html>
+    `;
+    
+    document.body.appendChild(tempDiv);
+    
+    // Configuración de html2pdf
+    const opt = {
+      margin: 0,
+      filename: `Factura_${reservation.invoice_number}.pdf`,
+      image: { type: 'jpeg', quality: 0.98 },
+      html2canvas: { scale: 2, useCORS: true },
+      jsPDF: { unit: 'mm', format: 'letter', orientation: 'portrait' }
+    };
+    
+    // Generar y descargar PDF
+    try {
+      await html2pdf().set(opt).from(tempDiv).save();
+    } catch (error) {
+      console.error('Error generating PDF:', error);
+      alert('Error al generar el PDF. Por favor, intenta nuevamente.');
+    } finally {
+      document.body.removeChild(tempDiv);
+    }
+  };
+
+
   const formatCurrency = (amount, currency) => {
     const formatted = new Intl.NumberFormat('es-DO').format(amount);
     return currency === 'DOP' ? `RD$ ${formatted}` : `$ ${formatted}`;
