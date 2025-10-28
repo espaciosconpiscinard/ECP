@@ -1380,7 +1380,13 @@ const Reservations = () => {
           </Button>
         </div>
         
-        <Dialog open={isFormOpen} onOpenChange={setIsFormOpen}>
+        <Dialog open={isFormOpen} onOpenChange={(open) => {
+          // Solo cerrar si es un cierre intencional (click fuera o ESC)
+          // NO cerrar por eventos de diálogos anidados
+          if (!open) {
+            setIsFormOpen(false);
+          }
+        }}>
           <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
             <DialogHeader>
               <DialogTitle>
