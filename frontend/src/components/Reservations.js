@@ -1620,6 +1620,7 @@ const Reservations = () => {
                     <p className="text-xs text-gray-500 mt-1">Selecciona una villa o servicio (opcional)</p>
                   )}
                 </div>
+                )}
 
                 {/* Click fuera para cerrar dropdown */}
                 {showVillaDropdown && (
