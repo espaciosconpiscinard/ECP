@@ -1013,7 +1013,6 @@ async def create_reservation(reservation_data: ReservationCreate, current_user: 
             if not owner:
                 # Crear nuevo propietario
                 from models import VillaOwner
-                import uuid
                 owner = {
                     "id": str(uuid.uuid4()),
                     "name": owner_name,
