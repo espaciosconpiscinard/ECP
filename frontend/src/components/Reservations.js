@@ -1349,26 +1349,39 @@ const Reservations = () => {
           <p className="text-gray-500 mt-1">Gestiona las facturas de villas y servicios</p>
         </div>
         <div className="flex gap-2">
-          <Dialog open={isFormOpen && invoiceType === 'villa'} onOpenChange={(open) => {
-            if (!open) {
-              setIsFormOpen(false);
-            }
-          }}>
-            <DialogTrigger asChild>
-              <Button onClick={() => {
-                setInvoiceType('villa');
-                resetForm();
-                setIsFormOpen(true);
-              }} data-testid="add-reservation-button">
-                <Plus className="mr-2 h-4 w-4" /> Nueva Factura
-              </Button>
-            </DialogTrigger>
-            <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
-              <DialogHeader>
-                <DialogTitle>
-                  {editingReservation ? 'Editar Factura' : 'Nueva Factura - Villa y Servicios'}
-                </DialogTitle>
-              </DialogHeader>
+          <Button onClick={() => {
+            setInvoiceType('villa');
+            resetForm();
+            setIsFormOpen(true);
+          }} data-testid="add-reservation-button">
+            <Plus className="mr-2 h-4 w-4" /> Nueva Factura
+          </Button>
+          
+          <Button 
+            variant="outline" 
+            onClick={() => {
+              setInvoiceType('service');
+              resetForm();
+              setIsFormOpen(true);
+              setShowExtraServices(true);
+            }} 
+            data-testid="add-service-only-button"
+          >
+            <Plus className="mr-2 h-4 w-4" /> Factura Solo Servicios
+          </Button>
+        </div>
+        
+        <Dialog open={isFormOpen} onOpenChange={setIsFormOpen}>
+          <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+            <DialogHeader>
+              <DialogTitle>
+                {editingReservation 
+                  ? 'Editar Factura' 
+                  : invoiceType === 'villa' 
+                    ? 'Nueva Factura - Villa y Servicios' 
+                    : 'Nueva Factura - Solo Servicios'}
+              </DialogTitle>
+            </DialogHeader>
 
             <form onSubmit={handleSubmit} className="space-y-4">
               <div className="grid grid-cols-2 gap-4">
