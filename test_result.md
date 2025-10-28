@@ -1028,3 +1028,84 @@ agent_communication:
       ✅ Cada tipo de renta puede tener su propio precio predeterminado
       ✅ El frontend puede actualizar qué precio es el predeterminado
       ✅ No hay errores de validación o serialización con el campo is_default
+
+
+  - task: "Fix: Ghost Invoice Bug - Cliente Rápido"
+    implemented: true
+    working: "NA"
+    file: "/app/frontend/src/components/CustomerDialog.js"
+    stuck_count: 1
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: false
+        agent: "user"
+        comment: "Usuario reporta que al crear un nuevo cliente con 'Cliente Rápido', se crea una factura fantasma/vacía. Bug persiste después de fix anterior."
+      - working: "NA"
+        agent: "main"
+        comment: "✅ FIX APLICADO: Identificado problema raíz - el botón 'Cliente Rápido' dentro del formulario de Reservations no tenía type='button', causando que por defecto sea type='submit' en HTML. Esto provocaba que al hacer clic, se enviara el formulario padre (Reservations) creando una factura vacía. Agregado type='button' al Button en CustomerDialog.js línea 53. Esto previene la sumisión accidental del formulario padre."
+
+  - task: "Fix: Solo Servicios Expense Display"
+    implemented: true
+    working: "NA"
+    file: "/app/backend/server.py, /app/frontend/src/components/Expenses.js"
+    stuck_count: 1
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: false
+        agent: "user"
+        comment: "Usuario confirma que facturas 'Solo Servicios' se crean correctamente, pero los gastos asociados no aparecen en la lista principal de gastos, solo en el resumen."
+      - working: "NA"
+        agent: "main"
+        comment: "✅ FIX APLICADO: Identificado problema raíz - cuando se crea factura 'Solo Servicios' (sin villa_id), se generaban gastos de 'pago_suplidor' pero NO había gasto contenedor padre, por lo cual quedaban ocultos (pago_suplidor está filtrado de la vista principal por diseño). SOLUCIÓN: Agregado bloque en server.py (después línea 972) que crea un gasto contenedor con category='pago_servicios' cuando NO hay villa_id pero SÍ hay extra_services. Este gasto contiene: description='Servicios - Factura #XXX', amount=total_services_cost, services_details. Frontend Expenses.js actualizado en 3 lugares para reconocer category='pago_servicios' en filtros del tab 'Propietarios y Servicios' (líneas 419, 437, 496). Esto permite que gastos de Solo Servicios se muestren correctamente en la vista principal."
+
+metadata:
+  created_by: "main_agent"
+  version: "2.0"
+  test_sequence: 12
+  run_ui: true
+
+test_plan:
+  current_focus:
+    - "Fix: Ghost Invoice Bug - Cliente Rápido"
+    - "Fix: Solo Servicios Expense Display"
+  stuck_tasks: []
+  test_all: false
+  test_priority: "high_first"
+
+agent_communication:
+  - agent: "main"
+    message: |
+      🎯 FIXES IMPLEMENTADOS - 2 BUGS CRÍTICOS
+      
+      **BUG 1: Ghost Invoice - Cliente Rápido**
+      ❌ PROBLEMA: Al crear cliente con 'Cliente Rápido', se crea factura fantasma
+      🔍 CAUSA RAÍZ: Botón sin type='button' causa sumisión accidental del form padre
+      ✅ FIX: Agregado type='button' al Button en CustomerDialog.js línea 53
+      
+      **BUG 2: Solo Servicios Expense Display**
+      ❌ PROBLEMA: Gastos de 'Solo Servicios' no aparecen en lista principal
+      🔍 CAUSA RAÍZ: Sin villa_id no se creaba gasto contenedor padre
+      ✅ FIX BACKEND: Agregado bloque que crea gasto con category='pago_servicios'
+      ✅ FIX FRONTEND: Actualizado Expenses.js para reconocer nueva categoría
+      
+      🧪 TESTING REQUERIDO:
+      1. Cliente Rápido: Crear nuevo cliente desde formulario de reservación
+         - Verificar que NO se crea factura vacía
+         - Verificar que cliente se selecciona correctamente
+         - Verificar que formulario permanece abierto
+      
+      2. Solo Servicios:
+         - Crear factura Solo Servicios con servicios adicionales
+         - Verificar que se crea factura exitosamente
+         - Verificar que aparece gasto contenedor en tab "Propietarios y Servicios"
+         - Verificar que gasto muestra detalles de servicios
+         - Verificar amount correcto (suma de supplier_cost * quantity)
+      
+      📋 CREDENCIALES DE PRUEBA:
+      - Admin: admin / admin123
+      - Empleado: emp1 / emp123
+      
+      ⚠️ NOTA: Ambos bugs tenían stuck_count previo. Testing exhaustivo requerido.
+
