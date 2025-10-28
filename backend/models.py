@@ -367,6 +367,9 @@ class ExpenseBase(BaseModel):
     
     # Para gastos únicos: mostrar también en variables
     show_in_variables: bool = False  # Si un gasto único debe aparecer también en el tab Variables
+    
+    # Detalles de servicios para gastos de "Solo Servicios"
+    services_details: Optional[List[Dict[str, Any]]] = None
 
 class ExpenseCreate(ExpenseBase):
     pass
