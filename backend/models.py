@@ -280,6 +280,126 @@ class Reservation(ReservationBase):
     updated_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
     created_by: str  # user_id
 
+
+# ============ QUOTATION (COTIZACIÓN) MODELS ============
+class QuotationBase(BaseModel):
+    customer_id: str
+    customer_name: str
+    villa_id: Optional[str] = None
+    villa_code: Optional[str] = None
+    villa_description: Optional[str] = None
+    villa_location: Optional[str] = None
+    
+    rental_type: Optional[Literal["pasadia", "amanecida", "evento"]] = None
+    event_type: Optional[str] = None
+    
+    quotation_date: datetime
+    validity_days: int = 30  # Días de validez de la cotización
+    check_in_time: str = "9:00 AM"
+    check_out_time: str = "8:00 PM"
+    
+    guests: int = 0
+    extra_people: int = 0
+    extra_people_cost: float = 0.0
+    
+    base_price: float = 0.0
+    extra_hours: float = 0.0
+    extra_hours_cost: float = 0.0
+    
+    extra_services: List[ReservationExtraService] = []
+    extra_services_total: float = 0.0
+    
+    subtotal: float
+    discount: float = 0.0
+    include_itbis: bool = False
+    itbis_amount: float = 0.0
+    total_amount: float
+    
+    currency: Literal["DOP", "USD"] = "DOP"
+    notes: Optional[str] = None
+    internal_notes: Optional[str] = None
+    status: Literal["pending", "approved", "rejected", "converted"] = "pending"  # converted = convertida a factura
+
+class QuotationCreate(QuotationBase):
+    quotation_number: Optional[int] = None  # Opcional: admin puede proporcionar número manual
+
+class QuotationUpdate(BaseModel):
+    villa_id: Optional[str] = None
+    villa_code: Optional[str] = None
+    villa_description: Optional[str] = None
+    rental_type: Optional[Literal["pasadia", "amanecida", "evento"]] = None
+    event_type: Optional[str] = None
+    quotation_date: Optional[datetime] = None
+    validity_days: Optional[int] = None
+    check_in_time: Optional[str] = None
+    check_out_time: Optional[str] = None
+    guests: Optional[int] = None
+    base_price: Optional[float] = None
+    extra_hours: Optional[float] = None
+    extra_hours_cost: Optional[float] = None
+    extra_services: Optional[List[ReservationExtraService]] = None
+    extra_services_total: Optional[float] = None
+    subtotal: Optional[float] = None
+    discount: Optional[float] = None
+    include_itbis: Optional[bool] = None
+    itbis_amount: Optional[float] = None
+    total_amount: Optional[float] = None
+    currency: Optional[Literal["DOP", "USD"]] = None
+    notes: Optional[str] = None
+    internal_notes: Optional[str] = None
+    status: Optional[Literal["pending", "approved", "rejected", "converted"]] = None
+
+class Quotation(QuotationBase):
+    model_config = ConfigDict(extra="ignore")
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    quotation_number: str  # COT-0001, COT-0002, etc.
+    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+    updated_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+    created_by: str  # user_id
+    converted_to_invoice_id: Optional[str] = None  # ID de la factura si fue convertida
+
+# ============ CONDUCE (DELIVERY NOTE) MODELS ============
+class ConduceItem(BaseModel):
+    description: str  # Descripción del ítem
+    quantity: int = 1  # Cantidad
+    unit: str = "unidad"  # unidad, caja, kg, etc.
+
+class ConduceBase(BaseModel):
+    recipient_name: str  # Nombre del destinatario (empleado, suplidor, cliente)
+    recipient_type: Literal["employee", "supplier", "customer"] = "customer"
+    recipient_id: Optional[str] = None  # ID si está en el sistema
+    
+    delivery_address: Optional[str] = None
+    delivery_date: datetime
+    
+    items: List[ConduceItem] = []  # Lista de ítems SIN precios
+    
+    notes: Optional[str] = None
+    internal_notes: Optional[str] = None
+    status: Literal["pending", "delivered", "cancelled"] = "pending"
+
+class ConduceCreate(ConduceBase):
+    conduce_number: Optional[int] = None  # Opcional: admin puede proporcionar número manual
+
+class ConduceUpdate(BaseModel):
+    recipient_name: Optional[str] = None
+    recipient_type: Optional[Literal["employee", "supplier", "customer"]] = None
+    recipient_id: Optional[str] = None
+    delivery_address: Optional[str] = None
+    delivery_date: Optional[datetime] = None
+    items: Optional[List[ConduceItem]] = None
+    notes: Optional[str] = None
+    internal_notes: Optional[str] = None
+    status: Optional[Literal["pending", "delivered", "cancelled"]] = None
+
+class Conduce(ConduceBase):
+    model_config = ConfigDict(extra="ignore")
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    conduce_number: str  # CON-0001, CON-0002, etc.
+    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+    updated_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+    created_by: str  # user_id
+
 # ============ VILLA OWNER MODELS ============
 class VillaOwnerBase(BaseModel):
     name: str
