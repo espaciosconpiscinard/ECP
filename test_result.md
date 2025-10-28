@@ -1032,11 +1032,11 @@ agent_communication:
 
   - task: "Fix: Ghost Invoice Bug - Cliente Rápido"
     implemented: true
-    working: "NA"
+    working: true
     file: "/app/frontend/src/components/CustomerDialog.js"
     stuck_count: 1
     priority: "high"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
       - working: false
         agent: "user"
@@ -1044,14 +1044,17 @@ agent_communication:
       - working: "NA"
         agent: "main"
         comment: "✅ FIX APLICADO: Identificado problema raíz - el botón 'Cliente Rápido' dentro del formulario de Reservations no tenía type='button', causando que por defecto sea type='submit' en HTML. Esto provocaba que al hacer clic, se enviara el formulario padre (Reservations) creando una factura vacía. Agregado type='button' al Button en CustomerDialog.js línea 53. Esto previene la sumisión accidental del formulario padre."
+      - working: true
+        agent: "testing"
+        comment: "✅ TESTED: Ghost Invoice Bug completamente corregido. Creación de cliente vía 'Cliente Rápido' NO genera facturas fantasma. Verificado: 1) Contador de reservaciones permanece igual antes/después de crear cliente, 2) Cliente se crea exitosamente y aparece en lista, 3) Cliente puede usarse para crear reservaciones legítimas. Test exhaustivo con múltiples verificaciones confirma que el fix es efectivo."
 
   - task: "Fix: Solo Servicios Expense Display"
     implemented: true
-    working: "NA"
-    file: "/app/backend/server.py, /app/frontend/src/components/Expenses.js"
+    working: true
+    file: "/app/backend/server.py, /app/backend/models.py, /app/frontend/src/components/Expenses.js"
     stuck_count: 1
     priority: "high"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
       - working: false
         agent: "user"
@@ -1059,6 +1062,9 @@ agent_communication:
       - working: "NA"
         agent: "main"
         comment: "✅ FIX APLICADO: Identificado problema raíz - cuando se crea factura 'Solo Servicios' (sin villa_id), se generaban gastos de 'pago_suplidor' pero NO había gasto contenedor padre, por lo cual quedaban ocultos (pago_suplidor está filtrado de la vista principal por diseño). SOLUCIÓN: Agregado bloque en server.py (después línea 972) que crea un gasto contenedor con category='pago_servicios' cuando NO hay villa_id pero SÍ hay extra_services. Este gasto contiene: description='Servicios - Factura #XXX', amount=total_services_cost, services_details. Frontend Expenses.js actualizado en 3 lugares para reconocer category='pago_servicios' en filtros del tab 'Propietarios y Servicios' (líneas 419, 437, 496). Esto permite que gastos de Solo Servicios se muestren correctamente en la vista principal."
+      - working: true
+        agent: "testing"
+        comment: "✅ TESTED: Solo Servicios Expense Display completamente funcional. Verificado: 1) Facturas Solo Servicios (sin villa) crean gasto contenedor con category='pago_servicios', 2) Gasto visible en lista principal de gastos, 3) Amount correcto (suma de supplier_cost), 4) Description contiene 'Servicios - Factura #XXX', 5) services_details presente con array de servicios, 6) payment_status='pending', 7) related_reservation_id vinculado correctamente. Fix requirió agregar 'pago_servicios' a modelo Expense y campo services_details. Ahora gastos de Solo Servicios aparecen correctamente en vista principal."
 
 metadata:
   created_by: "main_agent"
