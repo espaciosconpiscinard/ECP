@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { Button } from './ui/button';
-import { Home, Users, FileText, DollarSign, Building, Menu, X, LogOut, Tag, UserCog, Settings, Receipt, TrendingUp } from 'lucide-react';
+import { Home, Users, FileText, DollarSign, Building, Menu, X, LogOut, Tag, UserCog, Settings, Receipt, TrendingUp, ClipboardList, Truck } from 'lucide-react';
 
 const API_URL = process.env.REACT_APP_BACKEND_URL || '';
 
