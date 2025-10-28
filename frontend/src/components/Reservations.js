@@ -382,8 +382,24 @@ const Reservations = () => {
       setIsFormOpen(false);
       resetForm();
     } catch (err) {
-      setError(err.response?.data?.detail || 'Error al guardar reservación');
       console.error('Error completo:', err.response?.data);
+      
+      // Manejar errores de validación de Pydantic
+      if (err.response?.data?.detail) {
+        const detail = err.response.data.detail;
+        
+        // Si es un array de errores de validación
+        if (Array.isArray(detail)) {
+          const errorMessages = detail.map(e => `${e.loc.join('.')}: ${e.msg}`).join('\n');
+          setError('Errores de validación:\n' + errorMessages);
+        } else if (typeof detail === 'string') {
+          setError(detail);
+        } else {
+          setError('Error al guardar la factura');
+        }
+      } else {
+        setError('Error al guardar la factura');
+      }
     }
   };
 
