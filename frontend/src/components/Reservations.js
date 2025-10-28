@@ -1523,10 +1523,11 @@ const Reservations = () => {
                       }}
                       className={`p-3 border-2 rounded-md font-medium ${formData.rental_type === 'evento' ? 'border-blue-600 bg-blue-50 text-blue-600' : 'border-gray-300'}`}
                     >
-                      Evento
+                      {invoiceType === 'service' ? 'Servicios' : 'Evento'}
                     </button>
                   </div>
                 </div>
+                )}
 
                 {/* Villas Y Servicios con Buscador - Solo si es tipo 'villa' */}
                 {invoiceType === 'villa' && (
