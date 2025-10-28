@@ -2248,6 +2248,352 @@ const Reservations = () => {
             </form>
           </DialogContent>
         </Dialog>
+        
+        {/* Segundo botón y Dialog para Factura Solo Servicios */}
+        <Dialog open={isFormOpen && invoiceType === 'service'} onOpenChange={(open) => {
+          if (!open) {
+            setIsFormOpen(false);
+          }
+        }}>
+          <DialogTrigger asChild>
+            <Button 
+              variant="outline" 
+              onClick={() => {
+                setInvoiceType('service');
+                resetForm();
+                setIsFormOpen(true);
+                setShowExtraServices(true); // Asegurar que servicios extras sean visibles
+              }} 
+              data-testid="add-service-only-button"
+            >
+              <Plus className="mr-2 h-4 w-4" /> Factura Solo Servicios
+            </Button>
+          </DialogTrigger>
+          <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+            <DialogHeader>
+              <DialogTitle>
+                Nueva Factura - Solo Servicios
+              </DialogTitle>
+            </DialogHeader>
+
+            <form onSubmit={handleSubmit} className="space-y-4">
+              {/* Cliente con Buscador - REUTILIZADO */}
+              <div className="col-span-2">
+                <div className="flex justify-between items-center mb-2">
+                  <Label>Cliente *</Label>
+                  <CustomerDialog onCustomerCreated={(newCustomer) => {
+                    setCustomerSearchTerm(newCustomer.name);
+                    setFormData({ ...formData, customer_id: newCustomer.id, customer_name: newCustomer.name });
+                    setShowCustomerDropdown(false);
+                    fetchCustomersOnly();
+                  }} />
+                </div>
+                <div className="relative">
+                  <Input
+                    type="text"
+                    value={customerSearchTerm}
+                    onChange={(e) => {
+                      setCustomerSearchTerm(e.target.value);
+                      setShowCustomerDropdown(true);
+                    }}
+                    onFocus={() => setShowCustomerDropdown(true)}
+                    placeholder="Buscar por nombre o teléfono..."
+                    className="w-full"
+                  />
+                  {formData.customer_id === '' && (
+                    <span className="text-red-500 text-xs">* Debes seleccionar un cliente</span>
+                  )}
+                  
+                  {showCustomerDropdown && customerSearchTerm && (
+                    <div className="absolute z-10 w-full mt-1 bg-white border border-gray-300 rounded-md shadow-lg max-h-60 overflow-auto">
+                      {customers
+                        .filter(c => 
+                          c.name.toLowerCase().includes(customerSearchTerm.toLowerCase()) ||
+                          c.phone?.includes(customerSearchTerm)
+                        )
+                        .map(customer => (
+                          <div
+                            key={customer.id}
+                            className="px-4 py-2 hover:bg-gray-100 cursor-pointer"
+                            onClick={() => handleSelectCustomer(customer.id)}
+                          >
+                            <div className="font-medium">{customer.name}</div>
+                            <div className="text-sm text-gray-500">{customer.phone}</div>
+                          </div>
+                        ))}
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              {/* Servicios a Facturar - ÚNICA SECCIÓN RELEVANTE */}
+              <div className="col-span-2 border-2 border-green-200 p-4 rounded-md bg-green-50">
+                <div className="flex justify-between items-center mb-3">
+                  <Label className="text-lg font-bold">🍰 Servicios a Facturar</Label>
+                  <Button type="button" size="sm" onClick={() => {
+                    const newService = {
+                      id: Date.now().toString(),
+                      service_id: '',
+                      service_name: '',
+                      supplier_name: '',
+                      supplier_cost: 0,
+                      quantity: 1,
+                      unit_price: 0,
+                      total: 0
+                    };
+                    setFormData(prev => ({
+                      ...prev,
+                      extra_services: [...(prev.extra_services || []), newService]
+                    }));
+                  }}>
+                    <Plus size={16} className="mr-1" /> Agregar Servicio
+                  </Button>
+                </div>
+                
+                {/* Mensaje si no hay servicios */}
+                {(!formData.extra_services || formData.extra_services.length === 0) && (
+                  <div className="bg-yellow-50 border border-yellow-300 rounded p-3 mb-3">
+                    <p className="text-sm text-yellow-800">
+                      ⚠️ Debes agregar al menos un servicio para crear la factura.
+                    </p>
+                  </div>
+                )}
+                
+                {/* Lista de servicios */}
+                {formData.extra_services && formData.extra_services.map((service, index) => (
+                  <div key={service.id || index} className="mb-4 p-3 bg-white rounded border border-green-300">
+                    <div className="grid grid-cols-4 gap-2 mb-2">
+                      <div className="col-span-2">
+                        <Label className="text-xs">Servicio</Label>
+                        <select
+                          value={service.service_id}
+                          onChange={(e) => handleSelectService(index, e.target.value)}
+                          className="w-full p-2 border rounded text-sm"
+                        >
+                          <option value="">Seleccionar servicio</option>
+                          {extraServices.map(svc => (
+                            <option key={svc.id} value={svc.id}>
+                              {svc.name} - RD$ {svc.client_price?.toLocaleString()}
+                            </option>
+                          ))}
+                        </select>
+                      </div>
+                      
+                      <div>
+                        <Label className="text-xs">Cantidad</Label>
+                        <Input
+                          type="number"
+                          min="1"
+                          value={service.quantity}
+                          onChange={(e) => updateExtraService(index, 'quantity', parseInt(e.target.value) || 1)}
+                          className="text-sm"
+                        />
+                      </div>
+                      
+                      <div className="flex items-end">
+                        <Button
+                          type="button"
+                          variant="destructive"
+                          size="sm"
+                          onClick={() => {
+                            const newServices = formData.extra_services.filter((_, i) => i !== index);
+                            setFormData(prev => ({ ...prev, extra_services: newServices }));
+                          }}
+                        >
+                          <X size={16} />
+                        </Button>
+                      </div>
+                    </div>
+                    
+                    <div className="grid grid-cols-3 gap-2 text-xs text-gray-600">
+                      <div>
+                        <span className="font-medium">Precio Unitario:</span> RD$ {service.unit_price?.toLocaleString() || 0}
+                      </div>
+                      {service.supplier_name && (
+                        <>
+                          <div>
+                            <span className="font-medium">Suplidor:</span> {service.supplier_name}
+                          </div>
+                          <div>
+                            <span className="font-medium">Costo Suplidor:</span> RD$ {service.supplier_cost?.toLocaleString() || 0}
+                          </div>
+                        </>
+                      )}
+                      <div className="col-span-3 font-bold text-green-700">
+                        Total: RD$ {service.total?.toLocaleString() || 0}
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+
+              {/* Fecha, Horas, Descuento, etc. - SIMPLIFICADOS */}
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <Label>Fecha de Pasadía *</Label>
+                  <Input
+                    type="date"
+                    value={formData.reservation_date}
+                    onChange={(e) => setFormData({ ...formData, reservation_date: e.target.value })}
+                    required
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <Label>Hora de Entrada *</Label>
+                  <Input
+                    type="text"
+                    value={formData.check_in_time}
+                    onChange={(e) => setFormData({ ...formData, check_in_time: e.target.value })}
+                    placeholder="9:00 AM"
+                    required
+                  />
+                </div>
+                <div>
+                  <Label>Hora de Salida *</Label>
+                  <Input
+                    type="text"
+                    value={formData.check_out_time}
+                    onChange={(e) => setFormData({ ...formData, check_out_time: e.target.value })}
+                    placeholder="8:00 PM"
+                    required
+                  />
+                </div>
+              </div>
+
+              <div>
+                <Label>Descuento</Label>
+                <Input
+                  type="number"
+                  min="0"
+                  step="0.01"
+                  value={formData.discount}
+                  onChange={(e) => setFormData({ ...formData, discount: parseFloat(e.target.value) || 0 })}
+                />
+              </div>
+
+              <div className="flex items-center space-x-2">
+                <input
+                  type="checkbox"
+                  id="include_itbis_service"
+                  checked={formData.include_itbis}
+                  onChange={(e) => setFormData({ ...formData, include_itbis: e.target.checked })}
+                  className="w-4 h-4"
+                />
+                <Label htmlFor="include_itbis_service">Incluir ITBIS (18%)</Label>
+                <span className="text-sm text-gray-500">Se calcula sobre el total sin incluir el depósito de seguridad</span>
+              </div>
+
+              {/* Resumen de Totales */}
+              <div className="bg-gray-100 p-4 rounded-lg space-y-2">
+                <div className="flex justify-between text-lg">
+                  <span>Subtotal:</span>
+                  <span className="font-semibold">RD$ {formData.subtotal?.toLocaleString() || 0}</span>
+                </div>
+                {formData.include_itbis && (
+                  <div className="flex justify-between text-sm text-gray-600">
+                    <span>ITBIS (18%):</span>
+                    <span>RD$ {formData.itbis_amount?.toLocaleString() || 0}</span>
+                  </div>
+                )}
+                {formData.discount > 0 && (
+                  <div className="flex justify-between text-sm text-red-600">
+                    <span>Descuento:</span>
+                    <span>- RD$ {formData.discount?.toLocaleString() || 0}</span>
+                  </div>
+                )}
+                <div className="flex justify-between text-xl font-bold border-t-2 pt-2">
+                  <span>TOTAL:</span>
+                  <span className="text-blue-600">RD$ {formData.total_amount?.toLocaleString() || 0}</span>
+                </div>
+              </div>
+
+              {/* Campos de Pago */}
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <Label>Método de Pago *</Label>
+                  <select
+                    value={formData.payment_method}
+                    onChange={(e) => setFormData({ ...formData, payment_method: e.target.value })}
+                    className="w-full p-2 border rounded"
+                    required
+                  >
+                    <option value="efectivo">Efectivo</option>
+                    <option value="deposito">Depósito</option>
+                    <option value="transferencia">Transferencia</option>
+                    <option value="mixto">Mixto</option>
+                  </select>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <Label>Depósito de Seguridad</Label>
+                  <Input
+                    type="number"
+                    min="0"
+                    step="0.01"
+                    value={formData.deposit}
+                    onChange={(e) => setFormData({ ...formData, deposit: parseFloat(e.target.value) || 0 })}
+                  />
+                </div>
+                <div>
+                  <Label>Monto Pagado *</Label>
+                  <Input
+                    type="number"
+                    min="0"
+                    step="0.01"
+                    value={formData.amount_paid}
+                    onChange={(e) => setFormData({ ...formData, amount_paid: parseFloat(e.target.value) || 0 })}
+                    required
+                  />
+                </div>
+              </div>
+
+              <div>
+                <Label>Estado</Label>
+                <select
+                  value={formData.status}
+                  onChange={(e) => setFormData({ ...formData, status: e.target.value })}
+                  className="w-full p-2 border rounded"
+                >
+                  <option value="confirmed">Confirmada</option>
+                  <option value="pending">Pendiente</option>
+                  <option value="completed">Completada</option>
+                  <option value="cancelled">Cancelada</option>
+                </select>
+              </div>
+
+              <div>
+                <Label>Notas</Label>
+                <textarea
+                  value={formData.notes || ''}
+                  onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
+                  className="w-full p-2 border rounded"
+                  rows="3"
+                  placeholder="Notas adicionales..."
+                />
+              </div>
+
+              {error && (
+                <Alert variant="destructive">
+                  <AlertDescription>{error}</AlertDescription>
+                </Alert>
+              )}
+
+              <div className="flex justify-end gap-2 pt-4">
+                <Button type="button" variant="outline" onClick={() => setIsFormOpen(false)}>
+                  Cancelar
+                </Button>
+                <Button type="submit">
+                  Guardar
+                </Button>
+              </div>
+            </form>
+          </DialogContent>
+        </Dialog>
       </div>
 
       {/* Tarjetas de Totales */}
