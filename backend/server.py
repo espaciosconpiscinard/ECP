@@ -971,6 +971,60 @@ async def create_reservation(reservation_data: ReservationCreate, current_user: 
             
             await db.expenses.insert_one(expense)
     
+    # AUTO-CREAR GASTO CONTENEDOR PARA "SOLO SERVICIOS" (cuando NO hay villa)
+    # Esto permite que los gastos de suplidores se vean en la vista principal
+    elif not reservation_data.villa_id and reservation_data.extra_services:
+        # Es una factura "Solo Servicios"
+        # Calcular total de servicios adicionales
+        total_services_cost = 0
+        services_details = []
+        
+        for svc in reservation_data.extra_services:
+            supplier_cost = svc.supplier_cost if hasattr(svc, 'supplier_cost') else 0
+            quantity = svc.quantity if hasattr(svc, 'quantity') else 1
+            total = supplier_cost * quantity
+            total_services_cost += total
+            
+            services_details.append({
+                "service_name": svc.service_name if hasattr(svc, 'service_name') else 'N/A',
+                "supplier_name": svc.supplier_name if hasattr(svc, 'supplier_name') else 'N/A',
+                "quantity": quantity,
+                "unit_price": svc.unit_price if hasattr(svc, 'unit_price') else 0,
+                "supplier_cost": supplier_cost,
+                "total": svc.total if hasattr(svc, 'total') else 0
+            })
+        
+        # Crear gasto contenedor
+        description = f"Servicios - Factura #{invoice_number}"
+        notes_parts = [
+            f"Auto-generado. Cliente: {reservation_data.customer_name}.",
+            f"Factura Solo Servicios. Total suplidores: RD$ {total_services_cost:.2f}",
+            "\n\nServicios:"
+        ]
+        
+        for svc in services_details:
+            notes_parts.append(f"\n- {svc['service_name']} (Suplidor: {svc['supplier_name']}) x{svc['quantity']} = RD$ {svc['supplier_cost'] * svc['quantity']:.2f}")
+        
+        from models import Expense
+        
+        expense = {
+            "id": str(uuid.uuid4()),
+            "category": "pago_servicios",  # Nueva categoría para Solo Servicios
+            "category_id": None,
+            "description": description,
+            "amount": total_services_cost,
+            "currency": reservation_data.currency,
+            "expense_date": reservation_data.reservation_date if isinstance(reservation_data.reservation_date, str) else reservation_data.reservation_date.isoformat(),
+            "payment_status": "pending",
+            "notes": ''.join(notes_parts),
+            "related_reservation_id": reservation.id,
+            "services_details": services_details if services_details else None,
+            "created_at": datetime.now(timezone.utc).isoformat(),
+            "created_by": current_user["id"]
+        }
+        
+        await db.expenses.insert_one(expense)
+    
     # AUTO-CREAR GASTOS PARA SUPLIDORES DE SERVICIOS ADICIONALES
     # Estos gastos se crean pero NO se muestran en la lista principal
     # Solo se verán cuando se haga clic en el gasto del propietario
