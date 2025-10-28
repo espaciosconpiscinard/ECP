@@ -268,6 +268,7 @@ class ReservationUpdate(BaseModel):
     amount_paid: Optional[float] = None
     currency: Optional[Literal["DOP", "USD"]] = None
     notes: Optional[str] = None
+    internal_notes: Optional[str] = None  # Nota interna
     status: Optional[Literal["pending", "confirmed", "completed", "cancelled"]] = None
 
 class Reservation(ReservationBase):
