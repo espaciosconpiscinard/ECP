@@ -2984,6 +2984,17 @@ const Reservations = () => {
                             variant="outline"
                             onClick={(e) => {
                               e.stopPropagation();
+                              handleDownloadPDF(res);
+                            }}
+                            className="flex-1"
+                          >
+                            <Download size={14} className="mr-1" /> PDF
+                          </Button>
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            onClick={(e) => {
+                              e.stopPropagation();
                               handleEdit(res);
                             }}
                             className="flex-1"
