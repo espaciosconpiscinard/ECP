@@ -128,6 +128,27 @@ class BackendTester:
         else:
             self.log_test("Admin Login", False, "Admin login failed", result)
     
+    def approve_employee(self):
+        """Approve employee user (admin only)"""
+        # Get pending users
+        result = self.make_request("GET", "/users/pending/list", token=self.admin_token)
+        
+        if result.get("success"):
+            pending_users = result["data"]
+            emp_user = next((u for u in pending_users if u["username"] == "emp1"), None)
+            
+            if emp_user:
+                # Approve the employee
+                approve_result = self.make_request("PATCH", f"/users/{emp_user['id']}/approve", token=self.admin_token)
+                if approve_result.get("success"):
+                    self.log_test("Approve Employee", True, "Employee user approved successfully")
+                else:
+                    self.log_test("Approve Employee", False, "Failed to approve employee", approve_result)
+            else:
+                self.log_test("Find Pending Employee", True, "Employee already approved or not found in pending list")
+        else:
+            self.log_test("Get Pending Users", False, "Failed to get pending users", result)
+
     def test_employee_login(self):
         """Login as employee"""
         login_data = {
