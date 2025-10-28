@@ -493,8 +493,8 @@ const Expenses = () => {
     
     // Filtrar por tipo de tab activo (usando visibleExpenses que excluye pago_suplidor)
     let filtered = visibleExpenses.filter(expense => {
-      // EXCLUIR gastos de propietarios del tab Variables
-      if (activeTab === 'variables' && (expense.category === 'pago_propietario' || expense.related_reservation_id)) {
+      // EXCLUIR gastos de propietarios y servicios del tab Variables
+      if (activeTab === 'variables' && (expense.category === 'pago_propietario' || expense.category === 'pago_servicios' || expense.related_reservation_id)) {
         return false;
       }
       
