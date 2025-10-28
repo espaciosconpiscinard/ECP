@@ -1,13 +1,13 @@
 <analysis>
-The AI engineer's trajectory chronicles a complex, iterative development process, primarily focused on enhancing the Espacios Con Piscina application's reservation, expense, and commission management. Initial tasks involved UI refinements and bug fixes, such as renaming the Propietarios tab and addressing login issues. A major effort was dedicated to overhauling the expense abono modal in  and the reservation form in  to correctly display and manage payments for owner, extra services (with suppliers), and security deposits. This involved numerous backend model () and frontend (, ) code adjustments for data consistency and proper rendering.
+The AI engineer's work in this trajectory focused on resolving critical bugs and implementing a significant feature: the Solo Servicios invoice variant. Initial work verified a previous syntax error fix in  for conditional rendering, which proved successful for displaying two invoice types (Villa and Solo Servicios) within a single form. A persistent Quick Client bug, creating ghost invoices, was partially addressed by changing a  callback from  to .
 
-Key challenges included persistent date serialization issues across frontend and backend, incorrect environment variable usage ( vs. ), and a  error for reservation updates due to a missing backend PATCH endpoint. The engineer also implemented multi-selection and bulk actions for commissions. A significant recent focus has been on refactoring the reservation creation form into two variants (Villa vs. Solo Servicios) to address errors with service-only bookings and simplify the UI. This specific task is currently ongoing, marked by a recent syntax error in conditional rendering.
+Subsequent user feedback revealed continued issues: the Solo Servicios invoice triggered a , and the Quick Client bug persisted. The  error was traced to an  for  in , caused by duplicate  statements and mandatory // fields in . These backend issues were fixed by removing duplicate imports and making the fields optional. The UI was then refactored to implement separate Nueva Factura and Factura Solo Servicios buttons, simplifying user flow. This UI change itself caused multiple JSX syntax errors in  due to incorrect  closures, which required iterative debugging, including a call to , before finally rendering correctly. The trajectory ends with the user confirming Solo Servicios invoices are being created but reporting the Quick Client bug and expense display issue persist.
 </analysis>
 
 <product_requirements>
-The Espacios Con Piscina application manages villas, reservations, clients, and expenses. The core problem is to provide a comprehensive system for rental and service businesses. This includes robust reservation and client management, payment tracking, customizable invoices, and an expense tracker.
+The Espacios Con Piscina application manages villas, reservations, clients, and expenses to provide a comprehensive system for rental and service businesses, including customizable invoices and payment tracking.
 
-**Implemented Features & Refinements:**
+**Implemented Features & Refinements (from trajectory):**
 *   Professional invoice redesigns with partial payments.
 *   Advanced expense management: user-creatable categories, reminders, grouping, filtering,  checkbox.
 *   Cascade deletion.
@@ -32,7 +32,7 @@ The Espacios Con Piscina application manages villas, reservations, clients, and 
 *   Reservation/invoice list shows only an indicator for extra services.
 *   Security deposit managed in expense abono modal, impacts invoice pending status.
 *   Commission module with multi-selection for bulk delete/mark as paid/unpaid.
-*   Reservation form with two variants: Villa or Solo Servicios (for DJ, buffet etc.).
+*   Reservation form with two variants: Villa or Solo Servicios (for DJ, buffet etc.) implemented via separate buttons.
 
 **Outstanding Requests (from trajectory):**
 *   **Internal Note for Invoices**: An internal note visible only to the system, separate from the client-facing note.
@@ -41,6 +41,8 @@ The Espacios Con Piscina application manages villas, reservations, clients, and 
     *   Delivery Notes: Similar to quotations/invoices but without prices (for employees/suppliers/clients without seeing costs).
 *   **PDF Download Button**: In Facturas (Reservations section), next to print, a PDF download button.
 *   **Commission Control for Deleted Invoices**: If an invoice is deleted, its commission should be marked as such, allowing approval/disapproval.
+*   **Bug: Quick Client Ghost Invoice**: Creating a new client via Cliente Rápido still creates an empty/ghost invoice.
+*   **Bug: Solo Servicios Expense Display**: Expense for Solo Servicios is created but not shown in the main expenses list, only in the summary.
 </product_requirements>
 
 <key_technical_concepts>
@@ -48,54 +50,48 @@ The Espacios Con Piscina application manages villas, reservations, clients, and 
 -   **Authentication**: JWT, Bcrypt, Role-Based Access Control.
 -   **Data Modeling**: Pydantic for validation, UUIDs for IDs.
 -   **API Design**: RESTful with  prefix, environment variables for URLs.
--   **Date/Time Handling**: UTC-aware , ISO string serialization for MongoDB.
--   **Frontend State Management**: ,  in React.
--   **Conditional UI Rendering**: Dynamically showing/hiding form fields based on state.
--   **Bash Scripting**:  for mass file edits.
+-   **Date/Time Handling**: UTC-aware , ISO string serialization.
+-   **Frontend State Management**: , .
+-   **Conditional UI Rendering**: Dynamically showing/hiding form fields based on  state.
 </key_technical_concepts>
 
 <code_architecture>
 
--   ****: Stores environment variables like , , .
 -   ****: Defines Pydantic data models.
-    -   **Changes**:  and  now include .  uses  instead of /.
+    -   **Changes**:  and  previously included .  uses . **Recent change**: , , and  in  were made  to support Solo Servicios invoices.
 -   ****: Main FastAPI application.
-    -   **Changes**: Logic for auto-creating supplier expenses was commented out then reactivated and modified to allow filtering. Date handling () for reservation and expense creation was corrected to prevent day shifts.  endpoint now updates  of related expenses.
--   ****: Used to store . Critical fix from  to  was applied here, impacting all API calls.
--   ****: Frontend API client.
-    -   **Changes**:  now uses a PUT request to align with backend's full update mechanism, replacing a non-existent PATCH.
--   ****: Manages expenses.
-    -   **Changes**: Renamed Propietarios tab to Propietarios y Servicios. Modified  to fetch  data. The abono modal was completely redesigned to display distinct input fields for Propietario, Servicios Extras (with supplier details), and Depósito de Seguridad (with a checkbox for returned). The  function was updated to exclude  expenses from the main list. Logic to load and display  within the owner's expense detail modal was added. Owner payment input now defaults to . Fixed  typo to .
--   ****: Manages reservations and invoice generation.
-    -   **Changes**: Renamed Reservaciones to Facturas and Nueva Reservación to Nueva Factura. Villa * label changed to Villas Y Servicios and made optional. Extra service selection was modified to *not* auto-select a supplier initially.  was updated to ensure correct price calculation (using ) and recalculates  totals. Invoice list now shows a generic badge for Servicios Extras instead of details. The abono modal for invoices was reverted to its simple form, removing detailed reservation info (as it's intended for the *expense* abono modal). Critical date handling fixed in  to prevent date shifts by removing . Implemented  state and conditional rendering to support two form variants: 'villa' and 'service'. The 'service' variant hides irrelevant fields like rental type, extra people, base price, guests. Ensured  is correctly populated for extra services.
--   ****: Manages villa details and pricing.
-    -   (No recent changes in the provided trajectory, but historically includes flexible pricing, default price helper, extra hours/people inputs, and multi-supplier management.)
--   ****: Manages commissions.
-    -   **Changes**: Implemented multi-selection capabilities ( state, , ). Added mass action buttons (delete, mark paid/unpaid) and checkboxes in table headers and rows.
+    -   **Changes**: Logic for auto-creating supplier expenses modified. Date handling corrected.  endpoint now updates . **Recent changes**:  was added at the top-level and duplicate  statements within functions (e.g., , line 1016) were removed to resolve .
+-   ****: Stores .
+-   ****: Manages reservations/invoices.
+    -   **Changes**: Renamed Reservaciones to Facturas. Extra service selection, price calculation, and date handling fixed.  state implemented for conditional rendering of 'villa'/'service' forms. **Recent changes**: Syntax errors related to JSX comments and conditional rendering were fixed. The single Nueva Factura button was replaced by two distinct buttons: Nueva Factura (for villas and services) and Factura Solo Servicios, which now directly set the  and open the *same* form, which adapts its fields based on the  state. Multiple attempts were made to correctly remove/add dialog blocks, leading to temporary JSX syntax errors that were eventually resolved.
 -   ****: Reused for in-form client creation.
-    -   **Changes**: Modified to prevent unintended  calls upon customer creation, which previously caused form closures and empty invoice creation in .
+    -   **Changes**: Modified to prevent unintended  calls upon customer creation. **Recent change**: The callback  was changed from  to  in  when the CustomerDialog is invoked.
+-   ****: Manages expenses.
+    -   **Changes**: Renamed Propietarios tab to Propietarios y Servicios. Abono modal redesigned.  updated.  added.
+-   ****: Manages commissions.
+    -   **Changes**: Multi-selection and bulk actions implemented.
 </code_architecture>
 
 <pending_tasks>
--   **Internal Note for Invoices**: Add a separate internal note field for invoices, visible only in the system.
--   **Quotations and Delivery Notes**:
-    -   Implement a Quotations section with a custom editor and policies.
-    -   Implement a Delivery Notes section (price-less version of invoices/quotations).
--   **PDF Download Button**: Add a PDF download button next to the print option in the Facturas (Reservations) section.
--   **Commission Control for Deleted Invoices**: Enhance commission tracking to reflect deleted invoices, allowing for approval/disapproval of commissions for such instances.
+-   **Bug: Quick Client Ghost Invoice**: The Cliente Rápido feature still creates an empty/ghost invoice upon customer creation.
+-   **Bug: Solo Servicios Expense Display**: Expenses generated for Solo Servicios invoices are created but do not appear in the main expenses list, only in the summary.
+-   **Internal Note for Invoices**: Add a separate internal note field for invoices.
+-   **Quotations and Delivery Notes**: Implement dedicated sections for quotations and delivery notes.
+-   **PDF Download Button**: Add a PDF download button in the Facturas section.
+-   **Commission Control for Deleted Invoices**: Enhance commission tracking for deleted invoices.
 </pending_tasks>
 
 <current_work>
-Immediately before this summary, the AI engineer was addressing several critical issues and implementing a major feature: the Solo Servicios invoice variant.
+Immediately before this summary, the AI engineer was addressing two critical issues reported by the user after implementing separate buttons for Villa and Solo Servicios invoices.
 
-The user reported the Quick Client () bug persisted, where creating a client still closed windows and automatically created an empty invoice. The Single Service Invoice Error (an Objects are not valid as a React child error, which later manifested as a  due to  being required by the backend) also persisted. User explicitly requested prioritizing the implementation of two invoice variants (one for villas, one for services only), believing it would resolve the single service invoice error.
+The user reported that the Factura fantasma (ghost invoice) bug still persists when creating a new client via the Cliente Rápido functionality. This implies that the previous fix of changing  to  in  was insufficient or incorrect.
 
-The AI engineer implemented the  state and introduced conditional rendering in  to switch between 'villa' and 'service' forms. The 'service' form was designed to hide irrelevant fields like Tipo de Renta, Precio Base, Pago Propietario, Huéspedes, and extra hours/people. The Evento button was changed to Servicios for the service-only type. The  function was updated to ensure  is correctly populated.
+Additionally, the user confirmed that Solo Servicios invoices are now successfully being created (indicating the backend  fixes and  changes were successful in resolving the ). However, they noted a new problem: the expenses associated with these Solo Servicios invoices are generated correctly in the backend but are not visible in the main expenses list; they only appear in the summary.
 
-The immediate last message from the user (Chat Message 519) indicates a  in  related to a JSX comment . This error suggests a mismatch in closing conditional rendering tags. The AI identified that the closing  for  was missing, causing the subsequent JSX to be parsed incorrectly. The last action (Chat Message 522-524) was to fix this syntax error.
+The AI engineer acknowledged these two problems and, at the very end of the trajectory, stated the intent to first investigate the  component again to debug the ghost invoice issue.
 </current_work>
 
 <optional_next_step>
-Verify the syntax fix for the  conditional rendering and ensure the Solo Servicios form is now rendering and functioning correctly without syntax errors.
+Investigate the  component to resolve the ghost invoice bug when creating a quick client.
 </optional_next_step>
 

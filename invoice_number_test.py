@@ -10,7 +10,7 @@ import sys
 from typing import Dict, Any, Optional
 
 # Backend URL from environment
-BACKEND_URL = "https://villa-manager-8.preview.emergentagent.com/api"
+BACKEND_URL = "https://piscina-admin.preview.emergentagent.com/api"
 
 class InvoiceNumberTester:
     def __init__(self):
