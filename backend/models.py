@@ -541,6 +541,8 @@ class CommissionBase(BaseModel):
     notes: Optional[str] = None
     paid: bool = False  # Si ya se pagó la comisión
     paid_date: Optional[str] = None  # Fecha cuando se pagó
+    invoice_deleted: bool = False  # Si la factura asociada fue eliminada
+    invoice_deleted_date: Optional[str] = None  # Fecha cuando se eliminó la factura
 
 class CommissionCreate(CommissionBase):
     pass
