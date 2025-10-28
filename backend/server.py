@@ -1214,11 +1214,20 @@ async def delete_reservation(reservation_id: str, current_user: dict = Depends(r
     # Eliminar abonos de la reservación
     await db.reservation_abonos.delete_many({"reservation_id": reservation_id})
     
+    # Marcar comisión como eliminada (NO eliminar)
+    await db.commissions.update_many(
+        {"reservation_id": reservation_id},
+        {"$set": {
+            "invoice_deleted": True,
+            "invoice_deleted_date": datetime.now(timezone.utc).isoformat()
+        }}
+    )
+    
     # Eliminar la reservación
     result = await db.reservations.delete_one({"id": reservation_id})
     if result.deleted_count == 0:
         raise HTTPException(status_code=404, detail="Reservation not found")
-    return {"message": "Reservation and related expenses deleted successfully"}
+    return {"message": "Reservation and related expenses deleted successfully, commission marked as deleted"}
 
 # ============ ABONOS TO RESERVATIONS ============
 
