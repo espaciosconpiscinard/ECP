@@ -1923,9 +1923,13 @@ const Reservations = () => {
                     Este precio se autocompleta según la villa y tipo de renta seleccionado, pero puedes editarlo si necesitas aplicar un precio especial
                   </p>
                 </div>
+                </>
+                )}
 
-                {/* Horas Extras */}
-                <div>
+                {/* Horas Extras - Solo para villas */}
+                {invoiceType === 'villa' && (
+                  <>
+                    <div>
                   <Label>Horas Extras (Cantidad)</Label>
                   <Input
                     type="number"
