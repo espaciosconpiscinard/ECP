@@ -414,10 +414,12 @@ const Expenses = () => {
     // Solo se mostrarán dentro del modal del gasto del propietario
     const visibleExpenses = expenses.filter(e => e.category !== 'pago_suplidor');
     
-    // Tab especial: Propietarios (gastos auto-generados)
+    // Tab especial: Propietarios y Servicios (gastos auto-generados)
     if (activeTab === 'propietarios') {
       let filtered = visibleExpenses.filter(expense => 
-        expense.category === 'pago_propietario' || expense.related_reservation_id
+        expense.category === 'pago_propietario' || 
+        expense.category === 'pago_servicios' ||  // Nueva categoría para Solo Servicios
+        expense.related_reservation_id
       );
       
       // Filtrar por estado de pago
