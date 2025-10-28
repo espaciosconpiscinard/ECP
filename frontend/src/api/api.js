@@ -98,3 +98,34 @@ export const deleteReservationAbono = (reservationId, abonoId) => axios.delete(`
 
 // ============ DASHBOARD ============
 export const getDashboardStats = () => axios.get(`${API}/dashboard/stats`);
+
+
+// ============ QUOTATIONS (COTIZACIONES) ============
+export const getQuotations = (status = null, customerId = null) => {
+  let url = `${API}/quotations`;
+  const params = [];
+  if (status) params.push(`status=${status}`);
+  if (customerId) params.push(`customer_id=${customerId}`);
+  if (params.length > 0) url += `?${params.join('&')}`;
+  return axios.get(url);
+};
+export const getQuotation = (id) => axios.get(`${API}/quotations/${id}`);
+export const createQuotation = (data) => axios.post(`${API}/quotations`, data);
+export const updateQuotation = (id, data) => axios.put(`${API}/quotations/${id}`, data);
+export const deleteQuotation = (id) => axios.delete(`${API}/quotations/${id}`);
+export const convertQuotationToInvoice = (id) => axios.post(`${API}/quotations/${id}/convert-to-invoice`);
+
+// ============ CONDUCES (DELIVERY NOTES) ============
+export const getConduces = (status = null, recipientType = null) => {
+  let url = `${API}/conduces`;
+  const params = [];
+  if (status) params.push(`status=${status}`);
+  if (recipientType) params.push(`recipient_type=${recipientType}`);
+  if (params.length > 0) url += `?${params.join('&')}`;
+  return axios.get(url);
+};
+export const getConduce = (id) => axios.get(`${API}/conduces/${id}`);
+export const createConduce = (data) => axios.post(`${API}/conduces`, data);
+export const updateConduce = (id, data) => axios.put(`${API}/conduces/${id}`, data);
+export const deleteConduce = (id) => axios.delete(`${API}/conduces/${id}`);
+
