@@ -1416,9 +1416,6 @@ async def convert_quotation_to_invoice(quotation_id: str, current_user: dict = D
     if quotation.get("status") == "converted":
         raise HTTPException(status_code=400, detail="Quotation already converted to invoice")
     
-    # Create reservation from quotation
-    from models import ReservationCreate, Reservation
-    
     # Generate invoice number
     last_reservation = await db.reservations.find_one(
         sort=[("created_at", -1)],
