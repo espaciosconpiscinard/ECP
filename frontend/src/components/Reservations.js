@@ -2250,13 +2250,25 @@ const Reservations = () => {
                   </select>
                 </div>
                 <div className="col-span-2">
-                  <Label>Notas</Label>
+                  <Label>Notas (Visible para el Cliente)</Label>
                   <textarea
                     value={formData.notes}
                     onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
                     className="w-full p-2 border rounded-md"
                     rows="3"
+                    placeholder="Nota que se imprime en la factura..."
                     data-testid="notes-input"
+                  />
+                </div>
+                <div className="col-span-2">
+                  <Label>Nota Interna (Solo Visible en Sistema)</Label>
+                  <textarea
+                    value={formData.internal_notes}
+                    onChange={(e) => setFormData({ ...formData, internal_notes: e.target.value })}
+                    className="w-full p-2 border rounded-md bg-yellow-50"
+                    rows="2"
+                    placeholder="Nota interna que NO se imprime en la factura..."
+                    data-testid="internal-notes-input"
                   />
                 </div>
               </div>
