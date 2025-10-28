@@ -40,6 +40,10 @@ const AppContent = () => {
         return <Dashboard />;
       case 'reservations':
         return <Reservations />;
+      case 'quotations':
+        return <Quotations />;
+      case 'conduces':
+        return <Conduces />;
       case 'villas':
         return <VillasManagement />;
       case 'categories':
