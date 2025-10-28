@@ -1524,10 +1524,11 @@ const Reservations = () => {
                   </div>
                 </div>
 
-                {/* Villas Y Servicios con Buscador */}
-                <div className="col-span-2">
-                  <Label>Villas Y Servicios</Label>
-                  <div className="relative">
+                {/* Villas Y Servicios con Buscador - Solo si es tipo 'villa' */}
+                {invoiceType === 'villa' && (
+                  <div className="col-span-2">
+                    <Label>Villas Y Servicios</Label>
+                    <div className="relative">
                     <Input
                       type="text"
                       value={villaSearchTerm}
