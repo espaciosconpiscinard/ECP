@@ -1857,9 +1857,11 @@ const Reservations = () => {
                   />
                 </div>
                 
-                {/* Huéspedes y Moneda */}
-                <div>
-                  <Label>Huéspedes *</Label>
+                {/* Huéspedes y Moneda - Solo para facturas con villa */}
+                {invoiceType === 'villa' && (
+                  <>
+                    <div>
+                      <Label>Huéspedes *</Label>
                   <Input
                     type="number"
                     min="1"
