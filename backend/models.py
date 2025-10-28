@@ -233,7 +233,8 @@ class ReservationBase(BaseModel):
     
     # Estado
     currency: Literal["DOP", "USD"] = "DOP"
-    notes: Optional[str] = None
+    notes: Optional[str] = None  # Nota visible para el cliente (se imprime en factura)
+    internal_notes: Optional[str] = None  # Nota interna (NO se imprime, solo visible en sistema)
     status: Literal["pending", "confirmed", "completed", "cancelled"] = "confirmed"
 
 class ReservationCreate(ReservationBase):
