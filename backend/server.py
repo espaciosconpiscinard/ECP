@@ -1313,6 +1313,273 @@ async def delete_reservation_abono(reservation_id: str, abono_id: str, current_u
     
     return {"message": "Abono deleted successfully"}
 
+
+# ============ QUOTATION (COTIZACIÓN) ENDPOINTS ============
+
+@api_router.post("/quotations", response_model=Quotation)
+async def create_quotation(quotation_data: QuotationCreate, current_user: dict = Depends(get_current_user)):
+    """Create a new quotation"""
+    from models import Quotation
+    
+    # Generate quotation number
+    if quotation_data.quotation_number and current_user.get("role") == "admin":
+        # Admin can provide manual number
+        quotation_number = f"COT-{quotation_data.quotation_number:04d}"
+        # Check if exists
+        existing = await db.quotations.find_one({"quotation_number": quotation_number}, {"_id": 0})
+        if existing:
+            raise HTTPException(status_code=400, detail=f"Quotation number {quotation_number} already exists")
+    else:
+        # Auto-generate
+        last_quotation = await db.quotations.find_one(
+            sort=[("created_at", -1)],
+            projection={"quotation_number": 1, "_id": 0}
+        )
+        
+        if last_quotation:
+            last_num = int(last_quotation["quotation_number"].split("-")[1])
+            quotation_number = f"COT-{last_num + 1:04d}"
+        else:
+            quotation_number = "COT-0001"
+    
+    quotation = Quotation(
+        **quotation_data.model_dump(exclude={'quotation_number'}),
+        quotation_number=quotation_number,
+        created_by=current_user["id"]
+    )
+    
+    doc = prepare_doc_for_insert(quotation.model_dump())
+    await db.quotations.insert_one(doc)
+    
+    return quotation
+
+@api_router.get("/quotations", response_model=List[Quotation])
+async def get_quotations(
+    status: Optional[str] = None,
+    customer_id: Optional[str] = None,
+    current_user: dict = Depends(get_current_user)
+):
+    """Get all quotations"""
+    query = {}
+    if status:
+        query["status"] = status
+    if customer_id:
+        query["customer_id"] = customer_id
+    
+    quotations = await db.quotations.find(query, {"_id": 0}).sort("created_at", -1).to_list(1000)
+    return quotations
+
+@api_router.get("/quotations/{quotation_id}", response_model=Quotation)
+async def get_quotation(quotation_id: str, current_user: dict = Depends(get_current_user)):
+    """Get a specific quotation"""
+    quotation = await db.quotations.find_one({"id": quotation_id}, {"_id": 0})
+    if not quotation:
+        raise HTTPException(status_code=404, detail="Quotation not found")
+    return quotation
+
+@api_router.put("/quotations/{quotation_id}", response_model=Quotation)
+async def update_quotation(quotation_id: str, quotation_data: QuotationUpdate, current_user: dict = Depends(get_current_user)):
+    """Update a quotation"""
+    existing = await db.quotations.find_one({"id": quotation_id}, {"_id": 0})
+    if not existing:
+        raise HTTPException(status_code=404, detail="Quotation not found")
+    
+    update_data = {k: v for k, v in quotation_data.model_dump().items() if v is not None}
+    update_data["updated_at"] = datetime.now(timezone.utc).isoformat()
+    
+    update_data = prepare_doc_for_insert(update_data)
+    
+    await db.quotations.update_one(
+        {"id": quotation_id},
+        {"$set": update_data}
+    )
+    
+    updated = await db.quotations.find_one({"id": quotation_id}, {"_id": 0})
+    return updated
+
+@api_router.delete("/quotations/{quotation_id}")
+async def delete_quotation(quotation_id: str, current_user: dict = Depends(require_admin)):
+    """Delete a quotation (admin only)"""
+    result = await db.quotations.delete_one({"id": quotation_id})
+    if result.deleted_count == 0:
+        raise HTTPException(status_code=404, detail="Quotation not found")
+    return {"message": "Quotation deleted successfully"}
+
+@api_router.post("/quotations/{quotation_id}/convert-to-invoice", response_model=Reservation)
+async def convert_quotation_to_invoice(quotation_id: str, current_user: dict = Depends(get_current_user)):
+    """Convert a quotation to an invoice"""
+    quotation = await db.quotations.find_one({"id": quotation_id}, {"_id": 0})
+    if not quotation:
+        raise HTTPException(status_code=404, detail="Quotation not found")
+    
+    if quotation.get("status") == "converted":
+        raise HTTPException(status_code=400, detail="Quotation already converted to invoice")
+    
+    # Create reservation from quotation
+    from models import ReservationCreate, Reservation
+    
+    # Generate invoice number
+    last_reservation = await db.reservations.find_one(
+        sort=[("created_at", -1)],
+        projection={"invoice_number": 1, "_id": 0}
+    )
+    
+    if last_reservation:
+        invoice_number = str(int(last_reservation["invoice_number"]) + 1)
+    else:
+        invoice_number = "1600"
+    
+    # Calculate balance
+    balance_due = calculate_balance(
+        quotation.get("total_amount", 0),
+        0,  # No payment yet
+        0   # No deposit
+    )
+    
+    reservation = Reservation(
+        customer_id=quotation["customer_id"],
+        customer_name=quotation["customer_name"],
+        villa_id=quotation.get("villa_id"),
+        villa_code=quotation.get("villa_code"),
+        villa_description=quotation.get("villa_description"),
+        villa_location=quotation.get("villa_location"),
+        rental_type=quotation.get("rental_type"),
+        event_type=quotation.get("event_type"),
+        reservation_date=quotation["quotation_date"],
+        check_in_time=quotation["check_in_time"],
+        check_out_time=quotation["check_out_time"],
+        guests=quotation["guests"],
+        extra_people=quotation.get("extra_people", 0),
+        extra_people_cost=quotation.get("extra_people_cost", 0),
+        base_price=quotation["base_price"],
+        owner_price=0,  # Owner price not in quotation
+        extra_hours=quotation.get("extra_hours", 0),
+        extra_hours_cost=quotation.get("extra_hours_cost", 0),
+        extra_services=quotation.get("extra_services", []),
+        extra_services_total=quotation.get("extra_services_total", 0),
+        subtotal=quotation["subtotal"],
+        discount=quotation.get("discount", 0),
+        include_itbis=quotation.get("include_itbis", False),
+        itbis_amount=quotation.get("itbis_amount", 0),
+        total_amount=quotation["total_amount"],
+        deposit=0,
+        payment_method="efectivo",
+        amount_paid=0,
+        currency=quotation["currency"],
+        notes=quotation.get("notes"),
+        internal_notes=quotation.get("internal_notes"),
+        status="confirmed",
+        invoice_number=invoice_number,
+        balance_due=balance_due,
+        created_by=current_user["id"]
+    )
+    
+    doc = prepare_doc_for_insert(reservation.model_dump())
+    await db.reservations.insert_one(doc)
+    
+    # Mark quotation as converted
+    await db.quotations.update_one(
+        {"id": quotation_id},
+        {"$set": {
+            "status": "converted",
+            "converted_to_invoice_id": reservation.id,
+            "updated_at": datetime.now(timezone.utc).isoformat()
+        }}
+    )
+    
+    return reservation
+
+# ============ CONDUCE (DELIVERY NOTE) ENDPOINTS ============
+
+@api_router.post("/conduces", response_model=Conduce)
+async def create_conduce(conduce_data: ConduceCreate, current_user: dict = Depends(get_current_user)):
+    """Create a new conduce (delivery note)"""
+    from models import Conduce
+    
+    # Generate conduce number
+    if conduce_data.conduce_number and current_user.get("role") == "admin":
+        # Admin can provide manual number
+        conduce_number = f"CON-{conduce_data.conduce_number:04d}"
+        # Check if exists
+        existing = await db.conduces.find_one({"conduce_number": conduce_number}, {"_id": 0})
+        if existing:
+            raise HTTPException(status_code=400, detail=f"Conduce number {conduce_number} already exists")
+    else:
+        # Auto-generate
+        last_conduce = await db.conduces.find_one(
+            sort=[("created_at", -1)],
+            projection={"conduce_number": 1, "_id": 0}
+        )
+        
+        if last_conduce:
+            last_num = int(last_conduce["conduce_number"].split("-")[1])
+            conduce_number = f"CON-{last_num + 1:04d}"
+        else:
+            conduce_number = "CON-0001"
+    
+    conduce = Conduce(
+        **conduce_data.model_dump(exclude={'conduce_number'}),
+        conduce_number=conduce_number,
+        created_by=current_user["id"]
+    )
+    
+    doc = prepare_doc_for_insert(conduce.model_dump())
+    await db.conduces.insert_one(doc)
+    
+    return conduce
+
+@api_router.get("/conduces", response_model=List[Conduce])
+async def get_conduces(
+    status: Optional[str] = None,
+    recipient_type: Optional[str] = None,
+    current_user: dict = Depends(get_current_user)
+):
+    """Get all conduces"""
+    query = {}
+    if status:
+        query["status"] = status
+    if recipient_type:
+        query["recipient_type"] = recipient_type
+    
+    conduces = await db.conduces.find(query, {"_id": 0}).sort("created_at", -1).to_list(1000)
+    return conduces
+
+@api_router.get("/conduces/{conduce_id}", response_model=Conduce)
+async def get_conduce(conduce_id: str, current_user: dict = Depends(get_current_user)):
+    """Get a specific conduce"""
+    conduce = await db.conduces.find_one({"id": conduce_id}, {"_id": 0})
+    if not conduce:
+        raise HTTPException(status_code=404, detail="Conduce not found")
+    return conduce
+
+@api_router.put("/conduces/{conduce_id}", response_model=Conduce)
+async def update_conduce(conduce_id: str, conduce_data: ConduceUpdate, current_user: dict = Depends(get_current_user)):
+    """Update a conduce"""
+    existing = await db.conduces.find_one({"id": conduce_id}, {"_id": 0})
+    if not existing:
+        raise HTTPException(status_code=404, detail="Conduce not found")
+    
+    update_data = {k: v for k, v in conduce_data.model_dump().items() if v is not None}
+    update_data["updated_at"] = datetime.now(timezone.utc).isoformat()
+    
+    update_data = prepare_doc_for_insert(update_data)
+    
+    await db.conduces.update_one(
+        {"id": conduce_id},
+        {"$set": update_data}
+    )
+    
+    updated = await db.conduces.find_one({"id": conduce_id}, {"_id": 0})
+    return updated
+
+@api_router.delete("/conduces/{conduce_id}")
+async def delete_conduce(conduce_id: str, current_user: dict = Depends(require_admin)):
+    """Delete a conduce (admin only)"""
+    result = await db.conduces.delete_one({"id": conduce_id})
+    if result.deleted_count == 0:
+        raise HTTPException(status_code=404, detail="Conduce not found")
+    return {"message": "Conduce deleted successfully"}
+
 # ============ COMMISSION ENDPOINTS ============
 
 @api_router.get("/commissions", response_model=List[Commission])
