@@ -952,7 +952,6 @@ async def create_reservation(reservation_data: ReservationCreate, current_user: 
             
             # Crear gasto automático para el pago al propietario
             from models import Expense
-            import uuid
             
             expense = {
                 "id": str(uuid.uuid4()),
