@@ -1348,21 +1348,27 @@ const Reservations = () => {
           <h2 className="text-3xl font-bold text-gray-900">Facturas</h2>
           <p className="text-gray-500 mt-1">Gestiona las facturas de villas y servicios</p>
         </div>
-        <Dialog open={isFormOpen} onOpenChange={setIsFormOpen}>
-          <DialogTrigger asChild>
-            <Button onClick={() => resetForm()} data-testid="add-reservation-button">
-              <Plus className="mr-2 h-4 w-4" /> Nueva Factura
-            </Button>
-          </DialogTrigger>
-          <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
-            <DialogHeader>
-              <DialogTitle>
-                {editingReservation ? 'Editar Factura' : 'Nueva Factura'}
-              </DialogTitle>
-            </DialogHeader>
-            
-            {/* Selector de tipo de factura */}
-            {!editingReservation && (
+        <div className="flex gap-2">
+          <Dialog open={isFormOpen && invoiceType === 'villa'} onOpenChange={(open) => {
+            if (!open) {
+              setIsFormOpen(false);
+            }
+          }}>
+            <DialogTrigger asChild>
+              <Button onClick={() => {
+                setInvoiceType('villa');
+                resetForm();
+                setIsFormOpen(true);
+              }} data-testid="add-reservation-button">
+                <Plus className="mr-2 h-4 w-4" /> Nueva Factura
+              </Button>
+            </DialogTrigger>
+            <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+              <DialogHeader>
+                <DialogTitle>
+                  {editingReservation ? 'Editar Factura' : 'Nueva Factura - Villa y Servicios'}
+                </DialogTitle>
+              </DialogHeader>
               <div className="mb-4 p-4 bg-gray-50 rounded-lg border border-gray-300">
                 <label className="block text-sm font-medium text-gray-700 mb-2">Tipo de Factura</label>
                 <div className="grid grid-cols-2 gap-3">
