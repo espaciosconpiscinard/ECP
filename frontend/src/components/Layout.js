@@ -37,7 +37,9 @@ const Layout = ({ children, currentView, setCurrentView }) => {
   // Menú base para todos los usuarios
   const menuItems = [
     { id: 'dashboard', label: 'Dashboard', icon: Home, roles: ['admin', 'employee'] },
-    { id: 'reservations', label: 'Reservaciones', icon: FileText, roles: ['admin', 'employee'] },
+    { id: 'reservations', label: 'Facturas', icon: FileText, roles: ['admin', 'employee'] },
+    { id: 'quotations', label: 'Cotizaciones', icon: ClipboardList, roles: ['admin', 'employee'] },
+    { id: 'conduces', label: 'Conduce', icon: Truck, roles: ['admin', 'employee'] },
     { id: 'customers', label: 'Clientes', icon: Users, roles: ['admin', 'employee'] },
     { id: 'villas', label: 'Villas y Servicios', icon: Building, roles: ['admin', 'employee'] },
   ];
