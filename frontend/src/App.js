@@ -5,6 +5,8 @@ import Login from './components/Login';
 import Layout from './components/Layout';
 import Dashboard from './components/Dashboard';
 import Reservations from './components/Reservations';
+import Quotations from './components/Quotations';
+import Conduces from './components/Conduces';
 import VillasManagement from './components/VillasManagement';
 import Categories from './components/Categories';
 import ExpenseCategories from './components/ExpenseCategories';
