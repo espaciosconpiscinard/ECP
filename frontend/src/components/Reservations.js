@@ -1301,19 +1301,22 @@ const Reservations = () => {
       const newService = {
         service_id: service.id,
         name: service.name,
+        service_name: service.name,  // ✅ AGREGAR service_name que requiere el backend
         quantity: 1,
-        price_unit: 0,  // No establecer precio hasta que el usuario seleccione un suplidor
+        price_unit: 0,
         price_total: 0,
-        supplier_id: '',  // Vacío hasta que el usuario seleccione
-        supplier_name: '',  // Vacío hasta que el usuario seleccione
+        unit_price: 0,
+        total: 0,
+        supplier_id: '',
+        supplier_name: '',
         supplier_price_unit: 0,
-        supplier_price_total: 0
+        supplier_price_total: 0,
+        supplier_cost: 0
       };
       
       setSelectedExtraServices([newService]);
       setShowExtraServices(true);
       
-      // NO recalcular totales hasta que el usuario seleccione un suplidor
       setFormData(prev => ({
         ...prev,
         extra_services: [newService],
