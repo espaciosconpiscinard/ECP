@@ -2594,9 +2594,8 @@ const Reservations = () => {
             </form>
           </DialogContent>
         </Dialog>
-      </div>
-
-      {/* Tarjetas de Totales */}
+        
+        {/* Segundo botón y Dialog para Factura Solo Servicios */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
         {/* Total de Facturas */}
         <Card>
