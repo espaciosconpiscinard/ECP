@@ -47,6 +47,32 @@ const Quotations = () => {
   };
 
   const handlePrint = async (quotation) => {
+    // Cargar términos desde el backend
+    let quotationTerms = [];
+    try {
+      const API_URL = process.env.REACT_APP_BACKEND_URL || '';
+      const token = localStorage.getItem('token');
+      const response = await fetch(`${API_URL}/api/config/quotation-terms`, {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+      if (response.ok) {
+        const data = await response.json();
+        quotationTerms = data.terms || [];
+      }
+    } catch (err) {
+      console.error('Error loading terms:', err);
+      // Usar términos por defecto si hay error
+      quotationTerms = [
+        `Esta cotización es válida por ${quotation.validity_days || 30} días desde la fecha de emisión`,
+        'Los precios están sujetos a cambios sin previo aviso después de la fecha de validez',
+        'Se requiere un depósito del 50% para confirmar la reservación',
+        'El saldo restante debe ser pagado antes de la fecha del evento',
+        'Las cancelaciones deben notificarse con al menos 48 horas de anticipación'
+      ];
+    }
+    
     const printWindow = window.open('', '', 'width=800,height=600');
     
     const validityDate = new Date(quotation.quotation_date);
