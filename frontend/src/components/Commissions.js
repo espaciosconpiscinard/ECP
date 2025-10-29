@@ -591,7 +591,7 @@ function Commissions() {
                 </tr>
               ) : (
                 filteredCommissions.map((commission) => (
-                  <tr key={commission.id} className={`hover:bg-gray-50 ${commission.paid ? 'bg-green-50' : 'bg-white'}`}>
+                  <tr key={commission.id} className={`hover:bg-gray-50 ${commission.paid ? 'bg-green-50' : commission.invoice_deleted ? 'bg-red-50' : 'bg-white'}`}>
                     <td className="px-4 py-3 text-center">
                       <input
                         type="checkbox"
@@ -601,7 +601,18 @@ function Commissions() {
                       />
                     </td>
                     <td className="px-4 py-3 text-center">
-                      {commission.paid ? (
+                      {commission.invoice_deleted ? (
+                        <div>
+                          <span className="inline-block px-2 py-1 bg-red-600 text-white rounded text-xs font-bold mb-1">
+                            🗑️ FACTURA ELIMINADA
+                          </span>
+                          {commission.invoice_deleted_date && (
+                            <p className="text-xs text-red-600">
+                              {new Date(commission.invoice_deleted_date).toLocaleDateString()}
+                            </p>
+                          )}
+                        </div>
+                      ) : commission.paid ? (
                         <div>
                           <span className="inline-block px-2 py-1 bg-green-600 text-white rounded text-xs font-bold mb-1">
                             ✅ PAGADO
