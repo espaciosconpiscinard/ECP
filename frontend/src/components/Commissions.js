@@ -456,9 +456,30 @@ function Commissions() {
               </select>
             </div>
           </div>
+          
+          {/* Checkbox para Facturas Eliminadas */}
+          <div className="mt-4">
+            <label className="flex items-center gap-2 cursor-pointer">
+              <input
+                type="checkbox"
+                checked={showDeletedInvoices}
+                onChange={(e) => setShowDeletedInvoices(e.target.checked)}
+                className="w-4 h-4 text-red-600 border-gray-300 rounded focus:ring-red-500"
+              />
+              <span className="text-sm font-medium text-gray-700">
+                🗑️ Mostrar solo comisiones de facturas eliminadas
+              </span>
+            </label>
+          </div>
 
           {/* Resumen de filtros activos */}
           <div className="mt-3 flex flex-wrap gap-2">
+            {showDeletedInvoices && (
+              <span className="px-3 py-1 bg-red-100 text-red-800 rounded-full text-sm font-medium">
+                🗑️ Facturas Eliminadas
+                <button onClick={() => setShowDeletedInvoices(false)} className="ml-2 text-red-600 hover:text-red-800">✕</button>
+              </span>
+            )}
             {selectedStatus !== 'pending' && (
               <span className="px-3 py-1 bg-teal-100 text-teal-800 rounded-full text-sm font-medium">
                 🔵 {selectedStatus === 'paid' ? '✅ Pagadas' : '📋 Todas'}
