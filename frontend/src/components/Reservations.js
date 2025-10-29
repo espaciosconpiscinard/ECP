@@ -1425,6 +1425,19 @@ const Reservations = () => {
         });
       });
     }
+
+  const handleConduceSubmit = async (conduceData) => {
+    try {
+      const { createConduce } = await import('../api/api');
+      await createConduce(conduceData);
+      alert('Conduce creado exitosamente');
+      setIsConduceDialogOpen(false);
+      setConduceFromReservation(null);
+    } catch (err) {
+      alert('Error al crear conduce: ' + (err.response?.data?.detail || 'Error desconocido'));
+    }
+  };
+
     
     setConduceFromReservation(conduceData);
     setIsConduceDialogOpen(true);
