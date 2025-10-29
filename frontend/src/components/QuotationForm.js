@@ -194,13 +194,17 @@ const QuotationForm = ({ quotation, onSubmit, onCancel }) => {
           updated[index].total = supplier.client_price * updated[index].quantity;
         }
       }
-    } else if (field === 'quantity' || field === 'unit_price') {
+    } else if (field === 'quantity') {
+      updated[index].total = updated[index].unit_price * updated[index].quantity;
+    } else if (field === 'unit_price') {
       updated[index].total = updated[index].unit_price * updated[index].quantity;
     }
     
     setSelectedServices(updated);
+    
+    // Recalcular totales después de actualizar servicios
     const totals = calculateTotals(formData, updated);
-    setFormData({ ...formData, ...totals });
+    setFormData(prev => ({ ...prev, ...totals }));
   };
 
   const removeService = (index) => {
