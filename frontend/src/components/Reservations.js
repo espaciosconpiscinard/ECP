@@ -1054,6 +1054,7 @@ const Reservations = () => {
                   </tr>
                 </thead>
                 <tbody>
+                  ${reservation.villa_code || reservation.villa_name ? `
                   <tr>
                     <td>01</td>
                     <td><strong>Alquiler de Espacio</strong> - ${reservation.villa_code || reservation.villa_name}</td>
@@ -1061,6 +1062,7 @@ const Reservations = () => {
                     <td style="text-align: center;">1</td>
                     <td style="text-align: right;"><strong>${reservation.currency === 'DOP' ? 'RD$' : '$'}${(reservation.base_price || 0).toLocaleString('es-DO', {minimumFractionDigits: 2})}</strong></td>
                   </tr>
+                  ` : ''}
                   ${reservation.extra_hours && reservation.extra_hours > 0 ? `
                     <tr>
                       <td>02</td>
