@@ -653,6 +653,12 @@ const Quotations = () => {
                       <p className="text-sm font-semibold text-blue-600 mt-2">
                         Total: {quotation.currency} ${quotation.total_amount.toFixed(2)}
                       </p>
+                      {quotation.status === 'converted' && quotation.converted_to_invoice_id && (
+                        <p className="text-xs text-green-600 mt-1 flex items-center">
+                          <CheckCircle className="h-3 w-3 mr-1" />
+                          Sincronizada con factura - Los cambios se actualizarán automáticamente
+                        </p>
+                      )}
                     </div>
                     <div className="flex gap-2">
                       <Button size="sm" variant="outline" onClick={() => handlePrint(quotation)}>
