@@ -340,69 +340,73 @@ const QuotationForm = ({ quotation, onSubmit, onCancel }) => {
         </div>
       )}
 
-      {/* Precios y Detalles */}
-      <div className="grid grid-cols-2 gap-4">
-        <div>
-          <Label>Huéspedes</Label>
-          <Input
-            type="number"
-            value={formData.guests}
-            onChange={(e) => setFormData({ ...formData, guests: parseInt(e.target.value) || 0 })}
-          />
-        </div>
-        <div>
-          <Label>Días de Validez</Label>
-          <Input
-            type="number"
-            value={formData.validity_days}
-            onChange={(e) => setFormData({ ...formData, validity_days: parseInt(e.target.value) || 30 })}
-          />
-        </div>
-        <div>
-          <Label>Precio al Cliente</Label>
-          <Input
-            type="number"
-            step="0.01"
-            value={formData.base_price}
-            onChange={(e) => {
-              const newData = { ...formData, base_price: parseFloat(e.target.value) || 0 };
-              const totals = calculateTotals(newData, selectedServices);
-              setFormData({ ...newData, ...totals });
-            }}
-          />
-        </div>
-        <div>
-          <Label>Precio al Propietario</Label>
-          <Input
-            type="number"
-            step="0.01"
-            value={formData.owner_price}
-            onChange={(e) => setFormData({ ...formData, owner_price: parseFloat(e.target.value) || 0 })}
-          />
-        </div>
-      </div>
+      {/* Precios y Detalles - Solo mostrar si hay villa seleccionada */}
+      {formData.villa_id && (
+        <>
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <Label>Huéspedes</Label>
+              <Input
+                type="number"
+                value={formData.guests}
+                onChange={(e) => setFormData({ ...formData, guests: parseInt(e.target.value) || 0 })}
+              />
+            </div>
+            <div>
+              <Label>Días de Validez</Label>
+              <Input
+                type="number"
+                value={formData.validity_days}
+                onChange={(e) => setFormData({ ...formData, validity_days: parseInt(e.target.value) || 30 })}
+              />
+            </div>
+            <div>
+              <Label>Precio al Cliente</Label>
+              <Input
+                type="number"
+                step="0.01"
+                value={formData.base_price}
+                onChange={(e) => {
+                  const newData = { ...formData, base_price: parseFloat(e.target.value) || 0 };
+                  const totals = calculateTotals(newData, selectedServices);
+                  setFormData({ ...newData, ...totals });
+                }}
+              />
+            </div>
+            <div>
+              <Label>Precio al Propietario</Label>
+              <Input
+                type="number"
+                step="0.01"
+                value={formData.owner_price}
+                onChange={(e) => setFormData({ ...formData, owner_price: parseFloat(e.target.value) || 0 })}
+              />
+            </div>
+          </div>
 
-      {/* Horarios */}
-      <div className="grid grid-cols-2 gap-4">
-        <div>
-          <Label>Hora Entrada</Label>
-          <Input
-            type="text"
-            value={formData.check_in_time}
-            onChange={(e) => setFormData({ ...formData, check_in_time: e.target.value })}
-            placeholder="9:00 AM"
-          />
-        </div>
-        <div>
-          <Label>Hora Salida</Label>
-          <Input
-            type="text"
-            value={formData.check_out_time}
-            onChange={(e) => setFormData({ ...formData, check_out_time: e.target.value })}
-            placeholder="8:00 PM"
-          />
-        </div>
-      </div>
+          {/* Horarios */}
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <Label>Hora Entrada</Label>
+              <Input
+                type="text"
+                value={formData.check_in_time}
+                onChange={(e) => setFormData({ ...formData, check_in_time: e.target.value })}
+                placeholder="9:00 AM"
+              />
+            </div>
+            <div>
+              <Label>Hora Salida</Label>
+              <Input
+                type="text"
+                value={formData.check_out_time}
+                onChange={(e) => setFormData({ ...formData, check_out_time: e.target.value })}
+                placeholder="8:00 PM"
+              />
+            </div>
+          </div>
+        </>
+      )}
 
       {/* Servicios Adicionales */}
       <div>
