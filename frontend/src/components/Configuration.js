@@ -824,21 +824,20 @@ function Configuration() {
                 />
               </div>
 
-              {/* Buttons */}
-              <div className="flex gap-2 mt-4">
+              <div className="flex gap-3 items-end">
+                <div className="flex-1">
+                  <p className="text-xs text-gray-500 mt-1">
+                    La próxima factura será: #{newStartNumber || '---'}
+                  </p>
+                </div>
 
-                />
-                <p className="text-xs text-gray-500 mt-1">
-                  La próxima factura será: #{newStartNumber || '---'}
-                </p>
+                <button
+                  onClick={handleUpdateCounter}
+                  className="px-6 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 font-medium"
+                >
+                  Actualizar
+                </button>
               </div>
-
-              <button
-                onClick={handleUpdateCounter}
-                className="px-6 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 font-medium"
-              >
-                Actualizar
-              </button>
             </div>
           </div>
 
