@@ -2644,7 +2644,7 @@ const Reservations = () => {
           </div>
         </CardHeader>
         <CardContent className="p-0">
-          <div className="divide-y">
+          <div className="divide-y max-h-[600px] overflow-y-auto">
             {filteredReservations.length > 0 ? (
               filteredReservations.map((res) => {
                 const isExpanded = expandedReservations[res.id];
