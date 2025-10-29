@@ -505,6 +505,57 @@ async def reset_invoice_template(current_user: dict = Depends(require_admin)):
     
     return {"message": "Plantilla reseteada a valores por defecto", "template": default_template}
 
+
+# ============ QUOTATION TERMS & CONDITIONS ENDPOINTS (ADMIN ONLY) ============
+
+@api_router.get("/config/quotation-terms", response_model=QuotationTerms)
+async def get_quotation_terms(current_user: dict = Depends(get_current_user)):
+    """Get quotation terms and conditions"""
+    terms = await db.quotation_terms.find_one({"terms_id": "main_quotation_terms"}, {"_id": 0})
+    
+    if not terms:
+        # Return default terms
+        default_terms = QuotationTerms(
+            terms_id="main_quotation_terms",
+            updated_by=current_user["id"]
+        )
+        return default_terms
+    
+    return restore_datetimes(terms, ["created_at", "updated_at"])
+
+@api_router.put("/config/quotation-terms", response_model=QuotationTerms)
+async def update_quotation_terms(
+    terms_data: QuotationTermsUpdate,
+    current_user: dict = Depends(require_admin)
+):
+    """Update quotation terms and conditions (admin only)"""
+    existing_terms = await db.quotation_terms.find_one({"terms_id": "main_quotation_terms"})
+    
+    # Prepare update data
+    update_dict = {k: v for k, v in terms_data.model_dump(exclude_unset=True).items() if v is not None}
+    update_dict["updated_at"] = datetime.now(timezone.utc).isoformat()
+    update_dict["updated_by"] = current_user["id"]
+    
+    if not existing_terms:
+        # Create new terms
+        new_terms = QuotationTerms(
+            **terms_data.model_dump(exclude_unset=True),
+            terms_id="main_quotation_terms",
+            updated_by=current_user["id"]
+        )
+        doc = prepare_doc_for_insert(new_terms.model_dump())
+        await db.quotation_terms.insert_one(doc)
+        return new_terms
+    else:
+        # Update existing terms
+        await db.quotation_terms.update_one(
+            {"terms_id": "main_quotation_terms"},
+            {"$set": update_dict}
+        )
+        
+        updated_terms = await db.quotation_terms.find_one({"terms_id": "main_quotation_terms"}, {"_id": 0})
+        return restore_datetimes(updated_terms, ["created_at", "updated_at"])
+
 # ============ LOGO ENDPOINTS (ADMIN ONLY) ============
 
 @api_router.get("/config/logo")
