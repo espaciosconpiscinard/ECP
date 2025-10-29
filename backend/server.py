@@ -1389,7 +1389,7 @@ async def get_quotation(quotation_id: str, current_user: dict = Depends(get_curr
 
 @api_router.put("/quotations/{quotation_id}", response_model=Quotation)
 async def update_quotation(quotation_id: str, quotation_data: QuotationUpdate, current_user: dict = Depends(get_current_user)):
-    """Update a quotation"""
+    """Update a quotation and sync with related invoice if exists"""
     existing = await db.quotations.find_one({"id": quotation_id}, {"_id": 0})
     if not existing:
         raise HTTPException(status_code=404, detail="Quotation not found")
@@ -1403,6 +1403,80 @@ async def update_quotation(quotation_id: str, quotation_data: QuotationUpdate, c
         {"id": quotation_id},
         {"$set": update_data}
     )
+    
+    # If quotation was converted to invoice, sync changes to invoice
+    if existing.get("converted_to_invoice_id"):
+        invoice_id = existing["converted_to_invoice_id"]
+        
+        # Build invoice update data matching the fields
+        invoice_update = {}
+        
+        # Map quotation fields to invoice fields
+        if "villa_id" in update_data:
+            invoice_update["villa_id"] = update_data["villa_id"]
+        if "villa_code" in update_data:
+            invoice_update["villa_code"] = update_data["villa_code"]
+        if "villa_description" in update_data:
+            invoice_update["villa_description"] = update_data["villa_description"]
+        if "villa_location" in update_data:
+            invoice_update["villa_location"] = update_data["villa_location"]
+        if "rental_type" in update_data:
+            invoice_update["rental_type"] = update_data["rental_type"]
+        if "event_type" in update_data:
+            invoice_update["event_type"] = update_data["event_type"]
+        if "quotation_date" in update_data:
+            invoice_update["reservation_date"] = update_data["quotation_date"]
+        if "check_in_time" in update_data:
+            invoice_update["check_in_time"] = update_data["check_in_time"]
+        if "check_out_time" in update_data:
+            invoice_update["check_out_time"] = update_data["check_out_time"]
+        if "guests" in update_data:
+            invoice_update["guests"] = update_data["guests"]
+        if "extra_people" in update_data:
+            invoice_update["extra_people"] = update_data["extra_people"]
+        if "extra_people_cost" in update_data:
+            invoice_update["extra_people_cost"] = update_data["extra_people_cost"]
+        if "base_price" in update_data:
+            invoice_update["base_price"] = update_data["base_price"]
+        if "extra_hours" in update_data:
+            invoice_update["extra_hours"] = update_data["extra_hours"]
+        if "extra_hours_cost" in update_data:
+            invoice_update["extra_hours_cost"] = update_data["extra_hours_cost"]
+        if "extra_services" in update_data:
+            invoice_update["extra_services"] = update_data["extra_services"]
+        if "extra_services_total" in update_data:
+            invoice_update["extra_services_total"] = update_data["extra_services_total"]
+        if "subtotal" in update_data:
+            invoice_update["subtotal"] = update_data["subtotal"]
+        if "discount" in update_data:
+            invoice_update["discount"] = update_data["discount"]
+        if "include_itbis" in update_data:
+            invoice_update["include_itbis"] = update_data["include_itbis"]
+        if "itbis_amount" in update_data:
+            invoice_update["itbis_amount"] = update_data["itbis_amount"]
+        if "total_amount" in update_data:
+            invoice_update["total_amount"] = update_data["total_amount"]
+            # Recalculate balance_due
+            invoice = await db.reservations.find_one({"id": invoice_id}, {"_id": 0})
+            if invoice:
+                invoice_update["balance_due"] = calculate_balance(
+                    update_data["total_amount"],
+                    invoice.get("amount_paid", 0),
+                    invoice.get("deposit", 0)
+                )
+        if "currency" in update_data:
+            invoice_update["currency"] = update_data["currency"]
+        if "notes" in update_data:
+            invoice_update["notes"] = update_data["notes"]
+        if "internal_notes" in update_data:
+            invoice_update["internal_notes"] = update_data["internal_notes"]
+        
+        if invoice_update:
+            invoice_update["updated_at"] = datetime.now(timezone.utc).isoformat()
+            await db.reservations.update_one(
+                {"id": invoice_id},
+                {"$set": invoice_update}
+            )
     
     updated = await db.quotations.find_one({"id": quotation_id}, {"_id": 0})
     return updated
