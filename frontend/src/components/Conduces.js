@@ -54,6 +54,35 @@ const Conduces = () => {
     try {
       if (editingConduce) {
         await updateConduce(editingConduce.id, conduceData);
+        alert('Conduce actualizado exitosamente');
+      } else {
+        await createConduce(conduceData);
+        alert('Conduce creado exitosamente');
+      }
+      setIsFormOpen(false);
+      setEditingConduce(null);
+      fetchConduces();
+    } catch (err) {
+      alert('Error: ' + (err.response?.data?.detail || 'Error desconocido'));
+    }
+  };
+  
+  const handleEdit = (conduce) => {
+    setEditingConduce(conduce);
+    setIsFormOpen(true);
+  };
+  
+  const handleDelete = async (conduceId) => {
+    if (!window.confirm('¿Eliminar este conduce?')) return;
+    
+    try {
+      await deleteConduce(conduceId);
+      alert('Conduce eliminado exitosamente');
+      fetchConduces();
+    } catch (err) {
+      alert('Error al eliminar: ' + (err.response?.data?.detail || 'Error desconocido'));
+    }
+  };
 
   const handlePrint = async (conduce) => {
     const printWindow = window.open('', '', 'width=800,height=600');
