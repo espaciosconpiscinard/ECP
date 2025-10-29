@@ -390,6 +390,9 @@ const Conduces = () => {
                       </p>
                     </div>
                     <div className="flex gap-2">
+                      <Button size="sm" variant="outline" onClick={() => handlePrint(conduce)}>
+                        <Printer className="h-4 w-4" />
+                      </Button>
                       <Button size="sm" variant="outline" onClick={() => handleEdit(conduce)}>
                         <Edit2 className="h-4 w-4" />
                       </Button>
