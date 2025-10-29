@@ -1392,6 +1392,43 @@ const Reservations = () => {
       if (reservation.notes) {
         let notesY = totalY + (reservation.amount_paid > 0 ? 25 : 15);
         doc.setFontSize(9);
+
+  const handleGenerateConduce = (reservation) => {
+    // Preparar datos del conduce basado en la factura
+    const conduceData = {
+      recipient_name: reservation.customer_name,
+      recipient_type: 'customer',
+      delivery_date: new Date().toISOString().split('T')[0],
+      items: [],
+      notes: `Generado desde Factura #${reservation.invoice_number}`,
+      internal_notes: '',
+      status: 'pending'
+    };
+    
+    // Agregar villa si existe
+    if (reservation.villa_code) {
+      conduceData.items.push({
+        description: `Uso de ${reservation.villa_code}${reservation.villa_location ? ` - ${reservation.villa_location}` : ''}`,
+        quantity: 1,
+        unit: 'unidad'
+      });
+    }
+    
+    // Agregar servicios adicionales
+    if (reservation.extra_services && reservation.extra_services.length > 0) {
+      reservation.extra_services.forEach(service => {
+        conduceData.items.push({
+          description: service.service_name || 'Servicio adicional',
+          quantity: service.quantity || 1,
+          unit: 'unidad'
+        });
+      });
+    }
+    
+    setConduceFromReservation(conduceData);
+    setIsConduceDialogOpen(true);
+  };
+
         doc.setTextColor(60);
         doc.setFont(undefined, 'bold');
         doc.text('Notas:', 15, notesY);
