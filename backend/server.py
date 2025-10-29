@@ -1585,7 +1585,7 @@ async def convert_quotation_to_invoice(quotation_id: str, current_user: dict = D
         extra_people=quotation.get("extra_people", 0),
         extra_people_cost=quotation.get("extra_people_cost", 0),
         base_price=quotation["base_price"],
-        owner_price=0,  # Owner price not in quotation
+        owner_price=quotation.get("owner_price", 0),  # Ahora sí tomamos el owner_price de la cotización
         extra_hours=quotation.get("extra_hours", 0),
         extra_hours_cost=quotation.get("extra_hours_cost", 0),
         extra_services=quotation.get("extra_services", []),
@@ -1604,11 +1604,63 @@ async def convert_quotation_to_invoice(quotation_id: str, current_user: dict = D
         status="confirmed",
         invoice_number=invoice_number,
         balance_due=balance_due,
-        created_by=current_user["id"]
+        created_by=current_user["id"],
+        converted_from_quotation_number=quotation["quotation_number"]  # Agregar referencia a cotización
     )
     
     doc = prepare_doc_for_insert(reservation.model_dump())
     await db.reservations.insert_one(doc)
+    
+    # Create owner payment expense if owner_price > 0 and villa exists
+    if quotation.get("owner_price", 0) > 0 and quotation.get("villa_id"):
+        expense_category = await db.expense_categories.find_one({"name": "pago_propietario"}, {"_id": 0})
+        if not expense_category:
+            # Create category if doesn't exist
+            pago_propietario_cat = ExpenseCategory(
+                id=str(uuid.uuid4()),
+                name="pago_propietario",
+                description="Pagos a propietarios de villas",
+                is_active=True,
+                created_by=current_user["id"]
+            )
+            await db.expense_categories.insert_one(prepare_doc_for_insert(pago_propietario_cat.model_dump()))
+        
+        # Create expense
+        expense = Expense(
+            category="pago_propietario",
+            description=f"Pago propietario villa {quotation.get('villa_code', 'N/A')} - Factura #{invoice_number} (desde Cotización {quotation['quotation_number']})",
+            amount=quotation["owner_price"],
+            expense_date=quotation["quotation_date"],
+            payment_status="pending",
+            notes=f"Gasto generado automáticamente desde cotización {quotation['quotation_number']}",
+            related_reservation_id=reservation.id,
+            expense_type="variable",
+            show_in_variables=True,
+            created_by=current_user["id"]
+        )
+        await db.expenses.insert_one(prepare_doc_for_insert(expense.model_dump()))
+    
+    # Create commission for the employee who created the quotation
+    creator_user = await db.users.find_one({"id": quotation["created_by"]}, {"_id": 0})
+    if creator_user and creator_user.get("commission_percentage", 0) > 0:
+        commission_amount = quotation["total_amount"] * (creator_user["commission_percentage"] / 100)
+        
+        commission = Commission(
+            user_id=quotation["created_by"],
+            user_name=creator_user.get("username", ""),
+            reservation_id=reservation.id,
+            reservation_date=quotation["quotation_date"],
+            villa_code=quotation.get("villa_code"),
+            customer_name=quotation["customer_name"],
+            total_amount=quotation["total_amount"],
+            commission_percentage=creator_user["commission_percentage"],
+            commission_amount=commission_amount,
+            notes=f"Comisión desde cotización {quotation['quotation_number']}",
+            paid=False,
+            invoice_deleted=False,
+            created_by=current_user["id"]
+        )
+        await db.commissions.insert_one(prepare_doc_for_insert(commission.model_dump()))
     
     # Mark quotation as converted
     await db.quotations.update_one(
