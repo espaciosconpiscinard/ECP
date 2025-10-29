@@ -34,6 +34,8 @@ const Reservations = () => {
   const [selectedReservation, setSelectedReservation] = useState(null);
   const [villaSearchTerm, setVillaSearchTerm] = useState('');
   const [showVillaDropdown, setShowVillaDropdown] = useState(false);
+  const [isConduceDialogOpen, setIsConduceDialogOpen] = useState(false);
+  const [conduceFromReservation, setConduceFromReservation] = useState(null);
   const [customerSearchTerm, setCustomerSearchTerm] = useState('');
   const [showCustomerDropdown, setShowCustomerDropdown] = useState(false);
   
