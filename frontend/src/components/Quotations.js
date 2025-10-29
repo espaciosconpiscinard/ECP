@@ -343,6 +343,24 @@ const Quotations = () => {
   };
 
   const handlePrintConduce = async (quotation) => {
+    // Cargar términos desde el backend
+    let quotationTerms = [];
+    try {
+      const API_URL = process.env.REACT_APP_BACKEND_URL || '';
+      const token = localStorage.getItem('token');
+      const response = await fetch(`${API_URL}/api/config/quotation-terms`, {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+      if (response.ok) {
+        const data = await response.json();
+        quotationTerms = data.terms || [];
+      }
+    } catch (err) {
+      console.error('Error loading terms:', err);
+    }
+    
     const printWindow = window.open('', '', 'width=800,height=600');
     
     printWindow.document.write(`
