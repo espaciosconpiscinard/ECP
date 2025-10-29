@@ -1205,441 +1205,210 @@ const Reservations = () => {
   };
 
   const handleDownloadPDF = async (reservation) => {
-    // Cargar los abonos de esta reservación
-    let abonos = [];
     try {
-      const response = await fetch(`${API_URL}/api/reservations/${reservation.id}/abonos`, {
-        headers: {
-          'Authorization': `Bearer ${localStorage.getItem('token')}`
+      // Crear nuevo documento PDF
+      const doc = new jsPDF();
+      
+      // Configuración de colores
+      const primaryColor = [14, 165, 233]; // #0ea5e9
+      const darkColor = [3, 105, 161]; // #0369a1
+      
+      // Agregar logo si existe
+      if (logo) {
+        try {
+          doc.addImage(logo, 'PNG', 15, 15, 30, 30);
+        } catch (e) {
+          console.log('Could not add logo:', e);
+        }
+      }
+      
+      // Título
+      doc.setFontSize(24);
+      doc.setTextColor(...darkColor);
+      doc.setFont(undefined, 'bold');
+      doc.text('FACTURA', 150, 25);
+      
+      // Número de factura
+      doc.setFontSize(11);
+      doc.setTextColor(100);
+      doc.setFont(undefined, 'normal');
+      doc.text(`#${reservation.invoice_number}`, 150, 32);
+      
+      // Información de la empresa
+      doc.setFontSize(10);
+      doc.setTextColor(60);
+      doc.setFont(undefined, 'bold');
+      doc.text('Espacios Con Piscina', 15, 52);
+      doc.setFont(undefined, 'normal');
+      doc.setFontSize(9);
+      doc.text('Calle Mencia #5, Ensanche Los Tainos', 15, 58);
+      doc.text('San Isidro, SDE', 15, 63);
+      doc.text('Tel: 829-904-4245', 15, 68);
+      
+      // Información del cliente
+      doc.setFontSize(10);
+      doc.setFont(undefined, 'bold');
+      doc.text('CLIENTE', 150, 52);
+      doc.setFont(undefined, 'normal');
+      doc.setFontSize(9);
+      doc.text(reservation.customer_name, 150, 58);
+      doc.text(`Fecha: ${new Date(reservation.reservation_date).toLocaleDateString('es-ES')}`, 150, 63);
+      
+      // Estado de pago
+      const balanceDue = reservation.balance_due || 0;
+      const status = balanceDue <= 0 ? 'PAGADO' : reservation.amount_paid > 0 ? 'PAGO PARCIAL' : 'PENDIENTE';
+      const statusColor = balanceDue <= 0 ? [34, 197, 94] : reservation.amount_paid > 0 ? [59, 130, 246] : [234, 179, 8];
+      doc.setTextColor(...statusColor);
+      doc.setFont(undefined, 'bold');
+      doc.text(status, 150, 68);
+      
+      // Línea separadora
+      doc.setDrawColor(...primaryColor);
+      doc.setLineWidth(0.5);
+      doc.line(15, 75, 195, 75);
+      
+      // Tabla de ítems
+      const tableData = [];
+      
+      // Villa
+      if (reservation.villa_code) {
+        tableData.push([
+          1,
+          `${reservation.villa_code}${reservation.villa_location ? ` - ${reservation.villa_location}` : ''}`,
+          `${reservation.currency} ${reservation.base_price.toFixed(2)}`,
+          `${reservation.currency} ${reservation.base_price.toFixed(2)}`
+        ]);
+      }
+      
+      // Personas extra
+      if (reservation.extra_people > 0) {
+        tableData.push([
+          reservation.extra_people,
+          'Personas extra',
+          `${reservation.currency} ${(reservation.extra_people_cost / reservation.extra_people).toFixed(2)}`,
+          `${reservation.currency} ${reservation.extra_people_cost.toFixed(2)}`
+        ]);
+      }
+      
+      // Horas extra
+      if (reservation.extra_hours > 0) {
+        tableData.push([
+          reservation.extra_hours,
+          'Horas extra',
+          `${reservation.currency} ${(reservation.extra_hours_cost / reservation.extra_hours).toFixed(2)}`,
+          `${reservation.currency} ${reservation.extra_hours_cost.toFixed(2)}`
+        ]);
+      }
+      
+      // Servicios adicionales
+      if (reservation.extra_services && reservation.extra_services.length > 0) {
+        reservation.extra_services.forEach(service => {
+          tableData.push([
+            service.quantity || 1,
+            `${service.service_name || 'Servicio'}${service.supplier_name ? ` (${service.supplier_name})` : ''}`,
+            `${reservation.currency} ${(service.unit_price || 0).toFixed(2)}`,
+            `${reservation.currency} ${(service.total || 0).toFixed(2)}`
+          ]);
+        });
+      }
+      
+      doc.autoTable({
+        startY: 80,
+        head: [['CANT.', 'DESCRIPCIÓN', 'PRECIO UNIT.', 'TOTAL']],
+        body: tableData,
+        theme: 'striped',
+        headStyles: {
+          fillColor: darkColor,
+          fontSize: 10,
+          fontStyle: 'bold',
+          halign: 'center'
+        },
+        columnStyles: {
+          0: { halign: 'center', cellWidth: 20 },
+          1: { halign: 'left', cellWidth: 90 },
+          2: { halign: 'right', cellWidth: 35 },
+          3: { halign: 'right', cellWidth: 35 }
+        },
+        styles: {
+          fontSize: 9,
+          cellPadding: 4
         }
       });
-      if (response.ok) {
-        abonos = await response.json();
+      
+      // Totales
+      const finalY = doc.lastAutoTable.finalY + 10;
+      const rightX = 195;
+      
+      doc.setFontSize(9);
+      doc.setTextColor(60);
+      doc.setFont(undefined, 'normal');
+      
+      doc.text('Subtotal:', rightX - 60, finalY, { align: 'right' });
+      doc.text(`${reservation.currency} ${reservation.subtotal.toFixed(2)}`, rightX, finalY, { align: 'right' });
+      
+      if (reservation.discount > 0) {
+        doc.text('Descuento:', rightX - 60, finalY + 6, { align: 'right' });
+        doc.text(`-${reservation.currency} ${reservation.discount.toFixed(2)}`, rightX, finalY + 6, { align: 'right' });
       }
-    } catch (err) {
-      console.error('Error loading abonos for PDF:', err);
-    }
-    
-    const balanceDue = reservation.balance_due || 0;
-    
-    // Generar HTML de políticas
-    let policiesHtml = '';
-    if (invoiceTemplate && invoiceTemplate.policies && invoiceTemplate.policies.length > 0) {
-      policiesHtml = invoiceTemplate.policies.map(policy => `<p>• ${policy}</p>`).join('');
-    } else {
-      // Políticas por defecto
-      policiesHtml = `
-        <p>• El depósito de seguridad es reembolsable si no hay daños a la propiedad.</p>
-        <p>• Las reservaciones se garantizan con el pago del 50% del total.</p>
-        <p>• No hay reembolsos por cancelaciones, llegadas tardías o salidas anticipadas.</p>
-        <p>• El número máximo de huéspedes no debe ser excedido.</p>
-        <p>• Cualquier daño será cobrado al cliente. Prohibido fumar en áreas cerradas.</p>
-      `;
-    }
-    
-    // Crear elemento temporal para el PDF
-    const tempDiv = document.createElement('div');
-    tempDiv.style.position = 'absolute';
-    tempDiv.style.left = '-9999px';
-    tempDiv.innerHTML = `
-      <html>
-        <head>
-          <style>
-            * { margin: 0; padding: 0; box-sizing: border-box; }
-            body { 
-              font-family: 'Arial', sans-serif; 
-              color: #333;
-              background: white;
-            }
-            .invoice-wrapper {
-              width: 900px;
-              margin: 0 auto;
-              background: white;
-            }
-            
-            .top-bar {
-              height: 15px;
-              background: #0ea5e9;
-            }
-            
-            .header {
-              display: flex;
-              justify-content: space-between;
-              padding: 40px 50px 30px;
-              border-bottom: 3px solid #0369a1;
-            }
-            .header-left {
-              display: flex;
-              align-items: center;
-              gap: 15px;
-            }
-            .logo { 
-              height: 60px; 
-              width: auto;
-            }
-            .brand-info {
-              display: flex;
-              flex-direction: column;
-            }
-            .brand-name { 
-              font-size: 16px; 
-              font-weight: 700;
-              color: #0369a1;
-              line-height: 1.2;
-            }
-            .brand-tagline { 
-              font-size: 11px; 
-              color: #64748b;
-              font-style: italic;
-            }
-            .invoice-title {
-              text-align: right;
-            }
-            .invoice-title h1 { 
-              font-size: 32px; 
-              color: #0ea5e9; 
-              font-weight: 900; 
-            }
-            .invoice-title .invoice-number { 
-              font-size: 14px; 
-              color: #64748b; 
-            }
-            
-            .info-section {
-              display: flex;
-              justify-content: space-between;
-              padding: 30px 50px;
-              gap: 30px;
-            }
-            .info-box {
-              flex: 1;
-              background: #f8fafc;
-              padding: 20px;
-              border-radius: 8px;
-              border-left: 4px solid #0ea5e9;
-            }
-            .info-box h3 {
-              font-size: 12px;
-              color: #0369a1;
-              text-transform: uppercase;
-              letter-spacing: 1px;
-              margin-bottom: 10px;
-              font-weight: 700;
-            }
-            .info-box p {
-              font-size: 13px;
-              line-height: 1.6;
-              color: #334155;
-            }
-            
-            .items-section {
-              padding: 20px 50px;
-            }
-            table {
-              width: 100%;
-              border-collapse: collapse;
-              font-size: 13px;
-            }
-            thead th {
-              background: #0369a1;
-              color: white;
-              padding: 12px;
-              text-align: left;
-              font-weight: 600;
-              text-transform: uppercase;
-              font-size: 11px;
-              letter-spacing: 0.5px;
-            }
-            tbody td {
-              padding: 12px;
-              border-bottom: 1px solid #e2e8f0;
-            }
-            tbody tr:hover {
-              background: #f8fafc;
-            }
-            .item-name {
-              font-weight: 600;
-              color: #0f172a;
-            }
-            .text-right {
-              text-align: right;
-            }
-            
-            .totals-section {
-              padding: 20px 50px;
-              background: #f8fafc;
-            }
-            .totals-grid {
-              max-width: 400px;
-              margin-left: auto;
-            }
-            .total-row {
-              display: flex;
-              justify-content: space-between;
-              padding: 8px 0;
-              font-size: 13px;
-            }
-            .total-row.subtotal {
-              border-top: 1px solid #cbd5e1;
-              padding-top: 12px;
-              margin-top: 8px;
-            }
-            .total-row.grand-total {
-              border-top: 2px solid #0369a1;
-              padding-top: 12px;
-              margin-top: 8px;
-              font-size: 16px;
-              font-weight: 700;
-              color: #0369a1;
-            }
-            .total-row .label {
-              color: #64748b;
-            }
-            .total-row.grand-total .label {
-              color: #0369a1;
-            }
-            
-            .notes-section {
-              padding: 20px 50px;
-            }
-            .notes-section h3 {
-              font-size: 12px;
-              color: #0369a1;
-              text-transform: uppercase;
-              margin-bottom: 10px;
-              font-weight: 700;
-            }
-            .notes-section p {
-              font-size: 12px;
-              color: #64748b;
-              line-height: 1.6;
-            }
-            
-            .policies-section {
-              padding: 25px 50px;
-              background: #f1f5f9;
-              border-top: 2px solid #cbd5e1;
-            }
-            .policies-section h3 {
-              font-size: 13px;
-              color: #0369a1;
-              text-transform: uppercase;
-              margin-bottom: 12px;
-              font-weight: 700;
-            }
-            .policies-section p {
-              font-size: 11px;
-              color: #475569;
-              line-height: 1.7;
-              margin-bottom: 5px;
-            }
-            
-            .footer {
-              padding: 25px 50px;
-              text-align: center;
-              background: #0369a1;
-              color: white;
-            }
-            .thank-you {
-              font-size: 16px;
-              font-weight: 700;
-              margin-bottom: 8px;
-            }
-            .footer-contact {
-              font-size: 11px;
-              opacity: 0.9;
-            }
-            
-            .status-badge {
-              display: inline-block;
-              padding: 4px 12px;
-              border-radius: 12px;
-              font-size: 11px;
-              font-weight: 600;
-              text-transform: uppercase;
-            }
-            .status-pending {
-              background: #fef3c7;
-              color: #92400e;
-            }
-            .status-paid {
-              background: #d1fae5;
-              color: #065f46;
-            }
-            .status-partial {
-              background: #dbeafe;
-              color: #1e40af;
-            }
-          </style>
-        </head>
-        <body>
-          <div class="invoice-wrapper">
-            <div class="top-bar"></div>
-            
-            <div class="header">
-              <div class="header-left">
-                ${logo ? `<img src="${logo}" class="logo" alt="Logo" />` : ''}
-                <div class="brand-info">
-                  <div class="brand-name">Espacios Con Piscina</div>
-                  <div class="brand-tagline">Alquiler de villas premium</div>
-                </div>
-              </div>
-              <div class="invoice-title">
-                <h1>FACTURA</h1>
-                <div class="invoice-number">#${reservation.invoice_number}</div>
-              </div>
-            </div>
-            
-            <div class="info-section">
-              <div class="info-box">
-                <h3>Cliente</h3>
-                <p><strong>${reservation.customer_name}</strong></p>
-              </div>
-              <div class="info-box">
-                <h3>Fecha</h3>
-                <p>${new Date(reservation.reservation_date).toLocaleDateString('es-ES', { year: 'numeric', month: 'long', day: 'numeric' })}</p>
-              </div>
-              <div class="info-box">
-                <h3>Estado de Pago</h3>
-                <p>
-                  ${balanceDue <= 0 
-                    ? '<span class="status-badge status-paid">PAGADO</span>' 
-                    : reservation.amount_paid > 0 
-                      ? '<span class="status-badge status-partial">PAGO PARCIAL</span>'
-                      : '<span class="status-badge status-pending">PENDIENTE</span>'
-                  }
-                </p>
-              </div>
-            </div>
-            
-            <div class="items-section">
-              <table>
-                <thead>
-                  <tr>
-                    <th>CONCEPTO</th>
-                    <th class="text-right">CANTIDAD</th>
-                    <th class="text-right">PRECIO</th>
-                    <th class="text-right">TOTAL</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  ${reservation.villa_code ? `
-                    <tr>
-                      <td class="item-name">${reservation.villa_code}${reservation.villa_location ? ` - ${reservation.villa_location}` : ''}</td>
-                      <td class="text-right">1</td>
-                      <td class="text-right">${reservation.currency} ${reservation.base_price.toFixed(2)}</td>
-                      <td class="text-right">${reservation.currency} ${reservation.base_price.toFixed(2)}</td>
-                    </tr>
-                  ` : ''}
-                  ${reservation.extra_people > 0 ? `
-                    <tr>
-                      <td>Personas extra</td>
-                      <td class="text-right">${reservation.extra_people}</td>
-                      <td class="text-right">${reservation.currency} ${(reservation.extra_people_cost / reservation.extra_people).toFixed(2)}</td>
-                      <td class="text-right">${reservation.currency} ${reservation.extra_people_cost.toFixed(2)}</td>
-                    </tr>
-                  ` : ''}
-                  ${reservation.extra_hours > 0 ? `
-                    <tr>
-                      <td>Horas extra</td>
-                      <td class="text-right">${reservation.extra_hours}</td>
-                      <td class="text-right">${reservation.currency} ${(reservation.extra_hours_cost / reservation.extra_hours).toFixed(2)}</td>
-                      <td class="text-right">${reservation.currency} ${reservation.extra_hours_cost.toFixed(2)}</td>
-                    </tr>
-                  ` : ''}
-                  ${reservation.extra_services && reservation.extra_services.length > 0 
-                    ? reservation.extra_services.map(service => `
-                      <tr>
-                        <td>${service.service_name || 'Servicio adicional'}${service.supplier_name ? ` (${service.supplier_name})` : ''}</td>
-                        <td class="text-right">${service.quantity || 1}</td>
-                        <td class="text-right">${reservation.currency} ${service.unit_price?.toFixed(2) || '0.00'}</td>
-                        <td class="text-right">${reservation.currency} ${service.total?.toFixed(2) || '0.00'}</td>
-                      </tr>
-                    `).join('')
-                    : ''
-                  }
-                </tbody>
-              </table>
-            </div>
-            
-            <div class="totals-section">
-              <div class="totals-grid">
-                <div class="total-row subtotal">
-                  <span class="label">Subtotal:</span>
-                  <span>${reservation.currency} ${reservation.subtotal.toFixed(2)}</span>
-                </div>
-                ${reservation.discount > 0 ? `
-                  <div class="total-row">
-                    <span class="label">Descuento:</span>
-                    <span>-${reservation.currency} ${reservation.discount.toFixed(2)}</span>
-                  </div>
-                ` : ''}
-                ${reservation.include_itbis ? `
-                  <div class="total-row">
-                    <span class="label">ITBIS (18%):</span>
-                    <span>${reservation.currency} ${reservation.itbis_amount.toFixed(2)}</span>
-                  </div>
-                ` : ''}
-                <div class="total-row grand-total">
-                  <span class="label">TOTAL:</span>
-                  <span>${reservation.currency} ${reservation.total_amount.toFixed(2)}</span>
-                </div>
-                ${reservation.amount_paid > 0 ? `
-                  <div class="total-row">
-                    <span class="label">Pagado:</span>
-                    <span>${reservation.currency} ${reservation.amount_paid.toFixed(2)}</span>
-                  </div>
-                  <div class="total-row" style="color: ${balanceDue > 0 ? '#dc2626' : '#16a34a'}">
-                    <span class="label">Balance:</span>
-                    <span>${reservation.currency} ${balanceDue.toFixed(2)}</span>
-                  </div>
-                ` : ''}
-              </div>
-            </div>
-            
-            ${reservation.notes ? `
-              <div class="notes-section">
-                <h3>Notas</h3>
-                <p>${reservation.notes}</p>
-              </div>
-            ` : ''}
-            
-            <div class="policies-section">
-              <h3>Políticas y Condiciones</h3>
-              ${policiesHtml}
-            </div>
-            
-            <div class="footer">
-              <div class="thank-you">GRACIAS POR SU PREFERENCIA</div>
-              <div class="footer-contact">
-                Calle Mencia #5, Ensanche Los Tainos, San Isidro, SDE | 
-                Contacto: 829-904-4245 (WhatsApp)
-              </div>
-            </div>
-          </div>
-        </body>
-      </html>
-    `;
-    
-    document.body.appendChild(tempDiv);
-    
-    // Configuración de html2pdf
-    const opt = {
-      margin: 0,
-      filename: `Factura_${reservation.invoice_number}.pdf`,
-      image: { type: 'jpeg', quality: 0.98 },
-      html2canvas: { scale: 2, useCORS: true },
-      jsPDF: { unit: 'mm', format: 'letter', orientation: 'portrait' }
-    };
-    
-    // Generar y descargar PDF
-    try {
-      await html2pdf().set(opt).from(tempDiv).save();
+      
+      if (reservation.include_itbis) {
+        doc.text('ITBIS (18%):', rightX - 60, finalY + (reservation.discount > 0 ? 12 : 6), { align: 'right' });
+        doc.text(`${reservation.currency} ${reservation.itbis_amount.toFixed(2)}`, rightX, finalY + (reservation.discount > 0 ? 12 : 6), { align: 'right' });
+      }
+      
+      // Total
+      let totalY = finalY + 6;
+      if (reservation.discount > 0) totalY += 6;
+      if (reservation.include_itbis) totalY += 6;
+      
+      doc.setDrawColor(...darkColor);
+      doc.setLineWidth(0.3);
+      doc.line(rightX - 60, totalY, rightX, totalY);
+      
+      doc.setFontSize(11);
+      doc.setFont(undefined, 'bold');
+      doc.setTextColor(...darkColor);
+      doc.text('TOTAL:', rightX - 60, totalY + 6, { align: 'right' });
+      doc.text(`${reservation.currency} ${reservation.total_amount.toFixed(2)}`, rightX, totalY + 6, { align: 'right' });
+      
+      // Pagos
+      if (reservation.amount_paid > 0) {
+        doc.setFontSize(9);
+        doc.setFont(undefined, 'normal');
+        doc.setTextColor(60);
+        doc.text('Pagado:', rightX - 60, totalY + 12, { align: 'right' });
+        doc.text(`${reservation.currency} ${reservation.amount_paid.toFixed(2)}`, rightX, totalY + 12, { align: 'right' });
+        
+        const balanceColor = balanceDue > 0 ? [220, 38, 38] : [34, 197, 94];
+        doc.setTextColor(...balanceColor);
+        doc.setFont(undefined, 'bold');
+        doc.text('Balance:', rightX - 60, totalY + 18, { align: 'right' });
+        doc.text(`${reservation.currency} ${balanceDue.toFixed(2)}`, rightX, totalY + 18, { align: 'right' });
+      }
+      
+      // Notas
+      if (reservation.notes) {
+        let notesY = totalY + (reservation.amount_paid > 0 ? 25 : 15);
+        doc.setFontSize(9);
+        doc.setTextColor(60);
+        doc.setFont(undefined, 'bold');
+        doc.text('Notas:', 15, notesY);
+        doc.setFont(undefined, 'normal');
+        const splitNotes = doc.splitTextToSize(reservation.notes, 180);
+        doc.text(splitNotes, 15, notesY + 5);
+      }
+      
+      // Footer
+      doc.setFontSize(8);
+      doc.setTextColor(100);
+      doc.text('GRACIAS POR SU PREFERENCIA', 105, 280, { align: 'center' });
+      doc.text('Calle Mencia #5, Ensanche Los Tainos, San Isidro, SDE | Tel: 829-904-4245', 105, 285, { align: 'center' });
+      
+      // Guardar PDF
+      doc.save(`Factura_${reservation.invoice_number}.pdf`);
     } catch (error) {
       console.error('Error generating PDF:', error);
       alert('Error al generar el PDF. Por favor, intenta nuevamente.');
-    } finally {
-      document.body.removeChild(tempDiv);
     }
   };
 
