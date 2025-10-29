@@ -1216,46 +1216,47 @@ const Reservations = () => {
       const primaryColor = [14, 165, 233]; // #0ea5e9
       const darkColor = [3, 105, 161]; // #0369a1
       
-      // Agregar logo si existe
-      if (logo) {
-        try {
-          doc.addImage(logo, 'PNG', 15, 15, 30, 30);
-        } catch (e) {
-          console.log('Could not add logo:', e);
-        }
-      }
-      
-      // Título
-      doc.setFontSize(24);
+      // Título FACTURA
+      doc.setFontSize(28);
       doc.setTextColor(...darkColor);
       doc.setFont(undefined, 'bold');
-      doc.text('FACTURA', 150, 25);
+      doc.text('FACTURA', 105, 25, { align: 'center' });
       
       // Número de factura
-      doc.setFontSize(11);
+      doc.setFontSize(12);
       doc.setTextColor(100);
       doc.setFont(undefined, 'normal');
-      doc.text(`#${reservation.invoice_number}`, 150, 32);
+      doc.text(`#${reservation.invoice_number}`, 105, 32, { align: 'center' });
       
-      // Información de la empresa
+      // Línea separadora azul
+      doc.setDrawColor(...primaryColor);
+      doc.setLineWidth(1);
+      doc.line(15, 38, 195, 38);
+      
+      // Información de la empresa (izquierda)
       doc.setFontSize(10);
       doc.setTextColor(60);
       doc.setFont(undefined, 'bold');
-      doc.text('Espacios Con Piscina', 15, 52);
+      doc.text('EMISOR:', 15, 48);
       doc.setFont(undefined, 'normal');
       doc.setFontSize(9);
-      doc.text('Calle Mencia #5, Ensanche Los Tainos', 15, 58);
-      doc.text('San Isidro, SDE', 15, 63);
-      doc.text('Tel: 829-904-4245', 15, 68);
+      doc.text('Espacios Con Piscina', 15, 54);
+      doc.text('Calle Mencia #5, Los Tainos', 15, 59);
+      doc.text('San Isidro, SDE', 15, 64);
+      doc.text('Tel: 829-904-4245', 15, 69);
       
-      // Información del cliente
+      // Información del cliente (derecha)
       doc.setFontSize(10);
       doc.setFont(undefined, 'bold');
-      doc.text('CLIENTE', 150, 52);
+      doc.text('CLIENTE:', 130, 48);
       doc.setFont(undefined, 'normal');
       doc.setFontSize(9);
-      doc.text(reservation.customer_name, 150, 58);
-      doc.text(`Fecha: ${new Date(reservation.reservation_date).toLocaleDateString('es-ES')}`, 150, 63);
+      const clientName = doc.splitTextToSize(reservation.customer_name || '', 65);
+      doc.text(clientName, 130, 54);
+      
+      // Fecha
+      const yOffset = clientName.length > 1 ? 5 : 0;
+      doc.text(`Fecha: ${new Date(reservation.reservation_date).toLocaleDateString('es-ES')}`, 130, 59 + yOffset);
       
       // Estado de pago
       const balanceDue = reservation.balance_due || 0;
@@ -1263,12 +1264,7 @@ const Reservations = () => {
       const statusColor = balanceDue <= 0 ? [34, 197, 94] : reservation.amount_paid > 0 ? [59, 130, 246] : [234, 179, 8];
       doc.setTextColor(...statusColor);
       doc.setFont(undefined, 'bold');
-      doc.text(status, 150, 68);
-      
-      // Línea separadora
-      doc.setDrawColor(...primaryColor);
-      doc.setLineWidth(0.5);
-      doc.line(15, 75, 195, 75);
+      doc.text(`Estado: ${status}`, 130, 64 + yOffset);
       
       // Tabla de ítems
       const tableData = [];
@@ -1276,7 +1272,7 @@ const Reservations = () => {
       // Villa
       if (reservation.villa_code) {
         tableData.push([
-          1,
+          '1',
           `${reservation.villa_code}${reservation.villa_location ? ` - ${reservation.villa_location}` : ''}`,
           `${reservation.currency} ${reservation.base_price.toFixed(2)}`,
           `${reservation.currency} ${reservation.base_price.toFixed(2)}`
@@ -1286,7 +1282,7 @@ const Reservations = () => {
       // Personas extra
       if (reservation.extra_people > 0) {
         tableData.push([
-          reservation.extra_people,
+          reservation.extra_people.toString(),
           'Personas extra',
           `${reservation.currency} ${(reservation.extra_people_cost / reservation.extra_people).toFixed(2)}`,
           `${reservation.currency} ${reservation.extra_people_cost.toFixed(2)}`
@@ -1296,7 +1292,7 @@ const Reservations = () => {
       // Horas extra
       if (reservation.extra_hours > 0) {
         tableData.push([
-          reservation.extra_hours,
+          reservation.extra_hours.toString(),
           'Horas extra',
           `${reservation.currency} ${(reservation.extra_hours_cost / reservation.extra_hours).toFixed(2)}`,
           `${reservation.currency} ${reservation.extra_hours_cost.toFixed(2)}`
@@ -1307,7 +1303,7 @@ const Reservations = () => {
       if (reservation.extra_services && reservation.extra_services.length > 0) {
         reservation.extra_services.forEach(service => {
           tableData.push([
-            service.quantity || 1,
+            (service.quantity || 1).toString(),
             `${service.service_name || 'Servicio'}${service.supplier_name ? ` (${service.supplier_name})` : ''}`,
             `${reservation.currency} ${(service.unit_price || 0).toFixed(2)}`,
             `${reservation.currency} ${(service.total || 0).toFixed(2)}`
@@ -1349,100 +1345,53 @@ const Reservations = () => {
       doc.text('Subtotal:', rightX - 60, finalY, { align: 'right' });
       doc.text(`${reservation.currency} ${reservation.subtotal.toFixed(2)}`, rightX, finalY, { align: 'right' });
       
+      let currentY = finalY;
+      
       if (reservation.discount > 0) {
-        doc.text('Descuento:', rightX - 60, finalY + 6, { align: 'right' });
-        doc.text(`-${reservation.currency} ${reservation.discount.toFixed(2)}`, rightX, finalY + 6, { align: 'right' });
+        currentY += 6;
+        doc.text('Descuento:', rightX - 60, currentY, { align: 'right' });
+        doc.text(`-${reservation.currency} ${reservation.discount.toFixed(2)}`, rightX, currentY, { align: 'right' });
       }
       
       if (reservation.include_itbis) {
-        doc.text('ITBIS (18%):', rightX - 60, finalY + (reservation.discount > 0 ? 12 : 6), { align: 'right' });
-        doc.text(`${reservation.currency} ${reservation.itbis_amount.toFixed(2)}`, rightX, finalY + (reservation.discount > 0 ? 12 : 6), { align: 'right' });
+        currentY += 6;
+        doc.text('ITBIS (18%):', rightX - 60, currentY, { align: 'right' });
+        doc.text(`${reservation.currency} ${reservation.itbis_amount.toFixed(2)}`, rightX, currentY, { align: 'right' });
       }
       
       // Total
-      let totalY = finalY + 6;
-      if (reservation.discount > 0) totalY += 6;
-      if (reservation.include_itbis) totalY += 6;
-      
+      currentY += 8;
       doc.setDrawColor(...darkColor);
-      doc.setLineWidth(0.3);
-      doc.line(rightX - 60, totalY, rightX, totalY);
+      doc.setLineWidth(0.5);
+      doc.line(rightX - 60, currentY - 2, rightX, currentY - 2);
       
-      doc.setFontSize(11);
+      doc.setFontSize(12);
       doc.setFont(undefined, 'bold');
       doc.setTextColor(...darkColor);
-      doc.text('TOTAL:', rightX - 60, totalY + 6, { align: 'right' });
-      doc.text(`${reservation.currency} ${reservation.total_amount.toFixed(2)}`, rightX, totalY + 6, { align: 'right' });
+      doc.text('TOTAL:', rightX - 60, currentY, { align: 'right' });
+      doc.text(`${reservation.currency} ${reservation.total_amount.toFixed(2)}`, rightX, currentY, { align: 'right' });
       
       // Pagos
       if (reservation.amount_paid > 0) {
+        currentY += 8;
         doc.setFontSize(9);
         doc.setFont(undefined, 'normal');
         doc.setTextColor(60);
-        doc.text('Pagado:', rightX - 60, totalY + 12, { align: 'right' });
-        doc.text(`${reservation.currency} ${reservation.amount_paid.toFixed(2)}`, rightX, totalY + 12, { align: 'right' });
+        doc.text('Pagado:', rightX - 60, currentY, { align: 'right' });
+        doc.text(`${reservation.currency} ${reservation.amount_paid.toFixed(2)}`, rightX, currentY, { align: 'right' });
         
+        currentY += 6;
         const balanceColor = balanceDue > 0 ? [220, 38, 38] : [34, 197, 94];
         doc.setTextColor(...balanceColor);
         doc.setFont(undefined, 'bold');
-        doc.text('Balance:', rightX - 60, totalY + 18, { align: 'right' });
-        doc.text(`${reservation.currency} ${balanceDue.toFixed(2)}`, rightX, totalY + 18, { align: 'right' });
+        doc.text('Balance:', rightX - 60, currentY, { align: 'right' });
+        doc.text(`${reservation.currency} ${balanceDue.toFixed(2)}`, rightX, currentY, { align: 'right' });
       }
       
       // Notas
       if (reservation.notes) {
-        let notesY = totalY + (reservation.amount_paid > 0 ? 25 : 15);
+        let notesY = currentY + 15;
         doc.setFontSize(9);
-
-  const handleGenerateConduce = (reservation) => {
-    // Preparar datos del conduce basado en la factura
-    const conduceData = {
-      recipient_name: reservation.customer_name,
-      recipient_type: 'customer',
-      delivery_date: new Date().toISOString().split('T')[0],
-      items: [],
-      notes: `Generado desde Factura #${reservation.invoice_number}`,
-      internal_notes: '',
-      status: 'pending'
-    };
-    
-    // Agregar villa si existe
-    if (reservation.villa_code) {
-      conduceData.items.push({
-        description: `Uso de ${reservation.villa_code}${reservation.villa_location ? ` - ${reservation.villa_location}` : ''}`,
-        quantity: 1,
-        unit: 'unidad'
-      });
-    }
-    
-    // Agregar servicios adicionales
-    if (reservation.extra_services && reservation.extra_services.length > 0) {
-      reservation.extra_services.forEach(service => {
-        conduceData.items.push({
-          description: service.service_name || 'Servicio adicional',
-          quantity: service.quantity || 1,
-          unit: 'unidad'
-        });
-      });
-    }
-
-  const handleConduceSubmit = async (conduceData) => {
-    try {
-      const { createConduce } = await import('../api/api');
-      await createConduce(conduceData);
-      alert('Conduce creado exitosamente');
-      setIsConduceDialogOpen(false);
-      setConduceFromReservation(null);
-    } catch (err) {
-      alert('Error al crear conduce: ' + (err.response?.data?.detail || 'Error desconocido'));
-    }
-  };
-
-    
-    setConduceFromReservation(conduceData);
-    setIsConduceDialogOpen(true);
-  };
-
         doc.setTextColor(60);
         doc.setFont(undefined, 'bold');
         doc.text('Notas:', 15, notesY);
@@ -1454,14 +1403,16 @@ const Reservations = () => {
       // Footer
       doc.setFontSize(8);
       doc.setTextColor(100);
-      doc.text('GRACIAS POR SU PREFERENCIA', 105, 280, { align: 'center' });
-      doc.text('Calle Mencia #5, Ensanche Los Tainos, San Isidro, SDE | Tel: 829-904-4245', 105, 285, { align: 'center' });
+      doc.text('GRACIAS POR SU PREFERENCIA', 105, 275, { align: 'center' });
+      doc.setFontSize(7);
+      doc.text('Calle Mencia #5, Ensanche Los Tainos, San Isidro, SDE | Tel: 829-904-4245', 105, 280, { align: 'center' });
       
       // Guardar PDF
       doc.save(`Factura_${reservation.invoice_number}.pdf`);
+      
     } catch (error) {
-      console.error('Error generating PDF:', error);
-      alert('Error al generar el PDF. Por favor, intenta nuevamente.');
+      console.error('Error generando PDF:', error);
+      alert('Error al generar el PDF: ' + error.message);
     }
   };
 
