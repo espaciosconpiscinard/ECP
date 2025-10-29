@@ -17,6 +17,7 @@ function Commissions() {
   const [selectedMonth, setSelectedMonth] = useState('all');
   const [selectedFortnight, setSelectedFortnight] = useState('all');
   const [selectedStatus, setSelectedStatus] = useState('pending'); // pending, paid, all
+  const [showDeletedInvoices, setShowDeletedInvoices] = useState(false); // Nuevo filtro
   
   // Estados para selección múltiple
   const [selectedCommissions, setSelectedCommissions] = useState([]);
