@@ -72,7 +72,7 @@ const Quotations = () => {
             }
             .company-info h1 {
               font-size: 24px;
-              color: #065f46;
+              color: #0369a1;
               margin-bottom: 5px;
             }
             .company-info p {
@@ -100,7 +100,7 @@ const Quotations = () => {
             }
             .client-section h3 {
               font-size: 14px;
-              color: #065f46;
+              color: #0369a1;
               margin-bottom: 10px;
               text-transform: uppercase;
             }
@@ -160,7 +160,7 @@ const Quotations = () => {
               border-top: 2px solid #059669;
               font-size: 18px;
               font-weight: bold;
-              color: #065f46;
+              color: #0369a1;
               margin-top: 10px;
             }
             .notes-section {
@@ -171,7 +171,7 @@ const Quotations = () => {
             }
             .notes-section h4 {
               font-size: 12px;
-              color: #065f46;
+              color: #0369a1;
               margin-bottom: 8px;
               text-transform: uppercase;
             }
@@ -190,7 +190,7 @@ const Quotations = () => {
             .terms h4 {
               font-size: 12px;
               margin-bottom: 10px;
-              color: #065f46;
+              color: #0369a1;
             }
             .terms ul {
               margin-left: 20px;
@@ -343,7 +343,7 @@ const Quotations = () => {
             }
             .company-info h1 {
               font-size: 24px;
-              color: #065f46;
+              color: #0369a1;
               margin-bottom: 5px;
             }
             .company-info p {
@@ -371,7 +371,7 @@ const Quotations = () => {
             }
             .delivery-section h3 {
               font-size: 14px;
-              color: #065f46;
+              color: #0369a1;
               margin-bottom: 10px;
               text-transform: uppercase;
             }
