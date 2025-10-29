@@ -1474,7 +1474,7 @@ const Expenses = () => {
         </CardHeader>
         <CardContent>
           {!groupByCategory ? (
-            <div className="overflow-x-auto">
+            <div className="overflow-x-auto max-h-[600px] overflow-y-auto">
               <table className="w-full" data-testid="expenses-table">
                 <thead>
                   <tr className="border-b">
