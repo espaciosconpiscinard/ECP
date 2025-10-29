@@ -674,12 +674,11 @@ const Quotations = () => {
             </div>
           )}
           
-          <div className="space-y-3">
+          <div className="space-y-3 max-h-[600px] overflow-y-auto pr-2">
             {quotations.length === 0 ? (
               <p className="text-center text-gray-500 py-8">No hay cotizaciones registradas</p>
             ) : (
-              <>
-                {quotations.slice(0, displayedItems).map(quotation => (
+              quotations.map(quotation => (
                   <div key={quotation.id} className="border rounded-lg p-4 hover:bg-gray-50">
                     <div className="flex justify-between items-start">
                       <div className="flex-1">
