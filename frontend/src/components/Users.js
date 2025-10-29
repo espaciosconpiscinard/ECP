@@ -248,7 +248,7 @@ function Users() {
             <span className="text-2xl">⏳</span>
             Usuarios Pendientes de Aprobación ({pendingUsers.length})
           </h3>
-          <div className="space-y-3">
+          <div className="space-y-3 max-h-[400px] overflow-y-auto pr-2">
             {pendingUsers.map((pendingUser) => (
               <div key={pendingUser.id} className="bg-white rounded-lg p-4 shadow flex items-center justify-between">
                 <div>
