@@ -504,13 +504,14 @@ function Commissions() {
                 <button onClick={() => setSelectedFortnight('all')} className="ml-2 text-orange-600 hover:text-orange-800">✕</button>
               </span>
             )}
-            {(selectedStatus !== 'pending' || selectedUser !== 'all' || selectedMonth !== 'all' || selectedFortnight !== 'all') && (
+            {(selectedStatus !== 'pending' || selectedUser !== 'all' || selectedMonth !== 'all' || selectedFortnight !== 'all' || showDeletedInvoices) && (
               <button
                 onClick={() => {
                   setSelectedStatus('pending');
                   setSelectedUser('all');
                   setSelectedMonth('all');
                   setSelectedFortnight('all');
+                  setShowDeletedInvoices(false);
                 }}
                 className="px-3 py-1 bg-red-100 text-red-800 rounded-full text-sm hover:bg-red-200"
               >
