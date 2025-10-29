@@ -122,7 +122,7 @@ const Quotations = () => {
               margin: 20px 0;
             }
             thead {
-              background: #065f46;
+              background: #0369a1;
               color: white;
             }
             th {
@@ -385,7 +385,7 @@ const Quotations = () => {
               margin: 20px 0;
             }
             thead {
-              background: #065f46;
+              background: #0369a1;
               color: white;
             }
             th {
