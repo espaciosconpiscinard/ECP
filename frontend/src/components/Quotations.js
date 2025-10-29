@@ -85,7 +85,7 @@ const Quotations = () => {
             }
             .document-info h2 {
               font-size: 28px;
-              color: #059669;
+              color: #0ea5e9;
               margin-bottom: 5px;
             }
             .document-info p {
@@ -356,7 +356,7 @@ const Quotations = () => {
             }
             .document-info h2 {
               font-size: 28px;
-              color: #059669;
+              color: #0ea5e9;
               margin-bottom: 5px;
             }
             .document-info p {
