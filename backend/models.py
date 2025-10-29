@@ -337,6 +337,7 @@ class QuotationUpdate(BaseModel):
     check_out_time: Optional[str] = None
     guests: Optional[int] = None
     base_price: Optional[float] = None
+    owner_price: Optional[float] = None
     extra_hours: Optional[float] = None
     extra_hours_cost: Optional[float] = None
     extra_services: Optional[List[ReservationExtraService]] = None
