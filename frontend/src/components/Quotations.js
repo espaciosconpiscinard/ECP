@@ -66,6 +66,328 @@ const Quotations = () => {
       alert('Error: ' + (err.response?.data?.detail || 'Error desconocido'));
     }
   };
+
+  const handlePrint = async (quotation) => {
+    const printWindow = window.open('', '', 'width=800,height=600');
+    
+    const validityDate = new Date(quotation.quotation_date);
+    validityDate.setDate(validityDate.getDate() + (quotation.validity_days || 30));
+    
+    printWindow.document.write(`
+      <html>
+        <head>
+          <title>Cotización ${quotation.quotation_number}</title>
+          <style>
+            * { margin: 0; padding: 0; box-sizing: border-box; }
+            body { 
+              font-family: Arial, sans-serif; 
+              padding: 40px;
+              color: #333;
+            }
+            .header {
+              display: flex;
+              justify-content: space-between;
+              margin-bottom: 30px;
+              border-bottom: 3px solid #059669;
+              padding-bottom: 20px;
+            }
+            .company-info h1 {
+              font-size: 24px;
+              color: #065f46;
+              margin-bottom: 5px;
+            }
+            .company-info p {
+              font-size: 12px;
+              color: #666;
+              margin: 2px 0;
+            }
+            .document-info {
+              text-align: right;
+            }
+            .document-info h2 {
+              font-size: 28px;
+              color: #059669;
+              margin-bottom: 5px;
+            }
+            .document-info p {
+              font-size: 12px;
+              color: #666;
+            }
+            .client-section {
+              background: #ecfdf5;
+              padding: 15px;
+              border-radius: 8px;
+              margin: 20px 0;
+            }
+            .client-section h3 {
+              font-size: 14px;
+              color: #065f46;
+              margin-bottom: 10px;
+              text-transform: uppercase;
+            }
+            .client-section p {
+              font-size: 13px;
+              margin: 5px 0;
+            }
+            .validity-notice {
+              background: #fef3c7;
+              padding: 10px 15px;
+              border-left: 4px solid #f59e0b;
+              margin: 15px 0;
+              font-size: 12px;
+              color: #92400e;
+            }
+            table {
+              width: 100%;
+              border-collapse: collapse;
+              margin: 20px 0;
+            }
+            thead {
+              background: #065f46;
+              color: white;
+            }
+            th {
+              padding: 12px;
+              text-align: left;
+              font-size: 12px;
+              text-transform: uppercase;
+            }
+            td {
+              padding: 12px;
+              border-bottom: 1px solid #e0e0e0;
+              font-size: 13px;
+            }
+            tbody tr:nth-child(even) {
+              background: #f8fafc;
+            }
+            .totals {
+              width: 400px;
+              margin-left: auto;
+              margin-top: 20px;
+            }
+            .total-row {
+              display: flex;
+              justify-content: space-between;
+              padding: 8px 15px;
+              font-size: 14px;
+            }
+            .total-row.subtotal {
+              border-top: 1px solid #ccc;
+              margin-top: 10px;
+              padding-top: 10px;
+            }
+            .total-row.grand-total {
+              background: #ecfdf5;
+              border-top: 2px solid #059669;
+              font-size: 18px;
+              font-weight: bold;
+              color: #065f46;
+              margin-top: 10px;
+            }
+            .notes-section {
+              margin-top: 30px;
+              padding: 15px;
+              background: #f8fafc;
+              border-radius: 8px;
+            }
+            .notes-section h4 {
+              font-size: 12px;
+              color: #065f46;
+              margin-bottom: 8px;
+              text-transform: uppercase;
+            }
+            .notes-section p {
+              font-size: 11px;
+              color: #475569;
+              line-height: 1.6;
+            }
+            .terms {
+              margin-top: 30px;
+              font-size: 11px;
+              color: #666;
+              padding: 15px;
+              border-top: 1px solid #e0e0e0;
+            }
+            .terms h4 {
+              font-size: 12px;
+              margin-bottom: 10px;
+              color: #065f46;
+            }
+            .terms ul {
+              margin-left: 20px;
+              line-height: 1.8;
+            }
+            .footer {
+              margin-top: 40px;
+              text-align: center;
+              font-size: 10px;
+              color: #999;
+              border-top: 1px solid #e0e0e0;
+              padding-top: 15px;
+            }
+            @media print {
+              body { padding: 20px; }
+            }
+          </style>
+        </head>
+        <body>
+          <div class="header">
+            <div class="company-info">
+              <h1>Espacios Con Piscina</h1>
+              <p>Calle Mencia #5, Ensanche Los Tainos</p>
+              <p>San Isidro, SDE</p>
+              <p>Tel: 829-904-4245</p>
+              <p>Email: info@espaciosconpiscina.com</p>
+            </div>
+            <div class="document-info">
+              <h2>COTIZACIÓN</h2>
+              <p><strong>#${quotation.quotation_number}</strong></p>
+              <p>Fecha: ${new Date(quotation.quotation_date).toLocaleDateString('es-ES')}</p>
+            </div>
+          </div>
+
+          <div class="client-section">
+            <h3>Cliente:</h3>
+            <p><strong>${quotation.customer_name}</strong></p>
+            ${quotation.villa_code ? `<p>Villa: ${quotation.villa_code}</p>` : ''}
+          </div>
+
+          <div class="validity-notice">
+            <strong>⏰ Validez de la cotización:</strong> Esta cotización es válida hasta el ${validityDate.toLocaleDateString('es-ES')} (${quotation.validity_days || 30} días)
+          </div>
+
+          <table>
+            <thead>
+              <tr>
+                <th style="width: 10%">Cant.</th>
+                <th style="width: 50%">Descripción</th>
+                <th style="width: 20%">Precio Unit.</th>
+                <th style="width: 20%">Total</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${quotation.villa_code ? `
+                <tr>
+                  <td>1</td>
+                  <td>${quotation.villa_code}${quotation.villa_location ? ` - ${quotation.villa_location}` : ''}</td>
+                  <td>${quotation.currency} ${quotation.base_price.toFixed(2)}</td>
+                  <td>${quotation.currency} ${quotation.base_price.toFixed(2)}</td>
+                </tr>
+              ` : ''}
+              ${quotation.extra_services && quotation.extra_services.length > 0 ? quotation.extra_services.map(service => `
+                <tr>
+                  <td>${service.quantity || 1}</td>
+                  <td>${service.service_name || 'Servicio'}${service.supplier_name ? ` (${service.supplier_name})` : ''}</td>
+                  <td>${quotation.currency} ${(service.unit_price || 0).toFixed(2)}</td>
+                  <td>${quotation.currency} ${(service.total || 0).toFixed(2)}</td>
+                </tr>
+              `).join('') : ''}
+              ${!quotation.villa_code && (!quotation.extra_services || quotation.extra_services.length === 0) ? `
+                <tr><td colspan="4" style="text-align: center;">No hay ítems en esta cotización</td></tr>
+              ` : ''}
+            </tbody>
+          </table>
+
+          <div class="totals">
+            <div class="total-row subtotal">
+              <span>Subtotal:</span>
+              <span>${quotation.currency} ${quotation.subtotal.toFixed(2)}</span>
+            </div>
+            ${quotation.discount > 0 ? `
+              <div class="total-row">
+                <span>Descuento:</span>
+                <span>-${quotation.currency} ${quotation.discount.toFixed(2)}</span>
+              </div>
+            ` : ''}
+            ${quotation.include_itbis ? `
+              <div class="total-row">
+                <span>ITBIS (18%):</span>
+                <span>${quotation.currency} ${quotation.itbis_amount.toFixed(2)}</span>
+              </div>
+            ` : ''}
+            <div class="total-row grand-total">
+              <span>TOTAL:</span>
+              <span>${quotation.currency} ${quotation.total_amount.toFixed(2)}</span>
+            </div>
+          </div>
+
+          ${quotation.notes ? `
+            <div class="notes-section">
+              <h4>Notas:</h4>
+              <p>${quotation.notes}</p>
+            </div>
+          ` : ''}
+
+          <div class="terms">
+            <h4>Términos y Condiciones:</h4>
+            <ul>
+              <li>Esta cotización es válida por ${quotation.validity_days || 30} días desde la fecha de emisión</li>
+              <li>Los precios están sujetos a cambios sin previo aviso después de la fecha de validez</li>
+              <li>Se requiere un depósito del 50% para confirmar la reservación</li>
+              <li>El saldo restante debe ser pagado antes de la fecha del evento</li>
+              <li>Las cancelaciones deben notificarse con al menos 48 horas de anticipación</li>
+            </ul>
+          </div>
+
+          <div class="footer">
+            <p>Calle Mencia #5, Ensanche Los Tainos, San Isidro, SDE | Tel: 829-904-4245</p>
+            <p><strong>¿Preguntas? Contáctenos al 829-904-4245 o visite nuestras instalaciones</strong></p>
+          </div>
+        </body>
+      </html>
+    `);
+    
+    printWindow.document.close();
+    printWindow.focus();
+    setTimeout(() => {
+      printWindow.print();
+      printWindow.close();
+    }, 250);
+  };
+
+  const handleGenerateConduce = (quotation) => {
+    // Preparar datos del conduce basado en la cotización
+    const conduceData = {
+      recipient_name: quotation.customer_name,
+      recipient_type: 'customer',
+      delivery_date: new Date().toISOString().split('T')[0],
+      items: [],
+      notes: `Generado desde Cotización #${quotation.quotation_number}`,
+      internal_notes: '',
+      status: 'pending'
+    };
+    
+    // Agregar villa si existe
+    if (quotation.villa_code) {
+      conduceData.items.push({
+        description: `Uso de ${quotation.villa_code}${quotation.villa_location ? ` - ${quotation.villa_location}` : ''}`,
+        quantity: 1,
+        unit: 'unidad'
+      });
+    }
+    
+    // Agregar servicios adicionales
+    if (quotation.extra_services && quotation.extra_services.length > 0) {
+      quotation.extra_services.forEach(service => {
+        conduceData.items.push({
+          description: service.service_name || 'Servicio adicional',
+          quantity: service.quantity || 1,
+          unit: 'unidad'
+        });
+      });
+    }
+    
+    // Crear el conduce
+    const { createConduce } = require('../api/api');
+    createConduce(conduceData)
+      .then(() => {
+        alert('Conduce generado exitosamente desde la cotización');
+      })
+      .catch(err => {
+        alert('Error al generar conduce: ' + (err.response?.data?.detail || 'Error desconocido'));
+      });
+  };
+
   
   const handleEdit = (quotation) => {
     setEditingQuotation(quotation);
