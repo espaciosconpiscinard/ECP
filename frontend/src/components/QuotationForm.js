@@ -428,10 +428,10 @@ const QuotationForm = ({ quotation, onSubmit, onCancel }) => {
         </>
       )}
 
-      {/* Servicios Adicionales */}
+      {/* Servicios */}
       <div>
         <div className="flex justify-between items-center mb-3">
-          <Label>Servicios Adicionales</Label>
+          <Label>Servicios</Label>
           <Button type="button" size="sm" onClick={addService}>+ Agregar Servicio</Button>
         </div>
         {selectedServices.map((service, index) => {
