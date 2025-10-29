@@ -102,7 +102,10 @@ const Quotations = () => {
       <Card>
         <CardHeader className="flex flex-row items-center justify-between">
           <CardTitle>Cotizaciones</CardTitle>
-          <Dialog open={isFormOpen} onOpenChange={setIsFormOpen}>
+          <Dialog open={isFormOpen} onOpenChange={(open) => {
+            setIsFormOpen(open);
+            if (!open) setEditingQuotation(null);
+          }}>
             <DialogTrigger asChild>
               <Button>
                 <Plus className="mr-2 h-4 w-4" /> Nueva Cotización
@@ -110,12 +113,16 @@ const Quotations = () => {
             </DialogTrigger>
             <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
               <DialogHeader>
-                <DialogTitle>Nueva Cotización</DialogTitle>
+                <DialogTitle>{editingQuotation ? 'Editar Cotización' : 'Nueva Cotización'}</DialogTitle>
               </DialogHeader>
-              <div className="text-center py-8">
-                <p className="text-gray-500">Formulario de cotización próximamente...</p>
-                <p className="text-sm text-gray-400 mt-2">Este componente se implementará completamente en la siguiente fase</p>
-              </div>
+              <QuotationForm 
+                quotation={editingQuotation}
+                onSubmit={handleSubmit}
+                onCancel={() => {
+                  setIsFormOpen(false);
+                  setEditingQuotation(null);
+                }}
+              />
             </DialogContent>
           </Dialog>
         </CardHeader>
