@@ -9,6 +9,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { Plus, Edit, Trash2, Printer, Search, X, ChevronDown, ChevronUp, Download, FileText } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import CustomerDialog from './CustomerDialog';
+import ConduceForm from './ConduceForm';
 import { jsPDF } from 'jspdf';
 import 'jspdf-autotable';
 
