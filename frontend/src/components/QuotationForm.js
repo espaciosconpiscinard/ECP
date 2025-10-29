@@ -3,22 +3,29 @@ import { getCustomers, getVillas, getExtraServices } from '../api/api';
 import { Button } from './ui/button';
 import { Input } from './ui/input';
 import { Label } from './ui/label';
-import { X } from 'lucide-react';
+import { X, Check } from 'lucide-react';
 
 const QuotationForm = ({ quotation, onSubmit, onCancel }) => {
   const [customers, setCustomers] = useState([]);
   const [villas, setVillas] = useState([]);
   const [extraServices, setExtraServices] = useState([]);
+  const [selectedVillaFlexiblePrices, setSelectedVillaFlexiblePrices] = useState(null);
+  const [showPriceSelector, setShowPriceSelector] = useState(false);
   const [formData, setFormData] = useState({
     customer_id: '',
     customer_name: '',
     villa_id: '',
     villa_code: '',
+    villa_description: '',
     villa_location: '',
+    rental_type: 'pasadia',
     quotation_date: new Date().toISOString().split('T')[0],
     validity_days: 30,
+    check_in_time: '9:00 AM',
+    check_out_time: '8:00 PM',
     guests: 0,
     base_price: 0,
+    owner_price: 0,
     extra_services: [],
     extra_services_total: 0,
     subtotal: 0,
@@ -74,16 +81,72 @@ const QuotationForm = ({ quotation, onSubmit, onCancel }) => {
   const handleVillaChange = (villaId) => {
     const villa = villas.find(v => v.id === villaId);
     if (villa) {
-      const newData = {
-        ...formData,
-        villa_id: villa.id,
-        villa_code: villa.code,
-        villa_location: villa.location || '',
-        base_price: villa.prices?.[0]?.price || 0
-      };
-      const totals = calculateTotals(newData, selectedServices);
-      setFormData({ ...newData, ...totals });
+      setSelectedVillaFlexiblePrices(villa.flexible_prices || null);
+      
+      if (villa.flexible_prices && villa.flexible_prices[formData.rental_type]?.length > 0) {
+        setShowPriceSelector(true);
+        setFormData(prev => ({
+          ...prev,
+          villa_id: villaId,
+          villa_code: villa.code,
+          villa_description: villa.description || '',
+          villa_location: villa.location || '',
+          check_in_time: villa.default_check_in_time || '9:00 AM',
+          check_out_time: villa.default_check_out_time || '8:00 PM',
+          base_price: 0,
+          owner_price: 0
+        }));
+      } else {
+        setShowPriceSelector(false);
+        let clientPrice = 0;
+        let ownerPrice = 0;
+        
+        if (formData.rental_type === 'pasadia') {
+          clientPrice = villa.default_price_pasadia || 0;
+          ownerPrice = villa.owner_price_pasadia || 0;
+        } else if (formData.rental_type === 'amanecida') {
+          clientPrice = villa.default_price_amanecida || 0;
+          ownerPrice = villa.owner_price_amanecida || 0;
+        } else if (formData.rental_type === 'evento') {
+          clientPrice = villa.default_price_evento || 0;
+          ownerPrice = villa.owner_price_evento || 0;
+        }
+        
+        const newData = {
+          ...formData,
+          villa_id: villaId,
+          villa_code: villa.code,
+          villa_description: villa.description || '',
+          villa_location: villa.location || '',
+          check_in_time: villa.default_check_in_time || '9:00 AM',
+          check_out_time: villa.default_check_out_time || '8:00 PM',
+          base_price: clientPrice,
+          owner_price: ownerPrice
+        };
+        const totals = calculateTotals(newData, selectedServices);
+        setFormData({ ...newData, ...totals });
+      }
     }
+  };
+
+  const handleSelectFlexiblePrice = (priceOption) => {
+    let guestCount = 1;
+    if (priceOption.people_count) {
+      const match = priceOption.people_count.match(/(\d+)/g);
+      if (match && match.length > 0) {
+        guestCount = parseInt(match[match.length - 1]);
+      }
+    }
+    
+    const newData = {
+      ...formData,
+      base_price: priceOption.client_price,
+      owner_price: priceOption.owner_price,
+      guests: guestCount
+    };
+    const totals = calculateTotals(newData, selectedServices);
+    setFormData({ ...newData, ...totals });
+    setShowPriceSelector(false);
   };
 
   const handleCustomerChange = (customerId) => {
@@ -101,6 +164,9 @@ const QuotationForm = ({ quotation, onSubmit, onCancel }) => {
     setSelectedServices([...selectedServices, {
       service_id: '',
       service_name: '',
+      supplier_id: '',
+      supplier_name: '',
+      supplier_cost: 0,
       quantity: 1,
       unit_price: 0,
       total: 0
@@ -115,8 +181,18 @@ const QuotationForm = ({ quotation, onSubmit, onCancel }) => {
       const service = extraServices.find(s => s.id === value);
       if (service) {
         updated[index].service_name = service.name;
-        updated[index].unit_price = service.price;
-        updated[index].total = service.price * updated[index].quantity;
+        // Don't auto-fill price, let user choose supplier
+      }
+    } else if (field === 'supplier_id') {
+      const service = extraServices.find(s => s.id === updated[index].service_id);
+      if (service) {
+        const supplier = service.suppliers?.find(sup => sup.supplier_id === value);
+        if (supplier) {
+          updated[index].supplier_name = supplier.supplier_name;
+          updated[index].supplier_cost = supplier.cost;
+          updated[index].unit_price = supplier.client_price;
+          updated[index].total = supplier.client_price * updated[index].quantity;
+        }
       }
     } else if (field === 'quantity' || field === 'unit_price') {
       updated[index].total = updated[index].unit_price * updated[index].quantity;
@@ -140,7 +216,12 @@ const QuotationForm = ({ quotation, onSubmit, onCancel }) => {
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-4">
+    <form onSubmit={handleSubmit} className="space-y-6 bg-white p-6 rounded-lg shadow">
+      <h2 className="text-2xl font-bold text-gray-800">
+        {quotation ? 'Editar Cotización' : 'Nueva Cotización'}
+      </h2>
+
+      {/* Cliente y Fecha */}
       <div className="grid grid-cols-2 gap-4">
         <div>
           <Label>Cliente *</Label>
@@ -157,19 +238,6 @@ const QuotationForm = ({ quotation, onSubmit, onCancel }) => {
           </select>
         </div>
         <div>
-          <Label>Villa</Label>
-          <select
-            value={formData.villa_id}
-            onChange={(e) => handleVillaChange(e.target.value)}
-            className="w-full p-2 border rounded"
-          >
-            <option value="">Seleccionar villa (opcional)</option>
-            {villas.map(v => (
-              <option key={v.id} value={v.id}>{v.code} - {v.name}</option>
-            ))}
-          </select>
-        </div>
-        <div>
           <Label>Fecha Cotización *</Label>
           <Input
             type="date"
@@ -178,24 +246,120 @@ const QuotationForm = ({ quotation, onSubmit, onCancel }) => {
             required
           />
         </div>
+      </div>
+
+      {/* Tipo de Renta */}
+      <div>
+        <Label className="mb-2 block">Tipo de Renta *</Label>
+        <div className="grid grid-cols-3 gap-3">
+          <button
+            type="button"
+            onClick={() => {
+              setFormData({...formData, rental_type: 'pasadia'});
+              if(formData.villa_id) handleVillaChange(formData.villa_id);
+            }}
+            className={`p-3 border-2 rounded-md font-medium ${
+              formData.rental_type === 'pasadia' 
+                ? 'border-blue-600 bg-blue-50 text-blue-600' 
+                : 'border-gray-300'
+            }`}
+          >
+            <div className="text-sm">🌞 Pasadía</div>
+          </button>
+          <button
+            type="button"
+            onClick={() => {
+              setFormData({...formData, rental_type: 'amanecida'});
+              if(formData.villa_id) handleVillaChange(formData.villa_id);
+            }}
+            className={`p-3 border-2 rounded-md font-medium ${
+              formData.rental_type === 'amanecida' 
+                ? 'border-blue-600 bg-blue-50 text-blue-600' 
+                : 'border-gray-300'
+            }`}
+          >
+            <div className="text-sm">🌙 Amanecida</div>
+          </button>
+          <button
+            type="button"
+            onClick={() => {
+              setFormData({...formData, rental_type: 'evento'});
+              if(formData.villa_id) handleVillaChange(formData.villa_id);
+            }}
+            className={`p-3 border-2 rounded-md font-medium ${
+              formData.rental_type === 'evento' 
+                ? 'border-blue-600 bg-blue-50 text-blue-600' 
+                : 'border-gray-300'
+            }`}
+          >
+            <div className="text-sm">🎉 Evento</div>
+          </button>
+        </div>
+      </div>
+
+      {/* Villa */}
+      <div>
+        <Label>Villa (Opcional)</Label>
+        <select
+          value={formData.villa_id}
+          onChange={(e) => handleVillaChange(e.target.value)}
+          className="w-full p-2 border rounded"
+        >
+          <option value="">Sin villa (Solo Servicios)</option>
+          {villas.map(v => (
+            <option key={v.id} value={v.id}>{v.code} - {v.name}</option>
+          ))}
+        </select>
+      </div>
+
+      {/* Price Selector for Flexible Prices */}
+      {showPriceSelector && selectedVillaFlexiblePrices && (
+        <div className="bg-yellow-50 border-2 border-yellow-300 rounded-lg p-4">
+          <h3 className="font-bold text-yellow-800 mb-3">💰 Selecciona un Precio</h3>
+          <div className="space-y-2">
+            {selectedVillaFlexiblePrices[formData.rental_type]?.map((priceOption, idx) => (
+              <button
+                key={idx}
+                type="button"
+                onClick={() => handleSelectFlexiblePrice(priceOption)}
+                className="w-full p-3 bg-white border-2 border-yellow-400 rounded hover:bg-yellow-100 text-left flex justify-between items-center"
+              >
+                <div>
+                  <div className="font-semibold text-gray-800">
+                    {priceOption.people_count} personas
+                  </div>
+                  <div className="text-sm text-gray-600">
+                    Cliente: RD$ {priceOption.client_price.toLocaleString()} | 
+                    Propietario: RD$ {priceOption.owner_price.toLocaleString()}
+                  </div>
+                </div>
+                <Check className="text-yellow-600" size={20} />
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Precios y Detalles */}
+      <div className="grid grid-cols-2 gap-4">
+        <div>
+          <Label>Huéspedes</Label>
+          <Input
+            type="number"
+            value={formData.guests}
+            onChange={(e) => setFormData({ ...formData, guests: parseInt(e.target.value) || 0 })}
+          />
+        </div>
         <div>
           <Label>Días de Validez</Label>
           <Input
             type="number"
             value={formData.validity_days}
-            onChange={(e) => setFormData({ ...formData, validity_days: parseInt(e.target.value) })}
+            onChange={(e) => setFormData({ ...formData, validity_days: parseInt(e.target.value) || 30 })}
           />
         </div>
         <div>
-          <Label>Número de Huéspedes</Label>
-          <Input
-            type="number"
-            value={formData.guests}
-            onChange={(e) => setFormData({ ...formData, guests: parseInt(e.target.value) })}
-          />
-        </div>
-        <div>
-          <Label>Precio Base</Label>
+          <Label>Precio al Cliente</Label>
           <Input
             type="number"
             step="0.01"
@@ -207,48 +371,95 @@ const QuotationForm = ({ quotation, onSubmit, onCancel }) => {
             }}
           />
         </div>
+        <div>
+          <Label>Precio al Propietario</Label>
+          <Input
+            type="number"
+            step="0.01"
+            value={formData.owner_price}
+            onChange={(e) => setFormData({ ...formData, owner_price: parseFloat(e.target.value) || 0 })}
+          />
+        </div>
       </div>
 
+      {/* Horarios */}
+      <div className="grid grid-cols-2 gap-4">
+        <div>
+          <Label>Hora Entrada</Label>
+          <Input
+            type="text"
+            value={formData.check_in_time}
+            onChange={(e) => setFormData({ ...formData, check_in_time: e.target.value })}
+            placeholder="9:00 AM"
+          />
+        </div>
+        <div>
+          <Label>Hora Salida</Label>
+          <Input
+            type="text"
+            value={formData.check_out_time}
+            onChange={(e) => setFormData({ ...formData, check_out_time: e.target.value })}
+            placeholder="8:00 PM"
+          />
+        </div>
+      </div>
+
+      {/* Servicios Adicionales */}
       <div>
-        <div className="flex justify-between items-center mb-2">
+        <div className="flex justify-between items-center mb-3">
           <Label>Servicios Adicionales</Label>
           <Button type="button" size="sm" onClick={addService}>+ Agregar Servicio</Button>
         </div>
-        {selectedServices.map((service, index) => (
-          <div key={index} className="grid grid-cols-5 gap-2 mb-2">
-            <select
-              value={service.service_id}
-              onChange={(e) => updateService(index, 'service_id', e.target.value)}
-              className="p-2 border rounded col-span-2"
-            >
-              <option value="">Seleccionar servicio</option>
-              {extraServices.map(s => (
-                <option key={s.id} value={s.id}>{s.name}</option>
-              ))}
-            </select>
-            <Input
-              type="number"
-              placeholder="Cantidad"
-              value={service.quantity}
-              onChange={(e) => updateService(index, 'quantity', parseInt(e.target.value) || 1)}
-            />
-            <Input
-              type="number"
-              step="0.01"
-              placeholder="Precio"
-              value={service.unit_price}
-              onChange={(e) => updateService(index, 'unit_price', parseFloat(e.target.value) || 0)}
-            />
-            <div className="flex items-center gap-2">
-              <span className="text-sm">${service.total.toFixed(2)}</span>
-              <Button type="button" size="sm" variant="destructive" onClick={() => removeService(index)}>
-                <X size={14} />
-              </Button>
+        {selectedServices.map((service, index) => {
+          const serviceData = extraServices.find(s => s.id === service.service_id);
+          return (
+            <div key={index} className="grid grid-cols-6 gap-2 mb-2 items-center">
+              <select
+                value={service.service_id}
+                onChange={(e) => updateService(index, 'service_id', e.target.value)}
+                className="p-2 border rounded col-span-2"
+              >
+                <option value="">Seleccionar servicio</option>
+                {extraServices.map(s => (
+                  <option key={s.id} value={s.id}>{s.name}</option>
+                ))}
+              </select>
+              {service.service_id && serviceData?.suppliers?.length > 0 && (
+                <select
+                  value={service.supplier_id}
+                  onChange={(e) => updateService(index, 'supplier_id', e.target.value)}
+                  className="p-2 border rounded col-span-2"
+                >
+                  <option value="">Suplidor</option>
+                  {serviceData.suppliers.map(sup => (
+                    <option key={sup.supplier_id} value={sup.supplier_id}>
+                      {sup.supplier_name} - RD${sup.client_price}
+                    </option>
+                  ))}
+                </select>
+              )}
+              {(!service.service_id || !serviceData?.suppliers?.length) && (
+                <div className="col-span-2"></div>
+              )}
+              <Input
+                type="number"
+                placeholder="Cant."
+                value={service.quantity}
+                onChange={(e) => updateService(index, 'quantity', parseInt(e.target.value) || 1)}
+                className="text-center"
+              />
+              <div className="flex items-center gap-2">
+                <span className="text-sm font-medium">${service.total.toFixed(2)}</span>
+                <Button type="button" size="sm" variant="destructive" onClick={() => removeService(index)}>
+                  <X size={14} />
+                </Button>
+              </div>
             </div>
-          </div>
-        ))}
+          );
+        })}
       </div>
 
+      {/* Descuentos e ITBIS */}
       <div className="grid grid-cols-2 gap-4">
         <div>
           <Label>Descuento</Label>
@@ -263,7 +474,7 @@ const QuotationForm = ({ quotation, onSubmit, onCancel }) => {
             }}
           />
         </div>
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 mt-6">
           <input
             type="checkbox"
             checked={formData.include_itbis}
@@ -272,51 +483,65 @@ const QuotationForm = ({ quotation, onSubmit, onCancel }) => {
               const totals = calculateTotals(newData, selectedServices);
               setFormData({ ...newData, ...totals });
             }}
+            className="w-4 h-4"
           />
           <Label>Incluir ITBIS (18%)</Label>
         </div>
       </div>
 
-      <div className="bg-gray-50 p-4 rounded">
-        <div className="flex justify-between mb-1">
+      {/* Totales */}
+      <div className="bg-gray-50 p-4 rounded space-y-2">
+        <div className="flex justify-between">
           <span>Subtotal:</span>
-          <span>{formData.currency} ${formData.subtotal.toFixed(2)}</span>
+          <span className="font-semibold">${formData.subtotal.toFixed(2)}</span>
         </div>
-        {formData.include_itbis && (
-          <div className="flex justify-between mb-1">
-            <span>ITBIS (18%):</span>
-            <span>{formData.currency} ${formData.itbis_amount.toFixed(2)}</span>
+        {formData.discount > 0 && (
+          <div className="flex justify-between text-red-600">
+            <span>Descuento:</span>
+            <span>-${formData.discount.toFixed(2)}</span>
           </div>
         )}
-        <div className="flex justify-between font-bold text-lg">
+        {formData.include_itbis && (
+          <div className="flex justify-between text-blue-600">
+            <span>ITBIS (18%):</span>
+            <span>+${formData.itbis_amount.toFixed(2)}</span>
+          </div>
+        )}
+        <div className="flex justify-between text-xl font-bold border-t pt-2">
           <span>Total:</span>
-          <span>{formData.currency} ${formData.total_amount.toFixed(2)}</span>
+          <span className="text-blue-600">${formData.total_amount.toFixed(2)}</span>
         </div>
       </div>
 
+      {/* Notas */}
       <div>
-        <Label>Notas</Label>
+        <Label>Notas (visibles al cliente)</Label>
         <textarea
           value={formData.notes}
           onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
+          className="w-full p-2 border rounded"
+          rows="3"
+        />
+      </div>
+
+      <div>
+        <Label>Notas Internas (no visibles al cliente)</Label>
+        <textarea
+          value={formData.internal_notes}
+          onChange={(e) => setFormData({ ...formData, internal_notes: e.target.value })}
           className="w-full p-2 border rounded"
           rows="2"
         />
       </div>
 
-      <div>
-        <Label>Nota Interna</Label>
-        <textarea
-          value={formData.internal_notes}
-          onChange={(e) => setFormData({ ...formData, internal_notes: e.target.value })}
-          className="w-full p-2 border rounded bg-yellow-50"
-          rows="2"
-        />
-      </div>
-
-      <div className="flex gap-2 justify-end">
-        <Button type="button" variant="outline" onClick={onCancel}>Cancelar</Button>
-        <Button type="submit">Guardar Cotización</Button>
+      {/* Botones */}
+      <div className="flex justify-end gap-2">
+        <Button type="button" variant="outline" onClick={onCancel}>
+          Cancelar
+        </Button>
+        <Button type="submit" className="bg-blue-600 hover:bg-blue-700">
+          {quotation ? 'Actualizar' : 'Crear'} Cotización
+        </Button>
       </div>
     </form>
   );
