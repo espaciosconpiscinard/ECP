@@ -32,6 +32,13 @@ function Commissions() {
     // Filtrar comisiones por usuario, mes, quincena y estado
     let filtered = commissions;
     
+    // Filtro por facturas eliminadas
+    if (showDeletedInvoices) {
+      filtered = filtered.filter(c => c.invoice_deleted === true);
+    } else {
+      filtered = filtered.filter(c => !c.invoice_deleted);
+    }
+    
     // Filtro por estado (pendientes/pagadas/todas)
     if (selectedStatus === 'pending') {
       filtered = filtered.filter(c => !c.paid);
@@ -70,7 +77,7 @@ function Commissions() {
     }
     
     setFilteredCommissions(filtered);
-  }, [selectedUser, selectedMonth, selectedFortnight, selectedStatus, commissions]);
+  }, [selectedUser, selectedMonth, selectedFortnight, selectedStatus, commissions, showDeletedInvoices]);
 
   const fetchCommissions = async () => {
     try {
