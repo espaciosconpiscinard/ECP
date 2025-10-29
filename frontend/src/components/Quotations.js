@@ -93,7 +93,7 @@ const Quotations = () => {
               color: #666;
             }
             .client-section {
-              background: #ecfdf5;
+              background: #f0f9ff;
               padding: 15px;
               border-radius: 8px;
               margin: 20px 0;
@@ -156,7 +156,7 @@ const Quotations = () => {
               padding-top: 10px;
             }
             .total-row.grand-total {
-              background: #ecfdf5;
+              background: #f0f9ff;
               border-top: 2px solid #059669;
               font-size: 18px;
               font-weight: bold;
@@ -364,7 +364,7 @@ const Quotations = () => {
               color: #666;
             }
             .delivery-section {
-              background: #ecfdf5;
+              background: #f0f9ff;
               padding: 15px;
               border-radius: 8px;
               margin: 20px 0;
