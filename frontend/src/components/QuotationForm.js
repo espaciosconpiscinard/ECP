@@ -43,8 +43,10 @@ const QuotationForm = ({ quotation, onSubmit, onCancel }) => {
   useEffect(() => {
     fetchData();
     if (quotation) {
-      setFormData(quotation);
-      setSelectedServices(quotation.extra_services || []);
+      const services = quotation.extra_services || [];
+      setSelectedServices(services);
+      const totals = calculateTotals(quotation, services);
+      setFormData({ ...quotation, ...totals });
     }
   }, [quotation]);
 
