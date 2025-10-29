@@ -12,31 +12,10 @@ const Quotations = () => {
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [editingQuotation, setEditingQuotation] = useState(null);
   const [error, setError] = useState('');
-  const [logo, setLogo] = useState(null);
   
   useEffect(() => {
     fetchQuotations();
-    fetchLogo();
   }, []);
-  
-  const fetchLogo = async () => {
-    try {
-      const API_URL = process.env.REACT_APP_BACKEND_URL || '';
-      const response = await fetch(`${API_URL}/api/configuration/logo`, {
-        headers: {
-          'Authorization': `Bearer ${localStorage.getItem('token')}`
-        }
-      });
-      if (response.ok) {
-        const data = await response.json();
-        if (data.logo_url) {
-          setLogo(data.logo_url);
-        }
-      }
-    } catch (err) {
-      console.error('Error loading logo:', err);
-    }
-  };
   
   const fetchQuotations = async () => {
     try {
