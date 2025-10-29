@@ -731,23 +731,7 @@ const Quotations = () => {
                       </div>
                     </div>
                   </div>
-                ))}
-                {displayedItems < quotations.length && (
-                  <div className="text-center py-4">
-                    <Button 
-                      variant="outline" 
-                      onClick={() => setDisplayedItems(prev => prev + ITEMS_PER_PAGE)}
-                    >
-                      Cargar más ({quotations.length - displayedItems} restantes)
-                    </Button>
-                  </div>
-                )}
-                {displayedItems >= quotations.length && quotations.length > ITEMS_PER_PAGE && (
-                  <p className="text-center text-gray-500 py-4 text-sm">
-                    Mostrando todas las {quotations.length} cotizaciones
-                  </p>
-                )}
-              </>
+                ))
             )}
           </div>
         </CardContent>
