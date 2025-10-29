@@ -358,6 +358,28 @@ class Quotation(QuotationBase):
     created_by: str  # user_id
     converted_to_invoice_id: Optional[str] = None  # ID de la factura si fue convertida
 
+
+# ============ QUOTATION TERMS & CONDITIONS ============
+class QuotationTermsBase(BaseModel):
+    terms: List[str] = [
+        "Esta cotización es válida por 30 días desde la fecha de emisión",
+        "Los precios están sujetos a cambios sin previo aviso después de la fecha de validez",
+        "Se requiere un depósito del 50% para confirmar la reservación",
+        "El saldo restante debe ser pagado antes de la fecha del evento",
+        "Las cancelaciones deben notificarse con al menos 48 horas de anticipación"
+    ]
+
+class QuotationTermsUpdate(BaseModel):
+    terms: Optional[List[str]] = None
+
+class QuotationTerms(QuotationTermsBase):
+    model_config = ConfigDict(extra="ignore")
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    terms_id: str = "main_quotation_terms"  # Solo una configuración principal
+    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+    updated_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+    updated_by: str
+
 # ============ CONDUCE (DELIVERY NOTE) MODELS ============
 class ConduceItem(BaseModel):
     description: str  # Descripción del ítem
