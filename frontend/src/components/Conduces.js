@@ -54,6 +54,223 @@ const Conduces = () => {
     try {
       if (editingConduce) {
         await updateConduce(editingConduce.id, conduceData);
+
+  const handlePrint = async (conduce) => {
+    const printWindow = window.open('', '', 'width=800,height=600');
+    
+    printWindow.document.write(`
+      <html>
+        <head>
+          <title>Conduce ${conduce.conduce_number}</title>
+          <style>
+            * { margin: 0; padding: 0; box-sizing: border-box; }
+            body { 
+              font-family: Arial, sans-serif; 
+              padding: 40px;
+              color: #333;
+            }
+            .header {
+              display: flex;
+              justify-content: space-between;
+              margin-bottom: 30px;
+              border-bottom: 3px solid #0ea5e9;
+              padding-bottom: 20px;
+            }
+            .company-info h1 {
+              font-size: 24px;
+              color: #0369a1;
+              margin-bottom: 5px;
+            }
+            .company-info p {
+              font-size: 12px;
+              color: #666;
+              margin: 2px 0;
+            }
+            .document-info {
+              text-align: right;
+            }
+            .document-info h2 {
+              font-size: 28px;
+              color: #0ea5e9;
+              margin-bottom: 5px;
+            }
+            .document-info p {
+              font-size: 12px;
+              color: #666;
+            }
+            .delivery-section {
+              background: #f0f9ff;
+              padding: 15px;
+              border-radius: 8px;
+              margin: 20px 0;
+            }
+            .delivery-section h3 {
+              font-size: 14px;
+              color: #0369a1;
+              margin-bottom: 10px;
+              text-transform: uppercase;
+            }
+            .delivery-section p {
+              font-size: 13px;
+              margin: 5px 0;
+            }
+            table {
+              width: 100%;
+              border-collapse: collapse;
+              margin: 20px 0;
+            }
+            thead {
+              background: #0369a1;
+              color: white;
+            }
+            th {
+              padding: 12px;
+              text-align: left;
+              font-size: 12px;
+              text-transform: uppercase;
+            }
+            td {
+              padding: 12px;
+              border-bottom: 1px solid #e0e0e0;
+              font-size: 13px;
+            }
+            tbody tr:nth-child(even) {
+              background: #f8fafc;
+            }
+            .signature-section {
+              margin-top: 50px;
+              display: flex;
+              justify-content: space-between;
+            }
+            .signature-box {
+              width: 45%;
+            }
+            .signature-box p {
+              font-size: 12px;
+              color: #666;
+              margin-bottom: 5px;
+            }
+            .signature-line {
+              border-top: 1px solid #333;
+              margin-top: 40px;
+              padding-top: 5px;
+              font-size: 11px;
+              text-align: center;
+            }
+            .notes-section {
+              margin-top: 30px;
+              padding: 15px;
+              background: #fef3c7;
+              border-left: 4px solid #f59e0b;
+              border-radius: 4px;
+            }
+            .notes-section h4 {
+              font-size: 12px;
+              color: #92400e;
+              margin-bottom: 8px;
+            }
+            .notes-section p {
+              font-size: 11px;
+              color: #78350f;
+            }
+            .footer {
+              margin-top: 40px;
+              text-align: center;
+              font-size: 10px;
+              color: #999;
+              border-top: 1px solid #e0e0e0;
+              padding-top: 15px;
+            }
+            @media print {
+              body { padding: 20px; }
+              .no-print { display: none; }
+            }
+          </style>
+        </head>
+        <body>
+          <div class="header">
+            <div class="company-info">
+              <h1>Espacios Con Piscina</h1>
+              <p>Calle Mencia #5, Ensanche Los Tainos</p>
+              <p>San Isidro, SDE</p>
+              <p>Tel: 829-904-4245</p>
+              <p>Email: info@espaciosconpiscina.com</p>
+            </div>
+            <div class="document-info">
+              <h2>CONDUCE</h2>
+              <p><strong>#${conduce.conduce_number}</strong></p>
+              <p>Fecha: ${new Date(conduce.delivery_date).toLocaleDateString('es-ES')}</p>
+            </div>
+          </div>
+
+          <div class="delivery-section">
+            <h3>Entregar a:</h3>
+            <p><strong>${conduce.recipient_name}</strong></p>
+            <p>Tipo: ${conduce.recipient_type === 'customer' ? 'Cliente' : conduce.recipient_type === 'employee' ? 'Empleado' : 'Suplidor'}</p>
+            ${conduce.delivery_address ? `<p>Dirección: ${conduce.delivery_address}</p>` : ''}
+          </div>
+
+          <table>
+            <thead>
+              <tr>
+                <th style="width: 10%">No.</th>
+                <th style="width: 50%">Descripción</th>
+                <th style="width: 15%">Cantidad</th>
+                <th style="width: 15%">Unidad</th>
+                <th style="width: 10%">Completo</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${conduce.items && conduce.items.length > 0 ? conduce.items.map((item, index) => `
+                <tr>
+                  <td>${index + 1}</td>
+                  <td>${item.description}</td>
+                  <td>${item.quantity}</td>
+                  <td>${item.unit}</td>
+                  <td>☐</td>
+                </tr>
+              `).join('') : '<tr><td colspan="5" style="text-align: center;">No hay ítems</td></tr>'}
+            </tbody>
+          </table>
+
+          ${conduce.notes ? `
+            <div class="notes-section">
+              <h4>Notas:</h4>
+              <p>${conduce.notes}</p>
+            </div>
+          ` : ''}
+
+          <div class="signature-section">
+            <div class="signature-box">
+              <p><strong>Entregado por:</strong></p>
+              <div class="signature-line">
+                Firma y Fecha
+              </div>
+            </div>
+            <div class="signature-box">
+              <p><strong>Recibido por:</strong></p>
+              <div class="signature-line">
+                Firma y Fecha
+              </div>
+            </div>
+          </div>
+
+          <div class="footer">
+            <p>Calle Mencia #5, Ensanche Los Tainos, San Isidro, SDE | Tel: 829-904-4245</p>
+            <p>Este documento no tiene valor fiscal</p>
+          </div>
+        </body>
+      </html>
+    `);
+    
+    printWindow.document.close();
+    printWindow.focus();
+    setTimeout(() => {
+      printWindow.print();
+      printWindow.close();
+    }, 250);
+  };
+
         alert('Conduce actualizado exitosamente');
       } else {
         await createConduce(conduceData);
