@@ -164,8 +164,11 @@ const Quotations = () => {
                           <CheckCircle className="mr-1 h-4 w-4" /> Convertir a Factura
                         </Button>
                       )}
-                      <Button size="sm" variant="outline">
-                        <FileText className="h-4 w-4" />
+                      <Button size="sm" variant="outline" onClick={() => handleEdit(quotation)}>
+                        <Edit2 className="h-4 w-4" />
+                      </Button>
+                      <Button size="sm" variant="outline" onClick={() => handleDelete(quotation.id)}>
+                        <Trash2 className="h-4 w-4" />
                       </Button>
                     </div>
                   </div>
