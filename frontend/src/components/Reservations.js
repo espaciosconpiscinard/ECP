@@ -1477,7 +1477,7 @@ const Reservations = () => {
             
             <div class="header">
               <div class="header-left">
-                ${logoData ? `<img src="${logoData}" class="logo" alt="Logo" />` : ''}
+                ${logo ? `<img src="${logo}" class="logo" alt="Logo" />` : ''}
                 <div class="brand-info">
                   <div class="brand-name">Espacios Con Piscina</div>
                   <div class="brand-tagline">Alquiler de villas premium</div>
