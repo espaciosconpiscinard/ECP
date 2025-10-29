@@ -179,16 +179,29 @@ const QuotationForm = ({ quotation, onSubmit, onCancel }) => {
     const updated = [...selectedServices];
     updated[index][field] = value;
     
+    console.log('updateService called:', { index, field, value, currentService: updated[index] });
+    
     if (field === 'service_id') {
       const service = extraServices.find(s => s.id === value);
+      console.log('Service selected:', service);
       if (service) {
         updated[index].service_name = service.name;
-        // Don't auto-fill price, let user choose supplier
+        // Si el servicio solo tiene un suplidor, seleccionarlo automáticamente
+        if (service.suppliers && service.suppliers.length === 1) {
+          const supplier = service.suppliers[0];
+          updated[index].supplier_id = supplier.supplier_id;
+          updated[index].supplier_name = supplier.supplier_name;
+          updated[index].supplier_cost = supplier.cost;
+          updated[index].unit_price = supplier.client_price;
+          updated[index].total = supplier.client_price * updated[index].quantity;
+        }
       }
     } else if (field === 'supplier_id') {
       const service = extraServices.find(s => s.id === updated[index].service_id);
+      console.log('Supplier selected, service:', service);
       if (service) {
         const supplier = service.suppliers?.find(sup => sup.supplier_id === value);
+        console.log('Found supplier:', supplier);
         if (supplier) {
           updated[index].supplier_name = supplier.supplier_name;
           updated[index].supplier_cost = supplier.cost;
@@ -206,6 +219,7 @@ const QuotationForm = ({ quotation, onSubmit, onCancel }) => {
     
     // Recalcular totales después de actualizar servicios
     const totals = calculateTotals(formData, updated);
+    console.log('Calculated totals:', totals);
     setFormData(prev => ({ ...prev, ...totals }));
   };
 
