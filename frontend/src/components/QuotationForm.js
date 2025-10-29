@@ -450,11 +450,11 @@ const QuotationForm = ({ quotation, onSubmit, onCancel }) => {
               </select>
               {service.service_id && serviceData?.suppliers?.length > 0 && (
                 <select
-                  value={service.supplier_id}
+                  value={service.supplier_id || ''}
                   onChange={(e) => updateService(index, 'supplier_id', e.target.value)}
                   className="p-2 border rounded col-span-2"
                 >
-                  <option value="">Suplidor</option>
+                  <option value="">Seleccionar suplidor</option>
                   {serviceData.suppliers.map(sup => (
                     <option key={sup.supplier_id} value={sup.supplier_id}>
                       {sup.supplier_name} - RD${sup.client_price}
