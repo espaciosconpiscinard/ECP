@@ -4,11 +4,13 @@ import { Card, CardHeader, CardTitle, CardContent } from './ui/card';
 import { Button } from './ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from './ui/dialog';
 import { AlertCircle, Plus, Edit2, Trash2, FileText } from 'lucide-react';
+import ConduceForm from './ConduceForm';
 
 const Conduces = () => {
   const [conduces, setConduces] = useState([]);
   const [loading, setLoading] = useState(true);
   const [isFormOpen, setIsFormOpen] = useState(false);
+  const [editingConduce, setEditingConduce] = useState(null);
   const [error, setError] = useState('');
   
   useEffect(() => {
@@ -24,6 +26,40 @@ const Conduces = () => {
       setError('Error al cargar conduces');
     } finally {
       setLoading(false);
+    }
+  };
+  
+  const handleSubmit = async (conduceData) => {
+    try {
+      if (editingConduce) {
+        await updateConduce(editingConduce.id, conduceData);
+        alert('Conduce actualizado exitosamente');
+      } else {
+        await createConduce(conduceData);
+        alert('Conduce creado exitosamente');
+      }
+      setIsFormOpen(false);
+      setEditingConduce(null);
+      fetchConduces();
+    } catch (err) {
+      alert('Error: ' + (err.response?.data?.detail || 'Error desconocido'));
+    }
+  };
+  
+  const handleEdit = (conduce) => {
+    setEditingConduce(conduce);
+    setIsFormOpen(true);
+  };
+  
+  const handleDelete = async (conduceId) => {
+    if (!window.confirm('¿Eliminar este conduce?')) return;
+    
+    try {
+      await deleteConduce(conduceId);
+      alert('Conduce eliminado exitosamente');
+      fetchConduces();
+    } catch (err) {
+      alert('Error al eliminar: ' + (err.response?.data?.detail || 'Error desconocido'));
     }
   };
   
