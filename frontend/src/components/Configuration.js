@@ -821,9 +821,10 @@ function Configuration() {
                   onChange={(e) => setNewStartNumber(e.target.value)}
                   className="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
                   placeholder="Ej: 1600, 1548, etc."
+                />
+              </div>
 
-
-      {/* Quotation Terms & Conditions Section */}
+              {/* Buttons */}
       <div className="bg-white rounded-lg shadow p-6">
         <h3 className="text-xl font-bold mb-4 text-gray-800">📋 Términos y Condiciones de Cotizaciones</h3>
         <p className="text-sm text-gray-600 mb-4">
