@@ -821,6 +821,83 @@ function Configuration() {
                   onChange={(e) => setNewStartNumber(e.target.value)}
                   className="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
                   placeholder="Ej: 1600, 1548, etc."
+
+
+      {/* Quotation Terms & Conditions Section */}
+      <div className="bg-white rounded-lg shadow p-6">
+        <h3 className="text-xl font-bold mb-4 text-gray-800">📋 Términos y Condiciones de Cotizaciones</h3>
+        <p className="text-sm text-gray-600 mb-4">
+          Configura los términos y condiciones que aparecerán al final de cada cotización impresa.
+        </p>
+
+        {loadingTerms ? (
+          <div className="text-center py-4 text-gray-500">Cargando términos...</div>
+        ) : (
+          <>
+            {/* Current Terms List */}
+            <div className="mb-4">
+              <h4 className="font-semibold text-gray-700 mb-2">Términos Actuales:</h4>
+              {quotationTerms.length === 0 ? (
+                <p className="text-sm text-gray-500 italic">No hay términos configurados</p>
+              ) : (
+                <ul className="space-y-2">
+                  {quotationTerms.map((term, index) => (
+                    <li key={index} className="flex items-start gap-2 bg-gray-50 p-3 rounded border">
+                      <span className="flex-shrink-0 text-blue-600 font-bold">{index + 1}.</span>
+                      <span className="flex-1 text-sm text-gray-700">{term}</span>
+                      <button
+                        onClick={() => handleRemoveTerm(index)}
+                        className="flex-shrink-0 text-red-600 hover:text-red-800 font-bold"
+                        title="Eliminar término"
+                      >
+                        ✕
+                      </button>
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </div>
+
+            {/* Add New Term */}
+            <div className="mb-4">
+              <h4 className="font-semibold text-gray-700 mb-2">Agregar Nuevo Término:</h4>
+              <div className="flex gap-2">
+                <input
+                  type="text"
+                  value={newTerm}
+                  onChange={(e) => setNewTerm(e.target.value)}
+                  onKeyPress={(e) => e.key === 'Enter' && handleAddTerm()}
+                  placeholder="Ej: Esta cotización es válida por 30 días..."
+                  className="flex-1 px-3 py-2 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
+                />
+                <button
+                  onClick={handleAddTerm}
+                  className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 text-sm font-medium"
+                >
+                  + Agregar
+                </button>
+              </div>
+            </div>
+
+            {/* Save Button */}
+            <div className="flex justify-end">
+              <button
+                onClick={handleSaveTerms}
+                className="px-6 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 font-medium"
+              >
+                💾 Guardar Términos
+              </button>
+            </div>
+
+            {/* Help */}
+            <div className="mt-4 bg-blue-50 p-3 rounded text-sm text-blue-800">
+              <strong>💡 Tip:</strong> Estos términos se mostrarán automáticamente al final de cada cotización cuando se imprima.
+              Puedes agregar políticas de pago, condiciones de cancelación, validez de la cotización, etc.
+            </div>
+          </>
+        )}
+      </div>
+
                 />
                 <p className="text-xs text-gray-500 mt-1">
                   La próxima factura será: #{newStartNumber || '---'}
