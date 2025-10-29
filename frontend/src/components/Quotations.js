@@ -12,8 +12,6 @@ const Quotations = () => {
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [editingQuotation, setEditingQuotation] = useState(null);
   const [error, setError] = useState('');
-  const [displayedItems, setDisplayedItems] = useState(20);
-  const ITEMS_PER_PAGE = 20;
   
   useEffect(() => {
     fetchQuotations();
