@@ -201,6 +201,67 @@ function Configuration() {
   };
 
 
+  // Quotation Terms Functions
+  const fetchQuotationTerms = async () => {
+    setLoadingTerms(true);
+    try {
+      const token = localStorage.getItem('token');
+      const response = await fetch(`${API_URL}/api/config/quotation-terms`, {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+      
+      if (response.ok) {
+        const data = await response.json();
+        setQuotationTerms(data.terms || []);
+      }
+    } catch (err) {
+      console.error('Error al cargar términos:', err);
+    } finally {
+      setLoadingTerms(false);
+    }
+  };
+
+  const handleAddTerm = () => {
+    if (newTerm.trim()) {
+      setQuotationTerms([...quotationTerms, newTerm.trim()]);
+      setNewTerm('');
+    }
+  };
+
+  const handleRemoveTerm = (index) => {
+    const updatedTerms = quotationTerms.filter((_, i) => i !== index);
+    setQuotationTerms(updatedTerms);
+  };
+
+  const handleSaveTerms = async () => {
+    setError('');
+    setSuccess('');
+    
+    try {
+      const token = localStorage.getItem('token');
+      const response = await fetch(`${API_URL}/api/config/quotation-terms`, {
+        method: 'PUT',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ terms: quotationTerms })
+      });
+
+      if (!response.ok) {
+        throw new Error('Error al guardar términos');
+      }
+
+      setSuccess('✅ Términos de cotizaciones guardados exitosamente');
+      await fetchQuotationTerms();
+    } catch (err) {
+      setError(`❌ ${err.message}`);
+    }
+  };
+
+
   if (loading) {
     return (
       <div className="flex items-center justify-center h-64">
