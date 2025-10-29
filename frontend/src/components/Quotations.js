@@ -318,10 +318,6 @@ const Quotations = () => {
     
     printWindow.document.close();
     printWindow.focus();
-    setTimeout(() => {
-      printWindow.print();
-      printWindow.close();
-    }, 250);
   };
 
   const handlePrintConduce = async (quotation) => {
