@@ -2804,6 +2804,17 @@ const Reservations = () => {
                             variant="outline"
                             onClick={(e) => {
                               e.stopPropagation();
+                              handleGenerateConduce(res);
+                            }}
+                            className="flex-1"
+                          >
+                            <FileText size={14} className="mr-1" /> Conduce
+                          </Button>
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            onClick={(e) => {
+                              e.stopPropagation();
                               handleEdit(res);
                             }}
                             className="flex-1"
