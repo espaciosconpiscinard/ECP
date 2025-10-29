@@ -553,49 +553,6 @@ const Quotations = () => {
     }, 250);
   };
 
-  const handleGenerateConduce = (quotation) => {
-    // Preparar datos del conduce basado en la cotización
-    const conduceData = {
-      recipient_name: quotation.customer_name,
-      recipient_type: 'customer',
-      delivery_date: new Date().toISOString().split('T')[0],
-      items: [],
-      notes: `Generado desde Cotización #${quotation.quotation_number}`,
-      internal_notes: '',
-      status: 'pending'
-    };
-    
-    // Agregar villa si existe
-    if (quotation.villa_code) {
-      conduceData.items.push({
-        description: `Uso de ${quotation.villa_code}${quotation.villa_location ? ` - ${quotation.villa_location}` : ''}`,
-        quantity: 1,
-        unit: 'unidad'
-      });
-    }
-    
-    // Agregar servicios adicionales
-    if (quotation.extra_services && quotation.extra_services.length > 0) {
-      quotation.extra_services.forEach(service => {
-        conduceData.items.push({
-          description: service.service_name || 'Servicio adicional',
-          quantity: service.quantity || 1,
-          unit: 'unidad'
-        });
-      });
-    }
-    
-    // Crear el conduce
-    const { createConduce } = require('../api/api');
-    createConduce(conduceData)
-      .then(() => {
-        alert('Conduce generado exitosamente desde la cotización');
-      })
-      .catch(err => {
-        alert('Error al generar conduce: ' + (err.response?.data?.detail || 'Error desconocido'));
-      });
-  };
-
   
   const handleEdit = (quotation) => {
     setEditingQuotation(quotation);
