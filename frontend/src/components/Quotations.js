@@ -680,60 +680,77 @@ const Quotations = () => {
             {quotations.length === 0 ? (
               <p className="text-center text-gray-500 py-8">No hay cotizaciones registradas</p>
             ) : (
-              quotations.map(quotation => (
-                <div key={quotation.id} className="border rounded-lg p-4 hover:bg-gray-50">
-                  <div className="flex justify-between items-start">
-                    <div className="flex-1">
-                      <div className="flex items-center gap-3 mb-2">
-                        <h3 className="font-semibold text-lg">{quotation.quotation_number}</h3>
-                        {getStatusBadge(quotation.status)}
-                      </div>
-                      <p className="text-sm text-gray-600">Cliente: {quotation.customer_name}</p>
-                      {quotation.villa_code && (
-                        <p className="text-sm text-gray-600">Villa: {quotation.villa_code}</p>
-                      )}
-                      <p className="text-sm font-semibold text-blue-600 mt-2">
-                        Total: {quotation.currency} ${quotation.total_amount.toFixed(2)}
-                      </p>
-                      {quotation.status === 'converted' && quotation.converted_to_invoice_id && (
-                        <p className="text-xs text-green-600 mt-1 flex items-center">
-                          <CheckCircle className="h-3 w-3 mr-1" />
-                          Sincronizada con factura - Los cambios se actualizarán automáticamente
+              <>
+                {quotations.slice(0, displayedItems).map(quotation => (
+                  <div key={quotation.id} className="border rounded-lg p-4 hover:bg-gray-50">
+                    <div className="flex justify-between items-start">
+                      <div className="flex-1">
+                        <div className="flex items-center gap-3 mb-2">
+                          <h3 className="font-semibold text-lg">{quotation.quotation_number}</h3>
+                          {getStatusBadge(quotation.status)}
+                        </div>
+                        <p className="text-sm text-gray-600">Cliente: {quotation.customer_name}</p>
+                        {quotation.villa_code && (
+                          <p className="text-sm text-gray-600">Villa: {quotation.villa_code}</p>
+                        )}
+                        <p className="text-sm font-semibold text-blue-600 mt-2">
+                          Total: {quotation.currency} ${quotation.total_amount.toFixed(2)}
                         </p>
-                      )}
-                    </div>
-                    <div className="flex gap-2">
-                      <Button size="sm" variant="outline" onClick={() => handlePrint(quotation)}>
-                        <Printer className="h-4 w-4" />
-                      </Button>
-                      {quotation.status !== 'converted' && (
-                        <>
-                          <Button
-                            size="sm"
-                            variant="outline"
-                            onClick={() => handlePrintConduce(quotation)}
-                          >
-                            <FileText className="mr-1 h-4 w-4" /> Conduce
-                          </Button>
-                          <Button
-                            size="sm"
-                            onClick={() => handleConvertToInvoice(quotation.id)}
-                            className="bg-green-600 hover:bg-green-700 text-white"
-                          >
-                            <CheckCircle className="mr-1 h-4 w-4" /> Convertir a Factura
-                          </Button>
-                        </>
-                      )}
-                      <Button size="sm" variant="outline" onClick={() => handleEdit(quotation)}>
-                        <Edit2 className="h-4 w-4" />
-                      </Button>
-                      <Button size="sm" variant="outline" onClick={() => handleDelete(quotation.id)}>
-                        <Trash2 className="h-4 w-4" />
-                      </Button>
+                        {quotation.status === 'converted' && quotation.converted_to_invoice_id && (
+                          <p className="text-xs text-green-600 mt-1 flex items-center">
+                            <CheckCircle className="h-3 w-3 mr-1" />
+                            Sincronizada con factura - Los cambios se actualizarán automáticamente
+                          </p>
+                        )}
+                      </div>
+                      <div className="flex gap-2">
+                        <Button size="sm" variant="outline" onClick={() => handlePrint(quotation)}>
+                          <Printer className="h-4 w-4" />
+                        </Button>
+                        {quotation.status !== 'converted' && (
+                          <>
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              onClick={() => handlePrintConduce(quotation)}
+                            >
+                              <FileText className="mr-1 h-4 w-4" /> Conduce
+                            </Button>
+                            <Button
+                              size="sm"
+                              onClick={() => handleConvertToInvoice(quotation.id)}
+                              className="bg-green-600 hover:bg-green-700 text-white"
+                            >
+                              <CheckCircle className="mr-1 h-4 w-4" /> Convertir a Factura
+                            </Button>
+                          </>
+                        )}
+                        <Button size="sm" variant="outline" onClick={() => handleEdit(quotation)}>
+                          <Edit2 className="h-4 w-4" />
+                        </Button>
+                        <Button size="sm" variant="outline" onClick={() => handleDelete(quotation.id)}>
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
+                      </div>
                     </div>
                   </div>
-                </div>
-              ))
+                ))}
+                {displayedItems < quotations.length && (
+                  <div className="text-center py-4">
+                    <Button 
+                      variant="outline" 
+                      onClick={() => setDisplayedItems(prev => prev + ITEMS_PER_PAGE)}
+                    >
+                      Cargar más ({quotations.length - displayedItems} restantes)
+                    </Button>
+                  </div>
+                )}
+                {displayedItems >= quotations.length && quotations.length > ITEMS_PER_PAGE && (
+                  <p className="text-center text-gray-500 py-4 text-sm">
+                    Mostrando todas las {quotations.length} cotizaciones
+                  </p>
+                )}
+              </>
             )}
           </div>
         </CardContent>
