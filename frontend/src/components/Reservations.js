@@ -1447,10 +1447,6 @@ const Reservations = () => {
     
     printWindow.document.close();
     printWindow.focus();
-    setTimeout(() => {
-      printWindow.print();
-      printWindow.close();
-    }, 250);
   };
 
   const formatCurrency = (amount, currency) => {
