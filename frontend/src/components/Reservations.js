@@ -6,12 +6,10 @@ import { Input } from './ui/input';
 import { Label } from './ui/label';
 import { Alert, AlertDescription } from './ui/alert';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from './ui/dialog';
-import { Plus, Edit, Trash2, Printer, Search, X, ChevronDown, ChevronUp, Download, FileText } from 'lucide-react';
+import { Plus, Edit, Trash2, Printer, Search, X, ChevronDown, ChevronUp, FileText } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import CustomerDialog from './CustomerDialog';
 import ConduceForm from './ConduceForm';
-import { jsPDF } from 'jspdf';
-import 'jspdf-autotable';
 
 const API_URL = process.env.REACT_APP_BACKEND_URL || '';
 
