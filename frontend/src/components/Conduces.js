@@ -97,7 +97,10 @@ const Conduces = () => {
       <Card>
         <CardHeader className="flex flex-row items-center justify-between">
           <CardTitle>Conduces</CardTitle>
-          <Dialog open={isFormOpen} onOpenChange={setIsFormOpen}>
+          <Dialog open={isFormOpen} onOpenChange={(open) => {
+            setIsFormOpen(open);
+            if (!open) setEditingConduce(null);
+          }}>
             <DialogTrigger asChild>
               <Button>
                 <Plus className="mr-2 h-4 w-4" /> Nuevo Conduce
@@ -105,12 +108,16 @@ const Conduces = () => {
             </DialogTrigger>
             <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
               <DialogHeader>
-                <DialogTitle>Nuevo Conduce</DialogTitle>
+                <DialogTitle>{editingConduce ? 'Editar Conduce' : 'Nuevo Conduce'}</DialogTitle>
               </DialogHeader>
-              <div className="text-center py-8">
-                <p className="text-gray-500">Formulario de conduce próximamente...</p>
-                <p className="text-sm text-gray-400 mt-2">Este componente se implementará completamente en la siguiente fase</p>
-              </div>
+              <ConduceForm
+                conduce={editingConduce}
+                onSubmit={handleSubmit}
+                onCancel={() => {
+                  setIsFormOpen(false);
+                  setEditingConduce(null);
+                }}
+              />
             </DialogContent>
           </Dialog>
         </CardHeader>
