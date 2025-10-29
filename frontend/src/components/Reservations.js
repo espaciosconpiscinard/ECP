@@ -2794,7 +2794,7 @@ const Reservations = () => {
                             variant="outline"
                             onClick={(e) => {
                               e.stopPropagation();
-                              handleGenerateConduce(res);
+                              handlePrintConduce(res);
                             }}
                             className="flex-1"
                           >
