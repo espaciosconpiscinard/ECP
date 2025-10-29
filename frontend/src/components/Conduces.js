@@ -3,7 +3,7 @@ import { getConduces, createConduce, updateConduce, deleteConduce } from '../api
 import { Card, CardHeader, CardTitle, CardContent } from './ui/card';
 import { Button } from './ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from './ui/dialog';
-import { AlertCircle, Plus, Edit2, Trash2, FileText } from 'lucide-react';
+import { AlertCircle, Plus, Edit2, Trash2, Printer } from 'lucide-react';
 import ConduceForm from './ConduceForm';
 
 const Conduces = () => {
@@ -12,10 +12,31 @@ const Conduces = () => {
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [editingConduce, setEditingConduce] = useState(null);
   const [error, setError] = useState('');
+  const [logo, setLogo] = useState(null);
   
   useEffect(() => {
     fetchConduces();
+    fetchLogo();
   }, []);
+  
+  const fetchLogo = async () => {
+    try {
+      const API_URL = process.env.REACT_APP_BACKEND_URL || '';
+      const response = await fetch(`${API_URL}/api/configuration/logo`, {
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem('token')}`
+        }
+      });
+      if (response.ok) {
+        const data = await response.json();
+        if (data.logo_url) {
+          setLogo(data.logo_url);
+        }
+      }
+    } catch (err) {
+      console.error('Error loading logo:', err);
+    }
+  };
   
   const fetchConduces = async () => {
     try {
