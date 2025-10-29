@@ -4,11 +4,13 @@ import { Card, CardHeader, CardTitle, CardContent } from './ui/card';
 import { Button } from './ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from './ui/dialog';
 import { AlertCircle, Plus, Edit2, Trash2, FileText, CheckCircle } from 'lucide-react';
+import QuotationForm from './QuotationForm';
 
 const Quotations = () => {
   const [quotations, setQuotations] = useState([]);
   const [loading, setLoading] = useState(true);
   const [isFormOpen, setIsFormOpen] = useState(false);
+  const [editingQuotation, setEditingQuotation] = useState(null);
   const [error, setError] = useState('');
   
   useEffect(() => {
@@ -24,6 +26,40 @@ const Quotations = () => {
       setError('Error al cargar cotizaciones');
     } finally {
       setLoading(false);
+    }
+  };
+  
+  const handleSubmit = async (quotationData) => {
+    try {
+      if (editingQuotation) {
+        await updateQuotation(editingQuotation.id, quotationData);
+        alert('Cotización actualizada exitosamente');
+      } else {
+        await createQuotation(quotationData);
+        alert('Cotización creada exitosamente');
+      }
+      setIsFormOpen(false);
+      setEditingQuotation(null);
+      fetchQuotations();
+    } catch (err) {
+      alert('Error: ' + (err.response?.data?.detail || 'Error desconocido'));
+    }
+  };
+  
+  const handleEdit = (quotation) => {
+    setEditingQuotation(quotation);
+    setIsFormOpen(true);
+  };
+  
+  const handleDelete = async (quotationId) => {
+    if (!window.confirm('¿Eliminar esta cotización?')) return;
+    
+    try {
+      await deleteQuotation(quotationId);
+      alert('Cotización eliminada exitosamente');
+      fetchQuotations();
+    } catch (err) {
+      alert('Error al eliminar: ' + (err.response?.data?.detail || 'Error desconocido'));
     }
   };
   
