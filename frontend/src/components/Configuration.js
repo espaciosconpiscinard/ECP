@@ -21,6 +21,7 @@ function Configuration() {
   useEffect(() => {
     fetchConfig();
     fetchTemplatesInfo();
+    fetchQuotationTerms();
   }, []);
 
   const fetchTemplatesInfo = async () => {
