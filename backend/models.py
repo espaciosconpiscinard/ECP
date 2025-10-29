@@ -279,6 +279,7 @@ class Reservation(ReservationBase):
     created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
     updated_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
     created_by: str  # user_id
+    converted_from_quotation_number: Optional[str] = None  # Número de cotización de origen (ej: "COT-0001")
 
 
 # ============ QUOTATION (COTIZACIÓN) MODELS ============
