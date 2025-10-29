@@ -2670,6 +2670,11 @@ const Reservations = () => {
                           <p className="text-sm font-medium text-gray-900">{res.customer_name}</p>
                           <p className="text-xs text-gray-500">
                             #{res.invoice_number}
+                            {res.converted_from_quotation_number && (
+                              <span className="ml-2 px-2 py-0.5 bg-blue-100 text-blue-700 text-[10px] font-medium rounded">
+                                📋 Desde {res.converted_from_quotation_number}
+                              </span>
+                            )}
                             {reservationAbonos[res.id] && reservationAbonos[res.id].length > 0 && (
                               <span className="text-purple-600 ml-1">
                                 (Abonos: {reservationAbonos[res.id].map(a => `#${a.invoice_number}`).join(', ')})
