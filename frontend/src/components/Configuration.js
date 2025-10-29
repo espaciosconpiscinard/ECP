@@ -12,6 +12,11 @@ function Configuration() {
   const [showResetConfirm, setShowResetConfirm] = useState(false);
   const [templatesInfo, setTemplatesInfo] = useState([]);
   const [loadingTemplates, setLoadingTemplates] = useState(false);
+  
+  // Quotation Terms States
+  const [quotationTerms, setQuotationTerms] = useState([]);
+  const [loadingTerms, setLoadingTerms] = useState(false);
+  const [newTerm, setNewTerm] = useState('');
 
   useEffect(() => {
     fetchConfig();
