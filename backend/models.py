@@ -304,6 +304,7 @@ class QuotationBase(BaseModel):
     extra_people_cost: float = 0.0
     
     base_price: float = 0.0
+    owner_price: float = 0.0  # Precio que se paga al propietario
     extra_hours: float = 0.0
     extra_hours_cost: float = 0.0
     
