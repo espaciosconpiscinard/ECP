@@ -498,14 +498,26 @@ const Quotations = () => {
                       </p>
                     </div>
                     <div className="flex gap-2">
-                      {quotation.status === 'approved' && quotation.status !== 'converted' && (
-                        <Button
-                          size="sm"
-                          onClick={() => handleConvertToInvoice(quotation.id)}
-                          className="bg-green-600 hover:bg-green-700"
-                        >
-                          <CheckCircle className="mr-1 h-4 w-4" /> Convertir a Factura
-                        </Button>
+                      <Button size="sm" variant="outline" onClick={() => handlePrint(quotation)}>
+                        <Printer className="h-4 w-4" />
+                      </Button>
+                      {quotation.status !== 'converted' && (
+                        <>
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            onClick={() => handleGenerateConduce(quotation)}
+                          >
+                            <FileText className="mr-1 h-4 w-4" /> Conduce
+                          </Button>
+                          <Button
+                            size="sm"
+                            onClick={() => handleConvertToInvoice(quotation.id)}
+                            className="bg-green-600 hover:bg-green-700 text-white"
+                          >
+                            <CheckCircle className="mr-1 h-4 w-4" /> Convertir a Factura
+                          </Button>
+                        </>
                       )}
                       <Button size="sm" variant="outline" onClick={() => handleEdit(quotation)}>
                         <Edit2 className="h-4 w-4" />
