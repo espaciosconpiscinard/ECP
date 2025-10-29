@@ -152,8 +152,11 @@ const Conduces = () => {
                       </p>
                     </div>
                     <div className="flex gap-2">
-                      <Button size="sm" variant="outline">
-                        <FileText className="h-4 w-4" />
+                      <Button size="sm" variant="outline" onClick={() => handleEdit(conduce)}>
+                        <Edit2 className="h-4 w-4" />
+                      </Button>
+                      <Button size="sm" variant="outline" onClick={() => handleDelete(conduce.id)}>
+                        <Trash2 className="h-4 w-4" />
                       </Button>
                     </div>
                   </div>
