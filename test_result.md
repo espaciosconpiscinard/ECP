@@ -588,7 +588,49 @@ test_plan:
   test_priority: "high_first"
   latest_test: "Completado - Checkbox 'Por Defecto' implementado en las 3 secciones de precios flexibles (Pasadía, Amanecida, Evento). Pendiente: Testing de funcionalidad end-to-end"
 
+  - task: "Quotations - Botón Conduce para imprimir sin precios"
+    implemented: true
+    working: "NA"
+    file: "/app/frontend/src/components/Quotations.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "✅ IMPLEMENTADO: Agregado funcionalidad de impresión sin precios para Quotations. Eliminada función handleGenerateConduce (antigua que intentaba crear conduce vía API). Actualizado botón 'Conduce' para llamar handlePrintConduce en lugar de handleGenerateConduce. La función handlePrintConduce ya existía y genera un documento de entrega sin precios, mostrando solo cantidades y descripciones de ítems. Similar a la implementación en Reservations."
+
 agent_communication:
+  - agent: "main"
+    message: |
+      ✅ QUOTATIONS CONDUCE FUNCTIONALITY COMPLETADA
+      
+      IMPLEMENTACIÓN:
+      1. ✅ Eliminada función handleGenerateConduce (líneas 556-597)
+         - Esta función intentaba crear conduces vía API (enfoque antiguo)
+         - Ya no es necesaria después de simplificar conduces a print-only
+      
+      2. ✅ Actualizado botón "Conduce" (línea 717)
+         - Antes: onClick={() => handleGenerateConduce(quotation)}
+         - Ahora: onClick={() => handlePrintConduce(quotation)}
+      
+      3. ✅ La función handlePrintConduce ya existía (líneas 327-554)
+         - Genera documento de entrega sin precios
+         - Muestra: número de cotización, cliente, villa, servicios
+         - NO muestra: precios unitarios, subtotales, totales
+         - Incluye sección de firmas (Entregado por / Recibido por)
+      
+      ESTADO ACTUAL:
+      - Quotations tiene 2 botones de impresión:
+        * Botón Printer (ícono): Imprime cotización completa CON precios
+        * Botón "Conduce": Imprime conduce SIN precios (para entrega)
+      - Consistente con implementación en Reservations/Facturas
+      
+      SIGUIENTE PASO:
+      - Testing de funcionalidad de impresión de conduce desde Quotations
+      - Verificar que no se muestren precios en el documento impreso
+      - Verificar que se muestren todos los ítems correctamente
+  
   - agent: "main"
     message: |
       🔧 NUEVAS IMPLEMENTACIONES COMPLETADAS:
