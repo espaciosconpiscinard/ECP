@@ -671,7 +671,7 @@ const Quotations = () => {
                           <Button
                             size="sm"
                             variant="outline"
-                            onClick={() => handleGenerateConduce(quotation)}
+                            onClick={() => handlePrintConduce(quotation)}
                           >
                             <FileText className="mr-1 h-4 w-4" /> Conduce
                           </Button>
