@@ -157,7 +157,7 @@ const Quotations = () => {
             }
             .total-row.grand-total {
               background: #f0f9ff;
-              border-top: 2px solid #059669;
+              border-top: 2px solid #0ea5e9;
               font-size: 18px;
               font-weight: bold;
               color: #0369a1;
