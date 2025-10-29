@@ -326,11 +326,7 @@ const Quotations = () => {
           <div class="terms">
             <h4>Términos y Condiciones:</h4>
             <ul>
-              <li>Esta cotización es válida por ${quotation.validity_days || 30} días desde la fecha de emisión</li>
-              <li>Los precios están sujetos a cambios sin previo aviso después de la fecha de validez</li>
-              <li>Se requiere un depósito del 50% para confirmar la reservación</li>
-              <li>El saldo restante debe ser pagado antes de la fecha del evento</li>
-              <li>Las cancelaciones deben notificarse con al menos 48 horas de anticipación</li>
+              ${quotationTerms.map(term => `<li>${term}</li>`).join('')}
             </ul>
           </div>
 
