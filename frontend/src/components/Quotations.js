@@ -67,7 +67,7 @@ const Quotations = () => {
               display: flex;
               justify-content: space-between;
               margin-bottom: 30px;
-              border-bottom: 3px solid #059669;
+              border-bottom: 3px solid #0ea5e9;
               padding-bottom: 20px;
             }
             .company-info h1 {
@@ -338,7 +338,7 @@ const Quotations = () => {
               display: flex;
               justify-content: space-between;
               margin-bottom: 30px;
-              border-bottom: 3px solid #059669;
+              border-bottom: 3px solid #0ea5e9;
               padding-bottom: 20px;
             }
             .company-info h1 {
