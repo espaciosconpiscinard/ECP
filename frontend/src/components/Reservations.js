@@ -3065,6 +3065,25 @@ const Reservations = () => {
           </form>
         </DialogContent>
       </Dialog>
+
+      {/* Dialog para Generar Conduce */}
+      <Dialog open={isConduceDialogOpen} onOpenChange={setIsConduceDialogOpen}>
+        <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>Generar Conduce desde Factura</DialogTitle>
+          </DialogHeader>
+          {conduceFromReservation && (
+            <ConduceForm
+              conduce={conduceFromReservation}
+              onSubmit={handleConduceSubmit}
+              onCancel={() => {
+                setIsConduceDialogOpen(false);
+                setConduceFromReservation(null);
+              }}
+            />
+          )}
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
