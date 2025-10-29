@@ -28,6 +28,7 @@ from models import (
     CommissionCreate, Commission, CommissionUpdate,
     DashboardStats, InvoiceCounter,
     InvoiceTemplateCreate, InvoiceTemplateUpdate, InvoiceTemplate,
+    QuotationTermsUpdate, QuotationTerms,
     LogoConfig
 )
 from auth import (
