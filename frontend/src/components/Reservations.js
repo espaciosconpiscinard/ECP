@@ -273,16 +273,17 @@ const Reservations = () => {
   };
 
   const handleSelectFlexiblePrice = (priceOption) => {
-    // Extraer número de personas del people_count (ej: "1-10" → 10, "21+" → 21)
-    let guestCount = 1;
-    if (priceOption.people_count) {
-      const match = priceOption.people_count.match(/(\d+)/g);
-      if (match && match.length > 0) {
-        // Si tiene rango (ej: "1-10"), tomar el número más alto
-        guestCount = parseInt(match[match.length - 1]);
-      }
-    }
+    // Aplicar el precio seleccionado
+    setFormData(prev => ({
+      ...prev,
+      base_price: priceOption.client_price || 0,
+      owner_price: priceOption.owner_price || 0,
+      guests: 1  // Default a 1, el usuario puede editarlo
+    }));
     
+    // Ocultar el selector una vez seleccionado el precio
+    setShowPriceSelector(false);
+  };
     setFormData(prev => ({
       ...prev,
       base_price: priceOption.client_price,
