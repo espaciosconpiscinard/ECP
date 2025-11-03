@@ -1810,36 +1810,39 @@ const Reservations = () => {
                 {/* SELECTOR DE PRECIOS FLEXIBLES */}
                 {showPriceSelector && selectedVillaFlexiblePrices && (
                   <div className="col-span-2 bg-purple-50 p-4 rounded-lg border-2 border-purple-300">
-                    <h4 className="font-bold text-purple-900 mb-3">💰 Selecciona el Precio para esta Reservación</h4>
+                    <h4 className="font-bold text-purple-900 mb-3">💰 Selecciona el Precio para esta Factura</h4>
                     <p className="text-xs text-gray-600 mb-3">La cantidad de huéspedes se llenará automáticamente según tu selección</p>
                     <div className="space-y-2">
-                      {selectedVillaFlexiblePrices[formData.rental_type]?.map((priceOption, index) => (
-                        <button
-                          key={index}
-                          type="button"
-                          onClick={() => handleSelectFlexiblePrice(priceOption)}
-                          className="w-full p-4 bg-white hover:bg-purple-100 border-2 border-purple-200 hover:border-purple-400 rounded-lg text-left transition-colors"
-                        >
-                          <div className="flex justify-between items-center">
-                            <div className="flex-1">
-                              <div className="flex items-center gap-3 mb-2">
-                                <span className="text-2xl">👥</span>
-                                <span className="text-lg font-bold text-purple-900">
-                                  {priceOption.people_count || `Opción ${index + 1}`}
-                                </span>
+                      {/* Mostrar todos los precios flexibles disponibles */}
+                      {Object.entries(selectedVillaFlexiblePrices).map(([type, prices]) => 
+                        prices?.map((priceOption, index) => (
+                          <button
+                            key={`${type}-${index}`}
+                            type="button"
+                            onClick={() => handleSelectFlexiblePrice(priceOption)}
+                            className="w-full p-4 bg-white hover:bg-purple-100 border-2 border-purple-200 hover:border-purple-400 rounded-lg text-left transition-colors"
+                          >
+                            <div className="flex justify-between items-center">
+                              <div className="flex-1">
+                                <div className="flex items-center gap-3 mb-2">
+                                  <span className="text-2xl">👥</span>
+                                  <span className="text-lg font-bold text-purple-900">
+                                    {priceOption.people_count || `${type} - Opción ${index + 1}`}
+                                  </span>
+                                </div>
+                              </div>
+                              <div className="text-right">
+                                <p className="text-sm text-blue-700 mb-1">
+                                  <span className="text-xs">Cliente:</span> <span className="font-bold text-base">RD$ {priceOption.client_price?.toLocaleString()}</span>
+                                </p>
+                                <p className="text-sm text-green-700">
+                                  <span className="text-xs">Propietario:</span> <span className="font-bold text-base">RD$ {priceOption.owner_price?.toLocaleString()}</span>
+                                </p>
                               </div>
                             </div>
-                            <div className="text-right">
-                              <p className="text-sm text-blue-700 mb-1">
-                                <span className="text-xs">Cliente:</span> <span className="font-bold text-base">RD$ {priceOption.client_price?.toLocaleString()}</span>
-                              </p>
-                              <p className="text-sm text-green-700">
-                                <span className="text-xs">Propietario:</span> <span className="font-bold text-base">RD$ {priceOption.owner_price?.toLocaleString()}</span>
-                              </p>
-                            </div>
-                          </div>
-                        </button>
-                      ))}
+                          </button>
+                        ))
+                      )}
                     </div>
                     <p className="text-xs text-gray-600 mt-3 bg-blue-50 p-2 rounded border border-blue-200">
                       💡 <strong>Nota:</strong> Los precios y cantidad de huéspedes se llenarán automáticamente, pero puedes editarlos después
