@@ -2223,8 +2223,11 @@ const Expenses = () => {
                                         console.log('✅ [SERVICIO EXTRA] Pago registrado exitosamente');
                                         alert(`Pago registrado a ${service.supplier_name}`);
                                         document.getElementById(`servicio-${index}-monto`).value = '';
+                                        console.log('🔄 [SERVICIO EXTRA] Recargando lista de expenses...');
                                         await fetchExpenses();
+                                        console.log('✅ [SERVICIO EXTRA] Lista recargada');
                                         setIsAbonoDialogOpen(false);
+                                        setShowDetailsModal(false);  // Cerrar también el modal principal
                                       } else {
                                         const errorData = await response.json();
                                         console.error('❌ [SERVICIO EXTRA] Error response:', errorData);
