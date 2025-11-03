@@ -120,7 +120,12 @@ class VillaBase(BaseModel):
     description_pasadia: Optional[str] = None
     description_amanecida: Optional[str] = None
     description_evento: Optional[str] = None
-    villa_currency: str = "DOP"
+    villa_currency: str = "DOP"  # Moneda por defecto (deprecado, usar currency_pasadia, etc.)
+    
+    # Moneda específica por modalidad
+    currency_pasadia: str = "DOP"
+    currency_amanecida: str = "DOP"
+    currency_evento: str = "DOP"
     
     # Horarios separados por modalidad
     check_in_time_pasadia: str = "9:00 AM"
