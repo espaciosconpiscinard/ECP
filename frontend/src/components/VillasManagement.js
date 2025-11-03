@@ -610,6 +610,80 @@ const VillasManagementNew = () => {
                     />
                   </div>
 
+                  {/* MODALIDADES Y DESCRIPCIONES */}
+                  <div className="col-span-2 bg-blue-50 p-4 rounded-md border-2 border-blue-200">
+                    <h3 className="font-bold text-lg mb-3 text-blue-800">🏖️ Modalidades Disponibles</h3>
+                    
+                    {/* Checkboxes de Modalidades */}
+                    <div className="flex gap-4 mb-4">
+                      <label className="flex items-center space-x-2 cursor-pointer">
+                        <input
+                          type="checkbox"
+                          checked={formData.has_pasadia}
+                          onChange={(e) => setFormData({ ...formData, has_pasadia: e.target.checked })}
+                          className="w-4 h-4"
+                        />
+                        <span className="font-medium">Pasadía</span>
+                      </label>
+                      <label className="flex items-center space-x-2 cursor-pointer">
+                        <input
+                          type="checkbox"
+                          checked={formData.has_amanecida}
+                          onChange={(e) => setFormData({ ...formData, has_amanecida: e.target.checked })}
+                          className="w-4 h-4"
+                        />
+                        <span className="font-medium">Amanecida</span>
+                      </label>
+                    </div>
+
+                    {/* Moneda */}
+                    <div className="mb-4">
+                      <Label className="text-sm">Moneda de la Villa</Label>
+                      <select
+                        value={formData.villa_currency}
+                        onChange={(e) => setFormData({ ...formData, villa_currency: e.target.value })}
+                        className="w-full p-2 border rounded-md text-sm"
+                      >
+                        <option value="DOP">Peso Dominicano (DOP)</option>
+                        <option value="USD">Dólar (USD)</option>
+                      </select>
+                    </div>
+
+                    {/* Descripción para Pasadía */}
+                    {formData.has_pasadia && (
+                      <div className="mb-3">
+                        <Label className="text-sm font-semibold">Descripción para Pasadía</Label>
+                        <textarea
+                          value={formData.description_pasadia}
+                          onChange={(e) => setFormData({ ...formData, description_pasadia: e.target.value })}
+                          placeholder="Detalles específicos de la villa en modalidad Pasadía..."
+                          className="w-full p-2 border rounded text-sm mt-1"
+                          rows="3"
+                          style={{ whiteSpace: 'pre-wrap' }}
+                        />
+                      </div>
+                    )}
+
+                    {/* Descripción para Amanecida */}
+                    {formData.has_amanecida && (
+                      <div>
+                        <Label className="text-sm font-semibold">Descripción para Amanecida</Label>
+                        <textarea
+                          value={formData.description_amanecida}
+                          onChange={(e) => setFormData({ ...formData, description_amanecida: e.target.value })}
+                          placeholder="Detalles específicos de la villa en modalidad Amanecida..."
+                          className="w-full p-2 border rounded text-sm mt-1"
+                          rows="3"
+                          style={{ whiteSpace: 'pre-wrap' }}
+                        />
+                      </div>
+                    )}
+
+                    <p className="text-xs text-gray-600 mt-3 bg-white p-2 rounded border">
+                      💡 <strong>Nota:</strong> Al agregar esta villa a una factura, se agregará automáticamente según las modalidades seleccionadas. Si ambas están marcadas, aparecerá dos veces (una por cada modalidad).
+                    </p>
+                  </div>
+
                   {/* HORARIOS */}
                   <div className="col-span-2 bg-purple-50 p-4 rounded-md border-2 border-purple-200">
                     <h3 className="font-bold text-lg mb-3 text-purple-800">🕐 Horario Por Defecto</h3>
