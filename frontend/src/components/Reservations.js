@@ -1048,8 +1048,8 @@ const Reservations = () => {
                   ` : ''}
                   <div class="info-line"><strong>Villa:</strong> ${reservation.villa_code || reservation.villa_name}</div>
                   ${reservation.villa_location ? `<div class="info-line"><strong>Ubicación:</strong> ${reservation.villa_location}</div>` : ''}
-                  <div class="info-line"><strong>Tipo:</strong> ${reservation.rental_type === 'pasadia' ? 'Pasadía' : reservation.rental_type === 'amanecida' ? 'Amanecida' : 'Evento'}</div>
-                  <div class="info-line"><strong>Horario:</strong> ${reservation.check_in_time} - ${reservation.check_out_time}</div>
+                  ${reservation.rental_type ? `<div class="info-line"><strong>Tipo:</strong> ${reservation.rental_type}</div>` : ''}
+                  ${reservation.check_in_time && reservation.check_out_time ? `<div class="info-line"><strong>Horario:</strong> ${reservation.check_in_time} - ${reservation.check_out_time}</div>` : ''}
                   <div class="info-line"><strong>Personas:</strong> ${reservation.guests}</div>
                 </div>
               </div>
