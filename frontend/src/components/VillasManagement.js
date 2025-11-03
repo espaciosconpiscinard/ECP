@@ -190,11 +190,8 @@ const VillasManagementNew = () => {
       extra_people_price_owner: villa.extra_people_price_owner || 0,
       max_guests: villa.max_guests || 0,
       amenities: villa.amenities || [],
-      is_active: villa.is_active !== false,
-      use_flexible_pricing: true,  // SIEMPRE true
-      flexible_prices: villa.flexible_prices || { pasadia: [], amanecida: [], evento: [] }
+      is_active: villa.is_active !== false
     });
-    setFlexiblePrices(villa.flexible_prices || { pasadia: [], amanecida: [], evento: [] });
     setIsFormOpen(true);
   };
 
