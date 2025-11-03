@@ -46,6 +46,11 @@ const VillasManagementNew = () => {
     location: '',
     phone: '',
     category_id: '',
+    has_pasadia: false,  // Checkbox: si tiene modalidad Pasadía
+    has_amanecida: false,  // Checkbox: si tiene modalidad Amanecida
+    description_pasadia: '',  // Descripción específica para Pasadía
+    description_amanecida: '',  // Descripción específica para Amanecida
+    villa_currency: 'DOP',  // Moneda (DOP o USD)
     default_check_in_time: '9:00 AM',
     default_check_out_time: '8:00 PM',
     default_price_pasadia: 0,
