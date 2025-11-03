@@ -1086,7 +1086,10 @@ const Reservations = () => {
                   ${reservation.extra_services && reservation.extra_services.length > 0 ? reservation.extra_services.map((service, idx) => `
                     <tr>
                       <td>0${1 + (reservation.villa_code || reservation.villa_name ? 1 : 0) + (reservation.extra_hours > 0 ? 1 : 0) + (reservation.extra_people > 0 ? 1 : 0) + idx}</td>
-                      <td>${service.service_name}</td>
+                      <td>
+                        <strong>${service.service_name}</strong>
+                        ${service.description ? `<br><span style="font-size: 9px; color: #666; white-space: pre-wrap;">${service.description}</span>` : ''}
+                      </td>
                       <td style="text-align: right;">${reservation.currency === 'DOP' ? 'RD$' : '$'}${service.unit_price.toLocaleString('es-DO', {minimumFractionDigits: 2})}</td>
                       <td style="text-align: center;">${service.quantity}</td>
                       <td style="text-align: right;"><strong>${reservation.currency === 'DOP' ? 'RD$' : '$'}${service.total.toLocaleString('es-DO', {minimumFractionDigits: 2})}</strong></td>
