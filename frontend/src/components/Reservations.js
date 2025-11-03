@@ -1843,42 +1843,120 @@ const Reservations = () => {
                 {/* SELECTOR DE PRECIOS FLEXIBLES */}
                 {showPriceSelector && selectedVillaFlexiblePrices && (
                   <div className="col-span-2 bg-purple-50 p-4 rounded-lg border-2 border-purple-300">
-                    <h4 className="font-bold text-purple-900 mb-3">💰 Selecciona el Precio para esta Factura</h4>
-                    <p className="text-xs text-gray-600 mb-3">La cantidad de huéspedes se llenará automáticamente según tu selección</p>
-                    <div className="space-y-2">
-                      {/* Mostrar todos los precios flexibles disponibles */}
-                      {Object.entries(selectedVillaFlexiblePrices).map(([type, prices]) => 
-                        prices?.map((priceOption, index) => (
-                          <button
-                            key={`${type}-${index}`}
-                            type="button"
-                            onClick={() => handleSelectFlexiblePrice(priceOption)}
-                            className="w-full p-4 bg-white hover:bg-purple-100 border-2 border-purple-200 hover:border-purple-400 rounded-lg text-left transition-colors"
-                          >
-                            <div className="flex justify-between items-center">
-                              <div className="flex-1">
-                                <div className="flex items-center gap-3 mb-2">
-                                  <span className="text-2xl">👥</span>
-                                  <span className="text-lg font-bold text-purple-900">
-                                    {priceOption.people_count || `${type} - Opción ${index + 1}`}
-                                  </span>
+                    <h4 className="font-bold text-purple-900 mb-3">💰 Selecciona la Modalidad y Precio para esta Factura</h4>
+                    <p className="text-xs text-gray-600 mb-3">Elige la modalidad (Pasadía/Amanecida/Evento) y tipo de precio</p>
+                    <div className="space-y-4">
+                      {/* Mostrar todos los precios flexibles disponibles por modalidad */}
+                      {selectedVillaFlexiblePrices.pasadia && selectedVillaFlexiblePrices.pasadia.length > 0 && (
+                        <div>
+                          <h5 className="font-semibold text-blue-800 mb-2 flex items-center gap-2">
+                            <span>☀️</span> Pasadía
+                          </h5>
+                          <div className="space-y-2">
+                            {selectedVillaFlexiblePrices.pasadia.map((priceOption, index) => (
+                              <button
+                                key={`pasadia-${index}`}
+                                type="button"
+                                onClick={() => handleSelectFlexiblePrice(priceOption, 'pasadia')}
+                                className="w-full p-3 bg-white hover:bg-blue-50 border-2 border-blue-200 hover:border-blue-400 rounded-lg text-left transition-colors"
+                              >
+                                <div className="flex justify-between items-center">
+                                  <div className="flex-1">
+                                    <span className="text-base font-bold text-gray-800">
+                                      {priceOption.label || `Precio ${index + 1}`}
+                                    </span>
+                                  </div>
+                                  <div className="text-right">
+                                    <p className="text-sm text-blue-700 mb-1">
+                                      <span className="text-xs">Cliente:</span> <span className="font-bold text-base">RD$ {(priceOption.client_price || 0).toLocaleString()}</span>
+                                    </p>
+                                    {user?.role === 'admin' && (
+                                      <p className="text-sm text-green-700">
+                                        <span className="text-xs">Propietario:</span> <span className="font-bold text-base">RD$ {(priceOption.owner_price || 0).toLocaleString()}</span>
+                                      </p>
+                                    )}
+                                  </div>
                                 </div>
-                              </div>
-                              <div className="text-right">
-                                <p className="text-sm text-blue-700 mb-1">
-                                  <span className="text-xs">Cliente:</span> <span className="font-bold text-base">RD$ {priceOption.client_price?.toLocaleString()}</span>
-                                </p>
-                                <p className="text-sm text-green-700">
-                                  <span className="text-xs">Propietario:</span> <span className="font-bold text-base">RD$ {priceOption.owner_price?.toLocaleString()}</span>
-                                </p>
-                              </div>
-                            </div>
-                          </button>
-                        ))
+                              </button>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+                      
+                      {selectedVillaFlexiblePrices.amanecida && selectedVillaFlexiblePrices.amanecida.length > 0 && (
+                        <div>
+                          <h5 className="font-semibold text-indigo-800 mb-2 flex items-center gap-2">
+                            <span>🌙</span> Amanecida
+                          </h5>
+                          <div className="space-y-2">
+                            {selectedVillaFlexiblePrices.amanecida.map((priceOption, index) => (
+                              <button
+                                key={`amanecida-${index}`}
+                                type="button"
+                                onClick={() => handleSelectFlexiblePrice(priceOption, 'amanecida')}
+                                className="w-full p-3 bg-white hover:bg-indigo-50 border-2 border-indigo-200 hover:border-indigo-400 rounded-lg text-left transition-colors"
+                              >
+                                <div className="flex justify-between items-center">
+                                  <div className="flex-1">
+                                    <span className="text-base font-bold text-gray-800">
+                                      {priceOption.label || `Precio ${index + 1}`}
+                                    </span>
+                                  </div>
+                                  <div className="text-right">
+                                    <p className="text-sm text-blue-700 mb-1">
+                                      <span className="text-xs">Cliente:</span> <span className="font-bold text-base">RD$ {(priceOption.client_price || 0).toLocaleString()}</span>
+                                    </p>
+                                    {user?.role === 'admin' && (
+                                      <p className="text-sm text-green-700">
+                                        <span className="text-xs">Propietario:</span> <span className="font-bold text-base">RD$ {(priceOption.owner_price || 0).toLocaleString()}</span>
+                                      </p>
+                                    )}
+                                  </div>
+                                </div>
+                              </button>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+                      
+                      {selectedVillaFlexiblePrices.evento && selectedVillaFlexiblePrices.evento.length > 0 && (
+                        <div>
+                          <h5 className="font-semibold text-purple-800 mb-2 flex items-center gap-2">
+                            <span>🎉</span> Evento
+                          </h5>
+                          <div className="space-y-2">
+                            {selectedVillaFlexiblePrices.evento.map((priceOption, index) => (
+                              <button
+                                key={`evento-${index}`}
+                                type="button"
+                                onClick={() => handleSelectFlexiblePrice(priceOption, 'evento')}
+                                className="w-full p-3 bg-white hover:bg-purple-50 border-2 border-purple-200 hover:border-purple-400 rounded-lg text-left transition-colors"
+                              >
+                                <div className="flex justify-between items-center">
+                                  <div className="flex-1">
+                                    <span className="text-base font-bold text-gray-800">
+                                      {priceOption.label || `Precio ${index + 1}`}
+                                    </span>
+                                  </div>
+                                  <div className="text-right">
+                                    <p className="text-sm text-blue-700 mb-1">
+                                      <span className="text-xs">Cliente:</span> <span className="font-bold text-base">RD$ {(priceOption.client_price || 0).toLocaleString()}</span>
+                                    </p>
+                                    {user?.role === 'admin' && (
+                                      <p className="text-sm text-green-700">
+                                        <span className="text-xs">Propietario:</span> <span className="font-bold text-base">RD$ {(priceOption.owner_price || 0).toLocaleString()}</span>
+                                      </p>
+                                    )}
+                                  </div>
+                                </div>
+                              </button>
+                            ))}
+                          </div>
+                        </div>
                       )}
                     </div>
                     <p className="text-xs text-gray-600 mt-3 bg-blue-50 p-2 rounded border border-blue-200">
-                      💡 <strong>Nota:</strong> Los precios y cantidad de huéspedes se llenarán automáticamente, pero puedes editarlos después
+                      💡 <strong>Nota:</strong> Los precios se aplicarán automáticamente, pero puedes editarlos después si es necesario
                     </p>
                   </div>
                 )}
