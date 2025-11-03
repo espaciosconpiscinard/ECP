@@ -42,7 +42,6 @@ const Expenses = () => {
   // Estado para modal de detalles
   const [detailExpense, setDetailExpense] = useState(null);
   const [showDetailsModal, setShowDetailsModal] = useState(false);
-  const [supplierExpenses, setSupplierExpenses] = useState([]); // Gastos de suplidores relacionados
 
   
   // Abono states
