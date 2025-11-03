@@ -282,7 +282,10 @@ const Quotations = () => {
               ${quotation.extra_services && quotation.extra_services.length > 0 ? quotation.extra_services.map(service => `
                 <tr>
                   <td>${service.quantity || 1}</td>
-                  <td>${service.service_name || 'Servicio'}${service.supplier_name ? ` (${service.supplier_name})` : ''}</td>
+                  <td>
+                    <strong>${service.service_name || 'Servicio'}${service.supplier_name ? ` (${service.supplier_name})` : ''}</strong>
+                    ${service.description ? `<br><span style="font-size: 11px; color: #666; white-space: pre-wrap;">${service.description}</span>` : ''}
+                  </td>
                   <td>${quotation.currency} ${(service.unit_price || 0).toFixed(2)}</td>
                   <td>${quotation.currency} ${(service.total || 0).toFixed(2)}</td>
                 </tr>
