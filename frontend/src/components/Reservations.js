@@ -1084,7 +1084,6 @@ const Reservations = () => {
                     (reservation.rental_type ? `<div class="info-line"><strong>Modalidad:</strong> <span style="color: #0369a1; font-weight: 700;">${reservation.rental_type === 'pasadia' ? 'Pasadía' : reservation.rental_type === 'amanecida' ? 'Amanecida' : 'Evento'}</span></div>` : '')}
                   ${reservation.check_in_time && reservation.check_out_time ? `<div class="info-line"><strong>Horario:</strong> ${reservation.check_in_time} - ${reservation.check_out_time}</div>` : ''}
                   <div class="info-line"><strong>Personas:</strong> ${reservation.guests}</div>
-                  ${reservation.villa_description ? `<div class="info-line" style="margin-top: 8px; padding: 8px; background: #f0f9ff; border-left: 3px solid #0369a1;"><strong>Descripción:</strong> ${reservation.villa_description}</div>` : ''}
                 </div>
               </div>
               
