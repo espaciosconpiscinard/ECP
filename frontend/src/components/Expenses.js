@@ -2397,6 +2397,15 @@ const Expenses = () => {
                             </div>
                             
                             {/* Historial de Pagos al Suplidor */}
+                            {(() => {
+                              console.log('🔍 [HISTORIAL] Verificando historial para:', service.supplier_name);
+                              console.log('  - supplierExpense existe:', !!supplierExpense);
+                              console.log('  - supplierExpense.id:', supplierExpense?.id);
+                              console.log('  - supplierAbonos:', supplierAbonos);
+                              console.log('  - supplierAbonos[supplierExpense.id]:', supplierExpense?.id ? supplierAbonos[supplierExpense.id] : 'N/A');
+                              console.log('  - length:', supplierExpense?.id && supplierAbonos[supplierExpense.id] ? supplierAbonos[supplierExpense.id].length : 0);
+                              return null;
+                            })()}
                             {supplierExpense && supplierAbonos[supplierExpense.id] && supplierAbonos[supplierExpense.id].length > 0 && (
                               <div className="mt-4 pt-4 border-t border-orange-300">
                                 <h5 className="text-sm font-semibold text-orange-900 mb-2">
