@@ -281,10 +281,11 @@ const Reservations = () => {
     
     console.log('🔍 Villa seleccionada completa:', selectedVilla);
     
-    // Set modality-specific description and times
+    // Set modality-specific description, times, and currency
     let modalityDescription = '';
     let defaultCheckInTime = '';
     let defaultCheckOutTime = '';
+    let modalityCurrency = 'DOP';  // Moneda por defecto
     let rentalType = '';  // Para backend (minúsculas sin tildes)
     let rentalTypeDisplay = '';  // Para mostrar en UI (con formato)
     let villaCodeWithModality = formData.villa_code;  // Código original
@@ -295,6 +296,7 @@ const Reservations = () => {
         modalityDescription = selectedVilla.description_pasadia || selectedVilla.pasadia_description || '';
         defaultCheckInTime = selectedVilla.check_in_time_pasadia || selectedVilla.default_check_in_time_pasadia || '';
         defaultCheckOutTime = selectedVilla.check_out_time_pasadia || selectedVilla.default_check_out_time_pasadia || '';
+        modalityCurrency = selectedVilla.currency_pasadia || 'DOP';
         rentalType = 'pasadia';  // Backend
         rentalTypeDisplay = 'Pasadía';  // UI
         villaCodeWithModality = `${formData.villa_code} - PASADIA`;
@@ -302,6 +304,7 @@ const Reservations = () => {
         modalityDescription = selectedVilla.description_amanecida || selectedVilla.amanecida_description || '';
         defaultCheckInTime = selectedVilla.check_in_time_amanecida || selectedVilla.default_check_in_time_amanecida || '';
         defaultCheckOutTime = selectedVilla.check_out_time_amanecida || selectedVilla.default_check_out_time_amanecida || '';
+        modalityCurrency = selectedVilla.currency_amanecida || 'DOP';
         rentalType = 'amanecida';  // Backend
         rentalTypeDisplay = 'Amanecida';  // UI
         villaCodeWithModality = `${formData.villa_code} - AMANECIDA`;
@@ -309,6 +312,7 @@ const Reservations = () => {
         modalityDescription = selectedVilla.description_evento || selectedVilla.evento_description || '';
         defaultCheckInTime = '';
         defaultCheckOutTime = '';
+        modalityCurrency = selectedVilla.currency_evento || 'DOP';
         rentalType = 'evento';  // Backend
         rentalTypeDisplay = 'Evento';  // UI
         villaCodeWithModality = `${formData.villa_code} - EVENTO`;
@@ -320,6 +324,7 @@ const Reservations = () => {
       rentalType,
       rentalTypeDisplay,
       villaCodeWithModality,
+      modalityCurrency,
       defaultCheckInTime,
       defaultCheckOutTime,
       modalityDescription,
@@ -327,7 +332,8 @@ const Reservations = () => {
         description_pasadia: selectedVilla?.description_pasadia,
         pasadia_description: selectedVilla?.pasadia_description,
         check_in_time_pasadia: selectedVilla?.check_in_time_pasadia,
-        default_check_in_time_pasadia: selectedVilla?.default_check_in_time_pasadia
+        default_check_in_time_pasadia: selectedVilla?.default_check_in_time_pasadia,
+        currency_pasadia: selectedVilla?.currency_pasadia
       }
     });
     
@@ -338,6 +344,7 @@ const Reservations = () => {
       rental_type_display: rentalTypeDisplay,  // Para UI: 'Pasadía', 'Amanecida', 'Evento'
       villa_code: villaCodeWithModality,  // Código con modalidad: ECPVWPSI - PASADIA
       villa_description: modalityDescription,  // Descripción específica de la modalidad
+      currency: modalityCurrency,  // Moneda específica de la modalidad
       base_price: priceOption.client_price || 0,
       owner_price: priceOption.owner_price || 0,
       check_in_time: defaultCheckInTime,
@@ -345,7 +352,7 @@ const Reservations = () => {
       guests: 1  // Default to 1, user can edit
     }));
     
-    console.log('✅ FormData actualizado con modalidad');
+    console.log('✅ FormData actualizado con modalidad y moneda:', modalityCurrency);
     
     // Hide the selector once price is selected
     setShowPriceSelector(false);
