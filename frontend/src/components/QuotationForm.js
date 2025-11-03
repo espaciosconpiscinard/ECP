@@ -96,6 +96,7 @@ const QuotationForm = ({ quotation, onSubmit, onCancel }) => {
     setSelectedServices([...selectedServices, {
       service_id: '',
       service_name: '',
+      description: '',  // Campo para descripción del servicio
       supplier_id: '',
       supplier_name: '',
       supplier_cost: 0,
