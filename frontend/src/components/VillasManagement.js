@@ -35,7 +35,6 @@ const VillasManagementNew = () => {
   const [formData, setFormData] = useState({
     code: '',
     name: '',
-    description: '',
     location: '',
     phone: '',
     category_id: '',
