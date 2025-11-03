@@ -637,6 +637,19 @@ const VillasManagementNew = () => {
                     {formData.has_pasadia && (
                       <div className="mb-4 p-3 bg-white rounded border-2 border-blue-300">
                         <h4 className="font-semibold text-blue-800 mb-2">☀️ Pasadía</h4>
+                        
+                        {/* Horarios Pasadía */}
+                        <div className="grid grid-cols-2 gap-2 mb-3">
+                          <div>
+                            <Label className="text-xs">Hora Entrada</Label>
+                            <Input type="text" value={formData.check_in_time_pasadia} onChange={(e) => setFormData({ ...formData, check_in_time_pasadia: e.target.value })} placeholder="9:00 AM" className="text-xs" />
+                          </div>
+                          <div>
+                            <Label className="text-xs">Hora Salida</Label>
+                            <Input type="text" value={formData.check_out_time_pasadia} onChange={(e) => setFormData({ ...formData, check_out_time_pasadia: e.target.value })} placeholder="8:00 PM" className="text-xs" />
+                          </div>
+                        </div>
+                        
                         <div className="mb-3">
                           <Label className="text-xs">Descripción</Label>
                           <textarea
@@ -647,22 +660,25 @@ const VillasManagementNew = () => {
                             rows="2"
                           />
                         </div>
-                        <div className="grid grid-cols-3 gap-2">
-                          <div>
-                            <Label className="text-xs font-semibold text-green-700">Regular</Label>
-                            <Input type="number" step="0.01" value={formData.price_pasadia_regular_client} onChange={(e) => setFormData({ ...formData, price_pasadia_regular_client: parseFloat(e.target.value) || 0 })} placeholder="Cliente" className="text-xs mb-1" />
-                            <Input type="number" step="0.01" value={formData.price_pasadia_regular_owner} onChange={(e) => setFormData({ ...formData, price_pasadia_regular_owner: parseFloat(e.target.value) || 0 })} placeholder="Propietario" className="text-xs" />
+                        
+                        {/* Precios Pasadía */}
+                        <div className="space-y-2">
+                          <div className="flex justify-between items-center">
+                            <Label className="text-xs font-semibold">Precios</Label>
+                            <Button type="button" size="sm" onClick={() => addPrice('pasadia')} className="h-6 px-2 text-xs">
+                              + Agregar Precio
+                            </Button>
                           </div>
-                          <div>
-                            <Label className="text-xs font-semibold text-orange-700">Oferta</Label>
-                            <Input type="number" step="0.01" value={formData.price_pasadia_oferta_client} onChange={(e) => setFormData({ ...formData, price_pasadia_oferta_client: parseFloat(e.target.value) || 0 })} placeholder="Cliente" className="text-xs mb-1" />
-                            <Input type="number" step="0.01" value={formData.price_pasadia_oferta_owner} onChange={(e) => setFormData({ ...formData, price_pasadia_oferta_owner: parseFloat(e.target.value) || 0 })} placeholder="Propietario" className="text-xs" />
-                          </div>
-                          <div>
-                            <Label className="text-xs font-semibold text-red-700">Temp. Alta</Label>
-                            <Input type="number" step="0.01" value={formData.price_pasadia_alta_client} onChange={(e) => setFormData({ ...formData, price_pasadia_alta_client: parseFloat(e.target.value) || 0 })} placeholder="Cliente" className="text-xs mb-1" />
-                            <Input type="number" step="0.01" value={formData.price_pasadia_alta_owner} onChange={(e) => setFormData({ ...formData, price_pasadia_alta_owner: parseFloat(e.target.value) || 0 })} placeholder="Propietario" className="text-xs" />
-                          </div>
+                          {pasadiaPrices.map((price, idx) => (
+                            <div key={idx} className="grid grid-cols-4 gap-2 items-center bg-gray-50 p-2 rounded">
+                              <Input type="text" value={price.label} onChange={(e) => updatePrice('pasadia', idx, 'label', e.target.value)} placeholder="Ej: Regular" className="text-xs" />
+                              <Input type="number" step="0.01" value={price.client_price} onChange={(e) => updatePrice('pasadia', idx, 'client_price', e.target.value)} placeholder="Cliente" className="text-xs" />
+                              <Input type="number" step="0.01" value={price.owner_price} onChange={(e) => updatePrice('pasadia', idx, 'owner_price', e.target.value)} placeholder="Propietario" className="text-xs" />
+                              <Button type="button" size="sm" variant="destructive" onClick={() => removePrice('pasadia', idx)} className="h-6 px-2">
+                                <X size={12} />
+                              </Button>
+                            </div>
+                          ))}
                         </div>
                       </div>
                     )}
@@ -671,6 +687,19 @@ const VillasManagementNew = () => {
                     {formData.has_amanecida && (
                       <div className="mb-4 p-3 bg-white rounded border-2 border-blue-300">
                         <h4 className="font-semibold text-blue-800 mb-2">🌙 Amanecida</h4>
+                        
+                        {/* Horarios Amanecida */}
+                        <div className="grid grid-cols-2 gap-2 mb-3">
+                          <div>
+                            <Label className="text-xs">Hora Entrada</Label>
+                            <Input type="text" value={formData.check_in_time_amanecida} onChange={(e) => setFormData({ ...formData, check_in_time_amanecida: e.target.value })} placeholder="9:00 AM" className="text-xs" />
+                          </div>
+                          <div>
+                            <Label className="text-xs">Hora Salida</Label>
+                            <Input type="text" value={formData.check_out_time_amanecida} onChange={(e) => setFormData({ ...formData, check_out_time_amanecida: e.target.value })} placeholder="8:00 AM" className="text-xs" />
+                          </div>
+                        </div>
+                        
                         <div className="mb-3">
                           <Label className="text-xs">Descripción</Label>
                           <textarea
@@ -681,22 +710,25 @@ const VillasManagementNew = () => {
                             rows="2"
                           />
                         </div>
-                        <div className="grid grid-cols-3 gap-2">
-                          <div>
-                            <Label className="text-xs font-semibold text-green-700">Regular</Label>
-                            <Input type="number" step="0.01" value={formData.price_amanecida_regular_client} onChange={(e) => setFormData({ ...formData, price_amanecida_regular_client: parseFloat(e.target.value) || 0 })} placeholder="Cliente" className="text-xs mb-1" />
-                            <Input type="number" step="0.01" value={formData.price_amanecida_regular_owner} onChange={(e) => setFormData({ ...formData, price_amanecida_regular_owner: parseFloat(e.target.value) || 0 })} placeholder="Propietario" className="text-xs" />
+                        
+                        {/* Precios Amanecida */}
+                        <div className="space-y-2">
+                          <div className="flex justify-between items-center">
+                            <Label className="text-xs font-semibold">Precios</Label>
+                            <Button type="button" size="sm" onClick={() => addPrice('amanecida')} className="h-6 px-2 text-xs">
+                              + Agregar Precio
+                            </Button>
                           </div>
-                          <div>
-                            <Label className="text-xs font-semibold text-orange-700">Oferta</Label>
-                            <Input type="number" step="0.01" value={formData.price_amanecida_oferta_client} onChange={(e) => setFormData({ ...formData, price_amanecida_oferta_client: parseFloat(e.target.value) || 0 })} placeholder="Cliente" className="text-xs mb-1" />
-                            <Input type="number" step="0.01" value={formData.price_amanecida_oferta_owner} onChange={(e) => setFormData({ ...formData, price_amanecida_oferta_owner: parseFloat(e.target.value) || 0 })} placeholder="Propietario" className="text-xs" />
-                          </div>
-                          <div>
-                            <Label className="text-xs font-semibold text-red-700">Temp. Alta</Label>
-                            <Input type="number" step="0.01" value={formData.price_amanecida_alta_client} onChange={(e) => setFormData({ ...formData, price_amanecida_alta_client: parseFloat(e.target.value) || 0 })} placeholder="Cliente" className="text-xs mb-1" />
-                            <Input type="number" step="0.01" value={formData.price_amanecida_alta_owner} onChange={(e) => setFormData({ ...formData, price_amanecida_alta_owner: parseFloat(e.target.value) || 0 })} placeholder="Propietario" className="text-xs" />
-                          </div>
+                          {amanecidaPrices.map((price, idx) => (
+                            <div key={idx} className="grid grid-cols-4 gap-2 items-center bg-gray-50 p-2 rounded">
+                              <Input type="text" value={price.label} onChange={(e) => updatePrice('amanecida', idx, 'label', e.target.value)} placeholder="Ej: Regular" className="text-xs" />
+                              <Input type="number" step="0.01" value={price.client_price} onChange={(e) => updatePrice('amanecida', idx, 'client_price', e.target.value)} placeholder="Cliente" className="text-xs" />
+                              <Input type="number" step="0.01" value={price.owner_price} onChange={(e) => updatePrice('amanecida', idx, 'owner_price', e.target.value)} placeholder="Propietario" className="text-xs" />
+                              <Button type="button" size="sm" variant="destructive" onClick={() => removePrice('amanecida', idx)} className="h-6 px-2">
+                                <X size={12} />
+                              </Button>
+                            </div>
+                          ))}
                         </div>
                       </div>
                     )}
@@ -715,32 +747,35 @@ const VillasManagementNew = () => {
                             rows="2"
                           />
                         </div>
-                        <div className="grid grid-cols-3 gap-2">
-                          <div>
-                            <Label className="text-xs font-semibold text-green-700">Regular</Label>
-                            <Input type="number" step="0.01" value={formData.price_evento_regular_client} onChange={(e) => setFormData({ ...formData, price_evento_regular_client: parseFloat(e.target.value) || 0 })} placeholder="Cliente" className="text-xs mb-1" />
-                            <Input type="number" step="0.01" value={formData.price_evento_regular_owner} onChange={(e) => setFormData({ ...formData, price_evento_regular_owner: parseFloat(e.target.value) || 0 })} placeholder="Propietario" className="text-xs" />
+                        
+                        {/* Precios Evento */}
+                        <div className="space-y-2">
+                          <div className="flex justify-between items-center">
+                            <Label className="text-xs font-semibold">Precios</Label>
+                            <Button type="button" size="sm" onClick={() => addPrice('evento')} className="h-6 px-2 text-xs">
+                              + Agregar Precio
+                            </Button>
                           </div>
-                          <div>
-                            <Label className="text-xs font-semibold text-orange-700">Oferta</Label>
-                            <Input type="number" step="0.01" value={formData.price_evento_oferta_client} onChange={(e) => setFormData({ ...formData, price_evento_oferta_client: parseFloat(e.target.value) || 0 })} placeholder="Cliente" className="text-xs mb-1" />
-                            <Input type="number" step="0.01" value={formData.price_evento_oferta_owner} onChange={(e) => setFormData({ ...formData, price_evento_oferta_owner: parseFloat(e.target.value) || 0 })} placeholder="Propietario" className="text-xs" />
-                          </div>
-                          <div>
-                            <Label className="text-xs font-semibold text-red-700">Temp. Alta</Label>
-                            <Input type="number" step="0.01" value={formData.price_evento_alta_client} onChange={(e) => setFormData({ ...formData, price_evento_alta_client: parseFloat(e.target.value) || 0 })} placeholder="Cliente" className="text-xs mb-1" />
-                            <Input type="number" step="0.01" value={formData.price_evento_alta_owner} onChange={(e) => setFormData({ ...formData, price_evento_alta_owner: parseFloat(e.target.value) || 0 })} placeholder="Propietario" className="text-xs" />
-                          </div>
+                          {eventoPrices.map((price, idx) => (
+                            <div key={idx} className="grid grid-cols-4 gap-2 items-center bg-gray-50 p-2 rounded">
+                              <Input type="text" value={price.label} onChange={(e) => updatePrice('evento', idx, 'label', e.target.value)} placeholder="Ej: Regular" className="text-xs" />
+                              <Input type="number" step="0.01" value={price.client_price} onChange={(e) => updatePrice('evento', idx, 'client_price', e.target.value)} placeholder="Cliente" className="text-xs" />
+                              <Input type="number" step="0.01" value={price.owner_price} onChange={(e) => updatePrice('evento', idx, 'owner_price', e.target.value)} placeholder="Propietario" className="text-xs" />
+                              <Button type="button" size="sm" variant="destructive" onClick={() => removePrice('evento', idx)} className="h-6 px-2">
+                                <X size={12} />
+                              </Button>
+                            </div>
+                          ))}
                         </div>
                       </div>
                     )}
 
                     <p className="text-xs text-gray-600 mt-3 bg-white p-2 rounded border">
-                      💡 <strong>Nota:</strong> Los precios se aplicarán según la modalidad y tipo de temporada seleccionados al crear una factura
+                      💡 <strong>Nota:</strong> Agrega todos los precios que necesites con el botón "+". Ejemplo: Regular, Oferta, Temporada Alta, etc.
                     </p>
                   </div>
 
-                  {/* HORARIOS */}
+                  {/* HORARIOS (OBSOLETO - AHORA ESTÁN EN CADA MODALIDAD) */}
                   <div className="col-span-2 bg-purple-50 p-4 rounded-md border-2 border-purple-200">
                     <h3 className="font-bold text-lg mb-3 text-purple-800">🕐 Horario Por Defecto</h3>
                     <div className="grid grid-cols-2 gap-3">
