@@ -2285,108 +2285,121 @@ const Reservations = () => {
                     )}
                     
                     {selectedExtraServices.map((service, index) => (
-                      <div key={index} className="grid grid-cols-6 gap-2 mb-2 items-end">
-                        <div className="col-span-2">
-                          <Label className="text-xs">Servicio</Label>
-                          <select
-                            value={service.service_id}
-                            onChange={(e) => updateExtraService(index, 'service_id', e.target.value)}
-                            className="w-full p-2 border rounded-md text-sm"
-                          >
-                            <option value="">Seleccionar</option>
-                            {extraServices.map(s => (
-                              <option key={s.id} value={s.id}>{s.name}</option>
-                            ))}
-                          </select>
-                        </div>
-                        <div className="col-span-2">
-                          <Label className="text-xs">Suplidor</Label>
-                          <select
-                            value={service.supplier_name || ''}
-                            onChange={(e) => {
-                              const selectedService = extraServices.find(s => s.id === service.service_id);
-                              const selectedSupplier = selectedService?.suppliers?.find(sup => sup.name === e.target.value);
-                              if (selectedSupplier) {
-                                // Actualizar todos los campos del suplidor (usar supplier_cost como en el backend)
-                                updateExtraService(index, 'supplier_name', selectedSupplier.name);
-                                updateExtraService(index, 'supplier_id', selectedSupplier.name);
-                                updateExtraService(index, 'supplier_cost', selectedSupplier.supplier_cost);
-                                
-                                // Actualizar precios al cliente
-                                updateExtraService(index, 'price_unit', selectedSupplier.client_price);
-                                updateExtraService(index, 'unit_price', selectedSupplier.client_price);
-                                updateExtraService(index, 'price_total', selectedSupplier.client_price * service.quantity);
-                                updateExtraService(index, 'total', selectedSupplier.client_price * service.quantity);
-                                
-                                // Recalcular totales de la factura
-                                const servicesTotal = selectedExtraServices.reduce((sum, s, idx) => {
-                                  if (idx === index) {
-                                    return sum + (selectedSupplier.client_price * service.quantity);
-                                  }
-                                  return sum + (s.price_total || s.total || 0);
-                                }, 0);
-                                
-                                const newSubtotal = (formData.base_price || 0) + (formData.extra_hours_cost || 0) + (formData.extra_people_cost || 0) + servicesTotal;
-                                const newITBIS = formData.include_itbis ? newSubtotal * 0.18 : 0;
-                                const newTotal = newSubtotal + newITBIS - (formData.discount || 0);
-                                
-                                setFormData(prev => ({
-                                  ...prev,
-                                  extra_services_total: servicesTotal,
-                                  subtotal: newSubtotal,
-                                  itbis_amount: newITBIS,
-                                  total_amount: newTotal
-                                }));
-                              }
-                            }}
-                            className="w-full p-2 border rounded-md text-sm"
-                            disabled={!service.service_id}
-                          >
-                            <option value="">
-                              {!service.service_id 
-                                ? 'Primero selecciona un servicio' 
-                                : extraServices.find(s => s.id === service.service_id)?.suppliers?.length === 0
-                                  ? 'Este servicio no tiene suplidores'
-                                  : 'Seleccionar suplidor'}
-                            </option>
-                            {extraServices
-                              .find(s => s.id === service.service_id)?.suppliers?.map((supplier, idx) => (
-                                <option key={idx} value={supplier.name}>
-                                  {supplier.name} - Cliente: RD$ {supplier.client_price?.toLocaleString('es-DO')} | Suplidor: RD$ {supplier.supplier_cost?.toLocaleString('es-DO')}
-                                </option>
+                      <div key={index} className="mb-4 p-3 border rounded bg-gray-50">
+                        <div className="grid grid-cols-6 gap-2 mb-2 items-end">
+                          <div className="col-span-2">
+                            <Label className="text-xs">Servicio</Label>
+                            <select
+                              value={service.service_id}
+                              onChange={(e) => updateExtraService(index, 'service_id', e.target.value)}
+                              className="w-full p-2 border rounded-md text-sm"
+                            >
+                              <option value="">Seleccionar</option>
+                              {extraServices.map(s => (
+                                <option key={s.id} value={s.id}>{s.name}</option>
                               ))}
-                          </select>
-                        </div>
-                        <div>
-                          <Label className="text-xs">Cant.</Label>
-                          <Input
-                            type="number"
-                            min="1"
-                            value={service.quantity}
-                            onChange={(e) => updateExtraService(index, 'quantity', parseInt(e.target.value))}
-                            className="text-sm"
-                          />
-                        </div>
-                        <div className="flex items-center space-x-2">
-                          <div className="flex-1">
-                            <Label className="text-xs">Precio</Label>
+                            </select>
+                          </div>
+                          <div className="col-span-2">
+                            <Label className="text-xs">Suplidor</Label>
+                            <select
+                              value={service.supplier_name || ''}
+                              onChange={(e) => {
+                                const selectedService = extraServices.find(s => s.id === service.service_id);
+                                const selectedSupplier = selectedService?.suppliers?.find(sup => sup.name === e.target.value);
+                                if (selectedSupplier) {
+                                  // Actualizar todos los campos del suplidor (usar supplier_cost como en el backend)
+                                  updateExtraService(index, 'supplier_name', selectedSupplier.name);
+                                  updateExtraService(index, 'supplier_id', selectedSupplier.name);
+                                  updateExtraService(index, 'supplier_cost', selectedSupplier.supplier_cost);
+                                  
+                                  // Actualizar precios al cliente
+                                  updateExtraService(index, 'price_unit', selectedSupplier.client_price);
+                                  updateExtraService(index, 'unit_price', selectedSupplier.client_price);
+                                  updateExtraService(index, 'price_total', selectedSupplier.client_price * service.quantity);
+                                  updateExtraService(index, 'total', selectedSupplier.client_price * service.quantity);
+                                  
+                                  // Recalcular totales de la factura
+                                  const servicesTotal = selectedExtraServices.reduce((sum, s, idx) => {
+                                    if (idx === index) {
+                                      return sum + (selectedSupplier.client_price * service.quantity);
+                                    }
+                                    return sum + (s.price_total || s.total || 0);
+                                  }, 0);
+                                  
+                                  const newSubtotal = (formData.base_price || 0) + (formData.extra_hours_cost || 0) + (formData.extra_people_cost || 0) + servicesTotal;
+                                  const newITBIS = formData.include_itbis ? newSubtotal * 0.18 : 0;
+                                  const newTotal = newSubtotal + newITBIS - (formData.discount || 0);
+                                  
+                                  setFormData(prev => ({
+                                    ...prev,
+                                    extra_services_total: servicesTotal,
+                                    subtotal: newSubtotal,
+                                    itbis_amount: newITBIS,
+                                    total_amount: newTotal
+                                  }));
+                                }
+                              }}
+                              className="w-full p-2 border rounded-md text-sm"
+                              disabled={!service.service_id}
+                            >
+                              <option value="">
+                                {!service.service_id 
+                                  ? 'Primero selecciona un servicio' 
+                                  : extraServices.find(s => s.id === service.service_id)?.suppliers?.length === 0
+                                    ? 'Este servicio no tiene suplidores'
+                                    : 'Seleccionar suplidor'}
+                              </option>
+                              {extraServices
+                                .find(s => s.id === service.service_id)?.suppliers?.map((supplier, idx) => (
+                                  <option key={idx} value={supplier.name}>
+                                    {supplier.name} - Cliente: RD$ {supplier.client_price?.toLocaleString('es-DO')} | Suplidor: RD$ {supplier.supplier_cost?.toLocaleString('es-DO')}
+                                  </option>
+                                ))}
+                            </select>
+                          </div>
+                          <div>
+                            <Label className="text-xs">Cant.</Label>
                             <Input
                               type="number"
-                              step="0.01"
-                              value={service.unit_price}
-                              onChange={(e) => updateExtraService(index, 'unit_price', parseFloat(e.target.value))}
+                              min="1"
+                              value={service.quantity}
+                              onChange={(e) => updateExtraService(index, 'quantity', parseInt(e.target.value))}
                               className="text-sm"
                             />
                           </div>
-                          <Button
-                            type="button"
-                            variant="ghost"
-                            size="sm"
-                            onClick={() => removeExtraService(index)}
-                            className="text-red-600 mt-5"
-                          >
-                            <X size={16} />
-                          </Button>
+                          <div className="flex items-center space-x-2">
+                            <div className="flex-1">
+                              <Label className="text-xs">Precio</Label>
+                              <Input
+                                type="number"
+                                step="0.01"
+                                value={service.unit_price}
+                                onChange={(e) => updateExtraService(index, 'unit_price', parseFloat(e.target.value))}
+                                className="text-sm"
+                              />
+                            </div>
+                            <Button
+                              type="button"
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => removeExtraService(index)}
+                              className="text-red-600 mt-5"
+                            >
+                              <X size={16} />
+                            </Button>
+                          </div>
+                        </div>
+                        {/* Campo de descripción */}
+                        <div className="mt-2">
+                          <textarea
+                            value={service.description || ''}
+                            onChange={(e) => updateExtraService(index, 'description', e.target.value)}
+                            placeholder="Descripción del servicio (opcional, se mostrará en la factura)..."
+                            className="w-full p-2 border rounded text-sm"
+                            rows="2"
+                            style={{ whiteSpace: 'pre-wrap' }}
+                          />
                         </div>
                       </div>
                     ))}
