@@ -1054,10 +1054,10 @@ const Reservations = () => {
                 </div>
               </div>
               
-              <!-- Villa Description -->
+              <!-- Villa/Modality Description -->
               ${reservation.villa_description ? `
                 <div class="villa-description">
-                  <div class="villa-description-title">Descripción de la Villa</div>
+                  <div class="villa-description-title">Descripción</div>
                   <div class="villa-description-text">${reservation.villa_description}</div>
                 </div>
               ` : ''}
