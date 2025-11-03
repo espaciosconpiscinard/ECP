@@ -2156,6 +2156,273 @@ class BackendTester:
                          f"❌ No new 'pago_servicios' expense created. Count remained at {count_before}")
             return False
     
+    def test_villa_modality_pricing_structure(self):
+        """Test villa modality pricing structure (pasadia_prices, amanecida_prices, evento_prices)"""
+        print("\n🏠 Testing Villa Modality Pricing Structure")
+        
+        # TEST 1: GET /api/villas - verify response includes modality price fields
+        print("\n   📋 Test 1: GET /api/villas - verify modality price fields")
+        
+        villas_result = self.make_request("GET", "/villas", token=self.admin_token)
+        
+        if not villas_result.get("success"):
+            self.log_test("Get All Villas for Modality Test", False, "Failed to get villas", villas_result)
+            return
+        
+        villas = villas_result["data"]
+        self.log_test("Get All Villas for Modality Test", True, f"Retrieved {len(villas)} villas")
+        
+        # Check if any villa has the new modality price structure
+        villa_with_modality_prices = None
+        for villa in villas:
+            if (villa.get("pasadia_prices") or villa.get("amanecida_prices") or villa.get("evento_prices")):
+                villa_with_modality_prices = villa
+                break
+        
+        if villa_with_modality_prices:
+            self.log_test("Find Villa with Modality Prices", True, f"Found villa {villa_with_modality_prices['code']} with modality prices")
+            
+            # Verify structure of modality prices
+            modality_checks = []
+            
+            # Check pasadia_prices structure
+            if villa_with_modality_prices.get("pasadia_prices"):
+                pasadia_prices = villa_with_modality_prices["pasadia_prices"]
+                if isinstance(pasadia_prices, list) and len(pasadia_prices) > 0:
+                    price_obj = pasadia_prices[0]
+                    if all(key in price_obj for key in ["label", "client_price", "owner_price"]):
+                        modality_checks.append("✓ pasadia_prices: correct structure")
+                    else:
+                        modality_checks.append(f"✗ pasadia_prices: missing fields. Found: {list(price_obj.keys())}")
+                else:
+                    modality_checks.append("✗ pasadia_prices: not a valid array")
+            else:
+                modality_checks.append("- pasadia_prices: not present")
+            
+            # Check amanecida_prices structure
+            if villa_with_modality_prices.get("amanecida_prices"):
+                amanecida_prices = villa_with_modality_prices["amanecida_prices"]
+                if isinstance(amanecida_prices, list) and len(amanecida_prices) > 0:
+                    price_obj = amanecida_prices[0]
+                    if all(key in price_obj for key in ["label", "client_price", "owner_price"]):
+                        modality_checks.append("✓ amanecida_prices: correct structure")
+                    else:
+                        modality_checks.append(f"✗ amanecida_prices: missing fields. Found: {list(price_obj.keys())}")
+                else:
+                    modality_checks.append("✗ amanecida_prices: not a valid array")
+            else:
+                modality_checks.append("- amanecida_prices: not present")
+            
+            # Check evento_prices structure
+            if villa_with_modality_prices.get("evento_prices"):
+                evento_prices = villa_with_modality_prices["evento_prices"]
+                if isinstance(evento_prices, list) and len(evento_prices) > 0:
+                    price_obj = evento_prices[0]
+                    if all(key in price_obj for key in ["label", "client_price", "owner_price"]):
+                        modality_checks.append("✓ evento_prices: correct structure")
+                    else:
+                        modality_checks.append(f"✗ evento_prices: missing fields. Found: {list(price_obj.keys())}")
+                else:
+                    modality_checks.append("✗ evento_prices: not a valid array")
+            else:
+                modality_checks.append("- evento_prices: not present")
+            
+            # Check default times
+            default_time_checks = []
+            
+            if villa_with_modality_prices.get("default_check_in_time_pasadia"):
+                default_time_checks.append("✓ default_check_in_time_pasadia: present")
+            else:
+                default_time_checks.append("- default_check_in_time_pasadia: not present")
+            
+            if villa_with_modality_prices.get("default_check_out_time_pasadia"):
+                default_time_checks.append("✓ default_check_out_time_pasadia: present")
+            else:
+                default_time_checks.append("- default_check_out_time_pasadia: not present")
+            
+            if villa_with_modality_prices.get("default_check_in_time_amanecida"):
+                default_time_checks.append("✓ default_check_in_time_amanecida: present")
+            else:
+                default_time_checks.append("- default_check_in_time_amanecida: not present")
+            
+            if villa_with_modality_prices.get("default_check_out_time_amanecida"):
+                default_time_checks.append("✓ default_check_out_time_amanecida: present")
+            else:
+                default_time_checks.append("- default_check_out_time_amanecida: not present")
+            
+            all_modality_checks_passed = all("✓" in check for check in modality_checks if "✓" in check or "✗" in check)
+            
+            if all_modality_checks_passed:
+                self.log_test("Villa Modality Price Structure", True, f"Modality price structure verified:\n   " + "\n   ".join(modality_checks))
+            else:
+                self.log_test("Villa Modality Price Structure", False, f"Modality price structure issues:\n   " + "\n   ".join(modality_checks))
+            
+            self.log_test("Villa Default Times Structure", True, f"Default times structure:\n   " + "\n   ".join(default_time_checks))
+            
+        else:
+            self.log_test("Find Villa with Modality Prices", False, "No villa found with modality pricing structure")
+        
+        # TEST 2: GET /api/villas/{villa_id} - fetch specific villa (try ECPVKLK if it exists)
+        print("\n   📋 Test 2: GET /api/villas/{villa_id} - fetch specific villa ECPVKLK")
+        
+        ecpvklk_villa = None
+        for villa in villas:
+            if villa.get("code") == "ECPVKLK":
+                ecpvklk_villa = villa
+                break
+        
+        if ecpvklk_villa:
+            villa_detail_result = self.make_request("GET", f"/villas/{ecpvklk_villa['id']}", token=self.admin_token)
+            
+            if villa_detail_result.get("success"):
+                villa_detail = villa_detail_result["data"]
+                self.log_test("Get Villa ECPVKLK Details", True, f"Retrieved villa ECPVKLK details")
+                
+                # Verify the expected structure from the review request
+                expected_structure_checks = []
+                
+                # Check if villa has the expected fields
+                if villa_detail.get("code") == "ECPVKLK":
+                    expected_structure_checks.append("✓ code: ECPVKLK")
+                else:
+                    expected_structure_checks.append(f"✗ code: {villa_detail.get('code')} (expected: ECPVKLK)")
+                
+                # Check modality prices arrays
+                for modality in ["pasadia_prices", "amanecida_prices", "evento_prices"]:
+                    if modality in villa_detail:
+                        prices_array = villa_detail[modality]
+                        if isinstance(prices_array, list):
+                            if len(prices_array) > 0:
+                                # Check first price object structure
+                                price_obj = prices_array[0]
+                                if all(key in price_obj for key in ["label", "client_price", "owner_price"]):
+                                    # Verify data types
+                                    label_ok = isinstance(price_obj["label"], str)
+                                    client_price_ok = isinstance(price_obj["client_price"], (int, float))
+                                    owner_price_ok = isinstance(price_obj["owner_price"], (int, float))
+                                    
+                                    if label_ok and client_price_ok and owner_price_ok:
+                                        expected_structure_checks.append(f"✓ {modality}: correct structure and types")
+                                    else:
+                                        expected_structure_checks.append(f"✗ {modality}: incorrect data types")
+                                else:
+                                    expected_structure_checks.append(f"✗ {modality}: missing required fields")
+                            else:
+                                expected_structure_checks.append(f"- {modality}: empty array")
+                        else:
+                            expected_structure_checks.append(f"✗ {modality}: not an array")
+                    else:
+                        expected_structure_checks.append(f"- {modality}: not present")
+                
+                # Check default times
+                for time_field in ["default_check_in_time_pasadia", "default_check_out_time_pasadia", 
+                                 "default_check_in_time_amanecida", "default_check_out_time_amanecida"]:
+                    if villa_detail.get(time_field):
+                        if isinstance(villa_detail[time_field], str):
+                            expected_structure_checks.append(f"✓ {time_field}: {villa_detail[time_field]}")
+                        else:
+                            expected_structure_checks.append(f"✗ {time_field}: not a string")
+                    else:
+                        expected_structure_checks.append(f"- {time_field}: not present")
+                
+                all_structure_checks_passed = all("✓" in check for check in expected_structure_checks if "✓" in check or "✗" in check)
+                
+                if all_structure_checks_passed:
+                    self.log_test("Villa ECPVKLK Structure Verification", True, f"Villa structure verified:\n   " + "\n   ".join(expected_structure_checks))
+                else:
+                    self.log_test("Villa ECPVKLK Structure Verification", False, f"Villa structure issues:\n   " + "\n   ".join(expected_structure_checks))
+                
+                # Print detailed structure for debugging
+                print(f"   📊 Villa ECPVKLK detailed structure:")
+                print(f"      ID: {villa_detail.get('id')}")
+                print(f"      Code: {villa_detail.get('code')}")
+                
+                for modality in ["pasadia_prices", "amanecida_prices", "evento_prices"]:
+                    if villa_detail.get(modality):
+                        print(f"      {modality}: {len(villa_detail[modality])} price(s)")
+                        for i, price in enumerate(villa_detail[modality]):
+                            print(f"        [{i}] Label: {price.get('label')}, Client: {price.get('client_price')}, Owner: {price.get('owner_price')}")
+                    else:
+                        print(f"      {modality}: not configured")
+                
+                for time_field in ["default_check_in_time_pasadia", "default_check_out_time_pasadia", 
+                                 "default_check_in_time_amanecida", "default_check_out_time_amanecida"]:
+                    print(f"      {time_field}: {villa_detail.get(time_field, 'not set')}")
+                
+            else:
+                self.log_test("Get Villa ECPVKLK Details", False, "Failed to get villa ECPVKLK details", villa_detail_result)
+        else:
+            self.log_test("Find Villa ECPVKLK", False, "Villa with code ECPVKLK not found")
+            
+            # Show available villa codes for debugging
+            available_codes = [v.get("code") for v in villas if v.get("code")]
+            print(f"   🔍 Available villa codes: {available_codes}")
+        
+        # TEST 3: Create a test villa with modality pricing to verify the structure works
+        print("\n   📋 Test 3: Create test villa with modality pricing structure")
+        
+        test_villa_data = {
+            "code": "TESTMOD",
+            "name": "Test Villa Modality Pricing",
+            "description": "Test villa for modality pricing verification",
+            "location": "Test Location",
+            "bedrooms": 3,
+            "bathrooms": 2,
+            "max_guests": 6,
+            "price_per_night": 200.0,
+            "currency": "DOP",
+            "pasadia_prices": [
+                {"label": "Regular", "client_price": 15000.0, "owner_price": 10000.0},
+                {"label": "Oferta", "client_price": 12000.0, "owner_price": 8000.0}
+            ],
+            "amanecida_prices": [
+                {"label": "Regular", "client_price": 25000.0, "owner_price": 18000.0}
+            ],
+            "evento_prices": [
+                {"label": "Temporada Alta", "client_price": 50000.0, "owner_price": 35000.0}
+            ],
+            "default_check_in_time_pasadia": "9:00 AM",
+            "default_check_out_time_pasadia": "8:00 PM",
+            "default_check_in_time_amanecida": "9:00 AM",
+            "default_check_out_time_amanecida": "8:00 AM"
+        }
+        
+        create_villa_result = self.make_request("POST", "/villas", test_villa_data, self.admin_token)
+        
+        if create_villa_result.get("success"):
+            created_villa = create_villa_result["data"]
+            self.log_test("Create Test Villa with Modality Pricing", True, f"Created test villa TESTMOD with ID: {created_villa['id']}")
+            
+            # Verify the created villa has the correct structure
+            verification_checks = []
+            
+            for modality in ["pasadia_prices", "amanecida_prices", "evento_prices"]:
+                if created_villa.get(modality):
+                    prices = created_villa[modality]
+                    if isinstance(prices, list) and len(prices) > 0:
+                        verification_checks.append(f"✓ {modality}: {len(prices)} price(s) saved")
+                    else:
+                        verification_checks.append(f"✗ {modality}: not saved correctly")
+                else:
+                    verification_checks.append(f"✗ {modality}: missing from created villa")
+            
+            for time_field in ["default_check_in_time_pasadia", "default_check_out_time_pasadia", 
+                             "default_check_in_time_amanecida", "default_check_out_time_amanecida"]:
+                if created_villa.get(time_field):
+                    verification_checks.append(f"✓ {time_field}: {created_villa[time_field]}")
+                else:
+                    verification_checks.append(f"✗ {time_field}: missing from created villa")
+            
+            all_verification_passed = all("✓" in check for check in verification_checks)
+            
+            if all_verification_passed:
+                self.log_test("Verify Created Villa Modality Structure", True, f"Created villa structure verified:\n   " + "\n   ".join(verification_checks))
+            else:
+                self.log_test("Verify Created Villa Modality Structure", False, f"Created villa structure issues:\n   " + "\n   ".join(verification_checks))
+            
+        else:
+            self.log_test("Create Test Villa with Modality Pricing", False, "Failed to create test villa with modality pricing", create_villa_result)
+    
     def run_all_tests(self):
         """Run all backend tests"""
         print("🚀 Starting Backend Testing Suite for Category System")
