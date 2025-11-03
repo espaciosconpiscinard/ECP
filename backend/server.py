@@ -2150,9 +2150,16 @@ async def delete_expense(expense_id: str, current_user: dict = Depends(require_a
 @api_router.post("/expenses/{expense_id}/abonos", response_model=Abono)
 async def add_abono_to_expense(expense_id: str, abono_data: AbonoCreate, current_user: dict = Depends(get_current_user)):
     """Add a payment (abono) to an expense - each abono gets its own invoice number"""
+    print(f"💰 [ADD_ABONO] Iniciando para expense_id: {expense_id}")
+    print(f"💰 [ADD_ABONO] Data recibida: {abono_data}")
+    print(f"💰 [ADD_ABONO] User: {current_user.get('username')}")
+    
     expense = await db.expenses.find_one({"id": expense_id}, {"_id": 0})
     if not expense:
+        print(f"❌ [ADD_ABONO] Expense no encontrado: {expense_id}")
         raise HTTPException(status_code=404, detail="Expense not found")
+    
+    print(f"✅ [ADD_ABONO] Expense encontrado: {expense.get('description')}, categoria: {expense.get('category')}")
     
     # Handle invoice_number generation
     if abono_data.invoice_number:
@@ -2169,6 +2176,8 @@ async def add_abono_to_expense(expense_id: str, abono_data: AbonoCreate, current
         # Auto-generate invoice number for employee/admin
         invoice_number = str(await get_next_invoice_number())
     
+    print(f"📄 [ADD_ABONO] Invoice number asignado: {invoice_number}")
+    
     # Create abono record with invoice_number
     abono_dict = abono_data.model_dump()
     abono_dict["invoice_number"] = invoice_number  
@@ -2177,7 +2186,9 @@ async def add_abono_to_expense(expense_id: str, abono_data: AbonoCreate, current
     
     # Store in expense_abonos collection
     abono_doc["expense_id"] = expense_id
+    print(f"💾 [ADD_ABONO] Guardando abono en DB...")
     await db.expense_abonos.insert_one(abono_doc)
+    print(f"✅ [ADD_ABONO] Abono guardado exitosamente")
     
     # Get total abonos for this expense
     all_abonos = await db.expense_abonos.find({"expense_id": expense_id}, {"_id": 0}).to_list(1000)
