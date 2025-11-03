@@ -629,19 +629,6 @@ const VillasManagementNew = () => {
                       </label>
                     </div>
 
-                    {/* Moneda */}
-                    <div className="mb-4">
-                      <Label className="text-sm">Moneda de la Villa</Label>
-                      <select
-                        value={formData.villa_currency}
-                        onChange={(e) => setFormData({ ...formData, villa_currency: e.target.value })}
-                        className="w-full p-2 border rounded-md text-sm"
-                      >
-                        <option value="DOP">Peso Dominicano (DOP)</option>
-                        <option value="USD">Dólar (USD)</option>
-                      </select>
-                    </div>
-
                     {/* PASADÍA */}
                     {formData.has_pasadia && (
                       <div className="mb-4 p-3 bg-white rounded border-2 border-blue-300">
