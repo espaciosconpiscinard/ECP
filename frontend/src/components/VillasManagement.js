@@ -197,6 +197,9 @@ const VillasManagementNew = () => {
       amenities: [],
       is_active: true
     });
+    setPasadiaPrices([]);
+    setAmanecidaPrices([]);
+    setEventoPrices([]);
   };
 
   // ============ FUNCIONES PARA PRECIOS MÚLTIPLES ============
