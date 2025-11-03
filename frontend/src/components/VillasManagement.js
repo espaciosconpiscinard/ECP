@@ -956,6 +956,16 @@ const VillasManagementNew = () => {
                                     className="text-sm"
                                   />
                                 </div>
+                                <div className="col-span-4">
+                                  <Label className="text-xs">Descripción del Suplidor (Opcional)</Label>
+                                  <textarea
+                                    value={supplier.description || ''}
+                                    onChange={(e) => handleUpdateSupplier(index, 'description', e.target.value)}
+                                    placeholder="Ej: Incluye globos, centro de mesa, mantel..."
+                                    className="w-full p-2 border rounded-md text-sm"
+                                    rows="2"
+                                  />
+                                </div>
                                 <div className="col-span-2">
                                   <Label className="text-xs">Precio Cliente (RD$)</Label>
                                   <Input
