@@ -111,6 +111,10 @@ const VillasManagementNew = () => {
         evento_prices: eventoPrices
       };
       
+      console.log('📤 Guardando villa con datos:', dataToSave);
+      console.log('📝 Descripción Pasadía:', dataToSave.description_pasadia);
+      console.log('🕐 Horarios Pasadía:', dataToSave.check_in_time_pasadia, '-', dataToSave.check_out_time_pasadia);
+      
       if (editingVilla) {
         await updateVilla(editingVilla.id, dataToSave);
         alert('✅ Villa actualizada exitosamente');
