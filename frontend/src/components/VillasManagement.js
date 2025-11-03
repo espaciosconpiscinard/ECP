@@ -135,6 +135,10 @@ const VillasManagementNew = () => {
 
   const handleEdit = (villa) => {
     setEditingVilla(villa);
+    console.log('📥 Cargando villa para editar:', villa);
+    console.log('📝 Descripción Pasadía en BD:', villa.pasadia_description || villa.description_pasadia);
+    console.log('🕐 Horarios Pasadía en BD:', villa.default_check_in_time_pasadia, '-', villa.default_check_out_time_pasadia);
+    
     setFormData({
       code: villa.code,
       name: villa.name,
@@ -144,13 +148,13 @@ const VillasManagementNew = () => {
       has_pasadia: villa.has_pasadia || false,
       has_amanecida: villa.has_amanecida || false,
       has_evento: villa.has_evento || false,
-      description_pasadia: villa.pasadia_description || '',
-      description_amanecida: villa.amanecida_description || '',
-      description_evento: villa.evento_description || '',
-      check_in_time_pasadia: villa.default_check_in_time_pasadia || '9:00 AM',
-      check_out_time_pasadia: villa.default_check_out_time_pasadia || '8:00 PM',
-      check_in_time_amanecida: villa.default_check_in_time_amanecida || '9:00 AM',
-      check_out_time_amanecida: villa.default_check_out_time_amanecida || '8:00 AM',
+      description_pasadia: villa.pasadia_description || villa.description_pasadia || '',
+      description_amanecida: villa.amanecida_description || villa.description_amanecida || '',
+      description_evento: villa.evento_description || villa.description_evento || '',
+      check_in_time_pasadia: villa.default_check_in_time_pasadia || villa.check_in_time_pasadia || '9:00 AM',
+      check_out_time_pasadia: villa.default_check_out_time_pasadia || villa.check_out_time_pasadia || '8:00 PM',
+      check_in_time_amanecida: villa.default_check_in_time_amanecida || villa.check_in_time_amanecida || '9:00 AM',
+      check_out_time_amanecida: villa.default_check_out_time_amanecida || villa.check_out_time_amanecida || '8:00 AM',
       villa_currency: villa.default_currency || villa.villa_currency || 'DOP',
       extra_hours_price_client: villa.extra_hours_price_client || 0,
       extra_hours_price_owner: villa.extra_hours_price_owner || 0,
