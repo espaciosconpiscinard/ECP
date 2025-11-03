@@ -334,16 +334,19 @@ const Expenses = () => {
           console.error('❌ Error en respuesta:', await reservationResponse.text());
           setRelatedReservation(null);
           setSupplierExpenses([]);
+          setSupplierAbonos({});
         }
       } catch (err) {
         console.error('❌ Error al cargar reservación:', err);
         setRelatedReservation(null);
         setSupplierExpenses([]);
+        setSupplierAbonos({});
       }
     } else {
       console.log('⚠️ Gasto sin related_reservation_id');
       setRelatedReservation(null);
       setSupplierExpenses([]);
+      setSupplierAbonos({});
     }
     
     setIsAbonoDialogOpen(true);
