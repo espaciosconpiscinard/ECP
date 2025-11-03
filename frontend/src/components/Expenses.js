@@ -274,17 +274,50 @@ const Expenses = () => {
           const reservationData = await reservationResponse.json();
           console.log('✅ Reservación cargada:', reservationData);
           setRelatedReservation(reservationData);
+          
+          // Cargar los gastos de suplidores relacionados con esta reservación
+          console.log('📞 Cargando gastos de suplidores...');
+          try {
+            const allExpensesResponse = await fetch(
+              `${process.env.REACT_APP_BACKEND_URL}/api/expenses`,
+              {
+                headers: {
+                  'Authorization': `Bearer ${localStorage.getItem('token')}`
+                }
+              }
+            );
+            
+            if (allExpensesResponse.ok) {
+              const allExpenses = await allExpensesResponse.json();
+              // Filtrar solo los gastos de suplidores de esta reservación
+              const supplierExpensesForReservation = allExpenses.filter(e => 
+                e.category === 'pago_suplidor' && 
+                e.related_reservation_id === expense.related_reservation_id
+              );
+              console.log('✅ Gastos de suplidores cargados:', supplierExpensesForReservation);
+              setSupplierExpenses(supplierExpensesForReservation);
+            } else {
+              console.error('❌ Error al cargar gastos de suplidores');
+              setSupplierExpenses([]);
+            }
+          } catch (err) {
+            console.error('❌ Error al cargar gastos de suplidores:', err);
+            setSupplierExpenses([]);
+          }
         } else {
           console.error('❌ Error en respuesta:', await reservationResponse.text());
           setRelatedReservation(null);
+          setSupplierExpenses([]);
         }
       } catch (err) {
         console.error('❌ Error al cargar reservación:', err);
         setRelatedReservation(null);
+        setSupplierExpenses([]);
       }
     } else {
       console.log('⚠️ Gasto sin related_reservation_id');
       setRelatedReservation(null);
+      setSupplierExpenses([]);
     }
     
     setIsAbonoDialogOpen(true);
