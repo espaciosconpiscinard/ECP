@@ -1379,6 +1379,10 @@ const Reservations = () => {
             <h3>Entregar a:</h3>
             <p><strong>${reservation.customer_name}</strong></p>
             <p>Tipo: Cliente</p>
+            ${reservation.villa_code ? `<p><strong>Villa:</strong> ${reservation.villa_code}${reservation.villa_location ? ` - ${reservation.villa_location}` : ''}</p>` : ''}
+            ${reservation.rental_type ? `<p><strong>Modalidad:</strong> ${reservation.rental_type}</p>` : ''}
+            ${reservation.check_in_time && reservation.check_out_time ? `<p><strong>Horario:</strong> ${reservation.check_in_time} - ${reservation.check_out_time}</p>` : ''}
+            ${reservation.villa_description ? `<p style="margin-top: 8px; font-size: 12px; color: #64748b;">${reservation.villa_description}</p>` : ''}
           </div>
 
           <table>
