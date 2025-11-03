@@ -211,12 +211,8 @@ const Reservations = () => {
     
     const total = subtotalAfterDiscount + itbisAmount;
     
-    // Calcular owner_price (lo que se paga al propietario: base + horas extras + personas extras)
-    const ownerPrice = basePrice + extraHoursCost + extraPeopleCost;
-    
     setFormData(prev => ({
       ...prev,
-      owner_price: ownerPrice,  // Actualizar owner_price automáticamente
       extra_services_total: extraServicesTotal,
       subtotal: subtotal,
       itbis_amount: itbisAmount,
