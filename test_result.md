@@ -103,19 +103,14 @@
 #====================================================================================================
 
 user_problem_statement: |
-  Sistema de gestión de villas "Espacios Con Piscina" con los siguientes requerimientos nuevos:
-  1. **Sistema de Categorías**: Crear, editar y eliminar categorías personalizadas para agrupar villas (solo Admin)
-  2. **Vista de Villas Mejorada**: 
-     - Vista de lista compacta mostrando: Código/Nombre, Precio Cliente, Pago Propietario (solo Admin)
-     - Al hacer clic expandir para ver detalles completos
-     - Buscador por nombre/código/categoría
-     - Agrupar villas por categoría (orden alfabético)
-  3. **Vista de Reservaciones Mejorada**:
-     - Vista lista compacta: Nombre cliente, Código villa, Fecha, Pago realizado, Restante
-     - Al hacer clic expandir detalles completos
-  4. **Control de Permisos por Rol**:
-     - Admin: ve todo (categorías, gastos, pago propietario)
-     - Empleado: solo ve info cliente (sin gastos, sin pago propietario, sin categorías)
+  Aplicar correctamente los precios de modalidades de villa (Pasadía, Amanecida, Evento) configurados en VillasManagement cuando se selecciona una villa en el formulario de Facturas (Reservations.js).
+  
+  PROBLEMA REPORTADO: Los precios configurados con la nueva estructura de modalidades en VillasManagement.js (pasadia_prices, amanecida_prices, evento_prices) no se cargan correctamente cuando se selecciona una villa en el formulario de factura.
+  
+  SOLUCIÓN IMPLEMENTADA:
+  - Actualizado handleVillaChange para extraer precios de las nuevas estructuras de modalidades
+  - Refactorizado handleSelectFlexiblePrice para recibir modalidad como parámetro y aplicar horarios por defecto según la modalidad
+  - Actualizado price selector UI para mostrar precios agrupados por modalidad (Pasadía/Amanecida/Evento) con labels descriptivos (Regular, Oferta, Temporada Alta)
 
 backend:
   - task: "Campo DNI opcional en modelo Customer"
