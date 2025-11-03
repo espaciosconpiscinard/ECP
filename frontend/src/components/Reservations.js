@@ -629,6 +629,7 @@ const Reservations = () => {
   };
 
   const handleAddAbono = (reservation) => {
+    console.log('💰 [RESERVATION ABONO] handleAddAbono llamado con reservation:', reservation);
     setSelectedReservation(reservation);
     setAbonoFormData({
       amount: 0,
@@ -638,6 +639,7 @@ const Reservations = () => {
       notes: ''
     });
     setIsAbonoDialogOpen(true);
+    console.log('💰 [RESERVATION ABONO] Dialog abierto, isAbonoDialogOpen:', true);
   };
 
   const submitAbono = async (e) => {
