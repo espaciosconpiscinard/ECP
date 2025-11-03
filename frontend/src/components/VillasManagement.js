@@ -788,6 +788,20 @@ const VillasManagementNew = () => {
                     {formData.has_evento && (
                       <div className="mb-4 p-3 bg-white rounded border-2 border-blue-300">
                         <h4 className="font-semibold text-blue-800 mb-2">🎉 Evento</h4>
+                        
+                        {/* Moneda Evento */}
+                        <div className="mb-3">
+                          <Label className="text-xs">Moneda</Label>
+                          <select
+                            value={formData.currency_evento}
+                            onChange={(e) => setFormData({ ...formData, currency_evento: e.target.value })}
+                            className="w-full p-2 border rounded-md text-xs"
+                          >
+                            <option value="DOP">Pesos (DOP)</option>
+                            <option value="USD">Dólares (USD)</option>
+                          </select>
+                        </div>
+                        
                         <div className="mb-3">
                           <Label className="text-xs">Descripción</Label>
                           <textarea
