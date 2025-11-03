@@ -282,31 +282,45 @@ const Reservations = () => {
     let modalityDescription = '';
     let defaultCheckInTime = '';
     let defaultCheckOutTime = '';
-    let rentalType = '';
+    let rentalType = '';  // Para backend (minúsculas sin tildes)
+    let rentalTypeDisplay = '';  // Para mostrar en UI (con formato)
     
     if (selectedVilla && modality) {
       if (modality === 'pasadia') {
         modalityDescription = selectedVilla.pasadia_description || '';
         defaultCheckInTime = selectedVilla.default_check_in_time_pasadia || '';
         defaultCheckOutTime = selectedVilla.default_check_out_time_pasadia || '';
-        rentalType = 'Pasadía';
+        rentalType = 'pasadia';  // Backend
+        rentalTypeDisplay = 'Pasadía';  // UI
       } else if (modality === 'amanecida') {
         modalityDescription = selectedVilla.amanecida_description || '';
         defaultCheckInTime = selectedVilla.default_check_in_time_amanecida || '';
         defaultCheckOutTime = selectedVilla.default_check_out_time_amanecida || '';
-        rentalType = 'Amanecida';
+        rentalType = 'amanecida';  // Backend
+        rentalTypeDisplay = 'Amanecida';  // UI
       } else if (modality === 'evento') {
         modalityDescription = selectedVilla.evento_description || '';
         defaultCheckInTime = '';
         defaultCheckOutTime = '';
-        rentalType = 'Evento';
+        rentalType = 'evento';  // Backend
+        rentalTypeDisplay = 'Evento';  // UI
       }
     }
+    
+    console.log('Aplicando precio de modalidad:', {
+      modality,
+      rentalType,
+      rentalTypeDisplay,
+      defaultCheckInTime,
+      defaultCheckOutTime,
+      modalityDescription
+    });
     
     // Apply the selected price with modality-specific info
     setFormData(prev => ({
       ...prev,
-      rental_type: rentalType,  // Guardar modalidad para mostrar en factura
+      rental_type: rentalType,  // Para backend: 'pasadia', 'amanecida', 'evento'
+      rental_type_display: rentalTypeDisplay,  // Para UI: 'Pasadía', 'Amanecida', 'Evento'
       villa_description: modalityDescription,  // Descripción específica de la modalidad
       base_price: priceOption.client_price || 0,
       owner_price: priceOption.owner_price || 0,
