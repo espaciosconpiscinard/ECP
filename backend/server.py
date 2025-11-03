@@ -2336,21 +2336,135 @@ async def get_expense_abonos(expense_id: str, current_user: dict = Depends(get_c
 @api_router.delete("/expenses/{expense_id}/abonos/{abono_id}")
 async def delete_expense_abono(expense_id: str, abono_id: str, current_user: dict = Depends(require_admin)):
     """Delete an abono from an expense (admin only) - to correct errors"""
+    print(f"🗑️ [DELETE_ABONO] Eliminando abono {abono_id} del expense {expense_id}")
+    
     # Delete the abono
     result = await db.expense_abonos.delete_one({"expense_id": expense_id, "id": abono_id})
     if result.deleted_count == 0:
         raise HTTPException(status_code=404, detail="Abono not found")
     
-    # Recalculate expense status
+    print(f"✅ [DELETE_ABONO] Abono eliminado, recalculando estado...")
+    
+    # Recalculate expense status using same logic as add_abono
     expense = await db.expenses.find_one({"id": expense_id}, {"_id": 0})
     if expense:
         all_abonos = await db.expense_abonos.find({"expense_id": expense_id}, {"_id": 0}).to_list(1000)
         total_paid = sum(a.get("amount", 0) for a in all_abonos)
-        new_status = "paid" if total_paid >= expense.get("amount", 0) else "pending"
-        await db.expenses.update_one(
-            {"id": expense_id},
-            {"$set": {"payment_status": new_status}}
-        )
+        
+        print(f"🔍 [DELETE_ABONO] Verificando estado, categoria: {expense.get('category')}")
+        
+        if expense.get("category") == "pago_propietario":
+            print(f"💼 [DELETE_ABONO] Es pago propietario, revisando todos los requisitos...")
+            
+            # Check if all supplier expenses are paid
+            supplier_expenses = []
+            if expense.get("related_reservation_id"):
+                supplier_expenses = await db.expenses.find({
+                    "related_reservation_id": expense.get("related_reservation_id"),
+                    "category": "pago_suplidor"
+                }, {"_id": 0}).to_list(1000)
+            
+            all_suppliers_paid = True
+            for supplier_expense in supplier_expenses:
+                supplier_abonos = await db.expense_abonos.find({"expense_id": supplier_expense["id"]}, {"_id": 0}).to_list(1000)
+                supplier_total_paid = sum(a.get("amount", 0) for a in supplier_abonos)
+                if supplier_total_paid < supplier_expense.get("amount", 0):
+                    all_suppliers_paid = False
+                    print(f"❌ [DELETE_ABONO] Suplidor {supplier_expense.get('description')} AÚN DEBE: {supplier_expense.get('amount', 0) - supplier_total_paid}")
+                    break
+            
+            # Check if deposit was returned
+            deposit_returned = True
+            if expense.get("related_reservation_id"):
+                reservation = await db.reservations.find_one({"id": expense.get("related_reservation_id")}, {"_id": 0})
+                if reservation and reservation.get("deposit", 0) > 0:
+                    deposit_expense = await db.expenses.find_one({
+                        "related_reservation_id": expense.get("related_reservation_id"),
+                        "category": "devolucion_deposito",
+                        "payment_status": "paid"
+                    }, {"_id": 0})
+                    deposit_returned = deposit_expense is not None
+                    print(f"💵 [DELETE_ABONO] Depósito devuelto: {deposit_returned}")
+            
+            # ONLY mark owner payment as 'paid' if ALL conditions met
+            owner_paid = total_paid >= expense.get("amount", 0)
+            new_status = "paid" if (owner_paid and all_suppliers_paid and deposit_returned) else "pending"
+            print(f"📌 [DELETE_ABONO] Propietario pagado: {owner_paid}, Suplidores: {all_suppliers_paid}, Depósito: {deposit_returned}")
+            print(f"✅ [DELETE_ABONO] Nuevo estado propietario: {new_status}")
+            
+            # También actualizar el estado del gasto propietario después de eliminar cualquier abono de suplidor o depósito
+            await db.expenses.update_one(
+                {"id": expense_id},
+                {"$set": {"payment_status": new_status}}
+            )
+        elif expense.get("category") == "pago_suplidor":
+            # Si eliminamos abono de un suplidor, también debemos recalcular el estado del propietario
+            print(f"🛎️ [DELETE_ABONO] Es pago suplidor, actualizando estado del suplidor y del propietario...")
+            
+            # Actualizar estado del suplidor
+            new_status = "paid" if total_paid >= expense.get("amount", 0) else "pending"
+            await db.expenses.update_one(
+                {"id": expense_id},
+                {"$set": {"payment_status": new_status}}
+            )
+            print(f"✅ [DELETE_ABONO] Estado suplidor actualizado: {new_status}")
+            
+            # Ahora actualizar el estado del propietario
+            if expense.get("related_reservation_id"):
+                owner_expense = await db.expenses.find_one({
+                    "related_reservation_id": expense.get("related_reservation_id"),
+                    "category": "pago_propietario"
+                }, {"_id": 0})
+                
+                if owner_expense:
+                    print(f"🔄 [DELETE_ABONO] Recalculando estado del propietario...")
+                    
+                    # Verificar propietario pagado
+                    owner_abonos = await db.expense_abonos.find({"expense_id": owner_expense["id"]}, {"_id": 0}).to_list(1000)
+                    owner_total_paid = sum(a.get("amount", 0) for a in owner_abonos)
+                    owner_paid = owner_total_paid >= owner_expense.get("amount", 0)
+                    
+                    # Verificar suplidores
+                    supplier_expenses = await db.expenses.find({
+                        "related_reservation_id": expense.get("related_reservation_id"),
+                        "category": "pago_suplidor"
+                    }, {"_id": 0}).to_list(1000)
+                    
+                    all_suppliers_paid = True
+                    for supp_exp in supplier_expenses:
+                        supp_abonos = await db.expense_abonos.find({"expense_id": supp_exp["id"]}, {"_id": 0}).to_list(1000)
+                        supp_total_paid = sum(a.get("amount", 0) for a in supp_abonos)
+                        if supp_total_paid < supp_exp.get("amount", 0):
+                            all_suppliers_paid = False
+                            break
+                    
+                    # Verificar depósito
+                    deposit_returned = True
+                    reservation = await db.reservations.find_one({"id": expense.get("related_reservation_id")}, {"_id": 0})
+                    if reservation and reservation.get("deposit", 0) > 0:
+                        deposit_expense = await db.expenses.find_one({
+                            "related_reservation_id": expense.get("related_reservation_id"),
+                            "category": "devolucion_deposito",
+                            "payment_status": "paid"
+                        }, {"_id": 0})
+                        deposit_returned = deposit_expense is not None
+                    
+                    # Actualizar estado del propietario
+                    owner_new_status = "paid" if (owner_paid and all_suppliers_paid and deposit_returned) else "pending"
+                    print(f"📌 [DELETE_ABONO] Estado propietario: {owner_new_status} (Owner: {owner_paid}, Supp: {all_suppliers_paid}, Dep: {deposit_returned})")
+                    
+                    await db.expenses.update_one(
+                        {"id": owner_expense["id"]},
+                        {"$set": {"payment_status": owner_new_status}}
+                    )
+        else:
+            # For other expense types, simple check
+            new_status = "paid" if total_paid >= expense.get("amount", 0) else "pending"
+            await db.expenses.update_one(
+                {"id": expense_id},
+                {"$set": {"payment_status": new_status}}
+            )
+            print(f"✅ [DELETE_ABONO] Estado actualizado: {new_status}")
     
     return {"message": "Abono deleted successfully"}
 
