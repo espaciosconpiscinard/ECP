@@ -1358,6 +1358,82 @@ agent_communication:
         2. Verificar que muestre "Total original", "Pagado" y "RESTANTE a pagar"
         3. Realizar un pago parcial a un servicio extra
         4. Verificar que el "RESTANTE a pagar" se actualice correctamente
+
+  - agent: "main"
+    message: |
+      ✅ NUEVA FUNCIONALIDAD - EDITAR/ELIMINAR PAGOS A SUPLIDORES
+      
+      **PROBLEMA REPORTADO:**
+      No había forma de corregir un pago a un suplidor si se ingresaba un monto equivocado.
+      
+      **SOLUCIÓN IMPLEMENTADA:**
+      
+      1. ✅ Nuevo Estado `supplierAbonos` (línea 53)
+         - Almacena abonos de cada supplierExpense: { [expenseId]: [abonos] }
+         - Se actualiza cada vez que se abre el modal o se agrega/elimina un abono
+      
+      2. ✅ Actualizada función `handleOpenAbonoDialog` (líneas 280-324)
+         - Ahora carga abonos de cada supplierExpense al abrir el modal
+         - Loop sobre supplierExpensesForReservation para cargar abonos individuales
+         - Logs agregados: "Abonos de suplidores cargados"
+      
+      3. ✅ Nueva función `handleDeleteSupplierAbono` (líneas 427-475)
+         - Permite eliminar abonos específicos de un suplidor
+         - Recarga automáticamente:
+           * Los abonos del supplierExpense específico
+           * La lista de supplierExpenses (para actualizar balance_due)
+           * La lista general de expenses
+         - Confirmación antes de eliminar
+         - Solo disponible para admin
+      
+      4. ✅ Actualizado onClick del botón "Pagar" (líneas 2339-2381)
+         - Ya NO cierra los modales después de registrar un pago
+         - Recarga automáticamente los abonos del supplierExpense
+         - Recarga supplierExpenses para mostrar balance_due actualizado
+         - Usuario puede seguir viendo y gestionando pagos sin cerrar/reabrir
+      
+      5. ✅ Nueva sección "Historial de Pagos" (líneas 2403-2444)
+         - Se muestra debajo del formulario de pago de cada servicio extra
+         - Visible solo si hay abonos registrados
+         - Muestra para cada abono:
+           * Monto y moneda
+           * Fecha del pago
+           * Método de pago (badge azul)
+           * Número de factura si existe (badge púrpura)
+           * Notas del pago
+         - Botón de eliminar (X) visible solo para admin
+         - Diseño consistente con el historial de abonos del propietario
+      
+      **FLUJO DE USO:**
+      1. Admin abre modal de gasto del owner
+      2. Ve sección "SERVICIOS EXTRAS - PAGO A SUPLIDORES"
+      3. Cada servicio muestra:
+         - Total original, Pagado, RESTANTE a pagar
+         - Formulario para agregar nuevo pago
+         - Historial de pagos previos con opción de eliminar
+      4. Si se equivoca en un monto, puede eliminarlo y volver a registrar correctamente
+      5. Los totales se actualizan automáticamente sin cerrar el modal
+      
+      **LOGS AGREGADOS PARA DEBUGGING:**
+      - `🔍 [DEBUG SERVICIO]` - Muestra supplier_name
+      - `supplierExpense encontrado: SÍ/NO`
+      - `supplierExpense.id, amount, total_paid, balance_due`
+      - `totalAmount calculado, paidAmount, remainingAmount`
+      
+      **VERIFICACIÓN:**
+      ✅ Código compila sin errores
+      ✅ Build exitoso (173.49 kB JS, +575 B)
+      ✅ Funcionalidad de eliminar abonos implementada
+      ✅ UI actualizada con historial de pagos por servicio
+      
+      **SIGUIENTE PASO:**
+      Testing manual para verificar:
+      1. Agregar pago a suplidor con monto incorrecto
+      2. Ver historial de pagos debajo del formulario
+      3. Eliminar pago incorrecto (solo admin)
+      4. Verificar que balance_due se actualiza correctamente
+      5. Agregar nuevo pago con monto correcto
+
         5. Verificar que al cerrar y reabrir el modal, los valores sean correctos
 
         * "1-10 PERSONAS PRECIO DE OFERTA" (Client: 8000, Owner: 5000)
