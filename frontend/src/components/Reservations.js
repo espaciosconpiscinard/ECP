@@ -1410,7 +1410,10 @@ const Reservations = () => {
                   return `
                     <tr>
                       <td>${rowNum}</td>
-                      <td>${service.service_name || 'Servicio'}${service.supplier_name ? ` (${service.supplier_name})` : ''}</td>
+                      <td>
+                        <strong>${service.service_name || 'Servicio'}${service.supplier_name ? ` (${service.supplier_name})` : ''}</strong>
+                        ${service.description ? `<br><span style="font-size: 11px; color: #666; white-space: pre-wrap;">${service.description}</span>` : ''}
+                      </td>
                       <td>${service.quantity || 1}</td>
                       <td>unidad</td>
                       <td>☐</td>
