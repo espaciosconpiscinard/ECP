@@ -1134,13 +1134,77 @@ metadata:
   run_ui: true
 
 test_plan:
-  current_focus: []
+  current_focus:
+    - "Reservations.js - Villa modality price loading and selection"
   stuck_tasks: []
   test_all: false
   test_priority: "high_first"
-  latest_test: "Completado - Testing exhaustivo de 2 bugs críticos: Ghost Invoice Bug y Solo Servicios Expense Display. Ambos fixes verificados y funcionando correctamente."
+  latest_test: "Pendiente - Testing de carga de precios de modalidades de villa (Pasadía/Amanecida/Evento) en formulario de Facturas"
 
 agent_communication:
+  - agent: "main"
+    message: |
+      ✅ VILLA MODALITY PRICE LOADING - IMPLEMENTACIÓN COMPLETADA
+      
+      **PROBLEMA REPORTADO:**
+      Usuario reportó que los precios configurados en VillasManagement (villa ECPVKLK) no se cargaban al seleccionar la villa en el formulario de Facturas.
+      
+      **CAUSA RAÍZ:**
+      - handleVillaChange intentaba acceder a flexible_prices (estructura antigua) en lugar de pasadia_prices/amanecida_prices/evento_prices (estructura nueva)
+      - Price selector UI mostraba priceOption.people_count que no existe en la nueva estructura
+      - No se aplicaban horarios por defecto según la modalidad seleccionada
+      
+      **CAMBIOS IMPLEMENTADOS:**
+      
+      1. ✅ handleVillaChange (Reservations.js líneas 222-273)
+         - Actualizado para extraer precios de pasadia_prices, amanecida_prices, evento_prices
+         - Guarda precios en selectedVillaFlexiblePrices con estructura {pasadia: [], amanecida: [], evento: []}
+         - Muestra selector solo si hay precios configurados en alguna modalidad
+      
+      2. ✅ handleSelectFlexiblePrice (Reservations.js líneas 275-306)
+         - Refactorizado - ahora recibe (priceOption, modality) como parámetros
+         - Aplica horarios por defecto según modalidad:
+           * Pasadía: default_check_in_time_pasadia, default_check_out_time_pasadia
+           * Amanecida: default_check_in_time_amanecida, default_check_out_time_amanecida
+           * Evento: sin horarios específicos
+         - Aplica client_price y owner_price del precio seleccionado
+         - Removido código duplicado
+      
+      3. ✅ Price Selector UI (Reservations.js líneas 1831-1972 aprox)
+         - Completamente rediseñado para nueva estructura
+         - Precios agrupados por modalidad con secciones visuales separadas:
+           * ☀️ Pasadía (azul)
+           * 🌙 Amanecida (índigo)
+           * 🎉 Evento (púrpura)
+         - Muestra label descriptivo de cada precio (Regular, Oferta, Temporada Alta, etc.)
+         - Muestra precios cliente y propietario formateados
+         - Pago propietario solo visible para admin (user?.role === 'admin')
+         - Cada botón pasa modalidad al handleSelectFlexiblePrice
+      
+      **ESTRUCTURA DE DATOS:**
+      ```
+      Villa {
+        pasadia_prices: [{ label: 'Regular', client_price: 15000, owner_price: 10000 }],
+        amanecida_prices: [{ label: 'Oferta', client_price: 25000, owner_price: 18000 }],
+        evento_prices: [{ label: 'Temporada Alta', client_price: 50000, owner_price: 35000 }],
+        default_check_in_time_pasadia: '9:00 AM',
+        default_check_out_time_pasadia: '8:00 PM',
+        default_check_in_time_amanecida: '9:00 AM',
+        default_check_out_time_amanecida: '8:00 AM'
+      }
+      ```
+      
+      **SIGUIENTE PASO:**
+      - Testing manual o automatizado para verificar:
+        1. Villa ECPVKLK carga sus precios correctamente
+        2. Selector muestra modalidades con precios y labels
+        3. Al seleccionar un precio, se aplican valores correctos (client_price, owner_price, horarios)
+        4. Factura se puede guardar exitosamente con los precios seleccionados
+      
+      **CREDENCIALES:**
+      - Admin: admin / admin123
+      - Villa de prueba: ECPVKLK (debe tener precios configurados en VillasManagement)
+
   - agent: "main"
     message: |
       🎯 FIXES IMPLEMENTADOS - 2 BUGS CRÍTICOS
