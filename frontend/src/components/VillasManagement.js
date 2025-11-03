@@ -155,6 +155,9 @@ const VillasManagementNew = () => {
       amenities: villa.amenities || [],
       is_active: villa.is_active !== false
     });
+    setPasadiaPrices(villa.pasadia_prices || []);
+    setAmanecidaPrices(villa.amanecida_prices || []);
+    setEventoPrices(villa.evento_prices || []);
     setIsFormOpen(true);
   };
 
