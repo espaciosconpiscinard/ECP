@@ -275,27 +275,39 @@ const Reservations = () => {
   };
 
   const handleSelectFlexiblePrice = (priceOption, modality) => {
-    // Get the selected villa to access default times
+    // Get the selected villa to access modality-specific info
     const selectedVilla = villas.find(v => v.id === formData.villa_id);
     
-    // Set default times based on modality
+    // Set modality-specific description and times
+    let modalityDescription = '';
     let defaultCheckInTime = '';
     let defaultCheckOutTime = '';
+    let rentalType = '';
     
-    if (selectedVilla) {
+    if (selectedVilla && modality) {
       if (modality === 'pasadia') {
-        defaultCheckInTime = selectedVilla.default_check_in_time_pasadia || '9:00 AM';
-        defaultCheckOutTime = selectedVilla.default_check_out_time_pasadia || '8:00 PM';
+        modalityDescription = selectedVilla.pasadia_description || '';
+        defaultCheckInTime = selectedVilla.default_check_in_time_pasadia || '';
+        defaultCheckOutTime = selectedVilla.default_check_out_time_pasadia || '';
+        rentalType = 'Pasadía';
       } else if (modality === 'amanecida') {
-        defaultCheckInTime = selectedVilla.default_check_in_time_amanecida || '9:00 AM';
-        defaultCheckOutTime = selectedVilla.default_check_out_time_amanecida || '8:00 AM';
+        modalityDescription = selectedVilla.amanecida_description || '';
+        defaultCheckInTime = selectedVilla.default_check_in_time_amanecida || '';
+        defaultCheckOutTime = selectedVilla.default_check_out_time_amanecida || '';
+        rentalType = 'Amanecida';
+      } else if (modality === 'evento') {
+        modalityDescription = selectedVilla.evento_description || '';
+        defaultCheckInTime = '';
+        defaultCheckOutTime = '';
+        rentalType = 'Evento';
       }
-      // Evento doesn't have specific times in the model
     }
     
-    // Apply the selected price
+    // Apply the selected price with modality-specific info
     setFormData(prev => ({
       ...prev,
+      rental_type: rentalType,  // Guardar modalidad para mostrar en factura
+      villa_description: modalityDescription,  // Descripción específica de la modalidad
       base_price: priceOption.client_price || 0,
       owner_price: priceOption.owner_price || 0,
       check_in_time: defaultCheckInTime,
