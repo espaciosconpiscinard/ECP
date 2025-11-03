@@ -60,14 +60,14 @@ const Reservations = () => {
     customer_name: '',
     villa_id: '',
     villa_code: '',
-    villa_description: '',
+    villa_description: '',  // Descripción de la modalidad (no de la villa general)
     villa_location: '',
-    rental_type: null,  // Opcional
+    rental_type: '',  // Modalidad seleccionada: 'pasadia', 'amanecida', 'evento'
     event_type: '',
     reservation_date: new Date().toISOString().split('T')[0],
     check_out_date: '',
-    check_in_time: '',  // Vacío por defecto
-    check_out_time: '',  // Vacío por defecto
+    check_in_time: '',  // Se llenará según modalidad
+    check_out_time: '',  // Se llenará según modalidad
     guests: 1,  // 1 por defecto (mínimo razonable)
     base_price: 0,
     owner_price: 0,
