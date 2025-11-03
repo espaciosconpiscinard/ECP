@@ -1103,7 +1103,10 @@ const Reservations = () => {
                   ${reservation.villa_code || reservation.villa_name ? `
                   <tr>
                     <td>01</td>
-                    <td><strong>Alquiler de Espacio</strong> - ${reservation.villa_code || reservation.villa_name}</td>
+                    <td>
+                      <strong>Alquiler de Espacio</strong> - ${reservation.villa_code || reservation.villa_name}
+                      ${reservation.villa_description ? `<br><span style="font-size: 9px; color: #666; white-space: pre-wrap;">${reservation.villa_description}</span>` : ''}
+                    </td>
                     <td style="text-align: right;">${reservation.currency === 'DOP' ? 'RD$' : '$'}${(reservation.base_price || 0).toLocaleString('es-DO', {minimumFractionDigits: 2})}</td>
                     <td style="text-align: center;">1</td>
                     <td style="text-align: right;"><strong>${reservation.currency === 'DOP' ? 'RD$' : '$'}${(reservation.base_price || 0).toLocaleString('es-DO', {minimumFractionDigits: 2})}</strong></td>
