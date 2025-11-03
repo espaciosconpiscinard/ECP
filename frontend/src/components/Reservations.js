@@ -525,10 +525,6 @@ const Reservations = () => {
       villa_id: '',
       villa_code: '',
       villa_description: '',
-      villa_modality: null,
-      villa_description_pasadia: '',
-      villa_description_amanecida: '',
-      villa_currency: 'DOP',
       rental_type: null,  // Opcional
       event_type: '',
       reservation_date: new Date().toISOString().split('T')[0],
