@@ -1917,82 +1917,77 @@ const Reservations = () => {
                   />
                 </div>
                 
-                {/* Huéspedes y Moneda - Solo para facturas con villa */}
-                {invoiceType === 'villa' && (
-                  <>
-                    <div>
-                      <Label>Huéspedes *</Label>
-                  <Input
-                    type="number"
-                    min="1"
-                    value={formData.guests}
-                    onChange={(e) => setFormData({ ...formData, guests: parseInt(e.target.value) })}
-                    required
-                    data-testid="guests-input"
-                  />
-                </div>
-                
-                {/* Moneda */}
-                <div>
-                  <Label>Moneda *</Label>
-                  <select
-                    value={formData.currency}
-                    onChange={(e) => setFormData({ ...formData, currency: e.target.value })}
-                    className="w-full p-2 border rounded-md"
-                  >
-                    <option value="DOP">Pesos Dominicanos (DOP)</option>
-                    <option value="USD">Dólares (USD)</option>
-                  </select>
-                </div>
-
-                {/* Número de Factura Manual - SOLO ADMIN */}
-                {user?.role === 'admin' && (
-                  <div className="col-span-2 bg-yellow-50 p-4 rounded-md border-2 border-yellow-300">
-                    <Label className="font-bold text-yellow-800">Número de Factura (Opcional - Solo Admin)</Label>
+                {/* Huéspedes y Moneda - Opcionales */}
+                <>
+                  <div>
+                    <Label>Huéspedes</Label>
                     <Input
                       type="number"
                       min="1"
-                      value={formData.invoice_number || ''}
-                      onChange={(e) => setFormData({ 
-                        ...formData, 
-                        invoice_number: e.target.value ? parseInt(e.target.value) : null 
-                      })}
-                      placeholder="Dejar vacío para asignación automática"
+                      value={formData.guests}
+                      onChange={(e) => setFormData({ ...formData, guests: parseInt(e.target.value) })}
+                      data-testid="guests-input"
+                    />
+                  </div>
+                  
+                  {/* Moneda */}
+                  <div>
+                    <Label>Moneda</Label>
+                    <select
+                      value={formData.currency}
+                      onChange={(e) => setFormData({ ...formData, currency: e.target.value })}
+                      className="w-full p-2 border rounded-md"
+                    >
+                      <option value="DOP">Pesos Dominicanos (DOP)</option>
+                      <option value="USD">Dólares (USD)</option>
+                    </select>
+                  </div>
+
+                  {/* Número de Factura Manual - SOLO ADMIN */}
+                  {user?.role === 'admin' && (
+                    <div className="col-span-2 bg-yellow-50 p-4 rounded-md border-2 border-yellow-300">
+                      <Label className="font-bold text-yellow-800">Número de Factura (Opcional - Solo Admin)</Label>
+                      <Input
+                        type="number"
+                        min="1"
+                        value={formData.invoice_number || ''}
+                        onChange={(e) => setFormData({ 
+                          ...formData, 
+                          invoice_number: e.target.value ? parseInt(e.target.value) : null 
+                        })}
+                        placeholder="Dejar vacío para asignación automática"
+                        className="mt-2"
+                      />
+                      <p className="text-xs text-gray-600 mt-1">
+                        ⚠️ Si ingresas un número manual (ej: 1300), el sistema automáticamente ajustará la numeración de los empleados para evitar duplicados.
+                      </p>
+                    </div>
+                  )}
+
+                  {/* Precio Base de la Villa - EDITABLE y Opcional */}
+                  <div className="col-span-2 bg-blue-50 p-4 rounded-md border-2 border-blue-200">
+                    <Label className="font-bold text-blue-800">Precio Base de la Villa</Label>
+                    <Input
+                      type="number"
+                      step="0.01"
+                      min="0"
+                      value={formData.base_price}
+                      onChange={(e) => setFormData({ ...formData, base_price: parseFloat(e.target.value) || 0 })}
                       className="mt-2"
+                      data-testid="base-price-input"
                     />
                     <p className="text-xs text-gray-600 mt-1">
-                      ⚠️ Si ingresas un número manual (ej: 1300), el sistema automáticamente ajustará la numeración de los empleados para evitar duplicados.
+                      Este precio se autocompleta según la villa seleccionada, pero puedes editarlo si necesitas aplicar un precio especial
                     </p>
                   </div>
-                )}
-
-                {/* Precio Base de la Villa - EDITABLE */}
-                <div className="col-span-2 bg-blue-50 p-4 rounded-md border-2 border-blue-200">
-                  <Label className="font-bold text-blue-800">Precio Base de la Villa *</Label>
-                  <Input
-                    type="number"
-                    step="0.01"
-                    min="0"
-                    value={formData.base_price}
-                    onChange={(e) => setFormData({ ...formData, base_price: parseFloat(e.target.value) || 0 })}
-                    required
-                    className="mt-2"
-                    data-testid="base-price-input"
-                  />
-                  <p className="text-xs text-gray-600 mt-1">
-                    Este precio se autocompleta según la villa y tipo de renta seleccionado, pero puedes editarlo si necesitas aplicar un precio especial
-                  </p>
-                </div>
                 </>
-                )}
 
-                {/* Horas Extras - Solo para villas */}
-                {invoiceType === 'villa' && (
-                  <>
-                    <div>
-                  <Label>Horas Extras (Cantidad)</Label>
-                  <Input
-                    type="number"
+                {/* Horas Extras - Opcionales */}
+                <>
+                  <div>
+                    <Label>Horas Extras (Cantidad)</Label>
+                    <Input
+                      type="number"
                     step="0.5"
                     min="0"
                     value={formData.extra_hours}
