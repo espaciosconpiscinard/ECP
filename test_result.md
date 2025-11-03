@@ -286,6 +286,18 @@ backend:
 
 
 frontend:
+  - task: "Reservations.js - Villa modality price loading and selection"
+    implemented: true
+    working: "NA"
+    file: "/app/frontend/src/components/Reservations.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "✅ IMPLEMENTADO: 1) handleVillaChange actualizado para extraer precios de pasadia_prices, amanecida_prices, evento_prices. 2) handleSelectFlexiblePrice refactorizado - ahora recibe modalidad como parámetro y aplica default times según modalidad (pasadia: check_in/out_pasadia, amanecida: check_in/out_amanecida). 3) Price selector UI completamente rediseñado - muestra precios agrupados por modalidad con iconos (☀️ Pasadía, 🌙 Amanecida, 🎉 Evento), labels descriptivos (Regular/Oferta/Temporada Alta), y precios cliente/propietario. Pago propietario solo visible para admin. Cada modalidad tiene sección separada con color distintivo (azul/índigo/púrpura)."
+
   - task: "Componente Customers - Agregar campo DNI"
     implemented: true
     working: "NA"
