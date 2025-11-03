@@ -644,7 +644,14 @@ const Reservations = () => {
 
   const submitAbono = async (e) => {
     e.preventDefault();
-    if (!selectedReservation) return;
+    console.log('💰 [RESERVATION ABONO] submitAbono iniciado');
+    console.log('💰 [RESERVATION ABONO] selectedReservation:', selectedReservation);
+    console.log('💰 [RESERVATION ABONO] abonoFormData:', abonoFormData);
+    
+    if (!selectedReservation) {
+      console.error('❌ [RESERVATION ABONO] No hay reservación seleccionada');
+      return;
+    }
     
     try {
       // Preparar datos del abono, incluyendo invoice_number solo si se proporcionó
