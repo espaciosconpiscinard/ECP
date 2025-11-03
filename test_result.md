@@ -1142,7 +1142,7 @@ test_plan:
   stuck_tasks: []
   test_all: false
   test_priority: "high_first"
-  latest_test: "Pendiente - Testing de carga de precios de modalidades de villa (Pasadía/Amanecida/Evento) en formulario de Facturas"
+  latest_test: "Completado - Backend villa modality pricing structure verificado exitosamente. API retorna campos correctos (pasadia_prices, amanecida_prices, evento_prices) con estructura esperada."
 
 agent_communication:
   - agent: "main"
