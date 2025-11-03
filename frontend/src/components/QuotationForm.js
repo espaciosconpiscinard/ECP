@@ -293,46 +293,59 @@ const QuotationForm = ({ quotation, onSubmit, onCancel }) => {
         {selectedServices.map((service, index) => {
           const serviceData = extraServices.find(s => s.id === service.service_id);
           return (
-            <div key={index} className="grid grid-cols-6 gap-2 mb-2 items-center">
-              <select
-                value={service.service_id}
-                onChange={(e) => updateService(index, 'service_id', e.target.value)}
-                className="p-2 border rounded col-span-2"
-              >
-                <option value="">Seleccionar servicio</option>
-                {extraServices.map(s => (
-                  <option key={s.id} value={s.id}>{s.name}</option>
-                ))}
-              </select>
-              {service.service_id && serviceData?.suppliers?.length > 0 && (
+            <div key={index} className="mb-4 p-3 border rounded bg-gray-50">
+              <div className="grid grid-cols-6 gap-2 mb-2 items-center">
                 <select
-                  value={service.supplier_id || ''}
-                  onChange={(e) => updateService(index, 'supplier_id', e.target.value)}
+                  value={service.service_id}
+                  onChange={(e) => updateService(index, 'service_id', e.target.value)}
                   className="p-2 border rounded col-span-2"
                 >
-                  <option value="">Seleccionar suplidor</option>
-                  {serviceData.suppliers.map(sup => (
-                    <option key={sup.supplier_id} value={sup.supplier_id}>
-                      {sup.supplier_name} - RD${sup.client_price}
-                    </option>
+                  <option value="">Seleccionar servicio</option>
+                  {extraServices.map(s => (
+                    <option key={s.id} value={s.id}>{s.name}</option>
                   ))}
                 </select>
-              )}
-              {(!service.service_id || !serviceData?.suppliers?.length) && (
-                <div className="col-span-2"></div>
-              )}
-              <Input
-                type="number"
-                placeholder="Cant."
-                value={service.quantity}
-                onChange={(e) => updateService(index, 'quantity', parseInt(e.target.value) || 1)}
-                className="text-center"
-              />
-              <div className="flex items-center gap-2">
-                <span className="text-sm font-medium">${service.total.toFixed(2)}</span>
-                <Button type="button" size="sm" variant="destructive" onClick={() => removeService(index)}>
-                  <X size={14} />
-                </Button>
+                {service.service_id && serviceData?.suppliers?.length > 0 && (
+                  <select
+                    value={service.supplier_id || ''}
+                    onChange={(e) => updateService(index, 'supplier_id', e.target.value)}
+                    className="p-2 border rounded col-span-2"
+                  >
+                    <option value="">Seleccionar suplidor</option>
+                    {serviceData.suppliers.map(sup => (
+                      <option key={sup.supplier_id} value={sup.supplier_id}>
+                        {sup.supplier_name} - RD${sup.client_price}
+                      </option>
+                    ))}
+                  </select>
+                )}
+                {(!service.service_id || !serviceData?.suppliers?.length) && (
+                  <div className="col-span-2"></div>
+                )}
+                <Input
+                  type="number"
+                  placeholder="Cant."
+                  value={service.quantity}
+                  onChange={(e) => updateService(index, 'quantity', parseInt(e.target.value) || 1)}
+                  className="text-center"
+                />
+                <div className="flex items-center gap-2">
+                  <span className="text-sm font-medium">${service.total.toFixed(2)}</span>
+                  <Button type="button" size="sm" variant="destructive" onClick={() => removeService(index)}>
+                    <X size={14} />
+                  </Button>
+                </div>
+              </div>
+              {/* Campo de descripción */}
+              <div className="mt-2">
+                <textarea
+                  value={service.description || ''}
+                  onChange={(e) => updateService(index, 'description', e.target.value)}
+                  placeholder="Descripción del servicio (opcional, se mostrará en la cotización/factura)..."
+                  className="w-full p-2 border rounded text-sm"
+                  rows="2"
+                  style={{ whiteSpace: 'pre-wrap' }}
+                />
               </div>
             </div>
           );
