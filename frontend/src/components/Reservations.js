@@ -527,7 +527,7 @@ const Reservations = () => {
       check_out_date: '',
       check_in_time: '',  // Vacío por defecto
       check_out_time: '',  // Vacío por defecto
-      guests: 0,  // Opcional
+      guests: 1,  // 1 por defecto
       base_price: 0,
       owner_price: 0,
       extra_hours: 0,
