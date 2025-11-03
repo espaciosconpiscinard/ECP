@@ -193,6 +193,10 @@ class ReservationBase(BaseModel):
     villa_code: Optional[str] = None  # Opcional para facturas de solo servicios
     villa_description: Optional[str] = None
     villa_location: Optional[str] = None  # Ubicación de la villa
+    villa_modality: Optional[Literal["pasadia", "amanecida"]] = None  # Modalidad de la villa
+    villa_description_pasadia: Optional[str] = None  # Descripción para Pasadía
+    villa_description_amanecida: Optional[str] = None  # Descripción para Amanecida
+    villa_currency: Optional[str] = "DOP"  # Moneda de la villa (DOP/USD)
     
     # Tipo de renta (opcional para facturas de solo servicios)
     rental_type: Optional[Literal["pasadia", "amanecida", "evento"]] = None
