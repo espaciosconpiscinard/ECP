@@ -2227,6 +2227,7 @@ const Reservations = () => {
                                   updateExtraService(index, 'supplier_name', selectedSupplier.name);
                                   updateExtraService(index, 'supplier_id', selectedSupplier.name);
                                   updateExtraService(index, 'supplier_cost', selectedSupplier.supplier_cost);
+                                  updateExtraService(index, 'description', selectedSupplier.description || '');  // Cargar descripción del suplidor
                                   
                                   // Actualizar precios al cliente
                                   updateExtraService(index, 'price_unit', selectedSupplier.client_price);
