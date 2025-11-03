@@ -1277,3 +1277,47 @@ agent_communication:
       
       ✅ AMBOS BUGS CRÍTICOS HAN SIDO VERIFICADOS Y FUNCIONAN CORRECTAMENTE
 
+  - agent: "testing"
+    message: |
+      🏠 VILLA MODALITY PRICING BACKEND TESTING COMPLETADO - FUNCIONALIDAD VERIFICADA ✅
+      
+      ✅ FUNCIONALIDADES VERIFICADAS:
+      
+      🔍 ESTRUCTURA DE PRECIOS POR MODALIDAD:
+      - GET /api/villas retorna campos pasadia_prices, amanecida_prices, evento_prices ✅
+      - Villa ECPVKLK encontrada con estructura correcta de precios ✅
+      - Cada objeto precio tiene estructura {label: str, client_price: float, owner_price: float} ✅
+      - Tipos de datos correctos verificados (string para label, float para precios) ✅
+      
+      📊 DATOS VERIFICADOS EN VILLA ECPVKLK:
+      - pasadia_prices: 4 precios configurados ✅
+        * "1-10 PERSONAS PRECIO REGULAR" (Client: 10000, Owner: 8000)
+        * "1-10 PERSONAS PRECIO DE OFERTA" (Client: 8000, Owner: 5000)
+        * 2 precios adicionales con labels vacíos (configuración incompleta)
+      - amanecida_prices: 1 precio configurado ✅
+        * "10 PERSONAS REGULAR" (Client: 15000, Owner: 12000)
+      - evento_prices: array vacío (no configurado) ✅
+      
+      🧪 CREACIÓN DE VILLA TEST:
+      - Villa TESTMOD creada exitosamente con todas las modalidades ✅
+      - pasadia_prices: 2 precios guardados correctamente ✅
+      - amanecida_prices: 1 precio guardado correctamente ✅
+      - evento_prices: 1 precio guardado correctamente ✅
+      
+      ⚠️ ISSUE MENOR IDENTIFICADO:
+      - Campos default_check_in_time_* y default_check_out_time_* NO se guardan al crear villas
+      - Posible issue en modelo backend o serialización
+      - NO afecta funcionalidad core de precios por modalidad
+      
+      🎯 CRITERIOS DE ÉXITO CUMPLIDOS:
+      ✅ GET /api/villas incluye campos de modalidad (pasadia_prices, amanecida_prices, evento_prices)
+      ✅ GET /api/villas/{villa_id} retorna estructura correcta para villa específica
+      ✅ Cada precio tiene label (str), client_price (float), owner_price (float)
+      ✅ API funciona correctamente para carga de precios en frontend
+      
+      📋 RESULTADO FINAL: 8/9 pruebas de modalidad pasaron exitosamente
+      - Estructura de precios por modalidad: ✅ COMPLETAMENTE FUNCIONAL
+      - Default times: ⚠️ ISSUE MENOR (no crítico para funcionalidad principal)
+      
+      ✅ BACKEND VILLA MODALITY PRICING LISTO PARA USO EN FRONTEND
+
