@@ -74,6 +74,24 @@ const QuotationForm = ({ quotation, onSubmit, onCancel }) => {
   };
 
   const handleVillaChange = (villaId) => {
+    // Si no hay villa seleccionada o se seleccionó "Sin Villas", limpiar campos
+    if (!villaId || villaId === '' || villaId === 'sin-villas') {
+      const newData = {
+        ...formData,
+        villa_id: '',
+        villa_code: '',
+        villa_description: '',
+        villa_location: '',
+        check_in_time: '',
+        check_out_time: '',
+        base_price: 0,
+        owner_price: 0
+      };
+      const totals = calculateTotals(newData, selectedServices);
+      setFormData({ ...newData, ...totals });
+      return;
+    }
+    
     const villa = villas.find(v => v.id === villaId);
     if (villa) {
       const newData = {
