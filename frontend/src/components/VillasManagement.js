@@ -1057,12 +1057,12 @@ const VillasManagementNew = () => {
                           </div>
                           <div>
                             <p className="text-sm font-medium">Precio Cliente</p>
-                            <p className="text-sm text-gray-700">{formatCurrency(getDefaultPrice(villa, 'pasadia', 'client_price'))}</p>
+                            <p className="text-sm text-gray-700">{formatCurrency(villa.price_pasadia_regular_client || 0)}</p>
                           </div>
                           {isAdmin && (
                             <div>
                               <p className="text-sm font-medium">Pago Propietario</p>
-                              <p className="text-sm text-green-600 font-semibold">{formatCurrency(getDefaultPrice(villa, 'pasadia', 'owner_price'))}</p>
+                              <p className="text-sm text-green-600 font-semibold">{formatCurrency(villa.price_pasadia_regular_owner || 0)}</p>
                             </div>
                           )}
                           <div className="flex items-center justify-end space-x-2">
