@@ -1242,43 +1242,61 @@ async def update_reservation(
             {"$set": prepared_update}
         )
         
-        # Si se marcó deposit_returned como True, crear/actualizar gasto de devolución
-        if "deposit_returned" in update_dict and update_dict["deposit_returned"] and existing.get("deposit", 0) > 0:
-            print(f"💰 [DEPOSITO] Marcando depósito como devuelto para reservación {reservation_id}")
-            
-            # Buscar si ya existe el gasto de devolución de depósito
-            deposit_expense = await db.expenses.find_one({
-                "related_reservation_id": reservation_id,
-                "category": "devolucion_deposito"
-            }, {"_id": 0})
-            
-            if deposit_expense:
-                # Actualizar estado a paid
-                print(f"✅ [DEPOSITO] Actualizando gasto de devolución existente: {deposit_expense['id']}")
-                await db.expenses.update_one(
-                    {"id": deposit_expense["id"]},
-                    {"$set": {"payment_status": "paid"}}
-                )
-            else:
-                # Crear nuevo gasto de devolución de depósito
-                print(f"📝 [DEPOSITO] Creando gasto de devolución de depósito")
-                deposit_expense_data = {
-                    "id": str(uuid.uuid4()),
-                    "description": f"Devolución Depósito - Factura #{existing.get('invoice_number', reservation_id[-4:])}",
-                    "amount": existing.get("deposit", 0),
-                    "currency": existing.get("currency", "DOP"),
-                    "category": "devolucion_deposito",
-                    "expense_date": datetime.now(timezone.utc).isoformat(),
-                    "payment_status": "paid",
+        # Manejar cambios en deposit_returned
+        if "deposit_returned" in update_dict and existing.get("deposit", 0) > 0:
+            if update_dict["deposit_returned"]:
+                # MARCAR como devuelto
+                print(f"💰 [DEPOSITO] Marcando depósito como devuelto para reservación {reservation_id}")
+                
+                # Buscar si ya existe el gasto de devolución de depósito
+                deposit_expense = await db.expenses.find_one({
                     "related_reservation_id": reservation_id,
-                    "created_by": current_user["id"],
-                    "created_at": datetime.now(timezone.utc).isoformat(),
-                    "updated_at": datetime.now(timezone.utc).isoformat()
-                }
-                await db.expenses.insert_one(deposit_expense_data)
-                print(f"✅ [DEPOSITO] Gasto de devolución creado")
+                    "category": "devolucion_deposito"
+                }, {"_id": 0})
+                
+                if deposit_expense:
+                    # Actualizar estado a paid
+                    print(f"✅ [DEPOSITO] Actualizando gasto de devolución existente: {deposit_expense['id']}")
+                    await db.expenses.update_one(
+                        {"id": deposit_expense["id"]},
+                        {"$set": {"payment_status": "paid"}}
+                    )
+                else:
+                    # Crear nuevo gasto de devolución de depósito
+                    print(f"📝 [DEPOSITO] Creando gasto de devolución de depósito")
+                    deposit_expense_data = {
+                        "id": str(uuid.uuid4()),
+                        "description": f"Devolución Depósito - Factura #{existing.get('invoice_number', reservation_id[-4:])}",
+                        "amount": existing.get("deposit", 0),
+                        "currency": existing.get("currency", "DOP"),
+                        "category": "devolucion_deposito",
+                        "expense_date": datetime.now(timezone.utc).isoformat(),
+                        "payment_status": "paid",
+                        "related_reservation_id": reservation_id,
+                        "created_by": current_user["id"],
+                        "created_at": datetime.now(timezone.utc).isoformat(),
+                        "updated_at": datetime.now(timezone.utc).isoformat()
+                    }
+                    await db.expenses.insert_one(deposit_expense_data)
+                    print(f"✅ [DEPOSITO] Gasto de devolución creado")
+            else:
+                # DESMARCAR como devuelto
+                print(f"⚠️ [DEPOSITO] Desmarcando depósito como devuelto para reservación {reservation_id}")
+                
+                # Buscar y actualizar el gasto de devolución a pending
+                deposit_expense = await db.expenses.find_one({
+                    "related_reservation_id": reservation_id,
+                    "category": "devolucion_deposito"
+                }, {"_id": 0})
+                
+                if deposit_expense:
+                    print(f"📝 [DEPOSITO] Actualizando gasto de devolución a pending")
+                    await db.expenses.update_one(
+                        {"id": deposit_expense["id"]},
+                        {"$set": {"payment_status": "pending"}}
+                    )
             
-            # Ahora verificar si se debe actualizar el estado del gasto principal (pago_propietario)
+            # Recalcular estado del gasto propietario después de cambio en depósito
             owner_expense = await db.expenses.find_one({
                 "related_reservation_id": reservation_id,
                 "category": "pago_propietario"
