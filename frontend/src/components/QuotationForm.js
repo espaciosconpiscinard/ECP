@@ -1,28 +1,23 @@
 import React, { useState, useEffect } from 'react';
-import { getCustomers, getVillas, getExtraServices } from '../api/api';
+import { getVillas, getExtraServices } from '../api/api';
 import { Button } from './ui/button';
 import { Input } from './ui/input';
 import { Label } from './ui/label';
 import { X, Check } from 'lucide-react';
 
 const QuotationForm = ({ quotation, onSubmit, onCancel }) => {
-  const [customers, setCustomers] = useState([]);
   const [villas, setVillas] = useState([]);
   const [extraServices, setExtraServices] = useState([]);
-  const [selectedVillaFlexiblePrices, setSelectedVillaFlexiblePrices] = useState(null);
-  const [showPriceSelector, setShowPriceSelector] = useState(false);
   const [formData, setFormData] = useState({
-    customer_id: '',
-    customer_name: '',
+    customer_name: '',  // Texto libre para nombre del cliente
     villa_id: '',
     villa_code: '',
     villa_description: '',
     villa_location: '',
-    rental_type: 'pasadia',
     quotation_date: new Date().toISOString().split('T')[0],
     validity_days: 30,
-    check_in_time: '9:00 AM',
-    check_out_time: '8:00 PM',
+    check_in_time: '',
+    check_out_time: '',
     guests: 0,
     base_price: 0,
     owner_price: 0,
@@ -52,12 +47,10 @@ const QuotationForm = ({ quotation, onSubmit, onCancel }) => {
 
   const fetchData = async () => {
     try {
-      const [customersRes, villasRes, servicesRes] = await Promise.all([
-        getCustomers(),
+      const [villasRes, servicesRes] = await Promise.all([
         getVillas(),
         getExtraServices()
       ]);
-      setCustomers(customersRes.data);
       setVillas(villasRes.data);
       setExtraServices(servicesRes.data);
     } catch (err) {
@@ -83,82 +76,19 @@ const QuotationForm = ({ quotation, onSubmit, onCancel }) => {
   const handleVillaChange = (villaId) => {
     const villa = villas.find(v => v.id === villaId);
     if (villa) {
-      setSelectedVillaFlexiblePrices(villa.flexible_prices || null);
-      
-      if (villa.flexible_prices && villa.flexible_prices[formData.rental_type]?.length > 0) {
-        setShowPriceSelector(true);
-        setFormData(prev => ({
-          ...prev,
-          villa_id: villaId,
-          villa_code: villa.code,
-          villa_description: villa.description || '',
-          villa_location: villa.location || '',
-          check_in_time: villa.default_check_in_time || '9:00 AM',
-          check_out_time: villa.default_check_out_time || '8:00 PM',
-          base_price: 0,
-          owner_price: 0
-        }));
-      } else {
-        setShowPriceSelector(false);
-        let clientPrice = 0;
-        let ownerPrice = 0;
-        
-        if (formData.rental_type === 'pasadia') {
-          clientPrice = villa.default_price_pasadia || 0;
-          ownerPrice = villa.owner_price_pasadia || 0;
-        } else if (formData.rental_type === 'amanecida') {
-          clientPrice = villa.default_price_amanecida || 0;
-          ownerPrice = villa.owner_price_amanecida || 0;
-        } else if (formData.rental_type === 'evento') {
-          clientPrice = villa.default_price_evento || 0;
-          ownerPrice = villa.owner_price_evento || 0;
-        }
-        
-        const newData = {
-          ...formData,
-          villa_id: villaId,
-          villa_code: villa.code,
-          villa_description: villa.description || '',
-          villa_location: villa.location || '',
-          check_in_time: villa.default_check_in_time || '9:00 AM',
-          check_out_time: villa.default_check_out_time || '8:00 PM',
-          base_price: clientPrice,
-          owner_price: ownerPrice
-        };
-        const totals = calculateTotals(newData, selectedServices);
-        setFormData({ ...newData, ...totals });
-      }
-    }
-  };
-
-  const handleSelectFlexiblePrice = (priceOption) => {
-    let guestCount = 1;
-    if (priceOption.people_count) {
-      const match = priceOption.people_count.match(/(\d+)/g);
-      if (match && match.length > 0) {
-        guestCount = parseInt(match[match.length - 1]);
-      }
-    }
-    
-    const newData = {
-      ...formData,
-      base_price: priceOption.client_price,
-      owner_price: priceOption.owner_price,
-      guests: guestCount
-    };
-    const totals = calculateTotals(newData, selectedServices);
-    setFormData({ ...newData, ...totals });
-    setShowPriceSelector(false);
-  };
-
-  const handleCustomerChange = (customerId) => {
-    const customer = customers.find(c => c.id === customerId);
-    if (customer) {
-      setFormData({
+      const newData = {
         ...formData,
-        customer_id: customer.id,
-        customer_name: customer.name
-      });
+        villa_id: villaId,
+        villa_code: villa.code,
+        villa_description: villa.description || '',
+        villa_location: villa.location || '',
+        check_in_time: villa.default_check_in_time || '',
+        check_out_time: villa.default_check_out_time || '',
+        base_price: 0,
+        owner_price: 0
+      };
+      const totals = calculateTotals(newData, selectedServices);
+      setFormData({ ...newData, ...totals });
     }
   };
 
@@ -230,6 +160,13 @@ const QuotationForm = ({ quotation, onSubmit, onCancel }) => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
+    
+    // Validación: el nombre del cliente es obligatorio
+    if (!formData.customer_name || formData.customer_name.trim() === '') {
+      alert('El nombre del cliente es obligatorio');
+      return;
+    }
+    
     onSubmit({ ...formData, extra_services: selectedServices });
   };
 
@@ -239,21 +176,17 @@ const QuotationForm = ({ quotation, onSubmit, onCancel }) => {
         {quotation ? 'Editar Cotización' : 'Nueva Cotización'}
       </h2>
 
-      {/* Cliente y Fecha */}
+      {/* Nombre del Cliente y Fecha */}
       <div className="grid grid-cols-2 gap-4">
         <div>
-          <Label>Cliente *</Label>
-          <select
-            value={formData.customer_id}
-            onChange={(e) => handleCustomerChange(e.target.value)}
-            className="w-full p-2 border rounded"
+          <Label>Nombre del Cliente *</Label>
+          <Input
+            type="text"
+            value={formData.customer_name}
+            onChange={(e) => setFormData({ ...formData, customer_name: e.target.value })}
+            placeholder="Ingresa el nombre del cliente..."
             required
-          >
-            <option value="">Seleccionar cliente</option>
-            {customers.map(c => (
-              <option key={c.id} value={c.id}>{c.name}</option>
-            ))}
-          </select>
+          />
         </div>
         <div>
           <Label>Fecha Cotización *</Label>
@@ -266,55 +199,6 @@ const QuotationForm = ({ quotation, onSubmit, onCancel }) => {
         </div>
       </div>
 
-      {/* Tipo de Renta */}
-      <div>
-        <Label className="mb-2 block">Tipo de Renta *</Label>
-        <div className="grid grid-cols-3 gap-3">
-          <button
-            type="button"
-            onClick={() => {
-              setFormData({...formData, rental_type: 'pasadia'});
-              if(formData.villa_id) handleVillaChange(formData.villa_id);
-            }}
-            className={`p-3 border-2 rounded-md font-medium ${
-              formData.rental_type === 'pasadia' 
-                ? 'border-blue-600 bg-blue-50 text-blue-600' 
-                : 'border-gray-300'
-            }`}
-          >
-            <div className="text-sm">🌞 Pasadía</div>
-          </button>
-          <button
-            type="button"
-            onClick={() => {
-              setFormData({...formData, rental_type: 'amanecida'});
-              if(formData.villa_id) handleVillaChange(formData.villa_id);
-            }}
-            className={`p-3 border-2 rounded-md font-medium ${
-              formData.rental_type === 'amanecida' 
-                ? 'border-blue-600 bg-blue-50 text-blue-600' 
-                : 'border-gray-300'
-            }`}
-          >
-            <div className="text-sm">🌙 Amanecida</div>
-          </button>
-          <button
-            type="button"
-            onClick={() => {
-              setFormData({...formData, rental_type: 'evento'});
-              if(formData.villa_id) handleVillaChange(formData.villa_id);
-            }}
-            className={`p-3 border-2 rounded-md font-medium ${
-              formData.rental_type === 'evento' 
-                ? 'border-blue-600 bg-blue-50 text-blue-600' 
-                : 'border-gray-300'
-            }`}
-          >
-            <div className="text-sm">🎉 Evento</div>
-          </button>
-        </div>
-      </div>
-
       {/* Villa */}
       <div>
         <Label>Villa (Opcional)</Label>
@@ -323,40 +207,12 @@ const QuotationForm = ({ quotation, onSubmit, onCancel }) => {
           onChange={(e) => handleVillaChange(e.target.value)}
           className="w-full p-2 border rounded"
         >
-          <option value="">Sin villa (Solo Servicios)</option>
+          <option value="">Sin villa</option>
           {villas.map(v => (
             <option key={v.id} value={v.id}>{v.code} - {v.name}</option>
           ))}
         </select>
       </div>
-
-      {/* Price Selector for Flexible Prices */}
-      {showPriceSelector && selectedVillaFlexiblePrices && (
-        <div className="bg-yellow-50 border-2 border-yellow-300 rounded-lg p-4">
-          <h3 className="font-bold text-yellow-800 mb-3">💰 Selecciona un Precio</h3>
-          <div className="space-y-2">
-            {selectedVillaFlexiblePrices[formData.rental_type]?.map((priceOption, idx) => (
-              <button
-                key={idx}
-                type="button"
-                onClick={() => handleSelectFlexiblePrice(priceOption)}
-                className="w-full p-3 bg-white border-2 border-yellow-400 rounded hover:bg-yellow-100 text-left flex justify-between items-center"
-              >
-                <div>
-                  <div className="font-semibold text-gray-800">
-                    {priceOption.people_count} personas
-                  </div>
-                  <div className="text-sm text-gray-600">
-                    Cliente: RD$ {priceOption.client_price.toLocaleString()} | 
-                    Propietario: RD$ {priceOption.owner_price.toLocaleString()}
-                  </div>
-                </div>
-                <Check className="text-yellow-600" size={20} />
-              </button>
-            ))}
-          </div>
-        </div>
-      )}
 
       {/* Precios y Detalles - Solo mostrar si hay villa seleccionada */}
       {formData.villa_id && (
