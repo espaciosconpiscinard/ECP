@@ -1543,13 +1543,32 @@ async def delete_quotation(quotation_id: str, current_user: dict = Depends(requi
 
 @api_router.post("/quotations/{quotation_id}/convert-to-invoice", response_model=Reservation)
 async def convert_quotation_to_invoice(quotation_id: str, current_user: dict = Depends(get_current_user)):
-    """Convert a quotation to an invoice"""
+    """Convert a quotation to an invoice - creates customer automatically if not exists"""
     quotation = await db.quotations.find_one({"id": quotation_id}, {"_id": 0})
     if not quotation:
         raise HTTPException(status_code=404, detail="Quotation not found")
     
     if quotation.get("status") == "converted":
         raise HTTPException(status_code=400, detail="Quotation already converted to invoice")
+    
+    # AUTO-CREATE CUSTOMER if customer_id is None or empty
+    customer_id = quotation.get("customer_id")
+    if not customer_id:
+        # Create new customer with the name from quotation
+        new_customer = Customer(
+            name=quotation["customer_name"],
+            phone="",  # Vacío por defecto
+            email=None,
+            identification=None,
+            identification_document=None,
+            dni=None,
+            address=None,
+            notes=f"Cliente creado automáticamente desde cotización {quotation['quotation_number']}",
+            created_by=current_user["id"]
+        )
+        customer_doc = prepare_doc_for_insert(new_customer.model_dump())
+        await db.customers.insert_one(customer_doc)
+        customer_id = new_customer.id
     
     # Generate invoice number
     last_reservation = await db.reservations.find_one(
@@ -1570,7 +1589,7 @@ async def convert_quotation_to_invoice(quotation_id: str, current_user: dict = D
     )
     
     reservation = Reservation(
-        customer_id=quotation["customer_id"],
+        customer_id=customer_id,  # Use the created or existing customer_id
         customer_name=quotation["customer_name"],
         villa_id=quotation.get("villa_id"),
         villa_code=quotation.get("villa_code"),
