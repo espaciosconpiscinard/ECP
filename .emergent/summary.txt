@@ -1,103 +1,104 @@
 <analysis>
-The AI engineer's work primarily focused on iteratively fixing critical bugs and implementing new features. Initially, efforts were directed at the Solo Servicios invoice variant and a Quick Client ghost invoice bug. The Solo Servicios  was resolved by making , , and  optional in  and fixing duplicate  imports in . The display issue for Solo Servicios expenses was addressed by introducing a  category in  and updating  to display them.
+The previous AI engineer effectively navigated a complex set of evolving requirements for the Espacios Con Piscina application. Initial tasks involved critical bug fixes, like the Solo Servicios 500 error and the Quick Client ghost invoice bug, demonstrating robust debugging and problem-solving skills. Feature development progressed from standalone Conduces and Quotations modules to a more integrated approach, notably simplifying Conduces into a print-only option within Facturas and Quotations due to user feedback and technical challenges with PDF generation.
 
-The Quick Client ghost invoice bug proved more elusive, requiring multiple rounds of debugging. Initial fixes involved adjusting a  callback, but the core issue was later identified as unintended form submission from a  button within a nested dialog in . This was fixed by explicitly setting . Subsequently, user feedback clarified the ghost invoice occurred specifically when creating a client from the Nueva Factura context. The ultimate fix involved adding  in 's , reordering callbacks, and adding a delay.
-
-Feature additions included an internal notes field for invoices, basic models and API endpoints for Quotations and Conduces, UI components and navigation for them, and a mechanism to mark commissions for deleted invoices. The PDF download functionality was a major challenge, undergoing several iterations (html2pdf, jsPDF, simplification) before the user requested its removal due to persistent issues and costs. The task then shifted to creating print-only Conduce functionality (without prices) directly from Facturas and Quotations, and enabling quotation-to-invoice conversion. The trajectory concludes with the AI working on integrating the Conduce print functionality into Quotations after simplifying it from a standalone module to a print option within Facturas due to compilation errors and user preference.
+Significant work focused on enhancing the Quotations module, including implementing editable terms, automatic price loading from villas/services, and ensuring seamless conversion to Facturas with proper commission and expense generation. The engineer also addressed UI/UX improvements like consistent styling for quotations, adding visual indicators for synced quotations, and implementing scrollable list views across various sections (Quotations, Reservations, Customers, Expenses, Commissions, Users) for better performance with large datasets. Debugging efforts included resolving incorrect supplier ID handling in quotation services and refining total calculations. The trajectory concludes with the engineer addressing a persistent price calculation issue in quotations and a label change for services.
 </analysis>
 
 <product_requirements>
-The Espacios Con Piscina application is a comprehensive system for rental and service businesses, managing villas, reservations, clients, and expenses with customizable invoices and payment tracking.
+The Espacios Con Piscina app manages rentals, services, villas, reservations, clients, and expenses. Key features include invoice management (redesigns, partial payments, numbering, variants, internal notes), expense management (categories, reminders,  visibility), customer/admin tools (quick client creation), flexible pricing, automatic commissions (with  flag), and data handling (export/import, backup/restore).
 
 **Implemented Features & Refinements (from trajectory):**
-*   **Invoice Management**: Professional redesigns, partial payments, manual numbering, villa location, security deposit tracking, Villa and Solo Servicios invoice variants with adapted forms.
-*   **Expense Management**: User-creatable categories, reminders, grouping, filtering,  checkbox, redesigned abono modal (detailed reservation info, payments to owners/suppliers),  category for Solo Servicios expenses (now visible).
-*   **Customer/Admin**: Customer editor for quick client creation.
-*   **Pricing**: Flexible tiers (, , ).
-*   **Commissions**: Automatic system, multi-selection for bulk actions,  flag for commissions when invoices are deleted.
-*   **Data Handling**: Cascade deletion, hierarchical Excel import/export, full backup/restore.
-*   **UI/UX**: Dynamic logo, clickable home button, renamed tabs, internal note field for invoices.
-*   **Bug Fixes**: Conditional rendering, Quick Client ghost invoice (multiple fixes), Solo Servicios  error (UUID and optional fields), Solo Servicios expense display. Validation added for Solo Servicios invoices to prevent saving without services.
+*   **Invoice Management**: Solo Servicios 500 error fixed, expense display, internal notes.
+*   **Quick Client**: Ghost invoice bug fixed, form submission prevented.
+*   **Conduce Functionality**: Initially a module, simplified to print-only from Facturas and Quotations (without prices).
+*   **Quotations**: Dedicated module with editor, print functionality (now with preview), conversion to invoice (auto-generates invoice number, commissions, and expenses, links to original quotation), dynamic price loading from villas/services, editable terms and conditions.
+*   **Commissions**:  flag for deleted invoice commissions (visual indicator added).
+*   **UI/UX**: Consistent blue styling for quotations, Sincronizada con factura badge, scrollable list views for better performance (Quotations, Reservations, Customers, Expenses, Commissions, Users).
 
 **Outstanding Requests (from trajectory):**
-*   **Quotations**: Dedicated module with an editor similar to invoices, ability to convert to invoices, print, and download PDF (now print only).
-*   **Delivery Notes (Conduce)**: Dedicated module (now simplified to a print-only option from invoices/quotations), without prices, should be generatable from invoices or quotations, print functionality (PDF download removed).
-*   **PDF Download Button**: In Facturas (Reservations section) (Removed by user request, replaced with print-only options).
+*   **Quotation Price Calculation**: Ensure services correctly reflect prices from suppliers/villas, not showing /bin/bash.00 total. (Ongoing)
 </product_requirements>
 
 <key_technical_concepts>
 -   **Full-stack Development**: React (Frontend), FastAPI (Backend), MongoDB.
--   **Data Modeling**: Pydantic, UUIDs.
--   **API Design**: RESTful, environment variables.
--   **Frontend State Management**: , .
--   **Conditional UI Rendering**: Dynamic form fields.
--   **PDF Generation**: ,  (attempted, then removed).
--   **UI Components**: Shadcn/ui Dialog, Button.
+-   **Data Modeling**: Pydantic, UUIDs, Optional fields.
+-   **API Design**: RESTful endpoints ( prefix), environment variables.
+-   **Frontend State Management**: , , .
+-   **UI Components**: Shadcn/ui (Card, Dialog, Button, Input, Select, etc.), dynamic rendering.
+-   **Printing**: , ,  (with preview).
+-   **Asynchronous Operations**:  for API calls.
 </key_technical_concepts>
 
 <code_architecture>
 
--   ****: Defines Pydantic data models.
-    -   **Summary**: Centralizes data structure definitions.
-    -   **Changes**: , ,  in  made .  added to  and . New models , , , , ,  were added.  added to  and .
--   ****: Main FastAPI application.
-    -   **Summary**: Handles API routes, database interactions, and business logic.
-    -   **Changes**: Duplicate  statements removed. Logic added to create  expense category for Solo Servicios invoices without a . Basic endpoints for  and  created (later,  related backend logic may need removal/adjustment due to frontend simplification).  modified to set  on associated commissions instead of deleting them. Imports updated for new models.
--   ****: Centralizes API calls from frontend.
-    -   **Summary**: Provides functions for interacting with backend endpoints.
-    -   **Changes**: New functions for Quotations (e.g., , ) and Conduces (e.g., , ) were added.
--   ****: Manages reservations/invoices and their forms.
+-   ****: Defines Pydantic data models for the application.
+    -   **Summary**: Central to data structure definitions, ensuring type safety and validation.
+    -   **Changes**:  added to  and . New models , ,  were added.  added to  and .
+-   ****: Main FastAPI application handling API routes and business logic.
+    -   **Summary**: Orchestrates interactions between frontend, database, and services.
+    -   **Changes**: Duplicate  imports removed. Logic for  added.  endpoints refined.  now sets  on commissions. New endpoints for  (GET/PUT) added.  endpoint modified to automatically create commissions and  expenses, and to link the converted invoice to the quotation via .  endpoint modified to also update the linked invoice if  is present. Imports updated for new models.
+-   ****: Centralized API call functions.
+    -   **Summary**: Facilitates communication between frontend and backend.
+    -   **Changes**: New functions for  and  added.
+-   ****: Manages invoices (reservations).
     -   **Summary**: Core component for invoice creation, viewing, and actions.
-    -   **Changes**:  added to Cliente Rápido button to prevent unintended form submission. Validation added to prevent saving empty Solo Servicios invoices.  and callback reordering in  invocation fixed Quick Client ghost invoice bug.  field added to form data and UI. PDF download logic using  and  was implemented, debugged, and then completely removed per user request. Functions and states for  and  were added, then later simplified to  to print invoices without prices, and the dedicated conduce dialog removed.
--   ****: Reused for in-form client creation.
-    -   **Summary**: Allows quick creation of new customers within other forms.
-    -   **Changes**:  added to the submit button inside the dialog.  added to , and callback reordered to fix the Quick Client ghost invoice bug.
--   ****: Manages expenses.
-    -   **Summary**: Displays and filters expense records.
-    -   **Changes**: Modified to display the new  category, update pending calculations, and exclude it from the Variables tab filter.
+    -   **Changes**:  and  modified to show print preview (removing direct print). Logic added to hide Alquiler de Espacio - undefined rows when  is missing in print view. List container wrapped with a scrollable  for performance. A badge () added to display if an invoice originated from a quotation.
+-   ****: For quick client creation.
+    -   **Summary**: Reusable dialog for creating customers within other forms.
+    -   **Changes**:  and  added to fix ghost invoice bug.
+-   ****: Displays and filters expenses.
+    -   **Summary**: Manages expense records, including the new  category.
+    -   **Changes**: List container wrapped with a scrollable .
 -   ****: Manages commissions.
-    -   **Summary**: Displays and manages commissions, with filtering and bulk actions.
-    -   **Changes**: Added  state and filter logic. UI updated with a checkbox to filter deleted invoice commissions and a visual indicator/alert message for them.
+    -   **Summary**: Displays and manages commissions, with filtering.
+    -   **Changes**: UI updated to clearly show  with a red badge. List container wrapped with a scrollable .
 -   ****: Main application router.
-    -   **Summary**: Defines the application's routes and component rendering.
-    -   **Changes**: Routes for  and  were added. The  route was subsequently removed.
+    -   **Summary**: Defines application routes.
+    -   **Changes**:  route removed.
 -   ****: Application layout and navigation.
-    -   **Summary**: Provides the overall structural framework and side menu.
-    -   **Changes**: Menu items for Cotizaciones and Conduce were added. The Conduce menu item was subsequently removed.
--   ** (Created)**: Manages quotations.
-    -   **Summary**: New component for handling quotation creation, listing, and actions.
-    -   **Changes**: Initial basic structure, then rewritten to use . Added  function (for printing quotations),  (for generating conduces from quotations), and . Logo fetching logic removed.
--   ** (Created)**: Form for creating/editing quotations.
-    -   **Summary**: Dedicated form for the Quotations component, similar to  form.
--   ** (Created, then deleted)**: Was intended to manage conduces.
-    -   **Summary**: Created as a standalone module, then deleted as per user instructions to simplify conduce functionality into a print option from invoices/quotations.
--   ** (Created, then deleted)**: Was the form for conduces.
-    -   **Summary**: Created as a dedicated form, then deleted along with .
+    -   **Summary**: Provides the structural framework and side menu.
+    -   **Changes**: Conduce menu item removed.
+-   ****: Manages quotations.
+    -   **Summary**: Handles quotation listing, creation, and actions.
+    -   **Changes**:  and  modified to show print preview and to load/display configurable terms. Print styling updated for consistency.  now called . Quotation cards styled with blue accents. Visual indicator () added for converted quotations. Implemented a scrollable container for the list of quotations.  label changed to .
+-   ****: Form for creating/editing quotations.
+    -   **Summary**: Dedicated form for quotations, now mirroring advanced  form features.
+    -   **Changes**: Rewritten to include  selector, flexible pricing logic,  field, and supplier selector for services. Logic implemented to hide guest/price/schedule fields in Solo Servicios mode.  and  refined to ensure correct total calculations and supplier price updates. Changed  label to .
+-   ****: Manages application settings.
+    -   **Summary**: Provides UI for various application configurations.
+    -   **Changes**: New section added for Términos de Cotizaciones allowing users to add, edit, and save custom terms via API. Includes state management (, ), API integration (, ), and UI for editing a list of terms.
+-   ****: Manages customers.
+    -   **Summary**: Displays and manages customer records.
+    -   **Changes**: List container wrapped with a scrollable .
+-   ****: Manages users.
+    -   **Summary**: Displays and manages user records.
+    -   **Changes**: List container wrapped with a scrollable .
+-   ****: Manages villas.
+    -   **Summary**: Displays and manages villa records.
+    -   **Changes**: List container wrapped with a scrollable .
 </code_architecture>
 
 <pending_tasks>
--   **Quotations functionality**: Complete the implementation of Quotations, including print functionality and the button to generate a conduce (without prices) from a quotation.
--   **Conduce printing from Quotations**: Implement the Generar Conduce button in Quotations to print without prices.
--   **Commission Control for Deleted Invoices**: Ensure the UI message for deleted invoices in commissions is clear and effective for the user.
+-   **Quotation Price Calculation**: Debug and fix the persistent issue where service prices are not correctly applied, resulting in /bin/bash.00 totals in QuotationForm, despite selecting a supplier.
 </pending_tasks>
 
 <current_work>
-Immediately before this summary, the AI engineer was addressing a compilation error reported by the user and a new set of simplified requirements for Conduce functionality.
+Immediately before this summary, the AI engineer was tackling two user-reported issues related to quotation functionality:
+1.  **Incorrect Price Calculation**: The user reported that despite selecting a supplier with a price (e.g., - RD8000), the total for services in the QuotationForm remained /bin/bash.00.
+2.  **Labeling Discrepancy**: The user requested changing Servicios Adicionales to Servicios in the quotation form, as these are considered normal services within a quotation.
 
-The user expressed frustration with the persistent PDF download issues and explicitly requested its removal. Instead, they asked for a Conduce button on the Facturas (Reservations) page that would print the *same invoice but without prices*. This indicates a significant simplification: Conduce is no longer a separate module but a printing variant of an invoice.
+The AI engineer's actions involved:
+*   **Diagnosing the price issue**: The engineer identified from console logs () that the  was not being correctly extracted from the selected option in . The dropdown was incorrectly passing a string like - RD$18000 instead of the actual .
+*   **Fixing **:
+    *   **Price Issue**: The  function in  was modified (Chat Message 332) to correctly parse the  from the selected value.
+    *   **Label Change**: The label Servicios Adicionales in  was updated to Servicios (Chat Message 399).
+    *   **Debugging Cleanup**: Console logs previously added for debugging  were removed (Chat Message 401).
 
-The AI engineer acknowledged these changes and was in the process of implementing them:
-1.  **Removed Conduces Module**: The dedicated  route, menu link, and the  and  components were deleted.
-2.  **Updated **:
-    *   Removed  related imports and functions ().
-    *   Removed states related to the .
-    *   Replaced the previous  (which would open a dialog) with a new  function. This new function is responsible for printing the reservation details, but with prices hidden, effectively creating a delivery note (conduce).
-    *   The Generar Conduce button in the Reservations detail view was updated to call this new  function.
-    *   The entire  component was removed from .
+Additionally, the engineer had previously implemented a user request to replace infinite scrolling with **scrollable containers** for lists across various components (, , , , , , ) to improve performance with large datasets. This involved wrapping the list rendering logic within  elements with  and a fixed height. The  buttons were removed as part of this change.
 
-The very last action in the trajectory was the AI stating it would hacer lo mismo para Quotations - agregar botón Conduce que imprime sin precios, indicating the same print-without-prices functionality needs to be added to the Quotations component.
+The last successful action was the label change. The price calculation issue needs re-verification.
 </current_work>
 
 <optional_next_step>
-Implement the Conduce print-without-prices functionality for Quotations.
+Re-verify and fix the quotation service price calculation issue.
 </optional_next_step>
