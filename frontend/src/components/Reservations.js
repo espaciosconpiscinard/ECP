@@ -2284,6 +2284,8 @@ const Reservations = () => {
                     <option value="cancelled">Cancelada</option>
                   </select>
                 </div>
+                
+                {/* NOTAS AL FINAL */}
                 <div className="col-span-2">
                   <Label>Notas (Visible para el Cliente)</Label>
                   <textarea
