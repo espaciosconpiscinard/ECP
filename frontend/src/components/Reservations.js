@@ -279,42 +279,56 @@ const Reservations = () => {
     // Get the selected villa to access modality-specific info
     const selectedVilla = villas.find(v => v.id === formData.villa_id);
     
+    console.log('🔍 Villa seleccionada completa:', selectedVilla);
+    
     // Set modality-specific description and times
     let modalityDescription = '';
     let defaultCheckInTime = '';
     let defaultCheckOutTime = '';
     let rentalType = '';  // Para backend (minúsculas sin tildes)
     let rentalTypeDisplay = '';  // Para mostrar en UI (con formato)
+    let villaCodeWithModality = formData.villa_code;  // Código original
     
     if (selectedVilla && modality) {
       if (modality === 'pasadia') {
-        modalityDescription = selectedVilla.pasadia_description || '';
-        defaultCheckInTime = selectedVilla.default_check_in_time_pasadia || '';
-        defaultCheckOutTime = selectedVilla.default_check_out_time_pasadia || '';
+        // Intentar ambos nombres de campos por compatibilidad
+        modalityDescription = selectedVilla.description_pasadia || selectedVilla.pasadia_description || '';
+        defaultCheckInTime = selectedVilla.check_in_time_pasadia || selectedVilla.default_check_in_time_pasadia || '';
+        defaultCheckOutTime = selectedVilla.check_out_time_pasadia || selectedVilla.default_check_out_time_pasadia || '';
         rentalType = 'pasadia';  // Backend
         rentalTypeDisplay = 'Pasadía';  // UI
+        villaCodeWithModality = `${formData.villa_code} - PASADIA`;
       } else if (modality === 'amanecida') {
-        modalityDescription = selectedVilla.amanecida_description || '';
-        defaultCheckInTime = selectedVilla.default_check_in_time_amanecida || '';
-        defaultCheckOutTime = selectedVilla.default_check_out_time_amanecida || '';
+        modalityDescription = selectedVilla.description_amanecida || selectedVilla.amanecida_description || '';
+        defaultCheckInTime = selectedVilla.check_in_time_amanecida || selectedVilla.default_check_in_time_amanecida || '';
+        defaultCheckOutTime = selectedVilla.check_out_time_amanecida || selectedVilla.default_check_out_time_amanecida || '';
         rentalType = 'amanecida';  // Backend
         rentalTypeDisplay = 'Amanecida';  // UI
+        villaCodeWithModality = `${formData.villa_code} - AMANECIDA`;
       } else if (modality === 'evento') {
-        modalityDescription = selectedVilla.evento_description || '';
+        modalityDescription = selectedVilla.description_evento || selectedVilla.evento_description || '';
         defaultCheckInTime = '';
         defaultCheckOutTime = '';
         rentalType = 'evento';  // Backend
         rentalTypeDisplay = 'Evento';  // UI
+        villaCodeWithModality = `${formData.villa_code} - EVENTO`;
       }
     }
     
-    console.log('Aplicando precio de modalidad:', {
+    console.log('✅ Aplicando precio de modalidad:', {
       modality,
       rentalType,
       rentalTypeDisplay,
+      villaCodeWithModality,
       defaultCheckInTime,
       defaultCheckOutTime,
-      modalityDescription
+      modalityDescription,
+      'Campos disponibles en villa': {
+        description_pasadia: selectedVilla?.description_pasadia,
+        pasadia_description: selectedVilla?.pasadia_description,
+        check_in_time_pasadia: selectedVilla?.check_in_time_pasadia,
+        default_check_in_time_pasadia: selectedVilla?.default_check_in_time_pasadia
+      }
     });
     
     // Apply the selected price with modality-specific info
@@ -322,6 +336,7 @@ const Reservations = () => {
       ...prev,
       rental_type: rentalType,  // Para backend: 'pasadia', 'amanecida', 'evento'
       rental_type_display: rentalTypeDisplay,  // Para UI: 'Pasadía', 'Amanecida', 'Evento'
+      villa_code: villaCodeWithModality,  // Código con modalidad: ECPVWPSI - PASADIA
       villa_description: modalityDescription,  // Descripción específica de la modalidad
       base_price: priceOption.client_price || 0,
       owner_price: priceOption.owner_price || 0,
@@ -329,6 +344,8 @@ const Reservations = () => {
       check_out_time: defaultCheckOutTime,
       guests: 1  // Default to 1, user can edit
     }));
+    
+    console.log('✅ FormData actualizado con modalidad');
     
     // Hide the selector once price is selected
     setShowPriceSelector(false);
