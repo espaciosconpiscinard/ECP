@@ -221,6 +221,24 @@ const Reservations = () => {
     }));
   }, [formData.base_price, formData.extra_hours_cost, formData.extra_people_cost, formData.discount, formData.include_itbis, selectedExtraServices]);
   
+  // Actualizar owner_price cuando cambien horas/personas extras
+  useEffect(() => {
+    const baseOwnerPrice = parseFloat(formData.base_owner_price) || 0;
+    const extraHoursCost = parseFloat(formData.extra_hours_cost) || 0;
+    const extraPeopleCost = parseFloat(formData.extra_people_cost) || 0;
+    
+    // owner_price = precio base del propietario + extras
+    const newOwnerPrice = baseOwnerPrice + extraHoursCost + extraPeopleCost;
+    
+    // Solo actualizar si realmente cambió
+    if (newOwnerPrice !== formData.owner_price) {
+      setFormData(prev => ({
+        ...prev,
+        owner_price: newOwnerPrice
+      }));
+    }
+  }, [formData.base_owner_price, formData.extra_hours_cost, formData.extra_people_cost]);
+  
   const handleVillaChange = (villaId) => {
     const villa = villas.find(v => v.id === villaId);
     if (villa) {
