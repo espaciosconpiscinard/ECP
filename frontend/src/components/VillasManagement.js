@@ -417,6 +417,7 @@ const VillasManagementNew = () => {
   const handleAddSupplier = () => {
     const newSupplier = {
       name: '',
+      description: '',  // Descripción específica del suplidor
       client_price: 0,
       supplier_cost: 0,
       is_default: serviceFormData.suppliers.length === 0  // El primero es default
