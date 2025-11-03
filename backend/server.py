@@ -1271,6 +1271,7 @@ async def update_reservation(
                     "expense_date": datetime.now(timezone.utc).isoformat(),
                     "payment_status": "paid",
                     "related_reservation_id": reservation_id,
+                    "created_by": current_user["id"],
                     "created_at": datetime.now(timezone.utc).isoformat(),
                     "updated_at": datetime.now(timezone.utc).isoformat()
                 }
