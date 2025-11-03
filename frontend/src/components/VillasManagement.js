@@ -146,11 +146,8 @@ const VillasManagementNew = () => {
     setError('');
     
     try {
-      // Actualizar formData con los precios flexibles antes de guardar
-      const dataToSave = {
-        ...formData,
-        flexible_prices: flexiblePrices
-      };
+      // Guardar formData directamente
+      const dataToSave = { ...formData };
       
       if (editingVilla) {
         await updateVilla(editingVilla.id, dataToSave);
