@@ -222,44 +222,49 @@ const Reservations = () => {
   const handleVillaChange = (villaId) => {
     const villa = villas.find(v => v.id === villaId);
     if (villa) {
-      // Guardar precios flexibles de la villa
-      setSelectedVillaFlexiblePrices(villa.flexible_prices || null);
+      // Verificar si tiene precios configurados en alguna modalidad
+      const hasPasadiaPrices = villa.pasadia_prices && villa.pasadia_prices.length > 0;
+      const hasAmanecidaPrices = villa.amanecida_prices && villa.amanecida_prices.length > 0;
+      const hasEventoPrices = villa.evento_prices && villa.evento_prices.length > 0;
       
-      // Si tiene precios flexibles, mostrar selector
-      const hasFlexiblePrices = villa.flexible_prices && Object.values(villa.flexible_prices).some(prices => prices?.length > 0);
+      // Guardar los precios de la villa para mostrar selector
+      setSelectedVillaFlexiblePrices({
+        pasadia: hasPasadiaPrices ? villa.pasadia_prices : [],
+        amanecida: hasAmanecidaPrices ? villa.amanecida_prices : [],
+        evento: hasEventoPrices ? villa.evento_prices : []
+      });
       
-      if (hasFlexiblePrices) {
+      if (hasPasadiaPrices || hasAmanecidaPrices || hasEventoPrices) {
         setShowPriceSelector(true);
-        // No auto-llenar precios, esperar que usuario seleccione
+        // No auto-llenar precios, esperar que usuario seleccione modalidad y precio
         setFormData(prev => ({
           ...prev,
           villa_id: villaId,
           villa_code: villa.code,
           villa_description: villa.description || '',
           villa_location: villa.location || '',
-          check_in_time: villa.default_check_in_time || '',
-          check_out_time: villa.default_check_out_time || '',
+          villa_currency: villa.villa_currency || 'DOP',
+          check_in_time: '',  // Se llenará según la modalidad seleccionada
+          check_out_time: '',
           base_price: 0,
           owner_price: 0,
           extra_hours_unit_price: villa.extra_hours_price_client || 0,
           extra_people_unit_price: villa.extra_people_price_client || 0
         }));
       } else {
-        // Si no tiene precios flexibles, usar precio por defecto
+        // Si no tiene precios configurados
         setShowPriceSelector(false);
-        const clientPrice = villa.default_price_pasadia || villa.default_price_amanecida || villa.default_price_evento || 0;
-        const ownerPrice = villa.owner_price_pasadia || villa.owner_price_amanecida || villa.owner_price_evento || 0;
-        
         setFormData(prev => ({
           ...prev,
           villa_id: villaId,
           villa_code: villa.code,
           villa_description: villa.description || '',
           villa_location: villa.location || '',
-          check_in_time: villa.default_check_in_time || '',
-          check_out_time: villa.default_check_out_time || '',
-          base_price: clientPrice,
-          owner_price: ownerPrice,
+          villa_currency: villa.villa_currency || 'DOP',
+          check_in_time: villa.check_in_time_pasadia || '9:00 AM',
+          check_out_time: villa.check_out_time_pasadia || '8:00 PM',
+          base_price: 0,
+          owner_price: 0,
           extra_hours_unit_price: villa.extra_hours_price_client || 0,
           extra_people_unit_price: villa.extra_people_price_client || 0
         }));
