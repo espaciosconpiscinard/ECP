@@ -2354,32 +2354,8 @@ const Reservations = () => {
                   <p className="text-xs text-gray-500 ml-6">Se calcula sobre el total sin incluir el depósito de seguridad</p>
                 </div>
 
-                {/* Resumen de Totales */}
-                <div className="col-span-2 bg-gray-100 p-4 rounded-md">
-                  <div className="space-y-2">
-                    <div className="flex justify-between">
-                      <span>Subtotal:</span>
-                      <span className="font-bold">{formatCurrency(formData.subtotal, formData.currency)}</span>
-                    </div>
-                    {formData.discount > 0 && (
-                      <div className="flex justify-between text-red-600">
-                        <span>Descuento:</span>
-                        <span>- {formatCurrency(formData.discount, formData.currency)}</span>
-                      </div>
-                    )}
-                    {formData.include_itbis && (
-                      <div className="flex justify-between text-blue-600">
-                        <span>ITBIS (18%):</span>
-                        <span>+ {formatCurrency(formData.itbis_amount, formData.currency)}</span>
-                      </div>
-                    )}
-                    <div className="flex justify-between text-lg font-bold border-t pt-2">
-                      <span>TOTAL:</span>
-                      <span>{formatCurrency(formData.total_amount, formData.currency)}</span>
-                    </div>
-                  </div>
-                </div>
-
+                {/* CAMPOS DE PAGO - ANTES DEL TOTAL */}
+                
                 {/* Método de Pago */}
                 <div className="col-span-2">
                   <Label>Método de Pago *</Label>
@@ -2434,6 +2410,32 @@ const Reservations = () => {
                     <option value="completed">Completada</option>
                     <option value="cancelled">Cancelada</option>
                   </select>
+                </div>
+
+                {/* Resumen de Totales - DESPUÉS DE CAMPOS DE PAGO */}
+                <div className="col-span-2 bg-gray-100 p-4 rounded-md">
+                  <div className="space-y-2">
+                    <div className="flex justify-between">
+                      <span>Subtotal:</span>
+                      <span className="font-bold">{formatCurrency(formData.subtotal, formData.currency)}</span>
+                    </div>
+                    {formData.discount > 0 && (
+                      <div className="flex justify-between text-red-600">
+                        <span>Descuento:</span>
+                        <span>- {formatCurrency(formData.discount, formData.currency)}</span>
+                      </div>
+                    )}
+                    {formData.include_itbis && (
+                      <div className="flex justify-between text-blue-600">
+                        <span>ITBIS (18%):</span>
+                        <span>+ {formatCurrency(formData.itbis_amount, formData.currency)}</span>
+                      </div>
+                    )}
+                    <div className="flex justify-between text-lg font-bold border-t pt-2">
+                      <span>TOTAL:</span>
+                      <span>{formatCurrency(formData.total_amount, formData.currency)}</span>
+                    </div>
+                  </div>
                 </div>
                 
                 {/* NOTAS AL FINAL */}
