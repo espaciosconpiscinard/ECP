@@ -424,6 +424,47 @@ const Expenses = () => {
     }
   };
 
+  const handleDeleteSupplierAbono = async (supplierExpenseId, abonoId) => {
+    if (window.confirm('¿Estás seguro de eliminar este pago al suplidor?')) {
+      try {
+        await deleteExpenseAbono(supplierExpenseId, abonoId);
+        
+        // Refresh supplier abonos for this specific expense
+        const response = await getExpenseAbonos(supplierExpenseId);
+        setSupplierAbonos(prev => ({
+          ...prev,
+          [supplierExpenseId]: response.data || []
+        }));
+        
+        // Refresh expenses list to update balance_due
+        await fetchExpenses();
+        
+        // Refresh supplierExpenses to show updated balance
+        const allExpensesResponse = await fetch(
+          `${process.env.REACT_APP_BACKEND_URL}/api/expenses`,
+          {
+            headers: {
+              'Authorization': `Bearer ${localStorage.getItem('token')}`
+            }
+          }
+        );
+        
+        if (allExpensesResponse.ok) {
+          const allExpenses = await allExpensesResponse.json();
+          const supplierExpensesForReservation = allExpenses.filter(e => 
+            e.category === 'pago_suplidor' && 
+            e.related_reservation_id === selectedExpense.related_reservation_id
+          );
+          setSupplierExpenses(supplierExpensesForReservation);
+        }
+        
+        alert('✅ Pago al suplidor eliminado exitosamente');
+      } catch (err) {
+        alert('Error al eliminar pago: ' + (err.response?.data?.detail || err.message));
+      }
+    }
+  };
+
   const formatCurrency = (amount, currency) => {
     const formatted = new Intl.NumberFormat('es-DO').format(amount);
     return currency === 'DOP' ? `RD$ ${formatted}` : `$ ${formatted}`;
