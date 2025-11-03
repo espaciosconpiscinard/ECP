@@ -1712,6 +1712,34 @@ const Reservations = () => {
                     />
                     <Search className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={18} />
                     
+                    {/* Botón para limpiar villa seleccionada */}
+                    {formData.villa_id && (
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setFormData({
+                            ...formData,
+                            villa_id: '',
+                            villa_code: '',
+                            villa_description: '',
+                            villa_location: '',
+                            check_in_time: '',
+                            check_out_time: '',
+                            base_price: 0,
+                            owner_price: 0,
+                            extra_hours_unit_price: 0,
+                            extra_people_unit_price: 0
+                          });
+                          setVillaSearchTerm('');
+                          setShowPriceSelector(false);
+                          setSelectedVillaFlexiblePrices(null);
+                        }}
+                        className="absolute right-10 top-1/2 transform -translate-y-1/2 text-red-600 hover:text-red-800"
+                      >
+                        <X size={18} />
+                      </button>
+                    )}
+                    
                     {/* Dropdown de villas y servicios filtrados */}
                     {showVillaDropdown && (filteredVillas.length > 0 || filteredServices.length > 0) && (
                       <div className="absolute z-50 w-full mt-1 bg-white border border-gray-300 rounded-md shadow-lg max-h-60 overflow-y-auto">
@@ -1731,13 +1759,6 @@ const Reservations = () => {
                                   <div>
                                     <p className="font-semibold text-blue-600">{villa.code}</p>
                                     <p className="text-sm text-gray-600">{villa.name}</p>
-                                  </div>
-                                  <div className="text-right text-sm">
-                                    <p className="text-gray-700">
-                                      {formData.rental_type === 'pasadia' && `RD$ ${villa.default_price_pasadia?.toLocaleString()}`}
-                                      {formData.rental_type === 'amanecida' && `RD$ ${villa.default_price_amanecida?.toLocaleString()}`}
-                                      {formData.rental_type === 'evento' && `RD$ ${villa.default_price_evento?.toLocaleString()}`}
-                                    </p>
                                   </div>
                                 </div>
                               </div>
@@ -1785,8 +1806,11 @@ const Reservations = () => {
                       </div>
                     )}
                   </div>
+                  {formData.villa_id && (
+                    <p className="text-xs text-green-600 mt-1">✓ {formData.villa_code} seleccionada</p>
+                  )}
                   {!formData.villa_id && (
-                    <p className="text-xs text-gray-500 mt-1">Selecciona una villa o servicio (opcional)</p>
+                    <p className="text-xs text-gray-500 mt-1">Selecciona una villa (opcional)</p>
                   )}
                 </div>
 
