@@ -1403,23 +1403,57 @@ async def update_reservation(
                 "category": "pago_suplidor"
             }, {"_id": 0}).to_list(1000)
             
-            existing_suppliers = {exp.get("description", ""): exp for exp in existing_supplier_expenses}
+            # Crear mapa de gastos existentes por supplier_name
+            existing_suppliers_map = {}
+            for exp in existing_supplier_expenses:
+                # Extraer supplier_name del description
+                for service in old_services:
+                    if service.get("supplier_name") and service.get("supplier_name") in exp.get("description", ""):
+                        existing_suppliers_map[service.get("supplier_name")] = exp
+                        break
             
-            # Crear gastos para nuevos servicios con suplidor
+            # Procesar cada servicio nuevo
             for service in new_services:
                 if service.get("supplier_name"):
-                    supplier_key = f"{service.get('supplier_name')} - {service.get('service_name', 'Servicio')}"
+                    supplier_name = service.get("supplier_name")
+                    new_supplier_cost = service.get("supplier_cost", 0) * service.get("quantity", 1)
                     
                     # Verificar si ya existe el gasto para este suplidor
-                    if not any(supplier_key in desc for desc in existing_suppliers.keys()):
-                        print(f"📝 [UPDATE_RESERVATION] Creando nuevo gasto para suplidor: {service.get('supplier_name')}")
+                    if supplier_name in existing_suppliers_map:
+                        # Actualizar el gasto existente si el monto cambió
+                        existing_expense = existing_suppliers_map[supplier_name]
+                        old_amount = existing_expense.get("amount", 0)
                         
-                        supplier_cost = service.get("supplier_cost", 0) * service.get("quantity", 1)
+                        if old_amount != new_supplier_cost:
+                            print(f"📝 [UPDATE_RESERVATION] Actualizando gasto suplidor {supplier_name}: {old_amount} → {new_supplier_cost}")
+                            
+                            await db.expenses.update_one(
+                                {"id": existing_expense["id"]},
+                                {"$set": {
+                                    "amount": new_supplier_cost,
+                                    "updated_at": datetime.now(timezone.utc).isoformat()
+                                }}
+                            )
+                            
+                            # Recalcular estado del gasto suplidor
+                            supplier_abonos = await db.expense_abonos.find({"expense_id": existing_expense["id"]}, {"_id": 0}).to_list(1000)
+                            supplier_total_paid = sum(a.get("amount", 0) for a in supplier_abonos)
+                            supplier_paid = supplier_total_paid >= new_supplier_cost
+                            
+                            new_supplier_status = "paid" if supplier_paid else "pending"
+                            await db.expenses.update_one(
+                                {"id": existing_expense["id"]},
+                                {"$set": {"payment_status": new_supplier_status}}
+                            )
+                            print(f"✅ [UPDATE_RESERVATION] Gasto suplidor actualizado, nuevo estado: {new_supplier_status}")
+                    else:
+                        # Crear nuevo gasto para suplidor
+                        print(f"📝 [UPDATE_RESERVATION] Creando nuevo gasto para suplidor: {supplier_name}")
                         
                         supplier_expense = {
                             "id": str(uuid.uuid4()),
-                            "description": f"Pago suplidor {service.get('supplier_name')} - {service.get('service_name', 'Servicio')} (Factura #{existing.get('invoice_number', reservation_id[-4:])})",
-                            "amount": supplier_cost,
+                            "description": f"Pago suplidor {supplier_name} - {service.get('service_name', 'Servicio')} (Factura #{existing.get('invoice_number', reservation_id[-4:])})",
+                            "amount": new_supplier_cost,
                             "currency": existing.get("currency", "DOP"),
                             "category": "pago_suplidor",
                             "expense_date": existing.get("reservation_date") if isinstance(existing.get("reservation_date"), str) else datetime.now(timezone.utc).isoformat(),
