@@ -243,36 +243,6 @@ const VillasManagementNew = () => {
   };
 
   // ============ FLEXIBLE PRICING FUNCTIONS ============
-  const handleAddFlexiblePrice = (rentalType) => {
-    const newPrice = { people_count: '', client_price: 0, owner_price: 0, is_default: false };
-    setFlexiblePrices({
-      ...flexiblePrices,
-      [rentalType]: [...flexiblePrices[rentalType], newPrice]
-    });
-  };
-
-  const handleRemoveFlexiblePrice = (rentalType, index) => {
-    const updated = flexiblePrices[rentalType].filter((_, i) => i !== index);
-    setFlexiblePrices({
-      ...flexiblePrices,
-      [rentalType]: updated
-    });
-  };
-
-  const handleUpdateFlexiblePrice = (rentalType, index, field, value) => {
-    const updated = [...flexiblePrices[rentalType]];
-    // Para people_count es string, para precios es número
-    if (field === 'people_count') {
-      updated[index][field] = value;
-    } else {
-      updated[index][field] = parseFloat(value) || 0;
-    }
-    setFlexiblePrices({
-      ...flexiblePrices,
-      [rentalType]: updated
-    });
-  };
-
   // ============ SERVICIOS FUNCTIONS ============
   const handleServiceSubmit = async (e) => {
     e.preventDefault();
