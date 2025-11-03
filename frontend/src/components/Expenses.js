@@ -50,6 +50,7 @@ const Expenses = () => {
   const [abonos, setAbonos] = useState([]);
   const [relatedReservation, setRelatedReservation] = useState(null);
   const [supplierExpenses, setSupplierExpenses] = useState([]); // Gastos de suplidores para mostrar balance_due
+  const [supplierAbonos, setSupplierAbonos] = useState({}); // Abonos de cada supplierExpense: { [expenseId]: [abonos] }
   
   // Estado para almacenar los abonos de cada gasto (para mostrar invoice_numbers)
   const [expenseAbonos, setExpenseAbonos] = useState({});
