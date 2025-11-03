@@ -805,31 +805,6 @@ const VillasManagementNew = () => {
                     </p>
                   </div>
 
-                  {/* HORARIOS (OBSOLETO - AHORA ESTÁN EN CADA MODALIDAD) */}
-                  <div className="col-span-2 bg-purple-50 p-4 rounded-md border-2 border-purple-200">
-                    <h3 className="font-bold text-lg mb-3 text-purple-800">🕐 Horario Por Defecto</h3>
-                    <div className="grid grid-cols-2 gap-3">
-                      <div>
-                        <Label className="text-sm">Hora de Entrada *</Label>
-                        <Input
-                          value={formData.default_check_in_time}
-                          onChange={(e) => setFormData({ ...formData, default_check_in_time: e.target.value })}
-                          placeholder="9:00 AM"
-                          required
-                        />
-                      </div>
-                      <div>
-                        <Label className="text-sm">Hora de Salida *</Label>
-                        <Input
-                          value={formData.default_check_out_time}
-                          onChange={(e) => setFormData({ ...formData, default_check_out_time: e.target.value })}
-                          placeholder="8:00 PM"
-                          required
-                        />
-                      </div>
-                    </div>
-                  </div>
-
                   <div>
                     <Label>Máximo de Huéspedes</Label>
                     <Input
