@@ -565,18 +565,6 @@ const VillasManagementNew = () => {
                   </div>
 
                   <div className="col-span-2">
-                    <Label>Descripción de la Villa *</Label>
-                    <textarea
-                      value={formData.description}
-                      onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                      className="w-full p-2 border rounded-md"
-                      rows="3"
-                      placeholder="Piscina, Jacuzzi, BBQ, Gazebo, etc."
-                      required
-                    />
-                  </div>
-
-                  <div className="col-span-2">
                     <Label>Ubicación/Dirección</Label>
                     <Input
                       value={formData.location}
