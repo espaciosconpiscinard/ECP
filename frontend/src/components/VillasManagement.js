@@ -805,14 +805,8 @@ const VillasManagementNew = () => {
                     </div>
                   </div>
 
-                  {/* SISTEMA DE PRECIOS FLEXIBLES - SIEMPRE ACTIVO */}
-                  <div className="col-span-2 bg-purple-50 p-4 rounded-md border-2 border-purple-200">
-                    <div className="mb-3">
-                      <h3 className="font-bold text-lg text-purple-800">💰 Precios por Tipo de Renta</h3>
-                      <p className="text-xs text-gray-600 mt-1">Agrega diferentes precios para cada tipo de renta. Cada fila puede representar cantidad de personas, temporada, etc.</p>
-                    </div>
-                    
-                    {(
+                  <div className="col-span-2">
+                    <h4 className="font-semibold text-gray-700 mb-2">Precios de Horas Extras</h4>
                       <div className="space-y-4">
                         <p className="text-sm text-gray-600 mb-2">
                           Agrega múltiples precios para cada tipo de renta. Ordénalos tú mismo según tus criterios.
