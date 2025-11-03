@@ -9,7 +9,7 @@ import { Input } from './ui/input';
 import { Label } from './ui/label';
 import { Alert, AlertDescription } from './ui/alert';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from './ui/dialog';
-import { Plus, Edit, Trash2, Building, ChevronDown, ChevronUp, Search, Package } from 'lucide-react';
+import { Plus, Edit, Trash2, Building, ChevronDown, ChevronUp, Search, Package, X } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 
 const VillasManagementNew = () => {
