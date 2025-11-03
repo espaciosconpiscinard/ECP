@@ -1903,9 +1903,9 @@ const Reservations = () => {
                     <Label>Huéspedes</Label>
                     <Input
                       type="number"
-                      min="0"
+                      min="1"
                       value={formData.guests}
-                      onChange={(e) => setFormData({ ...formData, guests: parseInt(e.target.value) || 0 })}
+                      onChange={(e) => setFormData({ ...formData, guests: parseInt(e.target.value) || 1 })}
                       data-testid="guests-input"
                     />
                   </div>
