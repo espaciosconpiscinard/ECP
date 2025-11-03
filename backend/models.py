@@ -122,33 +122,16 @@ class VillaBase(BaseModel):
     description_evento: Optional[str] = None
     villa_currency: str = "DOP"
     
-    # Precios Pasadía (Regular, Oferta, Temporada Alta)
-    price_pasadia_regular_client: float = 0.0
-    price_pasadia_regular_owner: float = 0.0
-    price_pasadia_oferta_client: float = 0.0
-    price_pasadia_oferta_owner: float = 0.0
-    price_pasadia_alta_client: float = 0.0
-    price_pasadia_alta_owner: float = 0.0
+    # Horarios separados por modalidad
+    check_in_time_pasadia: str = "9:00 AM"
+    check_out_time_pasadia: str = "8:00 PM"
+    check_in_time_amanecida: str = "9:00 AM"
+    check_out_time_amanecida: str = "8:00 AM"
     
-    # Precios Amanecida (Regular, Oferta, Temporada Alta)
-    price_amanecida_regular_client: float = 0.0
-    price_amanecida_regular_owner: float = 0.0
-    price_amanecida_oferta_client: float = 0.0
-    price_amanecida_oferta_owner: float = 0.0
-    price_amanecida_alta_client: float = 0.0
-    price_amanecida_alta_owner: float = 0.0
-    
-    # Precios Evento (Regular, Oferta, Temporada Alta)
-    price_evento_regular_client: float = 0.0
-    price_evento_regular_owner: float = 0.0
-    price_evento_oferta_client: float = 0.0
-    price_evento_oferta_owner: float = 0.0
-    price_evento_alta_client: float = 0.0
-    price_evento_alta_owner: float = 0.0
-    
-    # Horarios por defecto
-    default_check_in_time: str = "9:00 AM"
-    default_check_out_time: str = "8:00 PM"
+    # Arrays de precios múltiples por modalidad
+    pasadia_prices: List[dict] = []  # [{ label: 'Regular', client_price: 0, owner_price: 0 }]
+    amanecida_prices: List[dict] = []
+    evento_prices: List[dict] = []
     
     # Precios por extras (aplican a cualquier tipo de renta) - separados cliente/propietario
     extra_hours_price_client: float = 0.0  # Precio al cliente por hora extra
