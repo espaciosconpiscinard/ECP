@@ -269,6 +269,10 @@ class ReservationUpdate(BaseModel):
     owner_price: Optional[float] = None
     extra_hours: Optional[float] = None
     extra_hours_cost: Optional[float] = None
+    extra_hours_unit_price: Optional[float] = None
+    extra_people: Optional[int] = None
+    extra_people_cost: Optional[float] = None
+    extra_people_unit_price: Optional[float] = None
     extra_services: Optional[List[ReservationExtraService]] = None
     extra_services_total: Optional[float] = None
     subtotal: Optional[float] = None
