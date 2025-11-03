@@ -1362,7 +1362,7 @@ async def update_reservation(
                             "amount": supplier_cost,
                             "currency": existing.get("currency", "DOP"),
                             "category": "pago_suplidor",
-                            "expense_date": existing.get("reservation_date", datetime.now(timezone.utc)).isoformat() if isinstance(existing.get("reservation_date"), str) else datetime.now(timezone.utc).isoformat(),
+                            "expense_date": existing.get("reservation_date") if isinstance(existing.get("reservation_date"), str) else datetime.now(timezone.utc).isoformat(),
                             "payment_status": "pending",
                             "related_reservation_id": reservation_id,
                             "created_by": current_user["id"],
