@@ -805,6 +805,234 @@ const VillasManagementNew = () => {
                     </div>
                   </div>
 
+                  <div className="col-span-2">
+                    <h4 className="font-semibold text-gray-700 mb-2">Precios de Horas Extras</h4>
+                      <div className="space-y-4">
+                        <p className="text-sm text-gray-600 mb-2">
+                          Agrega múltiples precios para cada tipo de renta. Ordénalos tú mismo según tus criterios.
+                        </p>
+                        
+                        {/* PASADÍA */}
+                        <div className="bg-blue-50 p-3 rounded border">
+                          <div className="flex justify-between items-center mb-2">
+                            <h4 className="font-bold text-blue-800">Precio de Pasadía</h4>
+                            <button
+                              type="button"
+                              onClick={() => handleAddFlexiblePrice('pasadia')}
+                              className="px-3 py-1 bg-blue-600 text-white rounded hover:bg-blue-700 text-sm"
+                            >
+                              ➕
+                            </button>
+                          </div>
+                          <div className="space-y-1">
+                            <div className="grid grid-cols-5 gap-2 text-xs font-semibold text-gray-600 mb-1">
+                              <span>Personas</span>
+                              <span>Cliente</span>
+                              <span>Propietario</span>
+                              <span>Por Defecto</span>
+                              <span></span>
+                            </div>
+                            {flexiblePrices.pasadia.map((price, index) => (
+                              <div key={index} className="grid grid-cols-5 gap-2 items-center">
+                                <input
+                                  type="text"
+                                  value={price.people_count || ''}
+                                  onChange={(e) => handleUpdateFlexiblePrice('pasadia', index, 'people_count', e.target.value)}
+                                  className="px-2 py-1 border rounded text-sm"
+                                  placeholder="1-10"
+                                />
+                                <input
+                                  type="number"
+                                  step="0.01"
+                                  value={price.client_price}
+                                  onChange={(e) => handleUpdateFlexiblePrice('pasadia', index, 'client_price', e.target.value)}
+                                  className="px-2 py-1 border rounded text-sm"
+                                  placeholder="5000"
+                                />
+                                <input
+                                  type="number"
+                                  step="0.01"
+                                  value={price.owner_price}
+                                  onChange={(e) => handleUpdateFlexiblePrice('pasadia', index, 'owner_price', e.target.value)}
+                                  className="px-2 py-1 border rounded text-sm"
+                                  placeholder="3000"
+                                />
+                                <div className="flex justify-center">
+                                  <input
+                                    type="checkbox"
+                                    checked={price.is_default || false}
+                                    onChange={(e) => {
+                                      // Solo permitir 1 checkbox por tipo
+                                      const newPrices = [...flexiblePrices.pasadia];
+                                      newPrices.forEach((p, i) => p.is_default = i === index && e.target.checked);
+                                      setFlexiblePrices({...flexiblePrices, pasadia: newPrices});
+                                    }}
+                                    className="w-4 h-4"
+                                  />
+                                </div>
+                                <button
+                                  type="button"
+                                  onClick={() => handleRemoveFlexiblePrice('pasadia', index)}
+                                  className="text-red-600 hover:text-red-800 text-sm"
+                                >
+                                  🗑️
+                                </button>
+                              </div>
+                            ))}
+                            {flexiblePrices.pasadia.length === 0 && (
+                              <p className="text-xs text-gray-500 italic">Presiona ➕ para agregar precios</p>
+                            )}
+                          </div>
+                        </div>
+
+                        {/* AMANECIDA */}
+                        <div className="bg-indigo-50 p-3 rounded border">
+                          <div className="flex justify-between items-center mb-2">
+                            <h4 className="font-bold text-indigo-800">Precio de Amanecida</h4>
+                            <button
+                              type="button"
+                              onClick={() => handleAddFlexiblePrice('amanecida')}
+                              className="px-3 py-1 bg-indigo-600 text-white rounded hover:bg-indigo-700 text-sm"
+                            >
+                              ➕
+                            </button>
+                          </div>
+                          <div className="space-y-1">
+                            <div className="grid grid-cols-5 gap-2 text-xs font-semibold text-gray-600 mb-1">
+                              <span>Personas</span>
+                              <span>Cliente</span>
+                              <span>Propietario</span>
+                              <span>Por Defecto</span>
+                              <span></span>
+                            </div>
+                            {flexiblePrices.amanecida.map((price, index) => (
+                              <div key={index} className="grid grid-cols-5 gap-2 items-center">
+                                <input
+                                  type="text"
+                                  value={price.people_count || ''}
+                                  onChange={(e) => handleUpdateFlexiblePrice('amanecida', index, 'people_count', e.target.value)}
+                                  className="px-2 py-1 border rounded text-sm"
+                                  placeholder="1-10"
+                                />
+                                <input
+                                  type="number"
+                                  step="0.01"
+                                  value={price.client_price}
+                                  onChange={(e) => handleUpdateFlexiblePrice('amanecida', index, 'client_price', e.target.value)}
+                                  className="px-2 py-1 border rounded text-sm"
+                                  placeholder="10000"
+                                />
+                                <input
+                                  type="number"
+                                  step="0.01"
+                                  value={price.owner_price}
+                                  onChange={(e) => handleUpdateFlexiblePrice('amanecida', index, 'owner_price', e.target.value)}
+                                  className="px-2 py-1 border rounded text-sm"
+                                  placeholder="8000"
+                                />
+                                <div className="flex justify-center">
+                                  <input
+                                    type="checkbox"
+                                    checked={price.is_default || false}
+                                    onChange={(e) => {
+                                      const newPrices = [...flexiblePrices.amanecida];
+                                      newPrices.forEach((p, i) => p.is_default = i === index && e.target.checked);
+                                      setFlexiblePrices({...flexiblePrices, amanecida: newPrices});
+                                    }}
+                                    className="w-4 h-4"
+                                  />
+                                </div>
+                                <button
+                                  type="button"
+                                  onClick={() => handleRemoveFlexiblePrice('amanecida', index)}
+                                  className="text-red-600 hover:text-red-800 text-sm"
+                                >
+                                  🗑️
+                                </button>
+                              </div>
+                            ))}
+                            {flexiblePrices.amanecida.length === 0 && (
+                              <p className="text-xs text-gray-500 italic">Presiona ➕ para agregar precios</p>
+                            )}
+                          </div>
+                        </div>
+
+                        {/* EVENTO */}
+                        <div className="bg-purple-50 p-3 rounded border">
+                          <div className="flex justify-between items-center mb-2">
+                            <h4 className="font-bold text-purple-800">Precio de Evento</h4>
+                            <button
+                              type="button"
+                              onClick={() => handleAddFlexiblePrice('evento')}
+                              className="px-3 py-1 bg-purple-600 text-white rounded hover:bg-purple-700 text-sm"
+                            >
+                              ➕
+                            </button>
+                          </div>
+                          <div className="space-y-1">
+                            <div className="grid grid-cols-5 gap-2 text-xs font-semibold text-gray-600 mb-1">
+                              <span>Personas</span>
+                              <span>Cliente</span>
+                              <span>Propietario</span>
+                              <span>Por Defecto</span>
+                              <span></span>
+                            </div>
+                            {flexiblePrices.evento.map((price, index) => (
+                              <div key={index} className="grid grid-cols-5 gap-2 items-center">
+                                <input
+                                  type="text"
+                                  value={price.people_count || ''}
+                                  onChange={(e) => handleUpdateFlexiblePrice('evento', index, 'people_count', e.target.value)}
+                                  className="px-2 py-1 border rounded text-sm"
+                                  placeholder="1-10"
+                                />
+                                <input
+                                  type="number"
+                                  step="0.01"
+                                  value={price.client_price}
+                                  onChange={(e) => handleUpdateFlexiblePrice('evento', index, 'client_price', e.target.value)}
+                                  className="px-2 py-1 border rounded text-sm"
+                                  placeholder="15000"
+                                />
+                                <input
+                                  type="number"
+                                  step="0.01"
+                                  value={price.owner_price}
+                                  onChange={(e) => handleUpdateFlexiblePrice('evento', index, 'owner_price', e.target.value)}
+                                  className="px-2 py-1 border rounded text-sm"
+                                  placeholder="12000"
+                                />
+                                <div className="flex justify-center">
+                                  <input
+                                    type="checkbox"
+                                    checked={price.is_default || false}
+                                    onChange={(e) => {
+                                      // Solo permitir 1 checkbox por tipo
+                                      const newPrices = [...flexiblePrices.evento];
+                                      newPrices.forEach((p, i) => p.is_default = i === index && e.target.checked);
+                                      setFlexiblePrices({...flexiblePrices, evento: newPrices});
+                                    }}
+                                    className="w-4 h-4"
+                                  />
+                                </div>
+                                <button
+                                  type="button"
+                                  onClick={() => handleRemoveFlexiblePrice('evento', index)}
+                                  className="text-red-600 hover:text-red-800 text-sm"
+                                >
+                                  🗑️
+                                </button>
+                              </div>
+                            ))}
+                            {flexiblePrices.evento.length === 0 && (
+                              <p className="text-xs text-gray-500 italic">Presiona ➕ para agregar precios</p>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+
                   <div>
                     <Label>Máximo de Huéspedes</Label>
                     <Input
