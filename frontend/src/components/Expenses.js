@@ -289,11 +289,25 @@ const Expenses = () => {
             
             if (allExpensesResponse.ok) {
               const allExpenses = await allExpensesResponse.json();
+              console.log('📊 [DEBUG] Total expenses:', allExpenses.length);
+              console.log('📊 [DEBUG] Buscando con related_reservation_id:', expense.related_reservation_id);
+              
               // Filtrar solo los gastos de suplidores de esta reservación
-              const supplierExpensesForReservation = allExpenses.filter(e => 
-                e.category === 'pago_suplidor' && 
-                e.related_reservation_id === expense.related_reservation_id
-              );
+              const supplierExpensesForReservation = allExpenses.filter(e => {
+                const isSupplier = e.category === 'pago_suplidor';
+                const matchesReservation = e.related_reservation_id === expense.related_reservation_id;
+                
+                if (isSupplier) {
+                  console.log('📊 [DEBUG] Gasto suplidor encontrado:', {
+                    id: e.id,
+                    description: e.description,
+                    related_reservation_id: e.related_reservation_id,
+                    matches: matchesReservation
+                  });
+                }
+                
+                return isSupplier && matchesReservation;
+              });
               console.log('✅ Gastos de suplidores cargados:', supplierExpensesForReservation);
               setSupplierExpenses(supplierExpensesForReservation);
               
