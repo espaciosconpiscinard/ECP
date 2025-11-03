@@ -2170,7 +2170,19 @@ const Expenses = () => {
                         
                         const totalAmount = (service.supplier_cost || 0) * service.quantity;
                         const paidAmount = supplierExpense?.total_paid || 0;
-                        const remainingAmount = supplierExpense?.balance_due || totalAmount;
+                        const remainingAmount = supplierExpense?.balance_due !== undefined ? supplierExpense.balance_due : totalAmount;
+                        
+                        console.log('🔍 [DEBUG SERVICIO]', service.supplier_name);
+                        console.log('  - supplierExpense encontrado:', supplierExpense ? 'SÍ' : 'NO');
+                        if (supplierExpense) {
+                          console.log('  - supplierExpense.id:', supplierExpense.id);
+                          console.log('  - supplierExpense.amount:', supplierExpense.amount);
+                          console.log('  - supplierExpense.total_paid:', supplierExpense.total_paid);
+                          console.log('  - supplierExpense.balance_due:', supplierExpense.balance_due);
+                        }
+                        console.log('  - totalAmount calculado:', totalAmount);
+                        console.log('  - paidAmount:', paidAmount);
+                        console.log('  - remainingAmount:', remainingAmount);
                         
                         return service.supplier_name && (
                           <div key={index} className="p-4 bg-orange-50 border border-orange-200 rounded-md">
