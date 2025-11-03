@@ -113,6 +113,13 @@ class VillaBase(BaseModel):
     phone: Optional[str] = None  # Teléfono del propietario (opcional)
     category_id: Optional[str] = None  # ID de la categoría asignada
     
+    # Modalidades disponibles y sus descripciones
+    has_pasadia: bool = False  # Si la villa tiene modalidad Pasadía
+    has_amanecida: bool = False  # Si la villa tiene modalidad Amanecida
+    description_pasadia: Optional[str] = None  # Descripción específica para Pasadía
+    description_amanecida: Optional[str] = None  # Descripción específica para Amanecida
+    villa_currency: str = "DOP"  # Moneda por defecto (DOP o USD)
+    
     # Horarios por defecto
     default_check_in_time: str = "9:00 AM"
     default_check_out_time: str = "8:00 PM"
