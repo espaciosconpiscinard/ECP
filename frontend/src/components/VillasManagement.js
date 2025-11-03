@@ -777,13 +777,23 @@ const VillasManagementNew = () => {
                             </Button>
                           </div>
                           {eventoPrices.map((price, idx) => (
-                            <div key={idx} className="grid grid-cols-4 gap-2 items-center bg-gray-50 p-2 rounded">
-                              <Input type="text" value={price.label} onChange={(e) => updatePrice('evento', idx, 'label', e.target.value)} placeholder="Ej: Regular" className="text-xs" />
-                              <Input type="number" step="0.01" value={price.client_price} onChange={(e) => updatePrice('evento', idx, 'client_price', e.target.value)} placeholder="Cliente" className="text-xs" />
-                              <Input type="number" step="0.01" value={price.owner_price} onChange={(e) => updatePrice('evento', idx, 'owner_price', e.target.value)} placeholder="Propietario" className="text-xs" />
-                              <Button type="button" size="sm" variant="destructive" onClick={() => removePrice('evento', idx)} className="h-6 px-2">
-                                <X size={12} />
-                              </Button>
+                            <div key={idx} className="bg-gray-50 p-3 rounded border">
+                              <div className="flex justify-between items-center mb-2">
+                                <Input type="text" value={price.label} onChange={(e) => updatePrice('evento', idx, 'label', e.target.value)} placeholder="Ej: Regular, Oferta, Temporada Alta" className="text-xs flex-1 mr-2" />
+                                <Button type="button" size="sm" variant="destructive" onClick={() => removePrice('evento', idx)} className="h-6 px-2">
+                                  <X size={12} />
+                                </Button>
+                              </div>
+                              <div className="grid grid-cols-2 gap-2">
+                                <div>
+                                  <Label className="text-xs text-blue-700">Precio Cliente</Label>
+                                  <Input type="number" step="0.01" value={price.client_price} onChange={(e) => updatePrice('evento', idx, 'client_price', e.target.value)} placeholder="5000" className="text-xs" />
+                                </div>
+                                <div>
+                                  <Label className="text-xs text-green-700">Precio Propietario</Label>
+                                  <Input type="number" step="0.01" value={price.owner_price} onChange={(e) => updatePrice('evento', idx, 'owner_price', e.target.value)} placeholder="4000" className="text-xs" />
+                                </div>
+                              </div>
                             </div>
                           ))}
                         </div>
