@@ -2193,9 +2193,12 @@ async def add_abono_to_expense(expense_id: str, abono_data: AbonoCreate, current
     # Get total abonos for this expense
     all_abonos = await db.expense_abonos.find({"expense_id": expense_id}, {"_id": 0}).to_list(1000)
     total_paid = sum(a.get("amount", 0) for a in all_abonos)
+    print(f"📊 [ADD_ABONO] Total abonos: {len(all_abonos)}, Total pagado: {total_paid}, Monto expense: {expense.get('amount', 0)}")
     
     # Check payment status based on expense category
+    print(f"🔍 [ADD_ABONO] Verificando estado de pago, categoria: {expense.get('category')}")
     if expense.get("category") == "pago_propietario":
+        print(f"💼 [ADD_ABONO] Es pago propietario, revisando gastos relacionados...")
         # For owner payments, check if all related expenses are paid
         supplier_expenses = []
         if expense.get("related_reservation_id"):
@@ -2204,6 +2207,8 @@ async def add_abono_to_expense(expense_id: str, abono_data: AbonoCreate, current
                 "category": "pago_suplidor"
             }, {"_id": 0}).to_list(1000)
         
+        print(f"📋 [ADD_ABONO] Supplier expenses encontrados: {len(supplier_expenses)}")
+        
         # Check if all supplier expenses are paid
         all_suppliers_paid = True
         for supplier_expense in supplier_expenses:
@@ -2211,6 +2216,7 @@ async def add_abono_to_expense(expense_id: str, abono_data: AbonoCreate, current
             supplier_total_paid = sum(a.get("amount", 0) for a in supplier_abonos)
             if supplier_total_paid < supplier_expense.get("amount", 0):
                 all_suppliers_paid = False
+                print(f"❌ [ADD_ABONO] Suplidor {supplier_expense.get('description')} AÚN DEBE: {supplier_expense.get('amount', 0) - supplier_total_paid}")
                 break
         
         # Check if deposit was returned (if applicable)
@@ -2224,18 +2230,24 @@ async def add_abono_to_expense(expense_id: str, abono_data: AbonoCreate, current
                     "payment_status": "paid"
                 }, {"_id": 0})
                 deposit_returned = deposit_expense is not None
+                print(f"💵 [ADD_ABONO] Depósito devuelto: {deposit_returned}")
         
         # ONLY mark owner payment as 'paid' if ALL conditions met
         owner_paid = total_paid >= expense.get("amount", 0)
         new_status = "paid" if (owner_paid and all_suppliers_paid and deposit_returned) else "pending"
+        print(f"📌 [ADD_ABONO] Propietario pagado: {owner_paid}, Suplidores pagados: {all_suppliers_paid}, Depósito devuelto: {deposit_returned}")
+        print(f"✅ [ADD_ABONO] Nuevo estado propietario: {new_status}")
     else:
         # For supplier payments and other expenses, simple check
         new_status = "paid" if total_paid >= expense.get("amount", 0) else "pending"
+        print(f"✅ [ADD_ABONO] Nuevo estado suplidor: {new_status}")
     
+    print(f"💾 [ADD_ABONO] Actualizando estado en BD...")
     await db.expenses.update_one(
         {"id": expense_id},
         {"$set": {"payment_status": new_status}}
     )
+    print(f"✅ [ADD_ABONO] Estado actualizado a: {new_status}")
     
     return abono
 
