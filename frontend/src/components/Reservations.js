@@ -272,24 +272,36 @@ const Reservations = () => {
     }
   };
 
-  const handleSelectFlexiblePrice = (priceOption) => {
-    // Aplicar el precio seleccionado
+  const handleSelectFlexiblePrice = (priceOption, modality) => {
+    // Get the selected villa to access default times
+    const selectedVilla = villas.find(v => v.id === formData.villa_id);
+    
+    // Set default times based on modality
+    let defaultCheckInTime = '';
+    let defaultCheckOutTime = '';
+    
+    if (selectedVilla) {
+      if (modality === 'pasadia') {
+        defaultCheckInTime = selectedVilla.default_check_in_time_pasadia || '9:00 AM';
+        defaultCheckOutTime = selectedVilla.default_check_out_time_pasadia || '8:00 PM';
+      } else if (modality === 'amanecida') {
+        defaultCheckInTime = selectedVilla.default_check_in_time_amanecida || '9:00 AM';
+        defaultCheckOutTime = selectedVilla.default_check_out_time_amanecida || '8:00 AM';
+      }
+      // Evento doesn't have specific times in the model
+    }
+    
+    // Apply the selected price
     setFormData(prev => ({
       ...prev,
       base_price: priceOption.client_price || 0,
       owner_price: priceOption.owner_price || 0,
-      guests: 1  // Default a 1, el usuario puede editarlo
+      check_in_time: defaultCheckInTime,
+      check_out_time: defaultCheckOutTime,
+      guests: 1  // Default to 1, user can edit
     }));
     
-    // Ocultar el selector una vez seleccionado el precio
-    setShowPriceSelector(false);
-  };
-    setFormData(prev => ({
-      ...prev,
-      base_price: priceOption.client_price,
-      owner_price: priceOption.owner_price,
-      guests: guestCount  // Auto-llenar huéspedes
-    }));
+    // Hide the selector once price is selected
     setShowPriceSelector(false);
   };
   
