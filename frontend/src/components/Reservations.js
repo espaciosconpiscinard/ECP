@@ -1063,20 +1063,13 @@ const Reservations = () => {
                   ` : ''}
                   <div class="info-line"><strong>Villa:</strong> ${reservation.villa_code || reservation.villa_name}</div>
                   ${reservation.villa_location ? `<div class="info-line"><strong>Ubicación:</strong> ${reservation.villa_location}</div>` : ''}
-                  ${reservation.rental_type_display ? `<div class="info-line"><strong>Tipo:</strong> ${reservation.rental_type_display}</div>` : 
-                    (reservation.rental_type ? `<div class="info-line"><strong>Tipo:</strong> ${reservation.rental_type === 'pasadia' ? 'Pasadía' : reservation.rental_type === 'amanecida' ? 'Amanecida' : 'Evento'}</div>` : '')}
+                  ${reservation.rental_type_display ? `<div class="info-line"><strong>Modalidad:</strong> <span style="color: #0369a1; font-weight: 700;">${reservation.rental_type_display}</span></div>` : 
+                    (reservation.rental_type ? `<div class="info-line"><strong>Modalidad:</strong> <span style="color: #0369a1; font-weight: 700;">${reservation.rental_type === 'pasadia' ? 'Pasadía' : reservation.rental_type === 'amanecida' ? 'Amanecida' : 'Evento'}</span></div>` : '')}
                   ${reservation.check_in_time && reservation.check_out_time ? `<div class="info-line"><strong>Horario:</strong> ${reservation.check_in_time} - ${reservation.check_out_time}</div>` : ''}
                   <div class="info-line"><strong>Personas:</strong> ${reservation.guests}</div>
+                  ${reservation.villa_description ? `<div class="info-line" style="margin-top: 8px; padding: 8px; background: #f0f9ff; border-left: 3px solid #0369a1;"><strong>Descripción:</strong> ${reservation.villa_description}</div>` : ''}
                 </div>
               </div>
-              
-              <!-- Villa/Modality Description -->
-              ${reservation.villa_description ? `
-                <div class="villa-description">
-                  <div class="villa-description-title">Descripción</div>
-                  <div class="villa-description-text">${reservation.villa_description}</div>
-                </div>
-              ` : ''}
               
               <!-- Services Table -->
               <table class="services-table">
