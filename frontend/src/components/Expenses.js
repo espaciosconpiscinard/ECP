@@ -2585,7 +2585,7 @@ const Expenses = () => {
                 {detailExpense.payment_status === 'pending' && (
                   <Button
                     onClick={() => {
-                      handleAddAbono(detailExpense);
+                      handleOpenAbonoDialog(detailExpense);
                       setShowDetailsModal(false);
                     }}
                     className="bg-green-600 hover:bg-green-700 text-white"
