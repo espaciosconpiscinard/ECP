@@ -719,7 +719,7 @@ const VillasManagementNew = () => {
                         <h4 className="font-semibold text-blue-800 mb-2">🌙 Amanecida</h4>
                         
                         {/* Horarios Amanecida */}
-                        <div className="grid grid-cols-2 gap-2 mb-3">
+                        <div className="grid grid-cols-3 gap-2 mb-3">
                           <div>
                             <Label className="text-xs">Hora Entrada</Label>
                             <Input type="text" value={formData.check_in_time_amanecida} onChange={(e) => setFormData({ ...formData, check_in_time_amanecida: e.target.value })} placeholder="9:00 AM" className="text-xs" />
@@ -727,6 +727,17 @@ const VillasManagementNew = () => {
                           <div>
                             <Label className="text-xs">Hora Salida</Label>
                             <Input type="text" value={formData.check_out_time_amanecida} onChange={(e) => setFormData({ ...formData, check_out_time_amanecida: e.target.value })} placeholder="8:00 AM" className="text-xs" />
+                          </div>
+                          <div>
+                            <Label className="text-xs">Moneda</Label>
+                            <select
+                              value={formData.currency_amanecida}
+                              onChange={(e) => setFormData({ ...formData, currency_amanecida: e.target.value })}
+                              className="w-full p-2 border rounded-md text-xs"
+                            >
+                              <option value="DOP">Pesos (DOP)</option>
+                              <option value="USD">Dólares (USD)</option>
+                            </select>
                           </div>
                         </div>
                         
