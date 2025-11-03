@@ -2297,8 +2297,8 @@ const Expenses = () => {
                               </Button>
                             </div>
                           </div>
-                        )
-                      ))}
+                        );
+                      })}
                     </>
                   )}
 
