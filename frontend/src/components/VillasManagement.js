@@ -916,17 +916,6 @@ const VillasManagementNew = () => {
                       />
                     </div>
 
-                    <div className="col-span-2">
-                      <Label>Descripción</Label>
-                      <textarea
-                        value={serviceFormData.description}
-                        onChange={(e) => setServiceFormData({ ...serviceFormData, description: e.target.value })}
-                        className="w-full p-2 border rounded-md"
-                        rows="3"
-                        placeholder="Describe el servicio..."
-                      />
-                    </div>
-
                     {/* Sección de Suplidores - REQUERIDO */}
                     <div className="col-span-2">
                       <div className="flex justify-between items-center mb-3">
