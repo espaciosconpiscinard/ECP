@@ -2163,19 +2163,34 @@ const Expenses = () => {
                   {relatedReservation.extra_services && relatedReservation.extra_services.length > 0 && (
                     <>
                       <h4 className="font-bold text-orange-900 mt-4">🛎️ SERVICIOS EXTRAS - PAGO A SUPLIDORES</h4>
-                      {relatedReservation.extra_services.map((service, index) => (
-                        service.supplier_name && (
+                      {relatedReservation.extra_services.map((service, index) => {
+                        // Buscar el gasto del suplidor correspondiente a este servicio
+                        const supplierExpense = service.supplier_name ? supplierExpenses.find(e => 
+                          e.description.includes(service.supplier_name)
+                        ) : null;
+                        
+                        const totalAmount = (service.supplier_cost || 0) * service.quantity;
+                        const paidAmount = supplierExpense?.total_paid || 0;
+                        const remainingAmount = supplierExpense?.balance_due || totalAmount;
+                        
+                        return service.supplier_name && (
                           <div key={index} className="p-4 bg-orange-50 border border-orange-200 rounded-md">
                             <div className="flex justify-between items-center mb-3">
                               <div>
                                 <h4 className="font-bold text-orange-900">{service.service_name || service.name}</h4>
                                 <p className="text-sm text-gray-600">Suplidor: {service.supplier_name}</p>
                                 <p className="text-xs text-gray-500">Cantidad: {service.quantity}</p>
+                                <p className="text-xs text-gray-500 mt-1">
+                                  Total original: {formatCurrency(totalAmount, selectedExpense?.currency)}
+                                </p>
+                                <p className="text-xs text-gray-500">
+                                  Pagado: {formatCurrency(paidAmount, selectedExpense?.currency)}
+                                </p>
                               </div>
                               <div className="text-right">
-                                <p className="text-sm text-gray-600">Total a pagar:</p>
+                                <p className="text-sm text-gray-600">RESTANTE a pagar:</p>
                                 <p className="text-xl font-bold text-orange-900">
-                                  {formatCurrency((service.supplier_cost || 0) * service.quantity, selectedExpense?.currency)}
+                                  {formatCurrency(remainingAmount, selectedExpense?.currency)}
                                 </p>
                               </div>
                             </div>
