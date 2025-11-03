@@ -524,6 +524,7 @@ const Reservations = () => {
       guests: reservation.guests,
       base_price: reservation.base_price,
       owner_price: reservation.owner_price || 0,
+      base_owner_price: (reservation.owner_price || 0) - (reservation.extra_hours_cost || 0) - (reservation.extra_people_cost || 0),  // Calcular base restando extras
       extra_hours: reservation.extra_hours || 0,
       extra_hours_cost: reservation.extra_hours_cost || 0,
       extra_hours_unit_price: reservation.extra_hours_unit_price || 0,
