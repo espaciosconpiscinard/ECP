@@ -72,6 +72,7 @@ const Reservations = () => {
     guests: 1,  // 1 por defecto (mínimo razonable)
     base_price: 0,
     owner_price: 0,
+    base_owner_price: 0,  // Precio base del propietario (sin extras)
     extra_hours: 0,
     extra_hours_cost: 0,
     extra_hours_unit_price: 0,
