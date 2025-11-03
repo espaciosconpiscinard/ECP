@@ -35,8 +35,6 @@ const Reservations = () => {
   const [customerSearchTerm, setCustomerSearchTerm] = useState('');
   const [showCustomerDropdown, setShowCustomerDropdown] = useState(false);
   
-  // Nuevo estado para tipo de factura
-  const [invoiceType, setInvoiceType] = useState('villa'); // 'villa' o 'service'
   const [abonoFormData, setAbonoFormData] = useState({
     amount: 0,
     currency: 'DOP',
