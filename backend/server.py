@@ -2183,44 +2183,43 @@ async def add_abono_to_expense(expense_id: str, abono_data: AbonoCreate, current
     all_abonos = await db.expense_abonos.find({"expense_id": expense_id}, {"_id": 0}).to_list(1000)
     total_paid = sum(a.get("amount", 0) for a in all_abonos)
     
-    # Check if there are pending supplier payments for this expense
-    supplier_expenses = []
-    if expense.get("related_reservation_id"):
-        # Get all supplier expenses related to the same reservation
-        supplier_expenses = await db.expenses.find({
-            "related_reservation_id": expense.get("related_reservation_id"),
-            "category": "pago_suplidor"
-        }, {"_id": 0}).to_list(1000)
-    
-    # Check if all supplier expenses are paid
-    all_suppliers_paid = True
-    for supplier_expense in supplier_expenses:
-        supplier_abonos = await db.expense_abonos.find({"expense_id": supplier_expense["id"]}, {"_id": 0}).to_list(1000)
-        supplier_total_paid = sum(a.get("amount", 0) for a in supplier_abonos)
-        if supplier_total_paid < supplier_expense.get("amount", 0):
-            all_suppliers_paid = False
-            break
-    
-    # Check if deposit was returned (if applicable)
-    deposit_returned = True
-    if expense.get("related_reservation_id"):
-        reservation = await db.reservations.find_one({"id": expense.get("related_reservation_id")}, {"_id": 0})
-        if reservation and reservation.get("deposit", 0) > 0:
-            # Check if there's a deposit return expense marked as paid
-            deposit_expense = await db.expenses.find_one({
+    # Check payment status based on expense category
+    if expense.get("category") == "pago_propietario":
+        # For owner payments, check if all related expenses are paid
+        supplier_expenses = []
+        if expense.get("related_reservation_id"):
+            supplier_expenses = await db.expenses.find({
                 "related_reservation_id": expense.get("related_reservation_id"),
-                "category": "devolucion_deposito",
-                "payment_status": "paid"
-            }, {"_id": 0})
-            deposit_returned = deposit_expense is not None
-    
-    # Update expense payment status
-    # ONLY mark as 'paid' if:
-    # 1. Owner payment is complete
-    # 2. All supplier payments are complete
-    # 3. Deposit was returned (if applicable)
-    owner_paid = total_paid >= expense.get("amount", 0)
-    new_status = "paid" if (owner_paid and all_suppliers_paid and deposit_returned) else "pending"
+                "category": "pago_suplidor"
+            }, {"_id": 0}).to_list(1000)
+        
+        # Check if all supplier expenses are paid
+        all_suppliers_paid = True
+        for supplier_expense in supplier_expenses:
+            supplier_abonos = await db.expense_abonos.find({"expense_id": supplier_expense["id"]}, {"_id": 0}).to_list(1000)
+            supplier_total_paid = sum(a.get("amount", 0) for a in supplier_abonos)
+            if supplier_total_paid < supplier_expense.get("amount", 0):
+                all_suppliers_paid = False
+                break
+        
+        # Check if deposit was returned (if applicable)
+        deposit_returned = True
+        if expense.get("related_reservation_id"):
+            reservation = await db.reservations.find_one({"id": expense.get("related_reservation_id")}, {"_id": 0})
+            if reservation and reservation.get("deposit", 0) > 0:
+                deposit_expense = await db.expenses.find_one({
+                    "related_reservation_id": expense.get("related_reservation_id"),
+                    "category": "devolucion_deposito",
+                    "payment_status": "paid"
+                }, {"_id": 0})
+                deposit_returned = deposit_expense is not None
+        
+        # ONLY mark owner payment as 'paid' if ALL conditions met
+        owner_paid = total_paid >= expense.get("amount", 0)
+        new_status = "paid" if (owner_paid and all_suppliers_paid and deposit_returned) else "pending"
+    else:
+        # For supplier payments and other expenses, simple check
+        new_status = "paid" if total_paid >= expense.get("amount", 0) else "pending"
     
     await db.expenses.update_one(
         {"id": expense_id},
