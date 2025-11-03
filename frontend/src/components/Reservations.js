@@ -2073,11 +2073,9 @@ const Reservations = () => {
                   )}
                 </div>
                 </>
-                )}
                 
-                {/* Checkbox para servicios adicionales - Solo para villas */}
-                {invoiceType === 'villa' && (
-                  <div className="col-span-2">
+                {/* Checkbox para servicios adicionales - Opcional */}
+                <div className="col-span-2">
                   <label className="flex items-center space-x-2 cursor-pointer">
                     <input
                       type="checkbox"
@@ -2088,10 +2086,9 @@ const Reservations = () => {
                     <span className="font-medium">¿Lleva servicios adicionales?</span>
                   </label>
                 </div>
-                )}
 
                 {/* Servicios Extras */}
-                {invoiceType === 'villa' && showExtraServices && (
+                {showExtraServices && (
                   <div className="col-span-2 border-2 border-blue-200 p-4 rounded-md bg-blue-50">
                     <div className="flex justify-between items-center mb-3">
                       <Label className="text-lg font-bold">Servicios Adicionales</Label>
