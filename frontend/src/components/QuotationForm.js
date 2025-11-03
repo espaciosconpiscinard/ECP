@@ -114,6 +114,7 @@ const QuotationForm = ({ quotation, onSubmit, onCancel }) => {
       const service = extraServices.find(s => s.id === value);
       if (service) {
         updated[index].service_name = service.name;
+        updated[index].description = service.description || '';  // Cargar descripción del servicio
         updated[index].supplier_id = '';
         updated[index].supplier_name = '';
         updated[index].unit_price = 0;
