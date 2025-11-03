@@ -179,6 +179,7 @@ class ExtraService(ExtraServiceBase):
 class ReservationExtraService(BaseModel):
     service_id: str
     service_name: str
+    description: Optional[str] = None  # Descripción del servicio
     supplier_name: Optional[str] = None  # Nombre del suplidor seleccionado
     supplier_cost: float = 0.0  # Costo del servicio (pago al suplidor)
     quantity: int = 1
