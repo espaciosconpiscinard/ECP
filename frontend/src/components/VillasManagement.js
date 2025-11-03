@@ -229,14 +229,10 @@ const VillasManagementNew = () => {
       extra_people_price_owner: 0,
       max_guests: 0,
       amenities: [],
-      is_active: true,
-      use_flexible_pricing: true,  // SIEMPRE true
-      flexible_prices: { pasadia: [], amanecida: [], evento: [] }
+      is_active: true
     });
-    setFlexiblePrices({ pasadia: [], amanecida: [], evento: [] });
   };
 
-  // ============ FLEXIBLE PRICING FUNCTIONS ============
   // ============ SERVICIOS FUNCTIONS ============
   const handleServiceSubmit = async (e) => {
     e.preventDefault();
