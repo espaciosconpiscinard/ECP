@@ -2037,37 +2037,23 @@ const Reservations = () => {
                 </div>
                 </>
                 
-                {/* Checkbox para servicios adicionales - Opcional */}
-                <div className="col-span-2">
-                  <label className="flex items-center space-x-2 cursor-pointer">
-                    <input
-                      type="checkbox"
-                      checked={showExtraServices}
-                      onChange={(e) => setShowExtraServices(e.target.checked)}
-                      className="w-4 h-4"
-                    />
-                    <span className="font-medium">¿Lleva servicios adicionales?</span>
-                  </label>
-                </div>
-
-                {/* Servicios Extras */}
-                {showExtraServices && (
-                  <div className="col-span-2 border-2 border-blue-200 p-4 rounded-md bg-blue-50">
-                    <div className="flex justify-between items-center mb-3">
-                      <Label className="text-lg font-bold">Servicios Adicionales</Label>
-                      <Button type="button" size="sm" onClick={addExtraService}>
-                        <Plus size={16} className="mr-1" /> Agregar
-                      </Button>
+                {/* Servicios - Siempre visible */}
+                <div className="col-span-2 border-2 border-blue-200 p-4 rounded-md bg-blue-50">
+                  <div className="flex justify-between items-center mb-3">
+                    <Label className="text-lg font-bold">Servicios</Label>
+                    <Button type="button" size="sm" onClick={addExtraService}>
+                      <Plus size={16} className="mr-1" /> Agregar
+                    </Button>
+                  </div>
+                  
+                  {/* Mensaje si no hay servicios disponibles */}
+                  {extraServices.length === 0 && (
+                    <div className="bg-yellow-50 border border-yellow-300 rounded p-3 mb-3">
+                      <p className="text-sm text-yellow-800">
+                        ⚠️ No hay servicios configurados. Por favor, ve a <strong>Villas → Servicios</strong> para crear servicios y agregar suplidores.
+                      </p>
                     </div>
-                    
-                    {/* Mensaje si no hay servicios disponibles */}
-                    {extraServices.length === 0 && (
-                      <div className="bg-yellow-50 border border-yellow-300 rounded p-3 mb-3">
-                        <p className="text-sm text-yellow-800">
-                          ⚠️ No hay servicios adicionales configurados. Por favor, ve a <strong>Villas → Servicios</strong> para crear servicios y agregar suplidores.
-                        </p>
-                      </div>
-                    )}
+                  )}
                     
                     {selectedExtraServices.map((service, index) => (
                       <div key={index} className="mb-4 p-3 border rounded bg-gray-50">
