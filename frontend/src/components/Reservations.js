@@ -35,10 +35,6 @@ const Reservations = () => {
   const [customerSearchTerm, setCustomerSearchTerm] = useState('');
   const [showCustomerDropdown, setShowCustomerDropdown] = useState(false);
   
-  // Estados para modalidades de villa
-  const [villaModalityPasadia, setVillaModalityPasadia] = useState(false);
-  const [villaModalityAmanecida, setVillaModalityAmanecida] = useState(false);
-  
   const [abonoFormData, setAbonoFormData] = useState({
     amount: 0,
     currency: 'DOP',
