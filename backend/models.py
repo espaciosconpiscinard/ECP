@@ -284,8 +284,8 @@ class Reservation(ReservationBase):
 
 # ============ QUOTATION (COTIZACIÓN) MODELS ============
 class QuotationBase(BaseModel):
-    customer_id: str
-    customer_name: str
+    customer_id: Optional[str] = None  # Opcional - puede ser texto libre
+    customer_name: str  # Nombre del cliente (texto libre)
     villa_id: Optional[str] = None
     villa_code: Optional[str] = None
     villa_description: Optional[str] = None
@@ -296,8 +296,8 @@ class QuotationBase(BaseModel):
     
     quotation_date: datetime
     validity_days: int = 30  # Días de validez de la cotización
-    check_in_time: str = "9:00 AM"
-    check_out_time: str = "8:00 PM"
+    check_in_time: str = ""
+    check_out_time: str = ""
     
     guests: int = 0
     extra_people: int = 0
