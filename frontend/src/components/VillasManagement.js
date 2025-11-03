@@ -1129,15 +1129,15 @@ const VillasManagementNew = () => {
                               <div className="space-y-1 text-sm">
                                 <div className="flex justify-between">
                                   <span>Pasadía:</span>
-                                  <span className="font-semibold">{formatCurrency(getDefaultPrice(villa, 'pasadia', 'client_price'))}</span>
+                                  <span className="font-semibold">{formatCurrency(villa.price_pasadia_regular_client || 0)}</span>
                                 </div>
                                 <div className="flex justify-between">
                                   <span>Amanecida:</span>
-                                  <span className="font-semibold">{formatCurrency(getDefaultPrice(villa, 'amanecida', 'client_price'))}</span>
+                                  <span className="font-semibold">{formatCurrency(villa.price_amanecida_regular_client || 0)}</span>
                                 </div>
                                 <div className="flex justify-between">
                                   <span>Evento:</span>
-                                  <span className="font-semibold">{formatCurrency(getDefaultPrice(villa, 'evento', 'client_price'))}</span>
+                                  <span className="font-semibold">{formatCurrency(villa.price_evento_regular_client || 0)}</span>
                                 </div>
                               </div>
                             </div>
@@ -1148,15 +1148,15 @@ const VillasManagementNew = () => {
                                 <div className="space-y-1 text-sm">
                                   <div className="flex justify-between">
                                     <span>Pasadía:</span>
-                                    <span className="font-semibold">{formatCurrency(getDefaultPrice(villa, 'pasadia', 'owner_price'))}</span>
+                                    <span className="font-semibold">{formatCurrency(villa.price_pasadia_regular_owner || 0)}</span>
                                   </div>
                                   <div className="flex justify-between">
                                     <span>Amanecida:</span>
-                                    <span className="font-semibold">{formatCurrency(getDefaultPrice(villa, 'amanecida', 'owner_price'))}</span>
+                                    <span className="font-semibold">{formatCurrency(villa.price_amanecida_regular_owner || 0)}</span>
                                   </div>
                                   <div className="flex justify-between">
                                     <span>Evento:</span>
-                                    <span className="font-semibold">{formatCurrency(getDefaultPrice(villa, 'evento', 'owner_price'))}</span>
+                                    <span className="font-semibold">{formatCurrency(villa.price_evento_regular_owner || 0)}</span>
                                   </div>
                                 </div>
                               </div>
