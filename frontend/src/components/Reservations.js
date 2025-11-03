@@ -362,13 +362,10 @@ const Reservations = () => {
     setError('');
     
     try {
-      // VALIDACIÓN: Facturas "Solo Servicios" deben tener al menos un servicio
-      if (invoiceType === 'service' && !formData.villa_id) {
-        const servicesWithData = selectedExtraServices.filter(s => s.service_id);
-        if (servicesWithData.length === 0) {
-          setError('No se pueden crear facturas "Solo Servicios" sin agregar servicios. Por favor, agrega al menos un servicio antes de guardar.');
-          return;
-        }
+      // VALIDACIÓN: Cliente es obligatorio
+      if (!formData.customer_id) {
+        setError('Debes seleccionar un cliente para crear la factura.');
+        return;
       }
       
       const customer = customers.find(c => c.id === formData.customer_id);
