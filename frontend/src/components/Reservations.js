@@ -62,13 +62,13 @@ const Reservations = () => {
     villa_code: '',
     villa_description: '',
     villa_location: '',
-    rental_type: 'pasadia',
+    rental_type: null,  // Opcional
     event_type: '',
     reservation_date: new Date().toISOString().split('T')[0],
     check_out_date: '',
-    check_in_time: '9:00 AM',
-    check_out_time: '8:00 PM',
-    guests: 1,
+    check_in_time: '',  // Vacío por defecto
+    check_out_time: '',  // Vacío por defecto
+    guests: 0,  // 0 por defecto, opcional
     base_price: 0,
     owner_price: 0,
     extra_hours: 0,
