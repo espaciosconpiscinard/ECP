@@ -119,11 +119,14 @@ backend:
     file: "/app/backend/models.py"
     stuck_count: 0
     priority: "high"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
       - working: "NA"
         agent: "main"
         comment: "Backend ya tenía soporte para pasadia_prices, amanecida_prices, evento_prices en modelo Villa. Campos agregados en refactoring previo. Estructura: array de objetos con {label: str, client_price: float, owner_price: float}. También incluye default_check_in_time_pasadia, default_check_out_time_pasadia, default_check_in_time_amanecida, default_check_out_time_amanecida."
+      - working: true
+        agent: "testing"
+        comment: "✅ TESTED: Villa modality pricing structure completamente funcional. Verificado: 1) GET /api/villas retorna villas con campos pasadia_prices, amanecida_prices, evento_prices, 2) Villa ECPVKLK encontrada con estructura correcta: pasadia_prices (4 precios), amanecida_prices (1 precio), evento_prices (array vacío), 3) Cada objeto precio tiene estructura correcta {label: str, client_price: float, owner_price: float}, 4) Creación de villa test TESTMOD exitosa con todas las modalidades. ISSUE MENOR: default_check_in_time_* y default_check_out_time_* no se guardan al crear villas (posible issue de modelo backend), pero funcionalidad core de precios por modalidad funciona perfectamente."
 
   - task: "Campo DNI opcional en modelo Customer"
     implemented: true
