@@ -114,29 +114,41 @@ class VillaBase(BaseModel):
     category_id: Optional[str] = None  # ID de la categoría asignada
     
     # Modalidades disponibles y sus descripciones
-    has_pasadia: bool = False  # Si la villa tiene modalidad Pasadía
-    has_amanecida: bool = False  # Si la villa tiene modalidad Amanecida
-    description_pasadia: Optional[str] = None  # Descripción específica para Pasadía
-    description_amanecida: Optional[str] = None  # Descripción específica para Amanecida
-    villa_currency: str = "DOP"  # Moneda por defecto (DOP o USD)
+    has_pasadia: bool = False
+    has_amanecida: bool = False
+    has_evento: bool = False
+    description_pasadia: Optional[str] = None
+    description_amanecida: Optional[str] = None
+    description_evento: Optional[str] = None
+    villa_currency: str = "DOP"
+    
+    # Precios Pasadía (Regular, Oferta, Temporada Alta)
+    price_pasadia_regular_client: float = 0.0
+    price_pasadia_regular_owner: float = 0.0
+    price_pasadia_oferta_client: float = 0.0
+    price_pasadia_oferta_owner: float = 0.0
+    price_pasadia_alta_client: float = 0.0
+    price_pasadia_alta_owner: float = 0.0
+    
+    # Precios Amanecida (Regular, Oferta, Temporada Alta)
+    price_amanecida_regular_client: float = 0.0
+    price_amanecida_regular_owner: float = 0.0
+    price_amanecida_oferta_client: float = 0.0
+    price_amanecida_oferta_owner: float = 0.0
+    price_amanecida_alta_client: float = 0.0
+    price_amanecida_alta_owner: float = 0.0
+    
+    # Precios Evento (Regular, Oferta, Temporada Alta)
+    price_evento_regular_client: float = 0.0
+    price_evento_regular_owner: float = 0.0
+    price_evento_oferta_client: float = 0.0
+    price_evento_oferta_owner: float = 0.0
+    price_evento_alta_client: float = 0.0
+    price_evento_alta_owner: float = 0.0
     
     # Horarios por defecto
     default_check_in_time: str = "9:00 AM"
     default_check_out_time: str = "8:00 PM"
-    
-    # Precios al cliente (compatibilidad con sistema antiguo)
-    default_price_pasadia: float = 0.0
-    default_price_amanecida: float = 0.0
-    default_price_evento: float = 0.0
-    
-    # Precios al propietario (lo que debemos pagar - compatibilidad)
-    owner_price_pasadia: float = 0.0
-    owner_price_amanecida: float = 0.0
-    owner_price_evento: float = 0.0
-    
-    # Sistema de precios flexibles (NUEVO - sin rangos, solo listas ordenadas)
-    use_flexible_pricing: bool = False  # Si es True, usar flexible_prices
-    flexible_prices: Optional[FlexiblePrices] = None  # Precios flexibles por tipo
     
     # Precios por extras (aplican a cualquier tipo de renta) - separados cliente/propietario
     extra_hours_price_client: float = 0.0  # Precio al cliente por hora extra
