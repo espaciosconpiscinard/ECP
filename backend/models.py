@@ -219,12 +219,14 @@ class ReservationBase(BaseModel):
     guests: int = 0
     extra_people: int = 0  # Cantidad de personas extras
     extra_people_cost: float = 0.0  # Costo de personas extras
+    extra_people_unit_price: float = 0.0  # Precio unitario por persona extra
     
     # Precios (base_price opcional para facturas de solo servicios)
     base_price: float = 0.0  # Precio base de la villa al cliente
     owner_price: float = 0.0  # Precio a pagar al propietario
     extra_hours: float = 0.0
     extra_hours_cost: float = 0.0
+    extra_hours_unit_price: float = 0.0  # Precio unitario por hora extra
     
     # Servicios extras
     extra_services: List[ReservationExtraService] = []
