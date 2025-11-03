@@ -104,8 +104,13 @@ const VillasManagementNew = () => {
     setError('');
     
     try {
-      // Guardar formData directamente
-      const dataToSave = { ...formData };
+      // Guardar formData con los precios
+      const dataToSave = {
+        ...formData,
+        pasadia_prices: pasadiaPrices,
+        amanecida_prices: amanecidaPrices,
+        evento_prices: eventoPrices
+      };
       
       if (editingVilla) {
         await updateVilla(editingVilla.id, dataToSave);
