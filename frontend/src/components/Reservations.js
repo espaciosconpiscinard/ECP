@@ -62,7 +62,8 @@ const Reservations = () => {
     villa_code: '',
     villa_description: '',  // Descripción de la modalidad (no de la villa general)
     villa_location: '',
-    rental_type: '',  // Modalidad seleccionada: 'pasadia', 'amanecida', 'evento'
+    rental_type: '',  // Para backend: 'pasadia', 'amanecida', 'evento'
+    rental_type_display: '',  // Para UI: 'Pasadía', 'Amanecida', 'Evento'
     event_type: '',
     reservation_date: new Date().toISOString().split('T')[0],
     check_out_date: '',
