@@ -2395,6 +2395,52 @@ const Expenses = () => {
                                 Pagar
                               </Button>
                             </div>
+                            
+                            {/* Historial de Pagos al Suplidor */}
+                            {supplierExpense && supplierAbonos[supplierExpense.id] && supplierAbonos[supplierExpense.id].length > 0 && (
+                              <div className="mt-4 pt-4 border-t border-orange-300">
+                                <h5 className="text-sm font-semibold text-orange-900 mb-2">
+                                  Historial de Pagos ({supplierAbonos[supplierExpense.id].length})
+                                </h5>
+                                <div className="space-y-2">
+                                  {supplierAbonos[supplierExpense.id].map((abono) => (
+                                    <div key={abono.id} className="flex justify-between items-center p-2 bg-white rounded border border-orange-200">
+                                      <div className="flex-1">
+                                        <div className="flex items-center space-x-3">
+                                          <span className="font-semibold text-sm">
+                                            {formatCurrency(abono.amount, abono.currency)}
+                                          </span>
+                                          <span className="text-xs text-gray-600">
+                                            {new Date(abono.payment_date).toLocaleDateString('es-DO')}
+                                          </span>
+                                          <span className="text-xs px-2 py-1 bg-blue-100 text-blue-800 rounded">
+                                            {abono.payment_method}
+                                          </span>
+                                          {abono.invoice_number && (
+                                            <span className="text-xs px-2 py-1 bg-purple-100 text-purple-800 rounded font-mono">
+                                              #{abono.invoice_number}
+                                            </span>
+                                          )}
+                                        </div>
+                                        {abono.notes && (
+                                          <p className="text-xs text-gray-500 mt-1">{abono.notes}</p>
+                                        )}
+                                      </div>
+                                      {user?.role === 'admin' && (
+                                        <Button
+                                          size="sm"
+                                          variant="ghost"
+                                          onClick={() => handleDeleteSupplierAbono(supplierExpense.id, abono.id)}
+                                          className="text-red-600 hover:text-red-700"
+                                        >
+                                          <X size={14} />
+                                        </Button>
+                                      )}
+                                    </div>
+                                  ))}
+                                </div>
+                              </div>
+                            )}
                           </div>
                         );
                       })}
