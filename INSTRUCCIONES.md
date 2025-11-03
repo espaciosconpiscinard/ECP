@@ -6,7 +6,7 @@ Sistema completo para gestionar el negocio de alquiler de villas, incluyendo res
 
 ### Acceso al Sistema
 
-La aplicación está disponible en: `https://quoteinvoice-6.preview.emergentagent.com`
+La aplicación está disponible en: `https://piscina-invoice.preview.emergentagent.com`
 
 ### Usuarios Predefinidos
 
