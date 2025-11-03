@@ -1292,6 +1292,74 @@ agent_communication:
       📊 DATOS VERIFICADOS EN VILLA ECPVKLK:
       - pasadia_prices: 4 precios configurados ✅
         * "1-10 PERSONAS PRECIO REGULAR" (Client: 10000, Owner: 8000)
+
+  - agent: "main"
+    message: |
+      ✅ FIX COMPLETADO - RESTANTE A PAGAR EN SERVICIOS EXTRAS
+      
+      **PROBLEMA REPORTADO:**
+      En el modal de gastos del owner, cuando se visualizan los servicios extras, 
+      el "RESTANTE a pagar" mostraba incorrectamente el total del owner en lugar 
+      del monto específico del proveedor.
+      
+      **CAUSA RAÍZ:**
+      - La sección de servicios extras solo mostraba "Total a pagar" (supplier_cost * quantity)
+      - No se mostraba cuánto se había pagado ni el "RESTANTE a pagar"
+      - Los gastos de suplidores (pago_suplidor) existen pero no se cargaban al abrir el modal
+      - El balance_due del supplierExpense específico no se calculaba ni mostraba
+      
+      **CAMBIOS IMPLEMENTADOS:**
+      
+      1. ✅ Agregado estado supplierExpenses (línea 53)
+         - Estado para almacenar gastos de suplidores relacionados con una reservación
+         - Se inicializa como array vacío
+      
+      2. ✅ Actualizado handleOpenAbonoDialog (líneas 236-321)
+         - Al abrir modal para gasto con related_reservation_id, ahora también carga supplierExpenses
+         - Filtra solo gastos con category='pago_suplidor' y mismo related_reservation_id
+         - Logs agregados para debugging: "Cargando gastos de suplidores..." y "Gastos de suplidores cargados"
+      
+      3. ✅ Modificada sección de Servicios Extras (líneas 2128-2300)
+         - Cada servicio extra ahora busca su supplierExpense correspondiente en el map
+         - Se calcula totalAmount, paidAmount y remainingAmount correctamente
+         - UI actualizada para mostrar:
+           * "Total original: XXX" (supplier_cost * quantity)
+           * "Pagado: XXX" (total_paid del supplierExpense)
+           * "RESTANTE a pagar: XXX" (balance_due del supplierExpense)
+         - Texto cambiado de "Total a pagar" a "RESTANTE a pagar"
+      
+      4. ✅ Optimizado onClick del botón Pagar (líneas 2209-2277)
+         - Ahora usa el supplierExpense ya encontrado en el scope del map
+         - Eliminada la búsqueda duplicada de expenses dentro del onClick
+         - Código más limpio y eficiente
+      
+      **ESTRUCTURA VISUAL:**
+      ```
+      🛎️ SERVICIOS EXTRAS - PAGO A SUPLIDORES
+      ┌─────────────────────────────────────────┐
+      │ Servicio: Comida                        │
+      │ Suplidor: Restaurant XYZ                │
+      │ Cantidad: 2                             │
+      │ Total original: RD$ 10,000              │
+      │ Pagado: RD$ 2,000                       │
+      │                    RESTANTE a pagar:    │
+      │                    RD$ 8,000 ←── CORREGIDO
+      └─────────────────────────────────────────┘
+      ```
+      
+      **VERIFICACIÓN:**
+      ✅ Código compila sin errores
+      ✅ Build exitoso (172.92 kB JS, 12.67 kB CSS)
+      ✅ Aplicación carga correctamente en localhost:3000
+      
+      **SIGUIENTE PASO:**
+      - Testing manual o automatizado para verificar:
+        1. Abrir modal de gasto del owner con servicios extras
+        2. Verificar que muestre "Total original", "Pagado" y "RESTANTE a pagar"
+        3. Realizar un pago parcial a un servicio extra
+        4. Verificar que el "RESTANTE a pagar" se actualice correctamente
+        5. Verificar que al cerrar y reabrir el modal, los valores sean correctos
+
         * "1-10 PERSONAS PRECIO DE OFERTA" (Client: 8000, Owner: 5000)
         * 2 precios adicionales con labels vacíos (configuración incompleta)
       - amanecida_prices: 1 precio configurado ✅
