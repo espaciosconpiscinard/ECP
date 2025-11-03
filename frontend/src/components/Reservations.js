@@ -1865,77 +1865,90 @@ const Reservations = () => {
                       <h3 className="font-bold text-green-900 mb-3">🛎️ Servicios a Facturar</h3>
                       <div className="space-y-3">
                         {selectedExtraServices.map((service, index) => (
-                          <div key={index} className="grid grid-cols-5 gap-2 bg-white p-3 rounded border">
-                            <div className="col-span-2">
-                              <Label className="text-xs">Servicio</Label>
-                              <select
-                                value={service.service_id || ''}
-                                onChange={(e) => {
-                                  const selectedService = extraServices.find(s => s.id === e.target.value);
-                                  if (selectedService) {
-                                    updateExtraService(index, 'service_id', e.target.value);
-                                  }
-                                }}
-                                className="w-full p-2 border rounded-md text-sm"
-                              >
-                                <option value="">Seleccionar servicio</option>
-                                {extraServices.map(svc => (
-                                  <option key={svc.id} value={svc.id}>{svc.name}</option>
-                                ))}
-                              </select>
-                            </div>
-
-                            <div className="col-span-2">
-                              <Label className="text-xs">Suplidor</Label>
-                              <select
-                                value={service.supplier_name || ''}
-                                onChange={(e) => {
-                                  const selectedService = extraServices.find(s => s.id === service.service_id);
-                                  const selectedSupplier = selectedService?.suppliers?.find(sup => sup.name === e.target.value);
-                                  if (selectedSupplier) {
-                                    updateExtraService(index, 'supplier_name', selectedSupplier.name);
-                                    updateExtraService(index, 'supplier_id', selectedSupplier.name);
-                                    updateExtraService(index, 'supplier_cost', selectedSupplier.supplier_cost);
-                                    updateExtraService(index, 'price_unit', selectedSupplier.client_price);
-                                    updateExtraService(index, 'unit_price', selectedSupplier.client_price);
-                                    updateExtraService(index, 'price_total', selectedSupplier.client_price * service.quantity);
-                                    updateExtraService(index, 'total', selectedSupplier.client_price * service.quantity);
-                                  }
-                                }}
-                                className="w-full p-2 border rounded-md text-sm"
-                                disabled={!service.service_id}
-                              >
-                                <option value="">{!service.service_id ? 'Primero selecciona servicio' : 'Seleccionar suplidor'}</option>
-                                {extraServices.find(s => s.id === service.service_id)?.suppliers?.map((supplier, idx) => (
-                                  <option key={idx} value={supplier.name}>
-                                    {supplier.name} - RD$ {supplier.client_price?.toLocaleString('es-DO')}
-                                  </option>
-                                ))}
-                              </select>
-                            </div>
-
-                            <div className="flex items-end gap-2">
-                              <div className="flex-1">
-                                <Label className="text-xs">Cant.</Label>
-                                <Input
-                                  type="number"
-                                  min="1"
-                                  value={service.quantity}
-                                  onChange={(e) => updateExtraService(index, 'quantity', parseInt(e.target.value) || 1)}
-                                  className="text-sm"
-                                />
+                          <div key={index} className="mb-3 p-3 border rounded bg-gray-50">
+                            <div className="grid grid-cols-5 gap-2 mb-2">
+                              <div className="col-span-2">
+                                <Label className="text-xs">Servicio</Label>
+                                <select
+                                  value={service.service_id || ''}
+                                  onChange={(e) => {
+                                    const selectedService = extraServices.find(s => s.id === e.target.value);
+                                    if (selectedService) {
+                                      updateExtraService(index, 'service_id', e.target.value);
+                                    }
+                                  }}
+                                  className="w-full p-2 border rounded-md text-sm"
+                                >
+                                  <option value="">Seleccionar servicio</option>
+                                  {extraServices.map(svc => (
+                                    <option key={svc.id} value={svc.id}>{svc.name}</option>
+                                  ))}
+                                </select>
                               </div>
-                              <button
-                                type="button"
-                                onClick={() => {
-                                  const updated = selectedExtraServices.filter((_, i) => i !== index);
-                                  setSelectedExtraServices(updated);
-                                  setFormData({ ...formData, extra_services: updated });
-                                }}
-                                className="p-2 text-red-600 hover:bg-red-50 rounded"
-                              >
-                                <X size={16} />
-                              </button>
+
+                              <div className="col-span-2">
+                                <Label className="text-xs">Suplidor</Label>
+                                <select
+                                  value={service.supplier_name || ''}
+                                  onChange={(e) => {
+                                    const selectedService = extraServices.find(s => s.id === service.service_id);
+                                    const selectedSupplier = selectedService?.suppliers?.find(sup => sup.name === e.target.value);
+                                    if (selectedSupplier) {
+                                      updateExtraService(index, 'supplier_name', selectedSupplier.name);
+                                      updateExtraService(index, 'supplier_id', selectedSupplier.name);
+                                      updateExtraService(index, 'supplier_cost', selectedSupplier.supplier_cost);
+                                      updateExtraService(index, 'price_unit', selectedSupplier.client_price);
+                                      updateExtraService(index, 'unit_price', selectedSupplier.client_price);
+                                      updateExtraService(index, 'price_total', selectedSupplier.client_price * service.quantity);
+                                      updateExtraService(index, 'total', selectedSupplier.client_price * service.quantity);
+                                    }
+                                  }}
+                                  className="w-full p-2 border rounded-md text-sm"
+                                  disabled={!service.service_id}
+                                >
+                                  <option value="">{!service.service_id ? 'Primero selecciona servicio' : 'Seleccionar suplidor'}</option>
+                                  {extraServices.find(s => s.id === service.service_id)?.suppliers?.map((supplier, idx) => (
+                                    <option key={idx} value={supplier.name}>
+                                      {supplier.name} - RD$ {supplier.client_price?.toLocaleString('es-DO')}
+                                    </option>
+                                  ))}
+                                </select>
+                              </div>
+
+                              <div className="flex items-end gap-2">
+                                <div className="flex-1">
+                                  <Label className="text-xs">Cant.</Label>
+                                  <Input
+                                    type="number"
+                                    min="1"
+                                    value={service.quantity}
+                                    onChange={(e) => updateExtraService(index, 'quantity', parseInt(e.target.value) || 1)}
+                                    className="text-sm"
+                                  />
+                                </div>
+                                <button
+                                  type="button"
+                                  onClick={() => {
+                                    const updated = selectedExtraServices.filter((_, i) => i !== index);
+                                    setSelectedExtraServices(updated);
+                                    setFormData({ ...formData, extra_services: updated });
+                                  }}
+                                  className="p-2 text-red-600 hover:bg-red-50 rounded"
+                                >
+                                  <X size={16} />
+                                </button>
+                              </div>
+                            </div>
+                            {/* Campo de descripción */}
+                            <div className="mt-2">
+                              <textarea
+                                value={service.description || ''}
+                                onChange={(e) => updateExtraService(index, 'description', e.target.value)}
+                                placeholder="Descripción del servicio (opcional, se mostrará en la factura)..."
+                                className="w-full p-2 border rounded text-sm"
+                                rows="2"
+                                style={{ whiteSpace: 'pre-wrap' }}
+                              />
                             </div>
                           </div>
                         ))}
@@ -1949,6 +1962,7 @@ const Reservations = () => {
                                 service_id: '',
                                 name: '',
                                 service_name: '',
+                                description: '',  // Agregar campo de descripción
                                 quantity: 1,
                                 price_unit: 0,
                                 price_total: 0,
