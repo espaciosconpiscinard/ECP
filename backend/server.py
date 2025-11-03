@@ -1323,8 +1323,13 @@ async def update_reservation(
                         all_suppliers_paid = False
                         break
                 
-                # Ahora el depósito está devuelto (acabamos de marcarlo)
-                deposit_returned = True
+                # Verificar estado ACTUAL del depósito (después del cambio)
+                deposit_expense_check = await db.expenses.find_one({
+                    "related_reservation_id": reservation_id,
+                    "category": "devolucion_deposito",
+                    "payment_status": "paid"
+                }, {"_id": 0})
+                deposit_returned = deposit_expense_check is not None
                 
                 # Actualizar estado del gasto del propietario
                 new_status = "paid" if (owner_paid and all_suppliers_paid and deposit_returned) else "pending"
