@@ -157,6 +157,7 @@ class Villa(VillaBase):
 class ServiceSupplier(BaseModel):
     """Suplidor de un servicio adicional con sus precios"""
     name: str  # Nombre del suplidor
+    description: Optional[str] = None  # Descripción específica del suplidor
     client_price: float = 0.0  # Precio al cliente
     supplier_cost: float = 0.0  # Costo del servicio (pago al suplidor)
     is_default: bool = False  # Si es el suplidor predeterminado
