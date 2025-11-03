@@ -41,34 +41,20 @@ const VillasManagementNew = () => {
     category_id: '',
     has_pasadia: false,
     has_amanecida: false,
-    has_evento: false,  // Nuevo checkbox para Eventos
+    has_evento: false,
     description_pasadia: '',
     description_amanecida: '',
-    description_evento: '',  // Descripción para Eventos
+    description_evento: '',
     villa_currency: 'DOP',
-    default_check_in_time: '9:00 AM',
-    default_check_out_time: '8:00 PM',
-    // Precios Pasadía
-    price_pasadia_regular_client: 0,
-    price_pasadia_regular_owner: 0,
-    price_pasadia_oferta_client: 0,
-    price_pasadia_oferta_owner: 0,
-    price_pasadia_alta_client: 0,
-    price_pasadia_alta_owner: 0,
-    // Precios Amanecida
-    price_amanecida_regular_client: 0,
-    price_amanecida_regular_owner: 0,
-    price_amanecida_oferta_client: 0,
-    price_amanecida_oferta_owner: 0,
-    price_amanecida_alta_client: 0,
-    price_amanecida_alta_owner: 0,
-    // Precios Evento
-    price_evento_regular_client: 0,
-    price_evento_regular_owner: 0,
-    price_evento_oferta_client: 0,
-    price_evento_oferta_owner: 0,
-    price_evento_alta_client: 0,
-    price_evento_alta_owner: 0,
+    // Horarios separados por modalidad
+    check_in_time_pasadia: '9:00 AM',
+    check_out_time_pasadia: '8:00 PM',
+    check_in_time_amanecida: '9:00 AM',
+    check_out_time_amanecida: '8:00 AM',
+    // Arrays de precios por modalidad (múltiples precios con botón +)
+    pasadia_prices: [],  // [{ label: 'Regular', client: 0, owner: 0 }]
+    amanecida_prices: [],
+    evento_prices: [],
     extra_hours_price_client: 0,
     extra_hours_price_owner: 0,
     extra_people_price_client: 0,
@@ -77,6 +63,11 @@ const VillasManagementNew = () => {
     amenities: [],
     is_active: true
   });
+
+  // Estados para precios de cada modalidad
+  const [pasadiaPrices, setPasadiaPrices] = useState([]);
+  const [amanecidaPrices, setAmanecidaPrices] = useState([]);
+  const [eventoPrices, setEventoPrices] = useState([]);
 
   const [serviceFormData, setServiceFormData] = useState({
     name: '',
