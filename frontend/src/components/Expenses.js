@@ -2220,71 +2220,53 @@ const Expenses = () => {
                                     return;
                                   }
                                   
+                                  // Usar el supplierExpense que ya fue encontrado en el scope del map
+                                  if (!supplierExpense) {
+                                    console.error('❌ [SERVICIO EXTRA] No se encontró el gasto del suplidor');
+                                    alert('No se encontró el gasto del suplidor');
+                                    return;
+                                  }
+                                  
                                   try {
-                                    console.log('💰 [SERVICIO EXTRA] Buscando expenses...');
-                                    const allExpensesResponse = await fetch(
-                                      `${process.env.REACT_APP_BACKEND_URL}/api/expenses`,
+                                    console.log('💰 [SERVICIO EXTRA] Supplier expense ID:', supplierExpense.id);
+                                    
+                                    const abonoData = {
+                                      amount: parseFloat(monto),
+                                      currency: selectedExpense?.currency,
+                                      payment_method: metodo,
+                                      payment_date: new Date().toISOString().split('T')[0],
+                                      notes: `Pago a suplidor ${service.supplier_name} - ${service.service_name || service.name}`
+                                    };
+                                    
+                                    console.log('💰 [SERVICIO EXTRA] Enviando abono:', abonoData);
+                                    
+                                    const response = await fetch(
+                                      `${process.env.REACT_APP_BACKEND_URL}/api/expenses/${supplierExpense.id}/abonos`,
                                       {
+                                        method: 'POST',
                                         headers: {
+                                          'Content-Type': 'application/json',
                                           'Authorization': `Bearer ${localStorage.getItem('token')}`
-                                        }
+                                        },
+                                        body: JSON.stringify(abonoData)
                                       }
                                     );
-                                    const allExpenses = await allExpensesResponse.json();
-                                    console.log('💰 [SERVICIO EXTRA] Total expenses:', allExpenses.length);
                                     
-                                    console.log('💰 [SERVICIO EXTRA] Buscando gasto del suplidor:', service.supplier_name);
-                                    const supplierExpense = allExpenses.find(e => 
-                                      e.category === 'pago_suplidor' && 
-                                      e.related_reservation_id === relatedReservation.id &&
-                                      e.description.includes(service.supplier_name)
-                                    );
+                                    console.log('💰 [SERVICIO EXTRA] Response status:', response.status);
                                     
-                                    console.log('💰 [SERVICIO EXTRA] Supplier expense encontrado:', supplierExpense);
-                                    
-                                    if (supplierExpense) {
-                                      const abonoData = {
-                                        amount: parseFloat(monto),
-                                        currency: selectedExpense?.currency,
-                                        payment_method: metodo,
-                                        payment_date: new Date().toISOString().split('T')[0],
-                                        notes: `Pago a suplidor ${service.supplier_name} - ${service.service_name || service.name}`
-                                      };
-                                      
-                                      console.log('💰 [SERVICIO EXTRA] Enviando abono:', abonoData);
-                                      console.log('💰 [SERVICIO EXTRA] A expense ID:', supplierExpense.id);
-                                      
-                                      const response = await fetch(
-                                        `${process.env.REACT_APP_BACKEND_URL}/api/expenses/${supplierExpense.id}/abonos`,
-                                        {
-                                          method: 'POST',
-                                          headers: {
-                                            'Content-Type': 'application/json',
-                                            'Authorization': `Bearer ${localStorage.getItem('token')}`
-                                          },
-                                          body: JSON.stringify(abonoData)
-                                        }
-                                      );
-                                      
-                                      console.log('💰 [SERVICIO EXTRA] Response status:', response.status);
-                                      
-                                      if (response.ok) {
-                                        console.log('✅ [SERVICIO EXTRA] Pago registrado exitosamente');
-                                        alert(`Pago registrado a ${service.supplier_name}`);
-                                        document.getElementById(`servicio-${index}-monto`).value = '';
-                                        console.log('🔄 [SERVICIO EXTRA] Recargando lista de expenses...');
-                                        await fetchExpenses();
-                                        console.log('✅ [SERVICIO EXTRA] Lista recargada');
-                                        setIsAbonoDialogOpen(false);
-                                        setShowDetailsModal(false);  // Cerrar también el modal principal
-                                      } else {
-                                        const errorData = await response.json();
-                                        console.error('❌ [SERVICIO EXTRA] Error response:', errorData);
-                                        alert('Error: ' + (errorData.detail || 'No se pudo registrar el pago'));
-                                      }
+                                    if (response.ok) {
+                                      console.log('✅ [SERVICIO EXTRA] Pago registrado exitosamente');
+                                      alert(`Pago registrado a ${service.supplier_name}`);
+                                      document.getElementById(`servicio-${index}-monto`).value = '';
+                                      console.log('🔄 [SERVICIO EXTRA] Recargando lista de expenses...');
+                                      await fetchExpenses();
+                                      console.log('✅ [SERVICIO EXTRA] Lista recargada');
+                                      setIsAbonoDialogOpen(false);
+                                      setShowDetailsModal(false);  // Cerrar también el modal principal
                                     } else {
-                                      console.error('❌ [SERVICIO EXTRA] No se encontró el gasto del suplidor');
-                                      alert('No se encontró el gasto del suplidor');
+                                      const errorData = await response.json();
+                                      console.error('❌ [SERVICIO EXTRA] Error response:', errorData);
+                                      alert('Error: ' + (errorData.detail || 'No se pudo registrar el pago'));
                                     }
                                   } catch (err) {
                                     console.error('❌ [SERVICIO EXTRA] Error catch:', err);
