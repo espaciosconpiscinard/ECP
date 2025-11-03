@@ -2340,11 +2340,46 @@ const Expenses = () => {
                                       console.log('✅ [SERVICIO EXTRA] Pago registrado exitosamente');
                                       alert(`Pago registrado a ${service.supplier_name}`);
                                       document.getElementById(`servicio-${index}-monto`).value = '';
+                                      
+                                      // Recargar abonos del supplierExpense
+                                      const abonosResponse = await fetch(
+                                        `${process.env.REACT_APP_BACKEND_URL}/api/expenses/${supplierExpense.id}/abonos`,
+                                        {
+                                          headers: {
+                                            'Authorization': `Bearer ${localStorage.getItem('token')}`
+                                          }
+                                        }
+                                      );
+                                      if (abonosResponse.ok) {
+                                        const abonosData = await abonosResponse.json();
+                                        setSupplierAbonos(prev => ({
+                                          ...prev,
+                                          [supplierExpense.id]: abonosData.data || []
+                                        }));
+                                      }
+                                      
+                                      // Recargar supplierExpenses para actualizar balance_due
+                                      const allExpensesResponse = await fetch(
+                                        `${process.env.REACT_APP_BACKEND_URL}/api/expenses`,
+                                        {
+                                          headers: {
+                                            'Authorization': `Bearer ${localStorage.getItem('token')}`
+                                          }
+                                        }
+                                      );
+                                      
+                                      if (allExpensesResponse.ok) {
+                                        const allExpenses = await allExpensesResponse.json();
+                                        const supplierExpensesForReservation = allExpenses.filter(e => 
+                                          e.category === 'pago_suplidor' && 
+                                          e.related_reservation_id === relatedReservation.id
+                                        );
+                                        setSupplierExpenses(supplierExpensesForReservation);
+                                      }
+                                      
                                       console.log('🔄 [SERVICIO EXTRA] Recargando lista de expenses...');
                                       await fetchExpenses();
                                       console.log('✅ [SERVICIO EXTRA] Lista recargada');
-                                      setIsAbonoDialogOpen(false);
-                                      setShowDetailsModal(false);  // Cerrar también el modal principal
                                     } else {
                                       const errorData = await response.json();
                                       console.error('❌ [SERVICIO EXTRA] Error response:', errorData);
