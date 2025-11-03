@@ -191,6 +191,44 @@ const VillasManagementNew = () => {
     });
   };
 
+  // ============ FUNCIONES PARA PRECIOS MÚLTIPLES ============
+  const addPrice = (modality) => {
+    const newPrice = { label: '', client_price: 0, owner_price: 0 };
+    if (modality === 'pasadia') {
+      setPasadiaPrices([...pasadiaPrices, newPrice]);
+    } else if (modality === 'amanecida') {
+      setAmanecidaPrices([...amanecidaPrices, newPrice]);
+    } else if (modality === 'evento') {
+      setEventoPrices([...eventoPrices, newPrice]);
+    }
+  };
+
+  const removePrice = (modality, index) => {
+    if (modality === 'pasadia') {
+      setPasadiaPrices(pasadiaPrices.filter((_, i) => i !== index));
+    } else if (modality === 'amanecida') {
+      setAmanecidaPrices(amanecidaPrices.filter((_, i) => i !== index));
+    } else if (modality === 'evento') {
+      setEventoPrices(eventoPrices.filter((_, i) => i !== index));
+    }
+  };
+
+  const updatePrice = (modality, index, field, value) => {
+    if (modality === 'pasadia') {
+      const updated = [...pasadiaPrices];
+      updated[index][field] = field === 'label' ? value : (parseFloat(value) || 0);
+      setPasadiaPrices(updated);
+    } else if (modality === 'amanecida') {
+      const updated = [...amanecidaPrices];
+      updated[index][field] = field === 'label' ? value : (parseFloat(value) || 0);
+      setAmanecidaPrices(updated);
+    } else if (modality === 'evento') {
+      const updated = [...eventoPrices];
+      updated[index][field] = field === 'label' ? value : (parseFloat(value) || 0);
+      setEventoPrices(updated);
+    }
+  };
+
   // ============ SERVICIOS FUNCTIONS ============
   const handleServiceSubmit = async (e) => {
     e.preventDefault();
