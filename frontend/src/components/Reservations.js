@@ -66,10 +66,6 @@ const Reservations = () => {
     villa_code: '',
     villa_description: '',
     villa_location: '',
-    villa_modality: null,  // Modalidad: pasadia o amanecida
-    villa_description_pasadia: '',  // Descripción para pasadía
-    villa_description_amanecida: '',  // Descripción para amanecida
-    villa_currency: 'DOP',  // Moneda de la villa
     rental_type: null,  // Opcional
     event_type: '',
     reservation_date: new Date().toISOString().split('T')[0],
