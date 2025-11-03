@@ -1330,6 +1330,66 @@ async def update_reservation(
                 {"$set": {"expense_date": new_date}}
             )
         
+        # Si cambió owner_price (por horas/personas extras), actualizar gasto propietario
+        if "owner_price" in update_dict and update_dict["owner_price"] != existing.get("owner_price"):
+            print(f"💰 [UPDATE_RESERVATION] Owner price cambió: {existing.get('owner_price')} → {update_dict['owner_price']}")
+            
+            owner_expense = await db.expenses.find_one({
+                "related_reservation_id": reservation_id,
+                "category": "pago_propietario"
+            }, {"_id": 0})
+            
+            if owner_expense:
+                old_amount = owner_expense.get("amount", 0)
+                new_amount = update_dict["owner_price"]
+                
+                print(f"📝 [UPDATE_RESERVATION] Actualizando gasto propietario: {old_amount} → {new_amount}")
+                
+                # Actualizar el monto del gasto
+                await db.expenses.update_one(
+                    {"id": owner_expense["id"]},
+                    {"$set": {"amount": new_amount}}
+                )
+                
+                # Recalcular estado
+                owner_abonos = await db.expense_abonos.find({"expense_id": owner_expense["id"]}, {"_id": 0}).to_list(1000)
+                owner_total_paid = sum(a.get("amount", 0) for a in owner_abonos)
+                owner_paid = owner_total_paid >= new_amount
+                
+                # Verificar suplidores
+                supplier_expenses = await db.expenses.find({
+                    "related_reservation_id": reservation_id,
+                    "category": "pago_suplidor"
+                }, {"_id": 0}).to_list(1000)
+                
+                all_suppliers_paid = True
+                for supplier_expense in supplier_expenses:
+                    supplier_abonos = await db.expense_abonos.find({"expense_id": supplier_expense["id"]}, {"_id": 0}).to_list(1000)
+                    supplier_total_paid = sum(a.get("amount", 0) for a in supplier_abonos)
+                    if supplier_total_paid < supplier_expense.get("amount", 0):
+                        all_suppliers_paid = False
+                        break
+                
+                # Verificar depósito
+                deposit_returned = True
+                if existing.get("deposit", 0) > 0:
+                    deposit_expense = await db.expenses.find_one({
+                        "related_reservation_id": reservation_id,
+                        "category": "devolucion_deposito",
+                        "payment_status": "paid"
+                    }, {"_id": 0})
+                    deposit_returned = deposit_expense is not None
+                
+                # Actualizar estado
+                new_owner_status = "paid" if (owner_paid and all_suppliers_paid and deposit_returned) else "pending"
+                print(f"📌 [UPDATE_RESERVATION] Estado propietario: {new_owner_status} (Owner: {owner_paid}, Supp: {all_suppliers_paid}, Dep: {deposit_returned})")
+                
+                await db.expenses.update_one(
+                    {"id": owner_expense["id"]},
+                    {"$set": {"payment_status": new_owner_status}}
+                )
+                print(f"✅ [UPDATE_RESERVATION] Gasto propietario actualizado")
+        
         # Si se agregaron/modificaron servicios extras, procesar gastos de suplidores
         if "extra_services" in update_dict:
             print(f"🛎️ [UPDATE_RESERVATION] Servicios extras actualizados, procesando gastos...")
