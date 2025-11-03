@@ -2136,7 +2136,7 @@ const Reservations = () => {
                               type="number"
                               min="1"
                               value={service.quantity}
-                              onChange={(e) => updateExtraService(index, 'quantity', parseInt(e.target.value))}
+                              onChange={(e) => updateExtraService(index, 'quantity', parseInt(e.target.value) || 1)}
                               className="text-sm"
                             />
                           </div>
@@ -2147,7 +2147,7 @@ const Reservations = () => {
                                 type="number"
                                 step="0.01"
                                 value={service.unit_price}
-                                onChange={(e) => updateExtraService(index, 'unit_price', parseFloat(e.target.value))}
+                                onChange={(e) => updateExtraService(index, 'unit_price', parseFloat(e.target.value) || 0)}
                                 className="text-sm"
                               />
                             </div>
