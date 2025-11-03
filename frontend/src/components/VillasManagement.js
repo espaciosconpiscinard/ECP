@@ -44,7 +44,10 @@ const VillasManagementNew = () => {
     description_pasadia: '',
     description_amanecida: '',
     description_evento: '',
-    villa_currency: 'DOP',
+    villa_currency: 'DOP',  // Deprecado, usar currency_pasadia, etc.
+    currency_pasadia: 'DOP',
+    currency_amanecida: 'DOP',
+    currency_evento: 'DOP',
     // Horarios separados por modalidad
     check_in_time_pasadia: '9:00 AM',
     check_out_time_pasadia: '8:00 PM',
