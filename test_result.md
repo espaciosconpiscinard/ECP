@@ -113,6 +113,18 @@ user_problem_statement: |
   - Actualizado price selector UI para mostrar precios agrupados por modalidad (Pasadía/Amanecida/Evento) con labels descriptivos (Regular, Oferta, Temporada Alta)
 
 backend:
+  - task: "Villa modality prices - Backend support"
+    implemented: true
+    working: true
+    file: "/app/backend/models.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Backend ya tenía soporte para pasadia_prices, amanecida_prices, evento_prices en modelo Villa. Campos agregados en refactoring previo. Estructura: array de objetos con {label: str, client_price: float, owner_price: float}. También incluye default_check_in_time_pasadia, default_check_out_time_pasadia, default_check_in_time_amanecida, default_check_out_time_amanecida."
+
   - task: "Campo DNI opcional en modelo Customer"
     implemented: true
     working: true
