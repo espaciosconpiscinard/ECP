@@ -1735,6 +1735,10 @@ const Reservations = () => {
                             villa_code: '',
                             villa_description: '',
                             villa_location: '',
+                            villa_modality: null,
+                            villa_description_pasadia: '',
+                            villa_description_amanecida: '',
+                            villa_currency: 'DOP',
                             check_in_time: '',
                             check_out_time: '',
                             base_price: 0,
@@ -1745,6 +1749,8 @@ const Reservations = () => {
                           setVillaSearchTerm('');
                           setShowPriceSelector(false);
                           setSelectedVillaFlexiblePrices(null);
+                          setVillaModalityPasadia(false);
+                          setVillaModalityAmanecida(false);
                         }}
                         className="absolute right-10 top-1/2 transform -translate-y-1/2 text-red-600 hover:text-red-800"
                       >
