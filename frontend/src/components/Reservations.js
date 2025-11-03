@@ -304,6 +304,7 @@ const Reservations = () => {
       { 
         service_id: '', 
         service_name: '', 
+        description: '',  // Campo para descripción
         supplier_name: '', 
         supplier_cost: 0, 
         quantity: 1, 
