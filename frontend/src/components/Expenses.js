@@ -296,13 +296,39 @@ const Expenses = () => {
               );
               console.log('✅ Gastos de suplidores cargados:', supplierExpensesForReservation);
               setSupplierExpenses(supplierExpensesForReservation);
+              
+              // Cargar abonos de cada supplierExpense
+              const abonosMap = {};
+              for (const supplierExp of supplierExpensesForReservation) {
+                try {
+                  const abonosResponse = await fetch(
+                    `${process.env.REACT_APP_BACKEND_URL}/api/expenses/${supplierExp.id}/abonos`,
+                    {
+                      headers: {
+                        'Authorization': `Bearer ${localStorage.getItem('token')}`
+                      }
+                    }
+                  );
+                  if (abonosResponse.ok) {
+                    const abonosData = await abonosResponse.json();
+                    abonosMap[supplierExp.id] = abonosData.data || [];
+                  }
+                } catch (err) {
+                  console.error(`Error al cargar abonos del supplierExpense ${supplierExp.id}:`, err);
+                  abonosMap[supplierExp.id] = [];
+                }
+              }
+              console.log('✅ Abonos de suplidores cargados:', abonosMap);
+              setSupplierAbonos(abonosMap);
             } else {
               console.error('❌ Error al cargar gastos de suplidores');
               setSupplierExpenses([]);
+              setSupplierAbonos({});
             }
           } catch (err) {
             console.error('❌ Error al cargar gastos de suplidores:', err);
             setSupplierExpenses([]);
+            setSupplierAbonos({});
           }
         } else {
           console.error('❌ Error en respuesta:', await reservationResponse.text());
