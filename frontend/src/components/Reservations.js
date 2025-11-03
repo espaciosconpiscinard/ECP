@@ -236,15 +236,16 @@ const Reservations = () => {
       
       if (hasPasadiaPrices || hasAmanecidaPrices || hasEventoPrices) {
         setShowPriceSelector(true);
-        // No auto-llenar precios, esperar que usuario seleccione modalidad y precio
+        // NO auto-llenar precios ni horarios - esperar que usuario seleccione modalidad
         setFormData(prev => ({
           ...prev,
           villa_id: villaId,
           villa_code: villa.code,
-          villa_description: villa.description || '',
+          villa_description: '',  // Se llenará con descripción de modalidad al seleccionar precio
           villa_location: villa.location || '',
           villa_currency: villa.villa_currency || 'DOP',
-          check_in_time: '',  // Se llenará según la modalidad seleccionada
+          rental_type: '',  // Se llenará al seleccionar modalidad
+          check_in_time: '',  // Se llenará según modalidad seleccionada
           check_out_time: '',
           base_price: 0,
           owner_price: 0,
@@ -258,11 +259,12 @@ const Reservations = () => {
           ...prev,
           villa_id: villaId,
           villa_code: villa.code,
-          villa_description: villa.description || '',
+          villa_description: '',
           villa_location: villa.location || '',
           villa_currency: villa.villa_currency || 'DOP',
-          check_in_time: villa.check_in_time_pasadia || '9:00 AM',
-          check_out_time: villa.check_out_time_pasadia || '8:00 PM',
+          rental_type: '',
+          check_in_time: '',
+          check_out_time: '',
           base_price: 0,
           owner_price: 0,
           extra_hours_unit_price: villa.extra_hours_price_client || 0,
