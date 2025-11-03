@@ -291,6 +291,10 @@ const Expenses = () => {
 
   const handleAbonoSubmit = async (e) => {
     e.preventDefault();
+    console.log('💰 Iniciando handleAbonoSubmit');
+    console.log('💰 Expense ID:', selectedExpense?.id);
+    console.log('💰 Abono Form Data:', abonoFormData);
+    
     try {
       const dataToSend = {
         ...abonoFormData,
@@ -302,13 +306,20 @@ const Expenses = () => {
         delete dataToSend.invoice_number;
       }
       
-      await addAbonoToExpense(selectedExpense.id, dataToSend);
+      console.log('💰 Data to send:', dataToSend);
+      console.log('💰 Llamando addAbonoToExpense...');
+      
+      const result = await addAbonoToExpense(selectedExpense.id, dataToSend);
+      console.log('✅ Abono agregado, resultado:', result);
       
       // Refresh abonos list
+      console.log('🔄 Refrescando lista de abonos...');
       const response = await getExpenseAbonos(selectedExpense.id);
+      console.log('📋 Abonos actualizados:', response.data);
       setAbonos(response.data);
       
       // Refresh expenses list
+      console.log('🔄 Refrescando lista de gastos...');
       await fetchExpenses();
       
       // Reset form
@@ -322,7 +333,11 @@ const Expenses = () => {
       });
       
       alert('✅ Abono agregado exitosamente');
+      console.log('✅ Proceso completado exitosamente');
     } catch (err) {
+      console.error('❌ Error en handleAbonoSubmit:', err);
+      console.error('❌ Error response:', err.response);
+      console.error('❌ Error message:', err.message);
       alert('Error al agregar abono: ' + (err.response?.data?.detail || err.message));
     }
   };
