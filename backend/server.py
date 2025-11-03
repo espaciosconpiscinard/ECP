@@ -1222,6 +1222,11 @@ async def update_reservation(
     
     update_dict = {k: v for k, v in update_data.model_dump(exclude_unset=True).items() if v is not None}
     
+    print(f"🔄 [UPDATE_RESERVATION] Actualizando reservación {reservation_id}")
+    print(f"📝 [UPDATE_RESERVATION] Campos a actualizar: {list(update_dict.keys())}")
+    if "owner_price" in update_dict:
+        print(f"💰 [UPDATE_RESERVATION] owner_price: {existing.get('owner_price')} → {update_dict['owner_price']}")
+    
     if update_dict:
         # Recalculate balance if amounts changed: Total + Depósito - Pagado
         total = update_dict.get("total_amount", existing["total_amount"])
