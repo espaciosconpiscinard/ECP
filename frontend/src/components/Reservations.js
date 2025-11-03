@@ -327,6 +327,7 @@ const Reservations = () => {
       if (service) {
         updated[index].service_name = service.name;
         updated[index].name = service.name;
+        updated[index].description = service.description || '';  // Cargar descripción
         updated[index].unit_price = service.default_price;
         updated[index].price_unit = service.default_price;
         updated[index].total = service.default_price * updated[index].quantity;
