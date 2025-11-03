@@ -1702,51 +1702,11 @@ const Reservations = () => {
                     onClick={() => setShowCustomerDropdown(false)}
                   />
                 )}
-                
-                {/* Tipo de Renta - Solo para facturas con villa */}
-                {invoiceType === 'villa' && (
-                  <div className="col-span-2">
-                    <Label>Tipo de Renta *</Label>
-                  <div className="grid grid-cols-3 gap-2 mt-2">
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setFormData({...formData, rental_type: 'pasadia'});
-                        if(formData.villa_id) handleVillaChange(formData.villa_id);
-                      }}
-                      className={`p-3 border-2 rounded-md font-medium ${formData.rental_type === 'pasadia' ? 'border-blue-600 bg-blue-50 text-blue-600' : 'border-gray-300'}`}
-                    >
-                      Pasadía
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setFormData({...formData, rental_type: 'amanecida'});
-                        if(formData.villa_id) handleVillaChange(formData.villa_id);
-                      }}
-                      className={`p-3 border-2 rounded-md font-medium ${formData.rental_type === 'amanecida' ? 'border-blue-600 bg-blue-50 text-blue-600' : 'border-gray-300'}`}
-                    >
-                      Amanecida
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setFormData({...formData, rental_type: 'evento'});
-                        if(formData.villa_id) handleVillaChange(formData.villa_id);
-                      }}
-                      className={`p-3 border-2 rounded-md font-medium ${formData.rental_type === 'evento' ? 'border-blue-600 bg-blue-50 text-blue-600' : 'border-gray-300'}`}
-                    >
-                      {invoiceType === 'service' ? 'Servicios' : 'Evento'}
-                    </button>
-                  </div>
-                </div>
-                )}
 
-                {/* Villas Y Servicios con Buscador - Solo si es tipo 'villa' */}
-                {invoiceType === 'villa' && (
-                  <div className="col-span-2">
-                    <Label>Villas Y Servicios</Label>
-                    <div className="relative">
+                {/* Villa (Opcional) */}
+                <div className="col-span-2">
+                  <Label>Villa (Opcional)</Label>
+                  <div className="relative">
                     <Input
                       type="text"
                       value={villaSearchTerm}
