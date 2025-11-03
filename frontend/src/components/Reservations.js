@@ -1975,6 +1975,25 @@ const Reservations = () => {
                   </div>
                 )}
 
+                {/* Modalidad Seleccionada */}
+                {formData.rental_type && (
+                  <div className="col-span-2 bg-green-50 p-3 rounded-lg border-2 border-green-300">
+                    <div className="flex items-center gap-2">
+                      <span className="text-2xl">
+                        {formData.rental_type === 'Pasadía' && '☀️'}
+                        {formData.rental_type === 'Amanecida' && '🌙'}
+                        {formData.rental_type === 'Evento' && '🎉'}
+                      </span>
+                      <div>
+                        <p className="font-bold text-green-900">Modalidad: {formData.rental_type}</p>
+                        {formData.villa_description && (
+                          <p className="text-xs text-gray-600 mt-1">{formData.villa_description}</p>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                )}
+
                 {/* Fecha de la Factura */}
                 <div className="col-span-2">
                   <Label>Fecha *</Label>
