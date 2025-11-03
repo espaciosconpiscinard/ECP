@@ -32,13 +32,6 @@ const VillasManagementNew = () => {
   const [selectedServices, setSelectedServices] = useState([]);
   const [selectAllServices, setSelectAllServices] = useState(false);
   
-  // Estados para precios flexibles - sin rangos de personas, solo listas ordenadas
-  const [flexiblePrices, setFlexiblePrices] = useState({
-    pasadia: [],
-    amanecida: [],
-    evento: []
-  });
-  
   const [formData, setFormData] = useState({
     code: '',
     name: '',
