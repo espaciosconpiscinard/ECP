@@ -2175,7 +2175,7 @@ const Reservations = () => {
                       </div>
                     ))}
                   </div>
-                )}
+                </div>
 
                 {/* Descuento */}
                 <div className="col-span-2">
