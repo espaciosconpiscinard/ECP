@@ -649,6 +649,15 @@ const VillasManagementNew = () => {
                         />
                         <span className="font-medium">Amanecida</span>
                       </label>
+                      <label className="flex items-center space-x-2 cursor-pointer">
+                        <input
+                          type="checkbox"
+                          checked={formData.has_evento}
+                          onChange={(e) => setFormData({ ...formData, has_evento: e.target.checked })}
+                          className="w-4 h-4"
+                        />
+                        <span className="font-medium">Evento</span>
+                      </label>
                     </div>
 
                     {/* Moneda */}
@@ -664,38 +673,110 @@ const VillasManagementNew = () => {
                       </select>
                     </div>
 
-                    {/* Descripción para Pasadía */}
+                    {/* PASADÍA */}
                     {formData.has_pasadia && (
-                      <div className="mb-3">
-                        <Label className="text-sm font-semibold">Descripción para Pasadía</Label>
-                        <textarea
-                          value={formData.description_pasadia}
-                          onChange={(e) => setFormData({ ...formData, description_pasadia: e.target.value })}
-                          placeholder="Detalles específicos de la villa en modalidad Pasadía..."
-                          className="w-full p-2 border rounded text-sm mt-1"
-                          rows="3"
-                          style={{ whiteSpace: 'pre-wrap' }}
-                        />
+                      <div className="mb-4 p-3 bg-white rounded border-2 border-blue-300">
+                        <h4 className="font-semibold text-blue-800 mb-2">☀️ Pasadía</h4>
+                        <div className="mb-3">
+                          <Label className="text-xs">Descripción</Label>
+                          <textarea
+                            value={formData.description_pasadia}
+                            onChange={(e) => setFormData({ ...formData, description_pasadia: e.target.value })}
+                            placeholder="Detalles específicos para Pasadía..."
+                            className="w-full p-2 border rounded text-sm"
+                            rows="2"
+                          />
+                        </div>
+                        <div className="grid grid-cols-3 gap-2">
+                          <div>
+                            <Label className="text-xs font-semibold text-green-700">Regular</Label>
+                            <Input type="number" step="0.01" value={formData.price_pasadia_regular_client} onChange={(e) => setFormData({ ...formData, price_pasadia_regular_client: parseFloat(e.target.value) || 0 })} placeholder="Cliente" className="text-xs mb-1" />
+                            <Input type="number" step="0.01" value={formData.price_pasadia_regular_owner} onChange={(e) => setFormData({ ...formData, price_pasadia_regular_owner: parseFloat(e.target.value) || 0 })} placeholder="Propietario" className="text-xs" />
+                          </div>
+                          <div>
+                            <Label className="text-xs font-semibold text-orange-700">Oferta</Label>
+                            <Input type="number" step="0.01" value={formData.price_pasadia_oferta_client} onChange={(e) => setFormData({ ...formData, price_pasadia_oferta_client: parseFloat(e.target.value) || 0 })} placeholder="Cliente" className="text-xs mb-1" />
+                            <Input type="number" step="0.01" value={formData.price_pasadia_oferta_owner} onChange={(e) => setFormData({ ...formData, price_pasadia_oferta_owner: parseFloat(e.target.value) || 0 })} placeholder="Propietario" className="text-xs" />
+                          </div>
+                          <div>
+                            <Label className="text-xs font-semibold text-red-700">Temp. Alta</Label>
+                            <Input type="number" step="0.01" value={formData.price_pasadia_alta_client} onChange={(e) => setFormData({ ...formData, price_pasadia_alta_client: parseFloat(e.target.value) || 0 })} placeholder="Cliente" className="text-xs mb-1" />
+                            <Input type="number" step="0.01" value={formData.price_pasadia_alta_owner} onChange={(e) => setFormData({ ...formData, price_pasadia_alta_owner: parseFloat(e.target.value) || 0 })} placeholder="Propietario" className="text-xs" />
+                          </div>
+                        </div>
                       </div>
                     )}
 
-                    {/* Descripción para Amanecida */}
+                    {/* AMANECIDA */}
                     {formData.has_amanecida && (
-                      <div>
-                        <Label className="text-sm font-semibold">Descripción para Amanecida</Label>
-                        <textarea
-                          value={formData.description_amanecida}
-                          onChange={(e) => setFormData({ ...formData, description_amanecida: e.target.value })}
-                          placeholder="Detalles específicos de la villa en modalidad Amanecida..."
-                          className="w-full p-2 border rounded text-sm mt-1"
-                          rows="3"
-                          style={{ whiteSpace: 'pre-wrap' }}
-                        />
+                      <div className="mb-4 p-3 bg-white rounded border-2 border-blue-300">
+                        <h4 className="font-semibold text-blue-800 mb-2">🌙 Amanecida</h4>
+                        <div className="mb-3">
+                          <Label className="text-xs">Descripción</Label>
+                          <textarea
+                            value={formData.description_amanecida}
+                            onChange={(e) => setFormData({ ...formData, description_amanecida: e.target.value })}
+                            placeholder="Detalles específicos para Amanecida..."
+                            className="w-full p-2 border rounded text-sm"
+                            rows="2"
+                          />
+                        </div>
+                        <div className="grid grid-cols-3 gap-2">
+                          <div>
+                            <Label className="text-xs font-semibold text-green-700">Regular</Label>
+                            <Input type="number" step="0.01" value={formData.price_amanecida_regular_client} onChange={(e) => setFormData({ ...formData, price_amanecida_regular_client: parseFloat(e.target.value) || 0 })} placeholder="Cliente" className="text-xs mb-1" />
+                            <Input type="number" step="0.01" value={formData.price_amanecida_regular_owner} onChange={(e) => setFormData({ ...formData, price_amanecida_regular_owner: parseFloat(e.target.value) || 0 })} placeholder="Propietario" className="text-xs" />
+                          </div>
+                          <div>
+                            <Label className="text-xs font-semibold text-orange-700">Oferta</Label>
+                            <Input type="number" step="0.01" value={formData.price_amanecida_oferta_client} onChange={(e) => setFormData({ ...formData, price_amanecida_oferta_client: parseFloat(e.target.value) || 0 })} placeholder="Cliente" className="text-xs mb-1" />
+                            <Input type="number" step="0.01" value={formData.price_amanecida_oferta_owner} onChange={(e) => setFormData({ ...formData, price_amanecida_oferta_owner: parseFloat(e.target.value) || 0 })} placeholder="Propietario" className="text-xs" />
+                          </div>
+                          <div>
+                            <Label className="text-xs font-semibold text-red-700">Temp. Alta</Label>
+                            <Input type="number" step="0.01" value={formData.price_amanecida_alta_client} onChange={(e) => setFormData({ ...formData, price_amanecida_alta_client: parseFloat(e.target.value) || 0 })} placeholder="Cliente" className="text-xs mb-1" />
+                            <Input type="number" step="0.01" value={formData.price_amanecida_alta_owner} onChange={(e) => setFormData({ ...formData, price_amanecida_alta_owner: parseFloat(e.target.value) || 0 })} placeholder="Propietario" className="text-xs" />
+                          </div>
+                        </div>
+                      </div>
+                    )}
+
+                    {/* EVENTO */}
+                    {formData.has_evento && (
+                      <div className="mb-4 p-3 bg-white rounded border-2 border-blue-300">
+                        <h4 className="font-semibold text-blue-800 mb-2">🎉 Evento</h4>
+                        <div className="mb-3">
+                          <Label className="text-xs">Descripción</Label>
+                          <textarea
+                            value={formData.description_evento}
+                            onChange={(e) => setFormData({ ...formData, description_evento: e.target.value })}
+                            placeholder="Detalles específicos para Eventos..."
+                            className="w-full p-2 border rounded text-sm"
+                            rows="2"
+                          />
+                        </div>
+                        <div className="grid grid-cols-3 gap-2">
+                          <div>
+                            <Label className="text-xs font-semibold text-green-700">Regular</Label>
+                            <Input type="number" step="0.01" value={formData.price_evento_regular_client} onChange={(e) => setFormData({ ...formData, price_evento_regular_client: parseFloat(e.target.value) || 0 })} placeholder="Cliente" className="text-xs mb-1" />
+                            <Input type="number" step="0.01" value={formData.price_evento_regular_owner} onChange={(e) => setFormData({ ...formData, price_evento_regular_owner: parseFloat(e.target.value) || 0 })} placeholder="Propietario" className="text-xs" />
+                          </div>
+                          <div>
+                            <Label className="text-xs font-semibold text-orange-700">Oferta</Label>
+                            <Input type="number" step="0.01" value={formData.price_evento_oferta_client} onChange={(e) => setFormData({ ...formData, price_evento_oferta_client: parseFloat(e.target.value) || 0 })} placeholder="Cliente" className="text-xs mb-1" />
+                            <Input type="number" step="0.01" value={formData.price_evento_oferta_owner} onChange={(e) => setFormData({ ...formData, price_evento_oferta_owner: parseFloat(e.target.value) || 0 })} placeholder="Propietario" className="text-xs" />
+                          </div>
+                          <div>
+                            <Label className="text-xs font-semibold text-red-700">Temp. Alta</Label>
+                            <Input type="number" step="0.01" value={formData.price_evento_alta_client} onChange={(e) => setFormData({ ...formData, price_evento_alta_client: parseFloat(e.target.value) || 0 })} placeholder="Cliente" className="text-xs mb-1" />
+                            <Input type="number" step="0.01" value={formData.price_evento_alta_owner} onChange={(e) => setFormData({ ...formData, price_evento_alta_owner: parseFloat(e.target.value) || 0 })} placeholder="Propietario" className="text-xs" />
+                          </div>
+                        </div>
                       </div>
                     )}
 
                     <p className="text-xs text-gray-600 mt-3 bg-white p-2 rounded border">
-                      💡 <strong>Nota:</strong> Al agregar esta villa a una factura, se agregará automáticamente según las modalidades seleccionadas. Si ambas están marcadas, aparecerá dos veces (una por cada modalidad).
+                      💡 <strong>Nota:</strong> Los precios se aplicarán según la modalidad y tipo de temporada seleccionados al crear una factura
                     </p>
                   </div>
 
