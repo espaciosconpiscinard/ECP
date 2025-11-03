@@ -2160,14 +2160,19 @@ const Expenses = () => {
                               <Button
                                 type="button"
                                 onClick={async () => {
+                                  console.log('💰 [SERVICIO EXTRA] Iniciando pago');
                                   const monto = document.getElementById(`servicio-${index}-monto`).value;
                                   const metodo = document.getElementById(`servicio-${index}-metodo`).value;
+                                  console.log('💰 [SERVICIO EXTRA] Monto:', monto, 'Metodo:', metodo);
+                                  
                                   if (!monto || monto <= 0) {
+                                    console.error('❌ [SERVICIO EXTRA] Monto inválido');
                                     alert('Por favor ingresa un monto válido');
                                     return;
                                   }
                                   
                                   try {
+                                    console.log('💰 [SERVICIO EXTRA] Buscando expenses...');
                                     const allExpensesResponse = await fetch(
                                       `${process.env.REACT_APP_BACKEND_URL}/api/expenses`,
                                       {
@@ -2177,12 +2182,16 @@ const Expenses = () => {
                                       }
                                     );
                                     const allExpenses = await allExpensesResponse.json();
+                                    console.log('💰 [SERVICIO EXTRA] Total expenses:', allExpenses.length);
                                     
+                                    console.log('💰 [SERVICIO EXTRA] Buscando gasto del suplidor:', service.supplier_name);
                                     const supplierExpense = allExpenses.find(e => 
                                       e.category === 'pago_suplidor' && 
                                       e.related_reservation_id === relatedReservation.id &&
                                       e.description.includes(service.supplier_name)
                                     );
+                                    
+                                    console.log('💰 [SERVICIO EXTRA] Supplier expense encontrado:', supplierExpense);
                                     
                                     if (supplierExpense) {
                                       const abonoData = {
@@ -2193,7 +2202,10 @@ const Expenses = () => {
                                         notes: `Pago a suplidor ${service.supplier_name} - ${service.service_name || service.name}`
                                       };
                                       
-                                      await fetch(
+                                      console.log('💰 [SERVICIO EXTRA] Enviando abono:', abonoData);
+                                      console.log('💰 [SERVICIO EXTRA] A expense ID:', supplierExpense.id);
+                                      
+                                      const response = await fetch(
                                         `${process.env.REACT_APP_BACKEND_URL}/api/expenses/${supplierExpense.id}/abonos`,
                                         {
                                           method: 'POST',
@@ -2205,16 +2217,26 @@ const Expenses = () => {
                                         }
                                       );
                                       
-                                      alert(`Pago registrado a ${service.supplier_name}`);
-                                      document.getElementById(`servicio-${index}-monto`).value = '';
-                                      await fetchExpenses();
-                                      setIsAbonoDialogOpen(false);
+                                      console.log('💰 [SERVICIO EXTRA] Response status:', response.status);
+                                      
+                                      if (response.ok) {
+                                        console.log('✅ [SERVICIO EXTRA] Pago registrado exitosamente');
+                                        alert(`Pago registrado a ${service.supplier_name}`);
+                                        document.getElementById(`servicio-${index}-monto`).value = '';
+                                        await fetchExpenses();
+                                        setIsAbonoDialogOpen(false);
+                                      } else {
+                                        const errorData = await response.json();
+                                        console.error('❌ [SERVICIO EXTRA] Error response:', errorData);
+                                        alert('Error: ' + (errorData.detail || 'No se pudo registrar el pago'));
+                                      }
                                     } else {
+                                      console.error('❌ [SERVICIO EXTRA] No se encontró el gasto del suplidor');
                                       alert('No se encontró el gasto del suplidor');
                                     }
                                   } catch (err) {
-                                    console.error('Error al registrar pago:', err);
-                                    alert('Error al registrar el pago');
+                                    console.error('❌ [SERVICIO EXTRA] Error catch:', err);
+                                    alert('Error al registrar el pago: ' + err.message);
                                   }
                                 }}
                                 className="bg-orange-600 hover:bg-orange-700"
