@@ -348,6 +348,7 @@ const Reservations = () => {
       currency: modalityCurrency,  // Moneda específica de la modalidad
       base_price: priceOption.client_price || 0,
       owner_price: priceOption.owner_price || 0,
+      base_owner_price: priceOption.owner_price || 0,  // Guardar precio base del propietario
       check_in_time: defaultCheckInTime,
       check_out_time: defaultCheckOutTime,
       guests: 1  // Default to 1, user can edit
