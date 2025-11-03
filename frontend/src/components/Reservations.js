@@ -2054,7 +2054,8 @@ const Reservations = () => {
                       </p>
                     </div>
                   )}
-                    
+                  
+                  <div>
                     {selectedExtraServices.map((service, index) => (
                       <div key={index} className="mb-4 p-3 border rounded bg-gray-50">
                         <div className="grid grid-cols-6 gap-2 mb-2 items-end">
