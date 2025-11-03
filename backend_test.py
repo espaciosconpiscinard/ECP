@@ -2425,7 +2425,7 @@ class BackendTester:
     
     def run_all_tests(self):
         """Run all backend tests"""
-        print("🚀 Starting Backend Testing Suite for Category System")
+        print("🚀 Starting Backend Testing Suite - Villa Modality Pricing")
         print("=" * 60)
         
         # Health check
@@ -2442,6 +2442,10 @@ class BackendTester:
             self.approve_employee()
         
         self.test_employee_login()
+        
+        # PRIMARY FOCUS: Villa Modality Pricing Tests
+        print("\n🏠 VILLA MODALITY PRICING TESTS (PRIMARY FOCUS)")
+        self.test_villa_modality_pricing_structure()
         
         # Category tests (admin)
         print("\n🏷️ Category Tests (Admin)")
