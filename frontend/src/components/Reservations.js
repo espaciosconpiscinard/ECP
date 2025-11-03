@@ -1847,73 +1847,35 @@ const Reservations = () => {
                   </div>
                 )}
 
-                {/* Fecha según tipo de renta */}
-                {formData.rental_type === 'pasadia' ? (
-                  <div className="col-span-2">
-                    <Label>Fecha de Pasadía *</Label>
-                    <Input
-                      type="date"
-                      value={formData.reservation_date}
-                      onChange={(e) => setFormData({ ...formData, reservation_date: e.target.value })}
-                      required
-                      data-testid="reservation-date-input"
-                    />
-                  </div>
-                ) : formData.rental_type === 'amanecida' ? (
-                  <>
-                    <div>
-                      <Label>Fecha Desde (Entrada) *</Label>
-                      <Input
-                        type="date"
-                        value={formData.reservation_date}
-                        onChange={(e) => setFormData({ ...formData, reservation_date: e.target.value })}
-                        required
-                        data-testid="reservation-date-from-input"
-                      />
-                    </div>
-                    <div>
-                      <Label>Fecha Hasta (Salida) *</Label>
-                      <Input
-                        type="date"
-                        value={formData.check_out_date || ''}
-                        onChange={(e) => setFormData({ ...formData, check_out_date: e.target.value })}
-                        required
-                        data-testid="reservation-date-to-input"
-                      />
-                    </div>
-                  </>
-                ) : (
-                  <div className="col-span-2">
-                    <Label>Fecha del Evento *</Label>
-                    <Input
-                      type="date"
-                      value={formData.reservation_date}
-                      onChange={(e) => setFormData({ ...formData, reservation_date: e.target.value })}
-                      required
-                      data-testid="reservation-date-input"
-                    />
-                  </div>
-                )}
+                {/* Fecha de la Factura */}
+                <div className="col-span-2">
+                  <Label>Fecha *</Label>
+                  <Input
+                    type="date"
+                    value={formData.reservation_date}
+                    onChange={(e) => setFormData({ ...formData, reservation_date: e.target.value })}
+                    required
+                    data-testid="reservation-date-input"
+                  />
+                </div>
                 
-                {/* Horarios */}
+                {/* Horarios - Opcionales */}
                 <div>
-                  <Label>Hora de Entrada *</Label>
+                  <Label>Hora de Entrada (Opcional)</Label>
                   <Input
                     type="text"
                     value={formData.check_in_time}
                     onChange={(e) => setFormData({ ...formData, check_in_time: e.target.value })}
                     placeholder="9:00 AM"
-                    required
                   />
                 </div>
                 <div>
-                  <Label>Hora de Salida *</Label>
+                  <Label>Hora de Salida (Opcional)</Label>
                   <Input
                     type="text"
                     value={formData.check_out_time}
                     onChange={(e) => setFormData({ ...formData, check_out_time: e.target.value })}
                     placeholder="8:00 PM"
-                    required
                   />
                 </div>
                 
