@@ -199,8 +199,8 @@ class ReservationBase(BaseModel):
     
     # Fechas y horarios
     reservation_date: datetime
-    check_in_time: str  # "9:00 AM"
-    check_out_time: str  # "8:00 PM"
+    check_in_time: str = ""  # Opcional - puede estar vacío
+    check_out_time: str = ""  # Opcional - puede estar vacío
     
     # Personas (opcional para facturas de solo servicios)
     guests: int = 0
