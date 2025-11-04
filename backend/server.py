@@ -2983,16 +2983,16 @@ async def reset_all_data(admin_code: str, current_user: dict = Depends(require_a
                 "deleted": result.deleted_count
             })
         
-        # Usuarios: eliminar todos EXCEPTO administradores
-        users_result = await db.users.delete_many({"role": {"$ne": "admin"}})
+        # NO eliminar usuarios - se mantienen todos (admin y empleados)
         deleted_summary.append({
-            "collection": "users (solo empleados)",
-            "deleted": users_result.deleted_count
+            "collection": "users",
+            "deleted": 0,
+            "note": "✅ Usuarios preservados (no eliminados)"
         })
         
         return {
             "message": "⚠️ SISTEMA RESETEADO COMPLETAMENTE",
-            "warning": "Todos los datos han sido eliminados excepto usuarios administradores",
+            "warning": "Todos los datos han sido eliminados. Usuarios preservados.",
             "deleted": deleted_summary,
             "timestamp": datetime.now(timezone.utc).isoformat()
         }
