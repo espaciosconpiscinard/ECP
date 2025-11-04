@@ -547,7 +547,7 @@ class ExpenseUpdate(BaseModel):
     amount: Optional[float] = None
     currency: Optional[Literal["DOP", "USD"]] = None
     expense_date: Optional[datetime] = None
-    payment_status: Optional[Literal["pending", "paid"]] = None
+    payment_status: Optional[Literal["pending", "partial", "paid"]] = None
     notes: Optional[str] = None
     expense_type: Optional[Literal["fijo", "variable", "unico"]] = None
     reservation_check_in: Optional[datetime] = None
