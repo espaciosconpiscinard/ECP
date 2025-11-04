@@ -622,10 +622,14 @@ const Expenses = () => {
     
     const targetType = typeMap[activeTab];
     
-    // Filtrar por tipo de tab activo (usando visibleExpenses que excluye pago_suplidor)
-    let filtered = visibleExpenses.filter(expense => {
-      // EXCLUIR gastos de propietarios y servicios del tab Variables
-      if (activeTab === 'variables' && (expense.category === 'pago_propietario' || expense.category === 'pago_servicios' || expense.related_reservation_id)) {
+    // Filtrar por tipo de tab activo
+    let filtered = expenses.filter(expense => {
+      // EXCLUIR todos los gastos de reservaciones de los otros tabs
+      if (expense.category === 'pago_propietario' || 
+          expense.category === 'pago_suplidor' || 
+          expense.category === 'devolucion_deposito' || 
+          expense.category === 'pago_servicios' || 
+          expense.related_reservation_id) {
         return false;
       }
       
