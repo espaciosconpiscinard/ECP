@@ -955,18 +955,15 @@ async def create_reservation(reservation_data: ReservationCreate, current_user: 
         if villa:
             # Calcular detalles del gasto
             details = []
+            # owner_price ya incluye base + extras, NO sumar nuevamente
             total_owner_payment = reservation_data.owner_price
             
-            # Agregar detalles de extras
+            # Solo agregar detalles informativos (NO sumar al total)
             if reservation_data.extra_hours > 0:
-                extra_hours_owner_cost = reservation_data.extra_hours * villa.get('extra_hours_price_owner', 0)
-                total_owner_payment += extra_hours_owner_cost
-                details.append(f"Horas extras: {reservation_data.extra_hours} hrs × RD$ {villa.get('extra_hours_price_owner', 0):.2f} = RD$ {extra_hours_owner_cost:.2f}")
+                details.append(f"Horas extras: {reservation_data.extra_hours} hrs")
             
             if reservation_data.extra_people > 0:
-                extra_people_owner_cost = reservation_data.extra_people * villa.get('extra_people_price_owner', 0)
-                total_owner_payment += extra_people_owner_cost
-                details.append(f"Personas extras: {reservation_data.extra_people} × RD$ {villa.get('extra_people_price_owner', 0):.2f} = RD$ {extra_people_owner_cost:.2f}")
+                details.append(f"Personas extras: {reservation_data.extra_people}")
             
             # Indicar si incluye ITBIS
             itbis_note = "Con ITBIS" if reservation_data.include_itbis else "Sin ITBIS"
