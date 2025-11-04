@@ -1465,3 +1465,39 @@ agent_communication:
       
       ✅ BACKEND VILLA MODALITY PRICING LISTO PARA USO EN FRONTEND
 
+  - agent: "main"
+    message: |
+      📋 CONTINUANDO ÚLTIMA SESIÓN - TESTING PENDIENTE
+      
+      **CONTEXTO:**
+      Se retoma la sesión donde se implementaron varias funcionalidades críticas del módulo de gastos.
+      Todas las funcionalidades están implementadas en código pero requieren testing exhaustivo.
+      
+      **FUNCIONALIDADES IMPLEMENTADAS QUE REQUIEREN TESTING:**
+      
+      1. ✅ Display de "RESTANTE a pagar" para servicios extras
+         - Problema corregido: mostraba total del owner en lugar del monto del suplidor
+         - Ahora muestra: Total original, Pagado, RESTANTE a pagar
+         - Archivos modificados: Expenses.js (líneas 2128-2300)
+      
+      2. ✅ Editar/Eliminar pagos a suplidores
+         - Funcionalidad para corregir pagos incorrectos
+         - Historial de pagos con opción de eliminar (solo admin)
+         - Actualización automática de balances sin cerrar modal
+         - Archivos modificados: Expenses.js (handleDeleteSupplierAbono líneas 427-475)
+      
+      3. ✅ Villa modality pricing en formulario de facturas
+         - Precios cargados desde pasadia_prices, amanecida_prices, evento_prices
+         - Selector UI con iconos y colores por modalidad
+         - Aplicación automática de horarios por defecto
+         - Archivos modificados: Reservations.js
+      
+      **ESTADO DE SERVICIOS:**
+      - Backend: ✅ RUNNING (uptime 0:01:36)
+      - Frontend: ✅ RUNNING (uptime 0:01:22)
+      - MongoDB: ✅ RUNNING
+      - Aplicación carga correctamente en pantalla de login
+      
+      **SIGUIENTE PASO:**
+      Testing backend exhaustivo de las funcionalidades de gastos y pagos a suplidores
+
