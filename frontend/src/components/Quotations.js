@@ -46,6 +46,44 @@ const Quotations = () => {
       alert('Error: ' + (err.response?.data?.detail || 'Error desconocido'));
     }
   };
+  
+  const handleSelectQuotation = (quotationId) => {
+    setSelectedQuotations(prev => {
+      if (prev.includes(quotationId)) {
+        return prev.filter(id => id !== quotationId);
+      } else {
+        return [...prev, quotationId];
+      }
+    });
+  };
+  
+  const handleSelectAll = () => {
+    if (selectedQuotations.length === quotations.length) {
+      setSelectedQuotations([]);
+    } else {
+      setSelectedQuotations(quotations.map(q => q.id));
+    }
+  };
+  
+  const handleDeleteSelected = async () => {
+    if (selectedQuotations.length === 0) {
+      alert('No hay cotizaciones seleccionadas');
+      return;
+    }
+    
+    if (window.confirm(`¿Estás seguro de eliminar ${selectedQuotations.length} cotización(es)?`)) {
+      try {
+        for (const quotationId of selectedQuotations) {
+          await deleteQuotation(quotationId);
+        }
+        alert(`${selectedQuotations.length} cotización(es) eliminada(s) exitosamente`);
+        setSelectedQuotations([]);
+        fetchQuotations();
+      } catch (err) {
+        alert('Error al eliminar cotizaciones: ' + (err.response?.data?.detail || 'Error desconocido'));
+      }
+    }
+  };
 
   const handlePrint = async (quotation) => {
     // Cargar términos desde el backend
