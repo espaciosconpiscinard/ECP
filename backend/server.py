@@ -2743,10 +2743,9 @@ async def delete_expense_abono(expense_id: str, abono_id: str, current_user: dic
                         deposit_returned = deposit_expense is not None
                     
                     # Actualizar estado del propietario
+                    # For owner payments, status remains 'pending' until all conditions are satisfied
                     if owner_paid and all_suppliers_paid and deposit_returned:
                         owner_new_status = "paid"
-                    elif owner_total_paid > 0:
-                        owner_new_status = "partial"
                     else:
                         owner_new_status = "pending"
                     print(f"📌 [DELETE_ABONO] Estado propietario: {owner_new_status} (Owner: {owner_paid}, Supp: {all_suppliers_paid}, Dep: {deposit_returned})")
