@@ -2534,8 +2534,13 @@ async def add_abono_to_expense(expense_id: str, abono_data: AbonoCreate, current
         print(f"📌 [ADD_ABONO] Propietario pagado: {owner_paid}, Suplidores pagados: {all_suppliers_paid}, Depósito devuelto: {deposit_returned}")
         print(f"✅ [ADD_ABONO] Nuevo estado propietario: {new_status}")
     else:
-        # For supplier payments and other expenses, simple check
-        new_status = "paid" if total_paid >= expense.get("amount", 0) else "pending"
+        # For supplier payments and other expenses, check for partial payments
+        if total_paid >= expense.get("amount", 0):
+            new_status = "paid"
+        elif total_paid > 0:
+            new_status = "partial"
+        else:
+            new_status = "pending"
         print(f"✅ [ADD_ABONO] Nuevo estado suplidor: {new_status}")
         
         # Si es un pago de suplidor, también recalcular estado del propietario
