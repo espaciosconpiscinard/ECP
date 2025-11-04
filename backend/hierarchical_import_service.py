@@ -184,7 +184,7 @@ async def import_villa_categories(file_content: bytes, db) -> Dict:
         }
 
 async def import_villas(file_content: bytes, db) -> Dict:
-    """Importa villas desde Excel"""
+    """Importa villas desde Excel con soporte para modalidades (Pasadía, Amanecida, Evento)"""
     try:
         df = pd.read_excel(BytesIO(file_content), sheet_name='Villas')
         
@@ -219,29 +219,62 @@ async def import_villas(file_content: bytes, db) -> Dict:
                     if category:
                         category_id = category['id']
                 
-                # Precio Cliente ya NO es obligatorio (para villas con precios flexibles)
-                client_price = row.get('Precio Cliente *')
-                client_price_val = float(client_price) if pd.notna(client_price) else 0
+                # MODALIDAD PASADÍA
+                has_pasadia = True  # Por defecto todas tienen pasadía
+                if pd.notna(row.get('Tiene Pasadía')):
+                    has_pasadia = str(row.get('Tiene Pasadía', 'SI')).strip().upper() in ['SI', 'SÍ', 'YES', 'TRUE', '1']
                 
-                owner_price = row.get('Precio Propietario')
-                owner_price_val = float(owner_price) if pd.notna(owner_price) else 0
+                pasadia_prices = parse_prices_from_excel(row.get('Precios Pasadía *', ''))
+                if not pasadia_prices and has_pasadia:
+                    errors.append(f"Fila {idx+2}: Precios Pasadía es obligatorio si tiene pasadía")
+                    continue
                 
-                # Preparar datos con el esquema correcto del modelo
+                # MODALIDAD AMANECIDA
+                has_amanecida = False
+                if pd.notna(row.get('Tiene Amanecida')):
+                    has_amanecida = str(row.get('Tiene Amanecida', 'NO')).strip().upper() in ['SI', 'SÍ', 'YES', 'TRUE', '1']
+                
+                amanecida_prices = parse_prices_from_excel(row.get('Precios Amanecida', '')) if has_amanecida else []
+                
+                # MODALIDAD EVENTO
+                has_evento = False
+                if pd.notna(row.get('Tiene Evento')):
+                    has_evento = str(row.get('Tiene Evento', 'NO')).strip().upper() in ['SI', 'SÍ', 'YES', 'TRUE', '1']
+                
+                evento_prices = parse_prices_from_excel(row.get('Precios Evento', '')) if has_evento else []
+                
+                # Preparar datos con el esquema actualizado
                 villa_data = {
                     'id': str(uuid.uuid4()),
                     'code': code,
                     'name': name,
-                    'description': str(row.get('Descripción', '')).strip() if pd.notna(row.get('Descripción')) else '',
-                    'phone': None,
                     'category_id': category_id,
-                    'default_check_in_time': str(row.get('Horario Check-in', '9:00 AM')).strip() if pd.notna(row.get('Horario Check-in')) else '9:00 AM',
-                    'default_check_out_time': str(row.get('Horario Check-out', '8:00 PM')).strip() if pd.notna(row.get('Horario Check-out')) else '8:00 PM',
-                    'default_price_pasadia': client_price_val,
-                    'default_price_amanecida': client_price_val,
-                    'default_price_evento': client_price_val,
-                    'owner_price_pasadia': owner_price_val,
-                    'owner_price_amanecida': owner_price_val,
-                    'owner_price_evento': owner_price_val,
+                    
+                    # MODALIDAD PASADÍA
+                    'has_pasadia': has_pasadia,
+                    'description_pasadia': str(row.get('Descripción Pasadía', '')).strip() if pd.notna(row.get('Descripción Pasadía')) else '',
+                    'pasadia_prices': pasadia_prices,
+                    'pasadia_currency': str(row.get('Moneda Pasadía', 'DOP')).strip() if pd.notna(row.get('Moneda Pasadía')) else 'DOP',
+                    'default_check_in_time_pasadia': str(row.get('Check-in Pasadía', '9:00 AM')).strip() if pd.notna(row.get('Check-in Pasadía')) else '9:00 AM',
+                    'default_check_out_time_pasadia': str(row.get('Check-out Pasadía', '8:00 PM')).strip() if pd.notna(row.get('Check-out Pasadía')) else '8:00 PM',
+                    
+                    # MODALIDAD AMANECIDA
+                    'has_amanecida': has_amanecida,
+                    'description_amanecida': str(row.get('Descripción Amanecida', '')).strip() if pd.notna(row.get('Descripción Amanecida')) else '',
+                    'amanecida_prices': amanecida_prices,
+                    'amanecida_currency': str(row.get('Moneda Amanecida', 'DOP')).strip() if pd.notna(row.get('Moneda Amanecida')) else 'DOP',
+                    'default_check_in_time_amanecida': str(row.get('Check-in Amanecida', '9:00 AM')).strip() if pd.notna(row.get('Check-in Amanecida')) else '9:00 AM',
+                    'default_check_out_time_amanecida': str(row.get('Check-out Amanecida', '8:00 AM')).strip() if pd.notna(row.get('Check-out Amanecida')) else '8:00 AM',
+                    
+                    # MODALIDAD EVENTO
+                    'has_evento': has_evento,
+                    'description_evento': str(row.get('Descripción Evento', '')).strip() if pd.notna(row.get('Descripción Evento')) else '',
+                    'evento_prices': evento_prices,
+                    'evento_currency': str(row.get('Moneda Evento', 'DOP')).strip() if pd.notna(row.get('Moneda Evento')) else 'DOP',
+                    'default_check_in_time_evento': str(row.get('Check-in Evento', '9:00 AM')).strip() if pd.notna(row.get('Check-in Evento')) else '9:00 AM',
+                    'default_check_out_time_evento': str(row.get('Check-out Evento', '8:00 PM')).strip() if pd.notna(row.get('Check-out Evento')) else '8:00 PM',
+                    
+                    # Campos generales
                     'max_guests': 0,
                     'amenities': [],
                     'is_active': True,
