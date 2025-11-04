@@ -1552,7 +1552,7 @@ const Expenses = () => {
                 : 'text-gray-600 hover:bg-gray-50'
             }`}
           >
-            🏡 Propietarios y Servicios ({expenses.filter(e => e.category === 'pago_propietario' || e.related_reservation_id).length})
+            🏡 Reservaciones ({expenses.filter(e => e.category === 'pago_propietario' || e.category === 'pago_suplidor' || e.category === 'devolucion_deposito').length})
           </button>
           <button
             onClick={() => setActiveTab('fijos')}
