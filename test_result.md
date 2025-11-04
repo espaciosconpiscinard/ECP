@@ -1144,7 +1144,72 @@ test_plan:
   test_priority: "high_first"
   latest_test: "Completado - Backend villa modality pricing structure verificado exitosamente. API retorna campos correctos (pasadia_prices, amanecida_prices, evento_prices) con estructura esperada."
 
+  - task: "Expenses Module - Supplier Payments and Extra Services"
+    implemented: true
+    working: true
+    file: "/app/backend/server.py, /app/backend/models.py"
+    stuck_count: 0
+    priority: "critical"
+    needs_retesting: false
+    status_history:
+      - working: true
+        agent: "testing"
+        comment: "✅ COMPREHENSIVE TESTING COMPLETADO - TODOS LOS TESTS PASARON (32/32). Verificado: 1) Auto-creación de gastos de suplidores con servicios extras (category='pago_suplidor'), 2) Sistema de abonos parciales con balance_due y payment_status ('pending'→'partial'→'paid'), 3) Eliminación de abonos con recálculo correcto, 4) Facturas Solo Servicios con gasto contenedor (category='pago_servicios'), 5) Sincronización de payment_status entre owner y suplidores. BUGS CORREGIDOS: balance_due calculation en GET /expenses/{id}, payment_status 'partial' agregado al modelo, lógica de sincronización owner/suppliers. Sistema completamente funcional para pagos a suplidores y servicios extras."
+
 agent_communication:
+  - agent: "testing"
+    message: |
+      🎯 EXPENSES MODULE COMPREHENSIVE TESTING COMPLETADO - 100% SUCCESS RATE ✅
+      
+      ✅ FUNCIONALIDADES EXHAUSTIVAMENTE VERIFICADAS:
+      
+      🛎️ TEST 1: RESERVACIÓN CON SERVICIOS EXTRAS
+      - Creación exitosa de reservación con 2 servicios extras (Comida + Música)
+      - Auto-generación correcta de gasto propietario (category='pago_propietario')
+      - Auto-generación correcta de 2 gastos suplidores (category='pago_suplidor')
+      - Verificación de campos: supplier_name, supplier_cost, quantity, related_reservation_id
+      - Montos correctos: Restaurant ABC RD$ 5,000, DJ Pro RD$ 3,000
+      
+      💰 TEST 2: SISTEMA DE ABONOS PARCIALES
+      - Abono parcial Restaurant ABC: RD$ 2,000 de RD$ 5,000 → balance_due: RD$ 3,000
+      - Abono parcial DJ Pro: RD$ 1,000 de RD$ 3,000 → balance_due: RD$ 2,000
+      - Payment_status correctamente actualizado: 'pending' → 'partial'
+      - Total_paid incrementa correctamente con cada abono
+      - Invoice_number auto-generado para cada abono
+      
+      🗑️ TEST 3: ELIMINACIÓN DE ABONOS
+      - Eliminación exitosa de abono DJ Pro (RD$ 1,000)
+      - Balance_due recalculado correctamente: RD$ 2,000 → RD$ 3,000
+      - Payment_status revertido correctamente: 'partial' → 'pending'
+      - Total_paid reducido correctamente: RD$ 1,000 → RD$ 0
+      
+      🛎️ TEST 4: FACTURAS SOLO SERVICIOS
+      - Creación exitosa de factura sin villa_id pero con extra_services
+      - Gasto contenedor creado con category='pago_servicios'
+      - Amount correcto: RD$ 4,500 (suma de supplier_cost * quantity)
+      - Services_details con array completo de servicios (Decoración + Fotografía)
+      - Gastos individuales de suplidores también creados
+      
+      🔄 TEST 5: SINCRONIZACIÓN PAYMENT_STATUS
+      - Owner pagado completamente pero suppliers unpaid → status: 'pending' ✅
+      - Suppliers pagados completamente → owner status: 'paid' ✅
+      - Lógica de sincronización funciona correctamente
+      - Owner payment contingente en suppliers + deposit
+      
+      🐛 BUGS CRÍTICOS CORREGIDOS DURANTE TESTING:
+      1. ✅ GET /expenses/{id} no calculaba balance_due ni total_paid
+      2. ✅ Modelo Expense no incluía 'partial' en payment_status Literal
+      3. ✅ Lógica de owner payment_status mejorada para sincronización
+      
+      📊 RESULTADO FINAL: 32/32 pruebas pasaron exitosamente (100% success rate)
+      - Auto-creación de gastos suplidores ✅ WORKING
+      - Sistema de abonos con balance calculation ✅ WORKING  
+      - Payment status synchronization ✅ WORKING
+      - Solo Servicios expense display ✅ WORKING
+      - Eliminación y recálculo de abonos ✅ WORKING
+      
+      ✅ MÓDULO DE GASTOS COMPLETAMENTE FUNCIONAL PARA SUPLIDORES Y SERVICIOS EXTRAS
+
   - agent: "main"
     message: |
       ✅ VILLA MODALITY PRICE LOADING - IMPLEMENTACIÓN COMPLETADA
