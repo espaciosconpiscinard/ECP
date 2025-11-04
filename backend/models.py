@@ -516,7 +516,7 @@ class ExpenseBase(BaseModel):
     amount: float
     currency: Literal["DOP", "USD"] = "DOP"
     expense_date: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
-    payment_status: Literal["pending", "paid"] = "pending"
+    payment_status: Literal["pending", "partial", "paid"] = "pending"
     notes: Optional[str] = None
     related_reservation_id: Optional[str] = None  # Para gastos auto-generados por reservaciones
     
