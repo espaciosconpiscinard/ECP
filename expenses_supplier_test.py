@@ -260,6 +260,19 @@ class ExpensesSupplierTester:
         """Test 1: Crear reservación con 2 servicios extras diferentes"""
         print("\n🛎️ TEST 1: Crear reservación con servicios extras que generen gastos de suplidores")
         
+        # Find services for testing
+        comida_service = next((s for s in self.extra_services if s["name"].lower() == "comida"), None)
+        musica_service = next((s for s in self.extra_services if s["name"].lower() in ["música", "dj"]), None)
+        
+        if not comida_service:
+            comida_service = self.extra_services[0] if self.extra_services else None
+        if not musica_service:
+            musica_service = self.extra_services[-1] if len(self.extra_services) > 1 else self.extra_services[0] if self.extra_services else None
+        
+        if not comida_service or not musica_service:
+            self.log_test("Find Services for Test", False, "Not enough extra services available")
+            return None
+        
         # Datos de la reservación con servicios extras
         reservation_data = {
             "customer_id": self.test_customer["id"],
@@ -281,6 +294,7 @@ class ExpensesSupplierTester:
             "notes": "Reservación con servicios extras para testing",
             "extra_services": [
                 {
+                    "service_id": comida_service["id"],
                     "service_name": "Comida",
                     "supplier_name": "Restaurant ABC",
                     "quantity": 10,
@@ -289,6 +303,7 @@ class ExpensesSupplierTester:
                     "total": 8000.0
                 },
                 {
+                    "service_id": musica_service["id"],
                     "service_name": "Música",
                     "supplier_name": "DJ Pro",
                     "quantity": 1,
