@@ -543,14 +543,12 @@ const Expenses = () => {
 
   // Función para filtrar y ordenar gastos por tipo con prioridad de urgencia
   const getFilteredAndSortedExpenses = () => {
-    // FILTRAR: Excluir gastos de suplidores de la vista principal
-    // Solo se mostrarán dentro del modal del gasto del propietario
-    const visibleExpenses = expenses.filter(e => e.category !== 'pago_suplidor');
-    
-    // Tab especial: Propietarios y Servicios (gastos auto-generados)
+    // Tab especial: Reservaciones (propietarios, suplidores, depósitos)
     if (activeTab === 'propietarios') {
-      let filtered = visibleExpenses.filter(expense => 
+      let filtered = expenses.filter(expense => 
         expense.category === 'pago_propietario' || 
+        expense.category === 'pago_suplidor' ||  // ✅ INCLUIR gastos de suplidores
+        expense.category === 'devolucion_deposito' ||  // ✅ INCLUIR devoluciones de depósito
         expense.category === 'pago_servicios' ||  // Nueva categoría para Solo Servicios
         expense.related_reservation_id
       );
@@ -568,8 +566,8 @@ const Expenses = () => {
       // Agregar pendientes de meses anteriores
       let pendingFiltered = [];
       if (paymentStatusFilter !== 'paid') {
-        pendingFiltered = visibleExpenses.filter(expense => {
-          if (!(expense.category === 'pago_propietario' || expense.category === 'pago_servicios' || expense.related_reservation_id)) return false;
+        pendingFiltered = expenses.filter(expense => {
+          if (!(expense.category === 'pago_propietario' || expense.category === 'pago_suplidor' || expense.category === 'devolucion_deposito' || expense.category === 'pago_servicios' || expense.related_reservation_id)) return false;
           if (expense.payment_status !== 'pending') return false;
           const expenseDate = new Date(expense.expense_date);
           const selectedDate = new Date(selectedYear, selectedMonth, 1);
