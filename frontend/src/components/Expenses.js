@@ -1757,6 +1757,26 @@ const Expenses = () => {
                                         <div className="flex flex-col gap-1">
                                           <div className="flex items-center gap-2 flex-wrap">
                                             <span className="font-medium">{description.split('\n')[0]}</span>
+                                            {/* Badge para gastos de suplidores */}
+                                            {expense.category === 'pago_suplidor' && (() => {
+                                              const invoiceMatch = description.match(/Factura #(\w+)/);
+                                              const invoiceNumber = invoiceMatch ? invoiceMatch[1] : '?';
+                                              return (
+                                                <span className="text-xs px-3 py-1.5 bg-orange-200 text-orange-900 rounded-full font-bold border-2 border-orange-400 shadow-sm" title="Gasto de suplidor">
+                                                  🛎️ SUPLIDOR - Factura #{invoiceNumber}
+                                                </span>
+                                              );
+                                            })()}
+                                            {/* Badge para devoluciones de depósito */}
+                                            {expense.category === 'devolucion_deposito' && (() => {
+                                              const invoiceMatch = description.match(/Factura #(\w+)/);
+                                              const invoiceNumber = invoiceMatch ? invoiceMatch[1] : '?';
+                                              return (
+                                                <span className="text-xs px-3 py-1.5 bg-green-200 text-green-900 rounded-full font-bold border-2 border-green-400 shadow-sm" title="Devolución de depósito">
+                                                  💵 DEPÓSITO - Factura #{invoiceNumber}
+                                                </span>
+                                              );
+                                            })()}
                                             {/* Badge destacado para servicios */}
                                             {servicesCount > 0 && (
                                               <span className="text-xs px-3 py-1.5 bg-purple-200 text-purple-900 rounded-full font-bold border-2 border-purple-400 shadow-sm" title={`Incluye ${servicesCount} servicio(s) adicional(es)`}>
