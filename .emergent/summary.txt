@@ -1,79 +1,83 @@
 <analysis>
-The trajectory details the AI engineer's work on the Espacios Con Piscina application, focusing on enhancing quotation, invoice, and villa management functionalities. Initial efforts involved improving quotation flexibility (free-text customer names, auto-customer creation) and displaying service descriptions across documents. A major refactoring unified invoice forms in , removing  and  dependencies and resolving UI bugs.
+This trajectory details the AI engineer's extensive work on the Espacios Con Piscina application, primarily focusing on resolving critical bugs and enhancing the expense management, reservation, and quotation modules. The core challenge revolved around the correct calculation, display, and synchronization of payments (abonos) for both owners and external service suppliers, especially within the context of extra services and security deposits. Initial efforts addressed the inability to register and visually reflect abonos for extra services, leading to a long chain of debugging in  and .
 
-The core challenge, and a recurring theme, was the integration of a new villa modality and pricing structure from  into the  invoice form. This involved numerous iterations to correctly load modality-specific prices, descriptions, and schedules, ensure data persistence, and accurately display information in both the form and printed invoices/conduces.
-
-A significant portion of the recent interaction centered on fixing the expense management system. The AI engineer corrected issues with abonos (payments) not registering for extra services, distinguishing between client abonos and expense abonos, and addressing user interface inconsistencies where paid amounts were not visually reflected, leading to user frustration. The final identified problem involves the remaining to pay display for extra services, where the UI incorrectly shows the owner's total instead of the supplier's specific expense.
+Key decisions included refactoring how supplier expenses are displayed and managed, creating a dedicated state for supplier abonos, and implementing complex backend logic to synchronize expense statuses based on various payment conditions (owner, suppliers, deposit). The engineer also tackled issues with  recalculation in , ensuring it accurately reflects base prices plus extras without double-counting, and made significant updates to the Excel import service () to support new villa modalities and pricing structures. The trajectory concludes with a fix for the Borrar Todo functionality, preventing accidental user deletion.
 </analysis>
 
 <product_requirements>
-The Espacios Con Piscina application facilitates rentals, services, villas, and financial management. The primary goal is a flexible quotation and invoicing system supporting diverse services with granular pricing and descriptions.
+The Espacios Con Piscina application aims to provide a flexible system for rentals, services, villas, and financial management. It requires a robust quotation and invoicing system supporting diverse services, granular pricing, and detailed descriptions.
 
-**Previously Implemented (before this trajectory):** Bug fixes, Conduces print-only, Quotations with editable terms and conversion to invoices (auto-commission/expenses), UI/UX improvements.
-
-**Features/Fixes implemented within this trajectory:**
-*   **Quotations:** Free-text customer names, auto-customer creation on conversion.
-*   **Invoices (Reservations):** Optional check-in/out hours, unified Nueva Factura and Factura Solo Servicios into a single form, removed /, basic input validation ( fixes).
-*   **Service Descriptions:**  field added to extra services in models/forms, displayed in prints.
-*   **Villa Modalities & Pricing (Refactored to VillasManagement):** Pasadía, Amanecida, Evento modalities with separate descriptions, multiple price entries (regular, oferta, temporada alta - client/owner), distinct default schedules.
-*   **User-driven refinements:** Price selector UI updated, form layout reordered (payments before totals), removal of extraneous default fields from villa management and new service forms.
-*   **Monetary flexibility:** Currency selection per villa modality in .
-*   **Expense Management:** Corrected abono logic to properly mark expenses as paid considering all outstanding items (extra services, security deposit) and fixed UI interaction for abono submission.
-*   **Quotation form:** Added functionality to clear villa-related fields when Sin Villas is selected.
+**Implemented features within this trajectory include:**
+*   **Expense Management Refinement:** Corrected abono registration for extra services, fixed UI display of remaining to pay amounts (now reflecting supplier-specific outstanding amounts), enabled editing/deletion of supplier abonos, and ensured expense status synchronization (owner/pending/paid) across various scenarios (abono deletion, adding extra services, deposit return). Supplier expenses are now integrated into the main expenses list with clear invoice links.
+*   **Reservation Enhancements:** Fixed loading of / details on invoice edit, and ensured  correctly updates when these change, without double-counting. Resolved an issue where service prices appeared as 0 due to incorrect  handling.
+*   **Quotations:** Added functionality for mass deletion of quotations via checkboxes.
+*   **Data Import/Export:** Updated the Excel import service to support new villa modalities (Pasadía, Amanecida, Evento) and their complex pricing structures, including providing a detailed import template.
+*   **System Maintenance:** Corrected the Borrar Todo function to prevent the accidental deletion of user accounts.
 
 **Outstanding Request:**
-*   Correctly display the remaining to pay amount for extra services within the owner's expense view, ensuring it reflects the supplier's specific expense rather than an aggregate owner total.
+*   The overall consistency and user-perception of the remaining to pay amount and payment status in the Expenses module, specifically for extra services and the owner's view, despite multiple fixes, may require further validation.
 </product_requirements>
 
 <key_technical_concepts>
--   **Full-stack Development:** React (Frontend), FastAPI (Backend), MongoDB for database.
--   **Data Modeling:** Pydantic for data validation and structure.
--   **Frontend State Management:** React ,  for dynamic forms.
--   **UI Components:** Shadcn/ui elements like Dialog, Input, Select, Checkbox.
--   **Data Persistence:** CRUD operations with FastAPI and MongoDB.
--   **Printing:** Custom HTML generation for  print views.
+-   **Full-stack Development:** React (Frontend), FastAPI (Backend), MongoDB (Database).
+-   **Data Validation:** Pydantic models for request/response validation.
+-   **Frontend State Management:** React ,  for dynamic UI and data synchronization.
+-   **Asynchronous Operations:**  API for client-server communication.
+-   **Database Interactions:** CRUD operations for expenses, reservations, and villas.
+-   **Data Transformation:** Excel import parsing and data mapping for bulk operations.
 </key_technical_concepts>
 
 <code_architecture>
 
 -   ****: Defines Pydantic data models.
-    -   **Summary**: Critical for data structure validation.
-    -   **Changes**:  in . , ,  added to .  now includes , , , , , and similar for  and  modalities, along with new , , .  now has a  field.
--   ****: Main FastAPI application.
-    -   **Summary**: Handles API routes, business logic, and database interactions.
-    -   **Changes**:  modified for auto-customer creation.  updated to correctly determine  by considering all outstanding items (owner, extra services, deposit), and then simplified to address a bug in abono registration. Logging was added for debugging abono submission.
--   ****: Manages quotations.
-    -   **Summary**: Lists, creates, and handles quotation actions.
-    -   **Changes**:  and  modified to display service  fields.
--   ****: Form for creating/editing quotations.
-    -   **Summary**: Frontend form for quotations.
-    -   **Changes**: Removed  selector. Customer input changed to free-text. Added  field for extra services.  updated to clear villa-related fields when Sin Villas is selected.
--   ****: Manages invoices (reservations).
-    -   **Summary**: Core component for invoice creation and management.
-    -   **Changes**: Unified Nueva Factura and Factura Solo Servicios. Removed  and  states. Made date/time/guest fields optional.  validation simplified. Added  textarea for extra services. Modified  and conduce printing to display service descriptions and modality. Added a button to clear selected villa. Reorganized form layout (notes below totals). Fixed  issues.  and  updated to load modality-specific prices, descriptions, schedules, and currency, also forming villa_code - MODALITY string. Added UI element to display selected modality. Adjusted print logic to show modality description below the rental item.  and  logs added for debugging.
--   ****: Manages villas.
-    -   **Summary**: Configures villa records and their modalities.
-    -   **Changes**: Added , , , , , and similar for  and  to . Added UI for selecting modalities (checkboxes), separate description textareas, default check-in/out times, and currency selectors per modality. Removed old Precios por Tipo de Renta and the general Descripción de la Villa field. Removed the general Moneda de la Villa selector. Updated , ,  to manage new modality/price structures.  and related functions (, ) updated to include  for each  and removed the general service description field from the Nuevo Servicio form. Added console logs for debugging data persistence.
--   ****: Manages expenses.
-    -   **Summary**: Handles expense tracking and payments.
-    -   **Changes**:  function calls ( direct fetch) changed to include console logs. The button to open the abono dialog was corrected from  to .  call added to ensure data refresh after abono submission.
+    -   **Importance**: Critical for data structure validation, ensuring data consistency across the application.
+    -   **Changes**:  added to  literal for correct validation.  and  added to  and  to correctly store unit prices for extra services.
+-   ****: Main FastAPI application handling API routes and business logic.
+    -   **Importance**: Central for all backend operations, data processing, and database interactions.
+    -   **Changes**:
+        -   : Enhanced logic for calculating  by considering all outstanding items (owner, extra services, deposit).
+        -   : Modified to create/update  expenses when  is toggled. Also updated to detect new extra services and recalculate owner expense status, and to update existing supplier expenses if quantity changes. Corrected  calculation to avoid double-counting extra hours/people. Fixed an  by handling string dates.
+        -   : Updated to trigger full recalculation of expense status after abono deletion.
+        -   : Corrected  calculation during reservation creation to avoid double-counting extra hours/people.
+        -   : Modified to prevent deletion of user accounts.
+-   ****: Handles importing data from Excel.
+    -   **Importance**: Facilitates bulk data entry for villas and related configurations.
+    -   **Changes**: Updated  to correctly parse and store the new , , and  modalities, their descriptions, prices, and default schedules, by adding helper functions to parse complex price strings.
+-   ****: Manages quotations in the UI.
+    -   **Importance**: User interface for listing and managing quotations.
+    -   **Changes**: Added state () and UI elements (checkboxes, Eliminar Seleccionados button) for bulk deletion of quotations.
+-   ****: Core component for invoice creation and management.
+    -   **Importance**: Central UI for creating, editing, and viewing reservations/invoices.
+    -   **Changes**:
+        -   : Updated to load new , , and  fields when editing a reservation.
+        -    for totals: Modified to dynamically update  based on  and changes in  and .
+        -   : Updated to store the  specific to the selected villa modality as .
+        -   Added  state to hold the original owner price.
+-   ****: Manages expenses in the UI.
+    -   **Importance**: User interface for tracking and managing expenses and payments.
+    -   **Changes**:
+        -   Logic for displaying RESTANTE a pagar was modified to accurately reflect supplier-specific outstanding amounts.
+        -   /: Updated to correctly load  and  for displaying a full payment history.
+        -   Added UI to display  history for each extra service with a delete option.
+        -   Refactored expense filtering and display to integrate supplier-specific expenses into the main Reservaciones tab, including a badge to link to the source invoice.
+        -   Corrected a bug where  array was often empty due to incorrect filtering or data loading, affecting abono display.
+-   ****: New documentation file.
+    -   **Importance**: Provides users with the correct structure and example data for importing villas via Excel, reflecting the new modality-based pricing system.
+    -   **Changes**: Created this file to document the updated Excel template.
 </code_architecture>
 
 <pending_tasks>
--   **Fix Expenses UI Remaining to Pay Display**: Correct the calculation and display of the RESTANTE a pagar for extra services within the owner's expense modal in , ensuring it reflects the specific supplier's outstanding amount.
+-   **Validate Expense Module Consistency**: Confirm the complete and consistent resolution of the remaining to pay display for extra services within the owner's expense view, and the overall synchronization of payment statuses from the user's perspective.
 </pending_tasks>
 
 <current_work>
-Immediately before this summary request, the AI engineer was addressing a critical and recurring user complaint regarding the  module. The user reported that even after submitting payments (abonos) for extra services, the UI continued to show the full amount as owed or pending, causing significant frustration.
+Immediately before this summary request, the AI engineer had just completed work related to system maintenance. Specifically, the user requested a fix for the Borrar Todo (Delete All) button in the backend, which was incorrectly deleting user accounts.
 
-The engineer's recent actions involved:
-1.  **Diagnosis:** Through detailed console logging in both the frontend () and backend ('s  endpoint), it was confirmed that abonos were successfully being sent to the backend () and the backend was correctly updating the expense status to paid.
-2.  **Root Cause Identification (Frontend):** The problem was determined to be a frontend data refresh issue. Although  was called after an abono, the expense detail modal was not fully reloading or refreshing its displayed data, thus showing a stale remaining amount.
-3.  **Attempted Solution (Frontend):** The engineer added specific logs for Recargando lista de expenses... and Lista recargada in  and explicitly forced the closure of the details modal () to ensure a fresh render on subsequent re-opening.
-4.  **Partial Success and New Diagnosis:** This successfully resolved the issue of abonos visually registering and the list updating. However, the user then pointed out a *new* UI inconsistency: while the abono registered, the owed amount still seemed incorrect in the *owner's* expense view, showing an amount (e.g., 8000) as due when it had been paid.
-5.  **Current Focus:** The engineer identified that the user was likely looking at the *owner's overall expense* which *includes* extra services, but the abonos for *extra services* are applied to *supplier-specific expenses*. The UI was incorrectly calculating or displaying the RESTANTE a pagar for extra services in the owner's context. The current work immediately before this summary is to locate where this remaining to pay calculation is made for extra services in  to correct this visual discrepancy.
+The engineer identified the problem in  within the  endpoint (lines 2960-3020 in the provided context). The logic was found to be explicitly deleting users whose .
+
+The AI engineer's action was to modify  to prevent any user deletion by this function. This involved editing the line responsible for deleting users, ensuring no user accounts are impacted by the Borrar Todo functionality. The edit () was successful, indicating the last explicit user request was addressed. Prior to this, the engineer also updated the Excel import/export logic to reflect the new villa modalities and pricing structures.
 </current_work>
 
 <optional_next_step>
-Locate and correct the logic for calculating and displaying the RESTANTE a pagar for extra services in  within the owner's expense view.
+Validate with the user if all expense module issues, including remaining to pay and abono display, are now completely resolved.
 </optional_next_step>
