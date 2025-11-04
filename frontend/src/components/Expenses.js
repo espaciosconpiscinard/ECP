@@ -2397,7 +2397,7 @@ const Expenses = () => {
                                         const abonosData = await abonosResponse.json();
                                         setSupplierAbonos(prev => ({
                                           ...prev,
-                                          [supplierExpense.id]: abonosData.data || []
+                                          [targetSupplierExpense.id]: abonosData.data || []
                                         }));
                                       }
                                       
