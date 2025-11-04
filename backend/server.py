@@ -2590,7 +2590,12 @@ async def add_abono_to_expense(expense_id: str, abono_data: AbonoCreate, current
                     deposit_returned = deposit_expense is not None
                 
                 # Actualizar estado del propietario
-                owner_new_status = "paid" if (owner_paid and all_suppliers_paid and deposit_returned) else "pending"
+                if owner_paid and all_suppliers_paid and deposit_returned:
+                    owner_new_status = "paid"
+                elif owner_total_paid > 0:
+                    owner_new_status = "partial"
+                else:
+                    owner_new_status = "pending"
                 print(f"📌 [ADD_ABONO] Estado propietario: Owner={owner_paid}, Supp={all_suppliers_paid}, Dep={deposit_returned} → {owner_new_status}")
                 
                 await db.expenses.update_one(
