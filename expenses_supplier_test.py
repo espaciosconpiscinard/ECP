@@ -632,12 +632,25 @@ class ExpensesSupplierTester:
         """Test 4: Factura Solo Servicios (sin villa)"""
         print("\n🛎️ TEST 4: Crear factura Solo Servicios sin villa")
         
+        # Find services for Solo Servicios test
+        decoracion_service = next((s for s in self.extra_services if s["name"].lower() == "decoración"), None)
+        fotografia_service = next((s for s in self.extra_services if s["name"].lower() == "fotografía"), None)
+        
+        if not decoracion_service:
+            decoracion_service = self.extra_services[0] if self.extra_services else None
+        if not fotografia_service:
+            fotografia_service = self.extra_services[-1] if len(self.extra_services) > 1 else self.extra_services[0] if self.extra_services else None
+        
+        if not decoracion_service or not fotografia_service:
+            self.log_test("Find Services for Solo Servicios", False, "Not enough extra services available")
+            return None
+        
         # Datos de factura Solo Servicios (sin villa_id)
         solo_servicios_data = {
             "customer_id": self.test_customer["id"],
             "customer_name": self.test_customer["name"],
             # NO villa_id - esto es clave para Solo Servicios
-            "rental_type": "servicio",
+            "rental_type": "pasadia",  # Use valid rental_type
             "reservation_date": "2025-01-26T00:00:00Z",
             "guests": 0,
             "base_price": 0.0,
@@ -650,6 +663,7 @@ class ExpensesSupplierTester:
             "notes": "Factura Solo Servicios para testing",
             "extra_services": [
                 {
+                    "service_id": decoracion_service["id"],
                     "service_name": "Decoración",
                     "supplier_name": "Decoraciones Elite",
                     "quantity": 1,
@@ -658,6 +672,7 @@ class ExpensesSupplierTester:
                     "total": 4000.0
                 },
                 {
+                    "service_id": fotografia_service["id"],
                     "service_name": "Fotografía",
                     "supplier_name": "Foto Studio",
                     "quantity": 1,
