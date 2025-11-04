@@ -2393,6 +2393,15 @@ async def get_expense(expense_id: str, current_user: dict = Depends(get_current_
     expense = await db.expenses.find_one({"id": expense_id}, {"_id": 0})
     if not expense:
         raise HTTPException(status_code=404, detail="Expense not found")
+    
+    # Calculate balance_due based on abonos
+    abonos = await db.expense_abonos.find({"expense_id": expense_id}, {"_id": 0}).to_list(1000)
+    total_paid = sum(a.get("amount", 0) for a in abonos)
+    
+    # Calculate balance_due: original amount - total paid
+    expense["total_paid"] = total_paid
+    expense["balance_due"] = expense.get("amount", 0) - total_paid
+    
     return restore_datetimes(expense, ["expense_date", "created_at"])
 
 @api_router.put("/expenses/{expense_id}", response_model=Expense)
