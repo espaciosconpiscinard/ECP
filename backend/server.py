@@ -2693,7 +2693,12 @@ async def delete_expense_abono(expense_id: str, abono_id: str, current_user: dic
             print(f"🛎️ [DELETE_ABONO] Es pago suplidor, actualizando estado del suplidor y del propietario...")
             
             # Actualizar estado del suplidor
-            new_status = "paid" if total_paid >= expense.get("amount", 0) else "pending"
+            if total_paid >= expense.get("amount", 0):
+                new_status = "paid"
+            elif total_paid > 0:
+                new_status = "partial"
+            else:
+                new_status = "pending"
             await db.expenses.update_one(
                 {"id": expense_id},
                 {"$set": {"payment_status": new_status}}
