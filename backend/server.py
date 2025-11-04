@@ -2528,6 +2528,57 @@ async def add_abono_to_expense(expense_id: str, abono_data: AbonoCreate, current
         # For supplier payments and other expenses, simple check
         new_status = "paid" if total_paid >= expense.get("amount", 0) else "pending"
         print(f"✅ [ADD_ABONO] Nuevo estado suplidor: {new_status}")
+        
+        # Si es un pago de suplidor, también recalcular estado del propietario
+        if expense.get("category") == "pago_suplidor" and expense.get("related_reservation_id"):
+            print(f"🔄 [ADD_ABONO] Recalculando estado del propietario después de pagar suplidor...")
+            
+            owner_expense = await db.expenses.find_one({
+                "related_reservation_id": expense.get("related_reservation_id"),
+                "category": "pago_propietario"
+            }, {"_id": 0})
+            
+            if owner_expense:
+                # Verificar si propietario está pagado
+                owner_abonos = await db.expense_abonos.find({"expense_id": owner_expense["id"]}, {"_id": 0}).to_list(1000)
+                owner_total_paid = sum(a.get("amount", 0) for a in owner_abonos)
+                owner_paid = owner_total_paid >= owner_expense.get("amount", 0)
+                
+                # Verificar si TODOS los suplidores están pagados
+                supplier_expenses = await db.expenses.find({
+                    "related_reservation_id": expense.get("related_reservation_id"),
+                    "category": "pago_suplidor"
+                }, {"_id": 0}).to_list(1000)
+                
+                all_suppliers_paid = True
+                for supp_exp in supplier_expenses:
+                    supp_abonos = await db.expense_abonos.find({"expense_id": supp_exp["id"]}, {"_id": 0}).to_list(1000)
+                    supp_total_paid = sum(a.get("amount", 0) for a in supp_abonos)
+                    if supp_total_paid < supp_exp.get("amount", 0):
+                        all_suppliers_paid = False
+                        print(f"❌ [ADD_ABONO] Suplidor {supp_exp.get('description')} AÚN PENDIENTE")
+                        break
+                
+                # Verificar depósito
+                deposit_returned = True
+                reservation = await db.reservations.find_one({"id": expense.get("related_reservation_id")}, {"_id": 0})
+                if reservation and reservation.get("deposit", 0) > 0:
+                    deposit_expense = await db.expenses.find_one({
+                        "related_reservation_id": expense.get("related_reservation_id"),
+                        "category": "devolucion_deposito",
+                        "payment_status": "paid"
+                    }, {"_id": 0})
+                    deposit_returned = deposit_expense is not None
+                
+                # Actualizar estado del propietario
+                owner_new_status = "paid" if (owner_paid and all_suppliers_paid and deposit_returned) else "pending"
+                print(f"📌 [ADD_ABONO] Estado propietario: Owner={owner_paid}, Supp={all_suppliers_paid}, Dep={deposit_returned} → {owner_new_status}")
+                
+                await db.expenses.update_one(
+                    {"id": owner_expense["id"]},
+                    {"$set": {"payment_status": owner_new_status}}
+                )
+                print(f"✅ [ADD_ABONO] Estado propietario actualizado a: {owner_new_status}")
     
     print(f"💾 [ADD_ABONO] Actualizando estado en BD...")
     await db.expenses.update_one(
