@@ -2674,7 +2674,12 @@ async def delete_expense_abono(expense_id: str, abono_id: str, current_user: dic
             
             # ONLY mark owner payment as 'paid' if ALL conditions met
             owner_paid = total_paid >= expense.get("amount", 0)
-            new_status = "paid" if (owner_paid and all_suppliers_paid and deposit_returned) else "pending"
+            if owner_paid and all_suppliers_paid and deposit_returned:
+                new_status = "paid"
+            elif total_paid > 0:
+                new_status = "partial"
+            else:
+                new_status = "pending"
             print(f"📌 [DELETE_ABONO] Propietario pagado: {owner_paid}, Suplidores: {all_suppliers_paid}, Depósito: {deposit_returned}")
             print(f"✅ [DELETE_ABONO] Nuevo estado propietario: {new_status}")
             
