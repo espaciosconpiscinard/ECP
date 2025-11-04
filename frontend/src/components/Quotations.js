@@ -719,6 +719,36 @@ const Quotations = () => {
             </div>
           )}
           
+          {/* Controles de selección múltiple */}
+          {quotations.length > 0 && (
+            <div className="flex items-center justify-between mb-4 p-3 bg-gray-50 rounded-lg">
+              <div className="flex items-center gap-3">
+                <input
+                  type="checkbox"
+                  checked={selectedQuotations.length === quotations.length && quotations.length > 0}
+                  onChange={handleSelectAll}
+                  className="h-4 w-4"
+                />
+                <span className="text-sm text-gray-700">
+                  {selectedQuotations.length > 0 
+                    ? `${selectedQuotations.length} seleccionada(s)` 
+                    : 'Seleccionar todas'}
+                </span>
+              </div>
+              {selectedQuotations.length > 0 && (
+                <Button 
+                  size="sm" 
+                  variant="destructive" 
+                  onClick={handleDeleteSelected}
+                  className="bg-red-600 hover:bg-red-700"
+                >
+                  <Trash2 className="h-4 w-4 mr-2" />
+                  Eliminar ({selectedQuotations.length})
+                </Button>
+              )}
+            </div>
+          )}
+          
           <div className="space-y-3 max-h-[600px] overflow-y-auto pr-2">
             {quotations.length === 0 ? (
               <p className="text-center text-gray-500 py-8">No hay cotizaciones registradas</p>
@@ -726,24 +756,33 @@ const Quotations = () => {
               quotations.map(quotation => (
                   <div key={quotation.id} className="border rounded-lg p-4 hover:bg-gray-50">
                     <div className="flex justify-between items-start">
-                      <div className="flex-1">
-                        <div className="flex items-center gap-3 mb-2">
-                          <h3 className="font-semibold text-lg">{quotation.quotation_number}</h3>
-                          {getStatusBadge(quotation.status)}
-                        </div>
-                        <p className="text-sm text-gray-600">Cliente: {quotation.customer_name}</p>
-                        {quotation.villa_code && (
-                          <p className="text-sm text-gray-600">Villa: {quotation.villa_code}</p>
-                        )}
-                        <p className="text-sm font-semibold text-blue-600 mt-2">
-                          Total: {quotation.currency} ${quotation.total_amount.toFixed(2)}
-                        </p>
-                        {quotation.status === 'converted' && quotation.converted_to_invoice_id && (
-                          <p className="text-xs text-green-600 mt-1 flex items-center">
-                            <CheckCircle className="h-3 w-3 mr-1" />
-                            Sincronizada con factura - Los cambios se actualizarán automáticamente
+                      <div className="flex items-center gap-3 flex-1">
+                        <input
+                          type="checkbox"
+                          checked={selectedQuotations.includes(quotation.id)}
+                          onChange={() => handleSelectQuotation(quotation.id)}
+                          className="h-4 w-4 mt-1"
+                          onClick={(e) => e.stopPropagation()}
+                        />
+                        <div className="flex-1">
+                          <div className="flex items-center gap-3 mb-2">
+                            <h3 className="font-semibold text-lg">{quotation.quotation_number}</h3>
+                            {getStatusBadge(quotation.status)}
+                          </div>
+                          <p className="text-sm text-gray-600">Cliente: {quotation.customer_name}</p>
+                          {quotation.villa_code && (
+                            <p className="text-sm text-gray-600">Villa: {quotation.villa_code}</p>
+                          )}
+                          <p className="text-sm font-semibold text-blue-600 mt-2">
+                            Total: {quotation.currency} ${quotation.total_amount.toFixed(2)}
                           </p>
-                        )}
+                          {quotation.status === 'converted' && quotation.converted_to_invoice_id && (
+                            <p className="text-xs text-green-600 mt-1 flex items-center">
+                              <CheckCircle className="h-3 w-3 mr-1" />
+                              Sincronizada con factura - Los cambios se actualizarán automáticamente
+                            </p>
+                          )}
+                        </div>
                       </div>
                       <div className="flex gap-2">
                         <Button size="sm" variant="outline" onClick={() => handlePrint(quotation)}>
