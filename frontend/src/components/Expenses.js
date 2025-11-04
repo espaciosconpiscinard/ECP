@@ -2316,15 +2316,44 @@ const Expenses = () => {
                                     return;
                                   }
                                   
-                                  // Usar el supplierExpense que ya fue encontrado en el scope del map
-                                  if (!supplierExpense) {
-                                    console.error('❌ [SERVICIO EXTRA] No se encontró el gasto del suplidor');
-                                    alert('No se encontró el gasto del suplidor');
-                                    return;
-                                  }
-                                  
                                   try {
-                                    console.log('💰 [SERVICIO EXTRA] Supplier expense ID:', supplierExpense.id);
+                                    // Buscar el gasto del suplidor dinámicamente
+                                    let targetSupplierExpense = supplierExpense;
+                                    
+                                    if (!targetSupplierExpense) {
+                                      console.log('🔍 [SERVICIO EXTRA] supplierExpense es null, buscando en base de datos...');
+                                      
+                                      // Buscar todos los gastos
+                                      const allExpensesResponse = await fetch(
+                                        `${process.env.REACT_APP_BACKEND_URL}/api/expenses`,
+                                        {
+                                          headers: {
+                                            'Authorization': `Bearer ${localStorage.getItem('token')}`
+                                          }
+                                        }
+                                      );
+                                      
+                                      if (allExpensesResponse.ok) {
+                                        const allExpenses = await allExpensesResponse.json();
+                                        
+                                        // Buscar por supplier_name en la descripción
+                                        targetSupplierExpense = allExpenses.find(e => 
+                                          e.category === 'pago_suplidor' && 
+                                          e.related_reservation_id === relatedReservation.id &&
+                                          e.description.includes(service.supplier_name)
+                                        );
+                                        
+                                        console.log('🔍 [SERVICIO EXTRA] Gasto encontrado en BD:', targetSupplierExpense);
+                                      }
+                                    }
+                                    
+                                    if (!targetSupplierExpense) {
+                                      console.error('❌ [SERVICIO EXTRA] No se encontró el gasto del suplidor');
+                                      alert('No se encontró el gasto del suplidor. Por favor recarga la página.');
+                                      return;
+                                    }
+                                    
+                                    console.log('💰 [SERVICIO EXTRA] Supplier expense ID:', targetSupplierExpense.id);
                                     
                                     const abonoData = {
                                       amount: parseFloat(monto),
@@ -2337,7 +2366,7 @@ const Expenses = () => {
                                     console.log('💰 [SERVICIO EXTRA] Enviando abono:', abonoData);
                                     
                                     const response = await fetch(
-                                      `${process.env.REACT_APP_BACKEND_URL}/api/expenses/${supplierExpense.id}/abonos`,
+                                      `${process.env.REACT_APP_BACKEND_URL}/api/expenses/${targetSupplierExpense.id}/abonos`,
                                       {
                                         method: 'POST',
                                         headers: {
@@ -2357,7 +2386,7 @@ const Expenses = () => {
                                       
                                       // Recargar abonos del supplierExpense
                                       const abonosResponse = await fetch(
-                                        `${process.env.REACT_APP_BACKEND_URL}/api/expenses/${supplierExpense.id}/abonos`,
+                                        `${process.env.REACT_APP_BACKEND_URL}/api/expenses/${targetSupplierExpense.id}/abonos`,
                                         {
                                           headers: {
                                             'Authorization': `Bearer ${localStorage.getItem('token')}`
