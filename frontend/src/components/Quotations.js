@@ -12,6 +12,7 @@ const Quotations = () => {
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [editingQuotation, setEditingQuotation] = useState(null);
   const [error, setError] = useState('');
+  const [selectedQuotations, setSelectedQuotations] = useState([]); // Para selección múltiple
   
   useEffect(() => {
     fetchQuotations();
