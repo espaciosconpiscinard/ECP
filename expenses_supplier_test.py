@@ -126,7 +126,7 @@ class ExpensesSupplierTester:
             self.log_test("Get Pending Users", False, "Failed to get pending users", result)
     
     def setup_test_data(self):
-        """Setup test customer and villa"""
+        """Setup test customer, villa, and extra services"""
         print("📋 Setting up test data...")
         
         # Create test customer
@@ -161,7 +161,100 @@ class ExpensesSupplierTester:
                 self.log_test("Get Test Villa", False, "No villas available for testing")
                 return False
         
+        # Setup extra services for testing
+        self.setup_extra_services()
+        
         return True
+    
+    def setup_extra_services(self):
+        """Create extra services for testing"""
+        # Get existing extra services
+        services_result = self.make_request("GET", "/extra-services", token=self.admin_token)
+        
+        if services_result.get("success"):
+            existing_services = services_result["data"]
+            self.log_test("Get Existing Extra Services", True, f"Found {len(existing_services)} existing services")
+            
+            # Store existing services for use in tests
+            self.extra_services = existing_services
+            
+            # Create additional services if needed
+            services_to_create = [
+                {
+                    "name": "Comida",
+                    "description": "Servicio de catering",
+                    "default_price": 800.0,
+                    "suppliers": [
+                        {
+                            "name": "Restaurant ABC",
+                            "description": "Catering premium",
+                            "client_price": 800.0,
+                            "supplier_cost": 500.0,
+                            "is_default": True
+                        }
+                    ]
+                },
+                {
+                    "name": "Música",
+                    "description": "Servicio de DJ",
+                    "default_price": 4000.0,
+                    "suppliers": [
+                        {
+                            "name": "DJ Pro",
+                            "description": "DJ profesional",
+                            "client_price": 4000.0,
+                            "supplier_cost": 3000.0,
+                            "is_default": True
+                        }
+                    ]
+                },
+                {
+                    "name": "Decoración",
+                    "description": "Servicio de decoración",
+                    "default_price": 4000.0,
+                    "suppliers": [
+                        {
+                            "name": "Decoraciones Elite",
+                            "description": "Decoración premium",
+                            "client_price": 4000.0,
+                            "supplier_cost": 2500.0,
+                            "is_default": True
+                        }
+                    ]
+                },
+                {
+                    "name": "Fotografía",
+                    "description": "Servicio de fotografía",
+                    "default_price": 3500.0,
+                    "suppliers": [
+                        {
+                            "name": "Foto Studio",
+                            "description": "Fotografía profesional",
+                            "client_price": 3500.0,
+                            "supplier_cost": 2000.0,
+                            "is_default": True
+                        }
+                    ]
+                }
+            ]
+            
+            for service_data in services_to_create:
+                # Check if service already exists
+                existing = next((s for s in existing_services if s["name"].lower() == service_data["name"].lower()), None)
+                
+                if not existing:
+                    result = self.make_request("POST", "/extra-services", service_data, self.admin_token)
+                    if result.get("success"):
+                        created_service = result["data"]
+                        self.extra_services.append(created_service)
+                        self.log_test(f"Create Extra Service '{service_data['name']}'", True, 
+                                     f"Created service: {created_service['id']}")
+                    else:
+                        self.log_test(f"Create Extra Service '{service_data['name']}'", False, 
+                                     "Failed to create service", result)
+        else:
+            self.log_test("Get Existing Extra Services", False, "Failed to get extra services", services_result)
+            self.extra_services = []
     
     def test_1_reservation_with_extra_services(self):
         """Test 1: Crear reservación con 2 servicios extras diferentes"""
