@@ -8,6 +8,61 @@ from typing import Dict, List, Tuple
 import uuid
 from datetime import datetime, timezone
 
+def parse_prices_from_excel(price_string: str) -> List[Dict]:
+    """
+    Parsea string de precios del Excel al formato del modelo
+    Formato esperado: "regular:12000|cliente:15000|oferta:10000|temporada_alta:18000|cliente_alta:22000"
+    
+    Returns: [
+        {"type": "regular", "owner_price": 12000, "client_price": 15000},
+        {"type": "oferta", "owner_price": 10000, "client_price": 15000},
+        {"type": "temporada_alta", "owner_price": 18000, "client_price": 22000}
+    ]
+    """
+    if not price_string or pd.isna(price_string) or str(price_string).strip() == '':
+        return []
+    
+    try:
+        price_string = str(price_string).strip()
+        prices = []
+        
+        # Parsear cada par key:value separado por |
+        pairs = price_string.split('|')
+        price_dict = {}
+        
+        for pair in pairs:
+            if ':' in pair:
+                key, value = pair.split(':', 1)
+                price_dict[key.strip()] = float(value.strip())
+        
+        # Crear objetos de precio según el tipo
+        if 'regular' in price_dict:
+            prices.append({
+                "type": "regular",
+                "owner_price": price_dict.get('regular', 0),
+                "client_price": price_dict.get('cliente', price_dict.get('regular', 0))
+            })
+        
+        if 'oferta' in price_dict:
+            prices.append({
+                "type": "oferta",
+                "owner_price": price_dict.get('oferta', 0),
+                "client_price": price_dict.get('cliente', price_dict.get('oferta', 0))
+            })
+        
+        if 'temporada_alta' in price_dict:
+            prices.append({
+                "type": "temporada_alta",
+                "owner_price": price_dict.get('temporada_alta', 0),
+                "client_price": price_dict.get('cliente_alta', price_dict.get('temporada_alta', 0))
+            })
+        
+        return prices
+        
+    except Exception as e:
+        print(f"Error parseando precios: {price_string} - {e}")
+        return []
+
 async def import_customers(file_content: bytes, db) -> Dict:
     """Importa clientes desde Excel"""
     try:
