@@ -2395,10 +2395,18 @@ const Expenses = () => {
                                       );
                                       if (abonosResponse.ok) {
                                         const abonosData = await abonosResponse.json();
-                                        setSupplierAbonos(prev => ({
-                                          ...prev,
-                                          [targetSupplierExpense.id]: abonosData.data || []
-                                        }));
+                                        console.log('📥 [SERVICIO EXTRA] Abonos recibidos del backend:', abonosData);
+                                        console.log('📥 [SERVICIO EXTRA] Cantidad de abonos:', abonosData.data?.length || 0);
+                                        setSupplierAbonos(prev => {
+                                          const updated = {
+                                            ...prev,
+                                            [targetSupplierExpense.id]: abonosData.data || []
+                                          };
+                                          console.log('📥 [SERVICIO EXTRA] supplierAbonos actualizado:', updated);
+                                          return updated;
+                                        });
+                                      } else {
+                                        console.error('❌ [SERVICIO EXTRA] Error al cargar abonos:', abonosResponse.status);
                                       }
                                       
                                       // Recargar supplierExpenses para actualizar balance_due
